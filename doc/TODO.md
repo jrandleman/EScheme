@@ -7,8 +7,6 @@
 - look up PATH variable then write escm to that? Have "installer" install the code in the path and rename Main to Escm so running "java Escm" launches it ???
      => TEST THIS ON MAC AND RPI4
 
-- PUT ESCM ON PRIVATE REPO ON GITHUB !
-
 
 
 

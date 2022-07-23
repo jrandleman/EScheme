@@ -267,7 +267,7 @@ public class Installer {
   ////////////////////////////////////////////////////////////////////////////
   // Compile EScheme
   private static void compileEScheme(String escmDir) {
-    String compileCmd = "javac -source 11 -target 11 -classpath "+escmDir+File.separator+"src "+escmDir+File.separator+"src"+File.separator+"Main.java";
+    String compileCmd = "javac -source 11 -target 11 -d "+escmDir+File.separator+"bin -classpath "+escmDir+File.separator+"src "+escmDir+File.separator+"src"+File.separator+"Main.java";
     try {
       ExecuteCommandResult res = executeCommand(compileCmd);
       if(res.exit != 0 || res.err.length() > 0) {
@@ -290,7 +290,7 @@ public class Installer {
   // Generate the Shell Alias to Invoke EScheme
   private static void printEscmShellAliasString(String escmDir) {
     System.out.println("> Alias for the REPL to put in `~/.bashrc` OR `~/.zshrc`:");
-    System.out.println("  alias escm='java -classpath "+escmDir+File.separator+"src Main'");
+    System.out.println("  alias escm='java -classpath "+escmDir+File.separator+"bin Main'");
   }
 
 
