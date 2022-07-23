@@ -2,7 +2,7 @@
 
 ## Installing and Running EScheme:
 * Installation: Compile and run `Installer.java` within `EScheme/installer`
-* Execution: Run `java EScheme/bin/Main`
+* Execution: Run `java Main` within `EScheme/bin`
 
 ## On Reserved Symbols:
 * Anything with the `escm-` prefix is considered reserved for use by the runtime.
