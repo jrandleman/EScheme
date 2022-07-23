@@ -3,6 +3,15 @@
 # Primitive Procedures
 ### Functions implemented in Java accessible by EScheme source code!
 
+
+------------------------
+## Language Help:
+```scheme
+(help <optional-query-symbol-or-obj>)
+```
+
+
+------------------------
 ## Variables:
 ```scheme
 *argv*
