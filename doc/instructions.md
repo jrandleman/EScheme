@@ -151,7 +151,7 @@ Note that `define-syntax` is NOT among their number.
 ------------------------------------------------------------------------------
 # Examples
 
-```
+```scheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Demoing the compilation of closures
 
