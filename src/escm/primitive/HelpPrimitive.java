@@ -215,7 +215,7 @@ public class HelpPrimitive {
         }
       }
       // Print the menu
-      if(totalOptions > 0) System.out.print('\n');
+      if(totalOptions > 0) System.out.print("\n  ");
       for(int i = 0; i < totalOptions; ++i) {
         String option = options.get(i);
         StringBuilder sb = new StringBuilder();
@@ -225,7 +225,11 @@ public class HelpPrimitive {
           sb.append(' ');
         }
         System.out.print(sb.toString());
-        if((i+1)%5 == 0 || i+1 == totalOptions) System.out.print('\n');
+        if((i+1)%5 == 0) {
+          System.out.print("\n  ");
+        } else if(i+1 == totalOptions) {
+          System.out.print('\n');
+        }
       }
       // Prompt for an entry
       prompt(true);
@@ -281,7 +285,7 @@ public class HelpPrimitive {
       }
       // Print classification
       if(queryTypes.size() > 0) {
-        sb.append("Type Class: ");
+        sb.append("Classification: ");
         for(int i = 0, n = queryTypes.size(); i < n; ++i) {
           sb.append(queryTypes.get(i));
           if(i+1 < n) sb.append(" > ");
