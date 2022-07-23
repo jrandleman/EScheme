@@ -1,0 +1,61 @@
+[{
+  "name": "number->string",
+  "aliases": ["number->str"],
+  "signatures": ["(number->string <num>)"],
+  "description": "Convert a number to a string.",
+  "example": null
+}, {
+  "name": "string->number",
+  "aliases": ["str->number"],
+  "signatures": ["(string->number <str>)"],
+  "description": "Convert a string to a number.",
+  "example": null
+}, {
+  "name": "keyword->symbol",
+  "aliases": ["keyword->sym"],
+  "signatures": ["(keyword->symbol <keyword>)"],
+  "description": "Convert a keyword to a symbol.",
+  "example": null
+}, {
+  "name": "symbol->keyword",
+  "aliases": ["sym->keyword"],
+  "signatures": ["(symbol->keyword <sym>)"],
+  "description": "Convert a symbol to a keyword.",
+  "example": null
+}, {
+  "name": "string->symbol",
+  "aliases": ["str->symbol","string->sym","str->sym"],
+  "signatures": ["(string->symbol <str>)"],
+  "description": "Convert a string to a symbol.",
+  "example": null
+}, {
+  "name": "symbol->string",
+  "aliases": ["sym->string","symbol->str","sym->str"],
+  "signatures": ["(symbol->string <sym>)"],
+  "description": "Convert a symbol to a string.",
+  "example": null
+}, {
+  "name": "string->keyword",
+  "aliases": ["str->keyword"],
+  "signatures": ["(string->keyword <str>)"],
+  "description": "Convert a string to a keyword.",
+  "example": null
+}, {
+  "name": "keyword->string",
+  "aliases": ["keyword->str"],
+  "signatures": ["(keyword->string <keyword>)"],
+  "description": "Convert a keyword to a string.",
+  "example": null
+}, {
+  "name": "write-to-string",
+  "aliases": ["write-to-str"],
+  "signatures": ["(write-to-string <obj>)"],
+  "description": "Serialize <obj> in machine-readable form.",
+  "example": null
+}, {
+  "name": "display-to-string",
+  "aliases": ["display-to-str"],
+  "signatures": ["(display-to-string <obj>)"],
+  "description": "Serialize <obj> in human-readable form.",
+  "example": null
+}]

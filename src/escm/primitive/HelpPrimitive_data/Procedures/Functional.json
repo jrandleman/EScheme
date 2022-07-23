@@ -1,0 +1,31 @@
+[{
+  "name": "compose",
+  "aliases": null,
+  "signatures": ["(compose <callable> ...)"],
+  "description": "Create a new, variadic procedure that is the composition of \"<callable> ...\".",
+  "example": null
+}, {
+  "name": "bind",
+  "aliases": null,
+  "signatures": ["(bind <callable> <obj> ...)"],
+  "description": "Create a new procedure by binding \"<obj> ...\" as arguments to <callable>.",
+  "example": null
+}, {
+  "name": "id",
+  "aliases": null,
+  "signatures": ["(id <obj>)"],
+  "description": "Returns <obj>. Useful for certain higher-level procedures.",
+  "example": null
+}, {
+  "name": "procedure?",
+  "aliases": null,
+  "signatures": ["(procedure? <obj>)"],
+  "description": "Returns whether <obj> is a procedure.\nPrefer <callable?> for more generic code.",
+  "example": null
+}, {
+  "name": "callable?",
+  "aliases": null,
+  "signatures": ["(callable? <obj>)"],
+  "description": "Returns whether <obj> is applicable. Equivalent to:\n  (or (procedure? <obj>) (functor? <obj>) (class? <obj>))",
+  "example": null
+}]

@@ -1,0 +1,67 @@
+[{
+  "name": "meta-object",
+  "aliases": ["metaobject", "meta-obj", "metaobj", "object"],
+  "signatures": null,
+  "description": "Super type of objects, classes, and interfaces.\nRefers to any entity that supports dot-notation to access a property.",
+  "example": null
+}, {
+  "name": "number",
+  "aliases": ["num"],
+  "signatures": null,
+  "description": "Represents a Java <double> under the hood, and parsed using the same syntax.",
+  "example": null
+}, {
+  "name": "string",
+  "aliases": ["str"],
+  "signatures": null,
+  "description": "Represents a Java <string> under the hood (hence immutable).\nDenoted via double-quotes.",
+  "example": null
+}, {
+  "name": "void",
+  "aliases": null,
+  "signatures": null,
+  "description": "The \"nothing\" type, typically returned by non-pure actions that end in '!'.\nDenoted via #void",
+  "example": null
+}, {
+  "name": "nil",
+  "aliases": ["null"],
+  "signatures": null,
+  "description": "The \"null\" type terminating lists. Denoted via (quote ()) and #nil",
+  "example": null
+}, {
+  "name": "boolean",
+  "aliases": ["bool"],
+  "signatures": null,
+  "description": "The boolean type. #t is true and #f is false. Any non-false value is truthy.\nTypically returned by predicate actions that end in '?'.",
+  "example": null
+}, {
+  "name": "keyword",
+  "aliases": null,
+  "signatures": null,
+  "description": "Similar to symbols, but they always evaluate to themselves.\nDenoted as a symbol prefixed with ':'.",
+  "example": null
+}, {
+  "name": "symbol",
+  "aliases": ["sym"],
+  "signatures": null,
+  "description": "Extensively used by metaprograms, symbols are variables that\nevaluate to another value.",
+  "example": null
+}, {
+  "name": "pair",
+  "aliases": null,
+  "signatures": null,
+  "description": "A pair of objects. <car> and <cdr> respectively get the 1st and 2nd items.\nNest them and end with #nil as the last <cdr> to create a list.",
+  "example": "; The following are equivalent:\n\n(list 1 2 3)\n(cons 1 (cons 2 (cons 3 #nil)))"
+}, {
+  "name": "stream",
+  "aliases": null,
+  "signatures": null,
+  "description": "A lazy alternative to lists, where each item is only evaluated once accessed.\nUse <scar> and <scdr> respectively to access to the 1st and 2nd items.",
+  "example": "(define (sieve ints)\n  (def current-int (scar ints))\n  (scons \n    current-int\n    (stream-filter \n      (lambda (n) (positive? (remainder n current-int)))\n      (sieve (scdr ints)))))\n\n(define (ints-from n)\n  (scons n (ints-from (+ n 1))))\n\n(define primes (sieve (ints-from 2))) ; infinite stream of prime numbers!\n\n(display (stream->list primes 13))\n(newline)"
+}, {
+  "name": "stream-pair",
+  "aliases": null,
+  "signatures": null,
+  "description": "A lazy alternative to pairs. Each item is only evaluated once accessed.\nNest them with #nil as the last <scdr> to create a stream.",
+  "example": "(define (sieve ints)\n  (def current-int (scar ints))\n  (scons \n    current-int\n    (stream-filter \n      (lambda (n) (positive? (remainder n current-int)))\n      (sieve (scdr ints)))))\n\n(define (ints-from n)\n  (scons n (ints-from (+ n 1))))\n\n(define primes (sieve (ints-from 2))) ; infinite stream of prime numbers!\n\n(display (stream->list primes 13))\n(newline)"
+}]

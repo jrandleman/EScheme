@@ -1,0 +1,271 @@
+[{
+  "name": "=",
+  "aliases": null,
+  "signatures": ["(= <num> <num> ...)"],
+  "description": "Returns whether \"<num> <num> ...\" are equal to one another.",
+  "example": null
+}, {
+  "name": "<",
+  "aliases": null,
+  "signatures": ["(< <num> <num> ...)"],
+  "description": "Returns whether \"<num> <num> ...\" are < one another.",
+  "example": null
+}, {
+  "name": ">",
+  "aliases": null,
+  "signatures": ["(> <num> <num> ...)"],
+  "description": "Returns whether \"<num> <num> ...\" are > one another.",
+  "example": null
+}, {
+  "name": "<=",
+  "aliases": null,
+  "signatures": ["(<= <num> <num> ...)"],
+  "description": "Returns whether \"<num> <num> ...\" are <= one another.",
+  "example": null
+}, {
+  "name": ">=",
+  "aliases": null,
+  "signatures": ["(>= <num> <num> ...)"],
+  "description": "Returns whether \"<num> <num> ...\" are >= one another.",
+  "example": null
+}, {
+  "name": "+",
+  "aliases": null,
+  "signatures": ["(+ <num> <num> ...)"],
+  "description": "Returns the sum of \"<num> <num> ...\".",
+  "example": null
+}, {
+  "name": "-",
+  "aliases": null,
+  "signatures": ["(- <num> <num> ...)", "(- <num>)"],
+  "description": "Returns the difference of \"<num> <num> ...\".\nIf given one <num>, returns its negative value.",
+  "example": null
+}, {
+  "name": "/",
+  "aliases": null,
+  "signatures": ["(/ <num> <num> ...)", "(/ <num>)"],
+  "description": "Returns the division of \"<num> <num> ...\".\nIf given one <num>, returns its inverse value.",
+  "example": null
+}, {
+  "name": "*",
+  "aliases": null,
+  "signatures": ["(* <num> <num> ...)"],
+  "description": "Returns the product of \"<num> <num> ...\".",
+  "example": null
+}, {
+  "name": "expt",
+  "aliases": null,
+  "signatures": ["(expt <num> <num> ...)"],
+  "description": "Returns the exponentiation of \"<num> <num> ...\".\nRemember that exponentiation is right-associative!",
+  "example": null
+}, {
+  "name": "exp",
+  "aliases": null,
+  "signatures": ["(exp <num>)"],
+  "description": "Returns Euler's number raised to the power of <num>.",
+  "example": null
+}, {
+  "name": "log",
+  "aliases": null,
+  "signatures": ["(log <num>)"],
+  "description": "Returns the natural log of <num>.",
+  "example": null
+}, {
+  "name": "sqrt",
+  "aliases": null,
+  "signatures": ["(sqrt <num>)"],
+  "description": "Returns the square-root of <num>.",
+  "example": null
+}, {
+  "name": "abs",
+  "aliases": null,
+  "signatures": ["(abs <num>)"],
+  "description": "Returns the absolute value of <num>.",
+  "example": null
+}, {
+  "name": "quotient",
+  "aliases": null,
+  "signatures": ["(quotient <num1> <num2>)"],
+  "description": "Returns the quotient of (/ <num1> <num2>).",
+  "example": null
+}, {
+  "name": "remainder",
+  "aliases": null,
+  "signatures": ["(remainder <num1> <num2>)"],
+  "description": "Returns the remainder of (/ <num1> <num2>).",
+  "example": null
+}, {
+  "name": "round",
+  "aliases": null,
+  "signatures": ["(round <num>)"],
+  "description": "Returns the rounded value of <num>.",
+  "example": null
+}, {
+  "name": "floor",
+  "aliases": null,
+  "signatures": ["(floor <num>)"],
+  "description": "Returns the floored value of <num>.",
+  "example": null
+}, {
+  "name": "ceiling",
+  "aliases": null,
+  "signatures": ["(ceiling <num>)"],
+  "description": "Returns the ceiling value of <num>.",
+  "example": null
+}, {
+  "name": "truncate",
+  "aliases": null,
+  "signatures": ["(truncate <num>)"],
+  "description": "Returns the truncated value of <num>.",
+  "example": null
+}, {
+  "name": "min",
+  "aliases": null,
+  "signatures": ["(min <num> ...)"],
+  "description": "Returns the min value of \"<num> ...\".",
+  "example": null
+}, {
+  "name": "max",
+  "aliases": null,
+  "signatures": ["(max <num> ...)"],
+  "description": "Returns the max value of \"<num> ...\".",
+  "example": null
+}, {
+  "name": "number?",
+  "aliases": null,
+  "signatures": ["(number? <obj>)"],
+  "description": "Returns whether <num> is a number.",
+  "example": null
+}, {
+  "name": "integer?",
+  "aliases": null,
+  "signatures": ["(integer? <num>)"],
+  "description": "Returns whether <num> is an integer.",
+  "example": null
+}, {
+  "name": "finite?",
+  "aliases": null,
+  "signatures": ["(finite? <num>)"],
+  "description": "Returns whether <num> is a finite value.",
+  "example": null
+}, {
+  "name": "infinite?",
+  "aliases": null,
+  "signatures": ["(infinite? <num>)"],
+  "description": "Returns whether <num> is <Infinite>.",
+  "example": null
+}, {
+  "name": "nan?",
+  "aliases": null,
+  "signatures": ["(nan? <num>)"],
+  "description": "Returns whether <num> is <NaN>.",
+  "example": null
+}, {
+  "name": "odd?",
+  "aliases": null,
+  "signatures": ["(odd? <num>)"],
+  "description": "Returns whether <num> is odd.",
+  "example": null
+}, {
+  "name": "even?",
+  "aliases": null,
+  "signatures": ["(even? <num>)"],
+  "description": "Returns whether <num> is even.",
+  "example": null
+}, {
+  "name": "positive?",
+  "aliases": null,
+  "signatures": ["(positive? <num>)"],
+  "description": "Returns whether <num> is positive.",
+  "example": null
+}, {
+  "name": "negative?",
+  "aliases": null,
+  "signatures": ["(negative? <num>)"],
+  "description": "Returns whether <num> is negative.",
+  "example": null
+}, {
+  "name": "zero?",
+  "aliases": null,
+  "signatures": ["(zero? <num>)"],
+  "description": "Returns whether <num> is zero.",
+  "example": null
+}, {
+  "name": "sin",
+  "aliases": null,
+  "signatures": ["(sin <num>)"],
+  "description": "Returns the sin of <num>.",
+  "example": null
+}, {
+  "name": "cos",
+  "aliases": null,
+  "signatures": ["(cos <num>)"],
+  "description": "Returns the cos of <num>.",
+  "example": null
+}, {
+  "name": "tan",
+  "aliases": null,
+  "signatures": ["(tan <num>)"],
+  "description": "Returns the tan of <num>.",
+  "example": null
+}, {
+  "name": "asin",
+  "aliases": null,
+  "signatures": ["(asin <num>)"],
+  "description": "Returns the asin of <num>.",
+  "example": null
+}, {
+  "name": "acos",
+  "aliases": null,
+  "signatures": ["(acos <num>)"],
+  "description": "Returns the acos of <num>.",
+  "example": null
+}, {
+  "name": "atan",
+  "aliases": null,
+  "signatures": ["(atan <num>)", "(atan <num1 <num2>)"],
+  "description": "Returns the atan of <num>. If given 2 arguments, returns the atan in\nradians of (/ <num1> <num2>) based on the signs of both values\nto determine the correct quadrant.",
+  "example": null
+}, {
+  "name": "sinh",
+  "aliases": null,
+  "signatures": ["(sinh <num>)"],
+  "description": "Returns the sinh of <num>.",
+  "example": null
+}, {
+  "name": "cosh",
+  "aliases": null,
+  "signatures": ["(cosh <num>)"],
+  "description": "Returns the cosh of <num>.",
+  "example": null
+}, {
+  "name": "tanh",
+  "aliases": null,
+  "signatures": ["(tanh <num>)"],
+  "description": "Returns the tanh of <num>.",
+  "example": null
+}, {
+  "name": "asinh",
+  "aliases": null,
+  "signatures": ["(asinh <num>)"],
+  "description": "Returns the asinh of <num>.",
+  "example": null
+}, {
+  "name": "acosh",
+  "aliases": null,
+  "signatures": ["(acosh <num>)"],
+  "description": "Returns the acosh of <num>.",
+  "example": null
+}, {
+  "name": "atanh",
+  "aliases": null,
+  "signatures": ["(atanh <num>)"],
+  "description": "Returns the atanh of <num>.",
+  "example": null
+}, {
+  "name": "random",
+  "aliases": null,
+  "signatures": ["(random)"],
+  "description": "Returns a random number between 0.0 and 1.0.\nGuarenteed to be unique across threads.",
+  "example": null
+}]

@@ -1,0 +1,13 @@
+[{
+  "name": "symbol-append",
+  "aliases": null,
+  "signatures": ["(symbol-append <sym> ...)"],
+  "description": "Returns a new symbol of \"<sym> ...\" concatenated with one another.",
+  "example": null
+}, {
+  "name": "symbol?",
+  "aliases": null,
+  "signatures": ["(symbol? <obj>)"],
+  "description": "Returns whether <obj> is a symbol.",
+  "example": null
+}]

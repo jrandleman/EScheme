@@ -1,0 +1,55 @@
+[{
+  "name": "*argv*",
+  "aliases": ["argv"],
+  "signatures": null,
+  "description": "A list of the command-line arguments as strings.",
+  "example": null
+}, {
+  "name": "*file-separator*",
+  "aliases": ["file-separator"],
+  "signatures": null,
+  "description": "The file seperator string used by the host operating system.",
+  "example": null
+}, {
+  "name": "*path-separator*",
+  "aliases": ["path-separator"],
+  "signatures": null,
+  "description": "The path seperator (think environment variables) string used\nby the host operating system.",
+  "example": null
+}, {
+  "name": "*os-name*",
+  "aliases": ["os-name"],
+  "signatures": null,
+  "description": "String of the host operating system's name.",
+  "example": null
+}, {
+  "name": "*os-version*",
+  "aliases": ["os-version"],
+  "signatures": null,
+  "description": "String of the host operating system's version.",
+  "example": null
+}, {
+  "name": "*os-arch*",
+  "aliases": ["os-arch"],
+  "signatures": null,
+  "description": "String of the host operating system's architecture.",
+  "example": null
+}, {
+  "name": "*escm-path*",
+  "aliases": ["escm-path", "escheme-path", "*escheme-path*"],
+  "signatures": null,
+  "description": "Path string to the hosting EScheme implementation's location.",
+  "example": null
+}, {
+  "name": "*dosync-lock*",
+  "aliases": null,
+  "signatures": null,
+  "description": "Mutex lock used by <dosync>.",
+  "example": null
+}, {
+  "name": "*generator-complete*",
+  "aliases": null,
+  "signatures": null,
+  "description": "Variable that resolves to the value returned by generators\n(see <define-generator>) upon completion.",
+  "example": null
+}]

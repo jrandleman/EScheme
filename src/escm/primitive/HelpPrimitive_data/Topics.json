@@ -1,0 +1,37 @@
+[{
+  "name": "object-oriented-programming",
+  "aliases": ["oop"],
+  "signatures": null,
+  "description": "EScheme has a totally optional object system. See the <class> 'help' entry\nfor more nitty-gritty usage details, and <meta-object> for type details.\n\nAt a high-level, EScheme supports classes and interfaces. Like Java, there's\nsingle inheritance for classes and multiple inheritance for interfaces.\n\nReflection is done via OO primitives, often prefixed with 'oo-'.\n\nDot-notation for property access is supported even at the bytecode level,\nhence (define obj.property) is a valid instruction!\n\nAgain, check out <class>'s 'help' entry for more usage details :)",
+  "example": null
+}, {
+  "name": "concurrency",
+  "aliases": null,
+  "signatures": null,
+  "description": "EScheme supports parallelism via true Java threads!\n\nIts core literal data structures are immutable (including lists,\nin a departure from standard Scheme), however, objects generated\nfrom classes can be mutated (meaning one could create mutable\nlists via the object system!).\n\nSpawn threads via the <thread> procedure.\nGet a reentrant lock via the <mutex> procedure.\nCheck out <help>'s 'Procedures > Concurrency' section for more!\n\nOn Threading & Continuations:\n* Threads each have their own stack, and hence their own set of continuations.\n* Continuations are delimited by the execution of the thread that created them.\n* Hence a child thread's continuation will never 'continue' back into the parent\n  thread, rather, it will terminate where the child thread terminated.\n\nOn Threading & Dynamic Environments:\n* Each thread has a so-called 'dynamic environment', wherein a set of variable\n  bindings is kept globally within the thread while being hidden from other threads.\n* After querying for a variable that doesn't exist in a thread's dynamic environment,\n  the 'meta thread''s dynamic environment is checked. If an entry is found in the\n  meta thread's dynamic environment, a local copy is cached into the current thread's\n  dynamic environment and the querying operation continues.\n* This allows for us to have 'environment-global-thread-local' variables! State can\n  be shared & operated upon by many procedures without having to lock, since each\n  thread only ever operates on a local copy of the state!\n  => This is used by <dynamic-wind> in order to maintain thread-local winds!",
+  "example": null
+}, {
+  "name": "comments",
+  "aliases": null,
+  "signatures": null,
+  "description": "Single-line comments start with ':'.",
+  "example": null
+}, {
+  "name": "macros",
+  "aliases": null,
+  "signatures": null,
+  "description": "EScheme's macros expand at compile time, and are bound at runtime.\n\nA set of symbolic names and procedures tracked by the compiler, macros\nare defined in the global environment, and hence are shared across threads.\nMacros may be deleted for localization.\n\nCreated by 'define-syntax', being bound to procedures means that macros can\nuse the full power of EScheme at compile time. Furthermore, they may have\nmultiple arities, support optional arguments, and have variadic arguments\njust like any other EScheme procedure!\n\nMacros are so important in fact, their expansion is one of the only 3 jobs\nthat EScheme's Java11 compiler performs:\n\n  1. Identify and expand macros\n  2. Reflect inlined bytecode from 'bytecode'\n  3. Compile function/macro applications\n\nThat's it! Every single other special form besides 'bytecode' is implemented\nas a macro (with the core special forms defined directly in inlined byetcode\ninstructions after being compiled by hand)!",
+  "example": null
+}, {
+  "name": "conventions",
+  "aliases": null,
+  "signatures": null,
+  "description": "EScheme follows in standard Scheme's footsteps in a number of regards,\nhowever, it differs in a few notable ways.\n\nWhile there are a number of Scheme tutorials already on the web, there\nare far fewer folks championing EScheme (for now ...). As such, this entry\nwill primarily focus on EScheme's differences from Scheme's standard:\n\n  0. The 'escm-' symbol prefix is reserved for use by the runtime.\n  1. Support for 'bytecode', 'compile', 'eval-bytecode'\n     - 'bytecode': special form to have the compiler reflect the given bytecode\n     - 'compile': convert a quoted escm expression into a quoted bytecode list\n     - 'eval-bytecode': evaluate the given quoted bytecode list in the global environment\n       * Hence 'eval' is equivalent to '(compose eval-bytecode compile)'!\n  2. #void #nil reader literals eval to their respective values\n  3. Keyword primitive types: like symbols, but prefixed with ':', & they always evaluate to themselves\n  4. Immutable core strings & pairs (mutable '<pair>' alternative may be implemented by users via escm's object system)\n  5. '\\' reader lambda literal support with 1-indexed params of index 'i' via '%i' syntax, and a variadic param via '%%'\n  6. '(. <obj>)' is equivalent to '<obj>' for the reader\n  7. Compile-time procedural macro system (no run-time bindings, all global in scope, deletable for localization)\n  8. A proper object system (classes, interfaces, and objects!)\n  9. Multi-arity and optional-parameter support via 'fn'\n  10. No 'eqv?', 'memv', or 'assv': only 'eq?' and 'equal?' are present.",
+  "example": null
+}, {
+  "name": "continuation-passing-style",
+  "aliases": ["continuations", "continuation", "cps"],
+  "signatures": null,
+  "description": "A style of programming which explicitly handles control flow via 'continuations',\nwhere a 'continuation' represents the rest of the work to be done in a program.\n\nProgramming with and manipulating continuations can yield certain advantages,\nmost notably the ability to implement many control flow operations in terms\nof continuations (including coroutines, try-catch, arbitrary returns, etc.)\n\nUnfortunately, explicitly programming with continuations is rarely desirable\nand hardly enjoyable. Fortunately, there are ways to convert any program into\nCPS, and Scheme as a language has this transformation baked in by default.\n\nThe power of continuations in Scheme may be leveraged through the primitive\n\"call/cc\" procedure: taking an unary procedure as its argument, \"call/cc\"\n(or \"call-with-current-continuation\") passes the current continuation as a\nunary-procedure argument to the function it received.\n\nNote that, when developing a runtime system, you actually have two means by\nwhich to go about implementing continuations. You can either transform the\nScheme into continuation passing style, or you could write the VM itself in\nCPS such that the continuation management is entirely handled internally.\n\nEScheme opts for the second approach. Note that it required a custom\ntrampolining library for this to work, since Java11 still doesn't implement\ntail-call optimizations, but oh well.\n\nOur baked-in VM-level continuations give us some serious advantages:\n\n  1. The bytecode is continuation-agnostic, since 'call/cc' is just like any\n     other procedure (this makes writing inlined bytecode MUCH simpler)\n  2. All function calls are 'call-optimized': since I both (a) implemented\n     trampolining for the Java tail-calls themselves, and (b) wrote the Java\n     code in CPS (thereby making every function call a tail-call).\n  3. Compiled procedure body bytecodes are MUCH shorter, since they don't\n     need to reflect the continuation-management logic already done by the VM.",
+  "example": null
+}]

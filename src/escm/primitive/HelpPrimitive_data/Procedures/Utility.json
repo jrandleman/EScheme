@@ -1,0 +1,67 @@
+[{
+  "name": "not",
+  "aliases": null,
+  "signatures": ["(not <obj>)"],
+  "description": "Returns #t if <obj> is #f, otherwise #t.",
+  "example": null
+}, {
+  "name": "error",
+  "aliases": null,
+  "signatures": ["(error <reason>)", "(error <reason> <arg> ...)"],
+  "description": "Triggers a fatal error, with <reason> displayed and \"<arg> ...\" written.",
+  "example": null
+}, {
+  "name": "copy",
+  "aliases": null,
+  "signatures": ["(copy <obj>)"],
+  "description": "Return a copy of <obj>.",
+  "example": null
+}, {
+  "name": "force",
+  "aliases": null,
+  "signatures": ["(force <delayed-expression>)"],
+  "description": "Forces an expression delayed by the <delay> macro to be evaluated.",
+  "example": null
+}, {
+  "name": "call-with-current-continuation",
+  "aliases": ["call/cc"],
+  "signatures": ["(call-with-current-continuation <unary-callable>)"],
+  "description": "Calls <unary-callable> with the current continuation as its argument.\nAliased by <call/cc>.",
+  "example": null
+}, {
+  "name": "dynamic-wind",
+  "aliases": null,
+  "signatures": ["(dynamic-wind <thunk1> <thunk2> <thunk3>)"],
+  "description": "Executes <thunk1>, <thunk2>, <thunk3> in that order. <thunk3> is guarenteed\nto execute even if if <thunk2> escapes via a continuation.",
+  "example": null
+}, {
+  "name": "values",
+  "aliases": null,
+  "signatures": ["(values <obj> ...)"],
+  "description": "Packs \"obj\" into a \"value object\" list.\nUsed in conjunction with <call-with-values>.",
+  "example": ";; Returns '(james . bond)\n(call-with-values\n  (lambda () (values 'bond 'james))\n  (lambda (x y) (cons y x)))"
+}, {
+  "name": "call-with-values",
+  "aliases": null,
+  "signatures": ["(call-with-values <thunk-producer> <callable-consumer>)"],
+  "description": "Applies the \"values object\" returned by <thunk-producer>\nas args to <callable-consumer>.\nUsed in conjunction with <values>.",
+  "example": ";; Returns '(james . bond)\n(call-with-values\n  (lambda () (values 'bond 'james))\n  (lambda (x y) (cons y x)))"
+}, {
+  "name": "with-exception-handler",
+  "aliases": null,
+  "signatures": ["(with-exception-handler <unary-callable-handler> <callable-thunk>)"],
+  "description": "Calls <callable-thunk>. If an exception is raised via <raise>,\nthat exception is passed to <unary-callable-handler>.\nNote that the handler should end by calling an escape continuation.\nAlso look into <guard> for nicer exception-handling syntax via macros.",
+  "example": ";; Prints <'an-error>:\n(call-with-current-continuation\n (lambda (k)\n   (with-exception-handler (lambda (x)\n                             (display \"condition: \")\n                             (write x)\n                             (newline)\n                             (k 'exception))\n     (lambda ()\n       (+ 1 (raise 'an-error))))))"
+}, {
+  "name": "raise",
+  "aliases": null,
+  "signatures": ["(raise <obj>)"],
+  "description": "Raises an exception by passing <obj> to the <unary-callable-handler>\nof <with-exception-handler>, or as the variable of <guard>.",
+  "example": ";; Prints <'an-error>:\n(call-with-current-continuation\n (lambda (k)\n   (with-exception-handler (lambda (x)\n                             (display \"condition: \")\n                             (write x)\n                             (newline)\n                             (k 'exception))\n     (lambda ()\n       (+ 1 (raise 'an-error))))))"
+}, {
+  "name": "help",
+  "aliases": null,
+  "signatures": ["(help)", "(help <symbol>)", "(help <obj>)"],
+  "description": "Our obligatory meta entry!\nNo Arguments:\n  Launch the interactive help menu.\nSymbol Argument:\n  Query for <symbol>'s help entry.\nObj Argument:\n  Get information about <obj>.",
+  "example": null
+}]

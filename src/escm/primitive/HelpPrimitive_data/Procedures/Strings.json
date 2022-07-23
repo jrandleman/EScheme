@@ -1,0 +1,163 @@
+[{
+  "name": "string-length",
+  "aliases": null,
+  "signatures": ["(string-length <str>)"],
+  "description": "Returns the length of <str>.",
+  "example": null
+}, {
+  "name": "string-empty?",
+  "aliases": null,
+  "signatures": ["(string-empty? <str>)"],
+  "description": "Returns whether <str> is empty.",
+  "example": null
+}, {
+  "name": "string-reverse",
+  "aliases": null,
+  "signatures": ["(string-reverse <str>)"],
+  "description": "Returns a string of <str> in reverse.",
+  "example": null
+}, {
+  "name": "string-append",
+  "aliases": null,
+  "signatures": ["(string-append <str> ...)"],
+  "description": "Returns strings \"<str> ...\" appended to one another.",
+  "example": null
+}, {
+  "name": "string-ref",
+  "aliases": null,
+  "signatures": ["(string-ref <str> <index-num>)"],
+  "description": "Returns the character at <index-num> index in <str> as a\nsubstring of length 1.",
+  "example": null
+}, {
+  "name": "substring",
+  "aliases": null,
+  "signatures": ["(substring <str> <index-num>)", "(substring <str> <index-num> <length-num>)"],
+  "description": "Returns a substring from <str> starting at <index-num> and spanning\n<length-num> items (defaults to end of <str>).",
+  "example": null
+}, {
+  "name": "string-upcase",
+  "aliases": null,
+  "signatures": ["(string-upcase <str>)"],
+  "description": "Returns <str> entirely upper-cased.",
+  "example": null
+}, {
+  "name": "string-downcase",
+  "aliases": null,
+  "signatures": ["(string-downcase <str>)"],
+  "description": "Returns <str> entirely lower-cased.",
+  "example": null
+}, {
+  "name": "string-escape",
+  "aliases": null,
+  "signatures": ["(string-escape <str>)"],
+  "description": "Returns <str> with special characters escaped (like\nwhen printing via <write>).",
+  "example": null
+}, {
+  "name": "string-unescape",
+  "aliases": null,
+  "signatures": ["(string-unescape <str>)"],
+  "description": "Returns <str> with special characters unescaped (like\nwhen printing via <display>).",
+  "example": null
+}, {
+  "name": "string-replace",
+  "aliases": null,
+  "signatures": ["(string-replace <str> <regex-str> <replacement-str>)"],
+  "description": "Replaces all instances of <regex-str> in <str> with <replacement-str>.",
+  "example": null
+}, {
+  "name": "string-trim",
+  "aliases": null,
+  "signatures": ["(string-trim <str>)"],
+  "description": "Returns a string with the whitespace removed from both ends of <str>.",
+  "example": null
+}, {
+  "name": "string-contains",
+  "aliases": ["string-contains-left"],
+  "signatures": ["(string-contains <str1> <str2>)"],
+  "description": "Returns the first index of <str2> in <str1> if present, or #f if it isn't.",
+  "example": null
+}, {
+  "name": "string-contains-right",
+  "aliases": null,
+  "signatures": ["(string-contains-right <str1> <str2>)"],
+  "description": "Returns the last index of <str2> in <str1> if present, or #f if it isn't.",
+  "example": null
+}, {
+  "name": "string-join",
+  "aliases": null,
+  "signatures": ["(string-join <str-list>)", "(string-join <str-list> <conjunction-str>)"],
+  "description": "Returns a string made from joining the strings in <str-list> by splicing\n<conjunction-str> (defaults to \"\") between each item.",
+  "example": null
+}, {
+  "name": "string-split",
+  "aliases": null,
+  "signatures": ["(string-split <str> <regex-str>)"],
+  "description": "Returns a list of strings made from splitting <str> at each <regex-str>\ninstance.",
+  "example": null
+}, {
+  "name": "string=?",
+  "aliases": null,
+  "signatures": ["(string=? <str> <str> ...)"],
+  "description": "Returns whether \"<str> <str> ...\" are equal to one another (case-sensitive).",
+  "example": null
+}, {
+  "name": "string<?",
+  "aliases": null,
+  "signatures": ["(string<? <str> <str> ...)"],
+  "description": "Returns whether \"<str> <str> ...\" are < one another (case-sensitive).",
+  "example": null
+}, {
+  "name": "string>?",
+  "aliases": null,
+  "signatures": ["(string>? <str> <str> ...)"],
+  "description": "Returns whether \"<str> <str> ...\" are > one another (case-sensitive).",
+  "example": null
+}, {
+  "name": "string<=?",
+  "aliases": null,
+  "signatures": ["(string<=? <str> <str> ...)"],
+  "description": "Returns whether \"<str> <str> ...\" are <= one another (case-sensitive).",
+  "example": null
+}, {
+  "name": "string>=?",
+  "aliases": null,
+  "signatures": ["(string>=? <str> <str> ...)"],
+  "description": "Returns whether \"<str> <str> ...\" are >= one another (case-sensitive).",
+  "example": null
+}, {
+  "name": "string-ci=?",
+  "aliases": null,
+  "signatures": ["(string-ci=? <str> <str> ...)"],
+  "description": "Returns whether \"<str> <str> ...\" are equal to one another (case-insensitive).",
+  "example": null
+}, {
+  "name": "string-ci<?",
+  "aliases": null,
+  "signatures": ["(string-ci<? <str> <str> ...)"],
+  "description": "Returns whether \"<str> <str> ...\" are < one another (case-insensitive).",
+  "example": null
+}, {
+  "name": "string-ci>?",
+  "aliases": null,
+  "signatures": ["(string-ci>? <str> <str> ...)"],
+  "description": "Returns whether \"<str> <str> ...\" are > one another (case-insensitive).",
+  "example": null
+}, {
+  "name": "string-ci<=?",
+  "aliases": null,
+  "signatures": ["(string-ci<=? <str> <str> ...)"],
+  "description": "Returns whether \"<str> <str> ...\" are <= one another (case-insensitive).",
+  "example": null
+}, {
+  "name": "string-ci>=?",
+  "aliases": null,
+  "signatures": ["(string-ci>=? <str> <str> ...)"],
+  "description": "Returns whether \"<str> <str> ...\" are >= one another (case-insensitive).",
+  "example": null
+}, {
+  "name": "string?",
+  "aliases": null,
+  "signatures": ["(string? <obj>)"],
+  "description": "Returns whether <obj> is a string.",
+  "example": null
+}]

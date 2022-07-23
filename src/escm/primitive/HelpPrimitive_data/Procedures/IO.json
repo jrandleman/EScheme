@@ -1,0 +1,31 @@
+[{
+  "name": "write",
+  "aliases": null,
+  "signatures": ["(write <obj>)"],
+  "description": "Print <obj> to the screen in machine-readable form.",
+  "example": null
+}, {
+  "name": "display",
+  "aliases": null,
+  "signatures": ["(display <obj>)"],
+  "description": "Print <obj> to the screen in human-readable form.",
+  "example": null
+}, {
+  "name": "newline",
+  "aliases": ["terpri"],
+  "signatures": ["(newline)"],
+  "description": "Print a newline to the screen. Equivalent to: (display \"\\n\")",
+  "example": null
+}, {
+  "name": "read",
+  "aliases": null,
+  "signatures": ["(read)"],
+  "description": "Read an EScheme datum as input from the keyboard.",
+  "example": null
+}, {
+  "name": "read-string",
+  "aliases": ["read-str"],
+  "signatures": ["(read-string <str>)"],
+  "description": "Read an EScheme datum from the string. Returns a pair:\n  (cons <read-datum> <str-w/o-serialized-read-datum>)",
+  "example": null
+}]

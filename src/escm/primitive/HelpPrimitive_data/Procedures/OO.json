@@ -1,0 +1,79 @@
+[{
+  "name": "meta-object?",
+  "aliases": null,
+  "signatures": ["(meta-object? <obj>)"],
+  "description": "Returns whether <obj> is a meta-object. Equivalent to:\n  (or (class? <obj>) (interface? <obj>) (object? <obj>))",
+  "example": null
+}, {
+  "name": "object?",
+  "aliases": null,
+  "signatures": ["(object? <obj>)"],
+  "description": "Returns whether <obj> is an <object> (as created by a class constructor).\nObjects can become functors by defining a <->procedure> method.",
+  "example": null
+}, {
+  "name": "class?",
+  "aliases": null,
+  "signatures": ["(class? <obj>)"],
+  "description": "Returns whether <obj> is a <class> (as created by <class> or <define-class>).\nClasses can be applied to invoke their constructor.",
+  "example": null
+}, {
+  "name": "interface?",
+  "aliases": null,
+  "signatures": ["(interface? <obj>)"],
+  "description": "Returns whether <obj> is an <interface> (as created by <interface> or <define-interface>).",
+  "example": null
+}, {
+  "name": "functor?",
+  "aliases": null,
+  "signatures": ["(functor? <obj>)"],
+  "description": "Returns whether <obj> is an applicable object. Equivalent to:\n  (and (object? <obj>) (oo-has? <obj> '->procedure))",
+  "example": null
+}, {
+  "name": "oo-is?",
+  "aliases": null,
+  "signatures": ["(oo-is? <object> <class-or-interface>)"],
+  "description": "Returns whether <object> is an instance of <class-or-interface>.",
+  "example": null
+}, {
+  "name": "oo-has?",
+  "aliases": null,
+  "signatures": ["(oo-has? <meta-object> <property-symbol-name> ...)"],
+  "description": "Returns whether <meta-object> contains \"<property-symbol-name> ...\" as a property chain.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.",
+  "example": null
+}, {
+  "name": "oo-get",
+  "aliases": null,
+  "signatures": ["(oo-get <meta-object> <property-symbol-name> ...)"],
+  "description": "Returns the \"<property-symbol-name> ...\" property of <meta-object>.\nTriggers an error upon failure.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.",
+  "example": null
+}, {
+  "name": "oo-set!",
+  "aliases": null,
+  "signatures": ["(oo-set! <meta-object> <property-symbol-name> ... <value>)"],
+  "description": "Sets the \"<property-symbol-name> ...\" property of <meta-object> to <value>.\nTriggers an error upon failure.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.",
+  "example": null
+}, {
+  "name": "oo-define",
+  "aliases": null,
+  "signatures": ["(oo-define <meta-object> <property-symbol-name> ... <value>)"],
+  "description": "Defines the \"<property-symbol-name> ...\" property of <meta-object> to be <value>.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.",
+  "example": null
+}, {
+  "name": "oo-super",
+  "aliases": null,
+  "signatures": ["(oo-super <class-or-object>)"],
+  "description": "Returns the super meta-object of <class-or-object>.",
+  "example": null
+}, {
+  "name": "oo-interfaces",
+  "aliases": null,
+  "signatures": ["(oo-interfaces <meta-object>)"],
+  "description": "Returns the list of interfaces implemented by <meta-object>.",
+  "example": null
+}, {
+  "name": "oo-properties",
+  "aliases": null,
+  "signatures": ["(oo-properties <meta-object>)"],
+  "description": "Returns a list of <meta-object>'s property name symbols.\nFor classes and interfaces, it also denotes whether the property is static or not.",
+  "example": null
+}]

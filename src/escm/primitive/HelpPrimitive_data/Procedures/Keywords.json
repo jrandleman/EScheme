@@ -1,0 +1,13 @@
+[{
+  "name": "keyword-append",
+  "aliases": null,
+  "signatures": ["(keyword-append <keyword> ...)"],
+  "description": "Returns a new keyword of \"<keyword> ...\" concatenated with one another.",
+  "example": null
+}, {
+  "name": "keyword?",
+  "aliases": null,
+  "signatures": ["(keyword? <obj>)"],
+  "description": "Returns whether <obj> is a keyword.",
+  "example": null
+}]

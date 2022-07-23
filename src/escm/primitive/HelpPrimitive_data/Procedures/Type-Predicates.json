@@ -1,0 +1,19 @@
+[{
+  "name": "typeof",
+  "aliases": ["typename","type-of","type-name"],
+  "signatures": ["(typeof <obj>)"],
+  "description": "Returns <obj>'s type name as a symbol.",
+  "example": null
+}, {
+  "name": "void?",
+  "aliases": null,
+  "signatures": ["(void? <obj>)"],
+  "description": "Returns whether <obj> has type #<void>.",
+  "example": null
+}, {
+  "name": "boolean?",
+  "aliases": null,
+  "signatures": ["(boolean? <obj>)"],
+  "description": "Returns whether <obj> is a boolean value (#t or #f).",
+  "example": null
+}]

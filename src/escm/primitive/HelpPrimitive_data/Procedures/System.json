@@ -1,0 +1,62 @@
+[{
+  "name": "exit",
+  "aliases": ["quit"],
+  "signatures": ["(exit)", "(exit <integer-exit-code>)"],
+  "description": "Terminate the current EScheme session with <integer-exit-code> (defaults to 0).",
+  "example": null
+}, {
+  "name": "file-read",
+  "aliases": null,
+  "signatures": ["(file-read <filename-str>)"],
+  "description": "Get the contents of <filename-str> as an EScheme data structure.",
+  "example": null
+}, {
+  "name": "file-read-string",
+  "aliases": ["file-read-str"],
+  "signatures": ["(file-read-string <filename-str>)"],
+  "description": "Get the contents of <filename-str> as a string.",
+  "example": null
+}, {
+  "name": "file-write",
+  "aliases": null,
+  "signatures": ["(file-write <filename-str> <obj>)"],
+  "description": "Write <obj> to <filename-str> using machine-readable syntax.",
+  "example": null
+}, {
+  "name": "file-display",
+  "aliases": null,
+  "signatures": ["(file-display <filename-str> <obj>)"],
+  "description": "Write <obj> to <filename-str> using human-readable syntax.",
+  "example": null
+}, {
+  "name": "file-delete!",
+  "aliases": null,
+  "signatures": ["(file-delete! <filename-str>)"],
+  "description": "Deletes <filename-str> if it exists. Returns the deletion's success status.",
+  "example": null
+}, {
+  "name": "file?",
+  "aliases": null,
+  "signatures": ["(file? <str>)"],
+  "description": "Returns whether <str> is a file.",
+  "example": null
+}, {
+  "name": "load",
+  "aliases": null,
+  "signatures": ["(load <filename-str>)"],
+  "description": "Reads and evaluates <filename-str>'s EScheme contents in the global environment.",
+  "example": null
+}, {
+  "name": "system",
+  "aliases": null,
+  "signatures": [
+                  "(system <cmd-str>)",
+                  "(system <cmd-str> <env-var-str-list>)",
+                  "(system <cmd-str> <env-var-str-list> <dir-str>)",
+                  "(system <cmd-str-list>)",
+                  "(system <cmd-str-list> <env-var-str-list>)",
+                  "(system <cmd-str-list> <env-var-str-list> <dir-str>)"
+                ],
+  "description": "Executes a command (or list of commands), using the environment variable\nbindings in <env-var-str-list> (defaults to the current environment), in\nthe <dir-str> directory (defaults to the current working directory).\nReturns a list:\n  (<cmd-stdout-str> <cmd-stderr-str> <cmd-exit-code>)",
+  "example": null
+}]

@@ -1,0 +1,205 @@
+[{
+  "name": "bytecode",
+  "aliases": ["byte-code"],
+  "signatures": ["(bytecode <instruction> ...)"],
+  "description": "Inlines the given bytecode instructions during compilation.\nSee 'doc/instructions.md' for EScheme's instruction set (also outlined below):\n\n# An Introduction to EScheme's Bytecode\n\n## Brief Insight\nEScheme's bytecode structure can be thought of as a chain of instruction sets \nserving as function bodies.\n\nThe instructions (as outlined below) are designed EXCLUSIVELY to serve as a \nmeans by which to perform control flow and bind items to the current environment. \n\n=> All logical operations are abstracted away via user-defined & primitive functions!\n\nSuch is the crux of our incredibly reduced instruction set, and the fact that \nwe can get away with having all of our instructions be either unary or nullary.\nFor example, unlike most flavors of assembly, there is no `add` instruction. \nRather, to us, `+` is called like any other function.\n\n\n## Data Manipulation\nAll data is handled via 2 mediums in our bytecode: the \"current value register\" \n(CVR), and the function stack.\n\nThe CVR psuedo-register is never explicitely referenced in EScheme bytecode, \nrather it is implicitly used by certain instructions. For example, compiling \n`(define life 42)` yields the bytecode `(load 42) (define life)`. The `load` \ninstruction implicitly sets CVR to its argument, and `define` implicitly binds \nits argument to CVR in the environment.\n\nThe function stack is referred to via the `push`, `pop`, and `call` instructions.\n`call` affects the stack because, due to our lack of multiple registers, we push \nour arguments (and the function we're calling) onto the stack rather than putting \nthem in registers. More details on the `call` instruction may be found below.\n\n\n## Why Write Bytecode?\nThe vast majority of the bytecode that the interpreter works with is the result of\ncompiling EScheme expressions. However, it may be desirable to write out bytecode \nby hand under very specific circumstances. \n\nFor example, while EScheme certainly supports iteration via recursion, there is no \n\"true\" iteration by default a la `for`/`while` loop in Java or C++. However, by \nleveraging inlined bytecode, we can write a `while` macro that DOES have true\niteration (such is outlined as an example below)!\n\n\n## Writing Bytecode\nIn order to write out bytecode, simply follow the instruction syntax outlined below.\nNote that any arguments specified as `<symbol>` or `<number>` MUST be symbolic or \nnumeric literals respectively. For example, `jump` and `call` both accept numbers, \nbut whereas `jump` requires that it's argument is a numeric literal, `call` also \naccepts variables that evaluate to numbers.\n\n### NIL\nA note on writing NIL literals: use `()`. For example, `(define n (quote ()))`\ncompiles to `(load ()) (define n)`. You may alternatively use the `#nil` reader\nliteral.\n\n### VOID\nA note on writing VOID literals: use `#void`. For example, `(define n #void)`\ncompiles to `(load #void) (define n)`.\n\n### Closures\nA note on writing closures: you may nest the `load-closure` syntax as needed in order\nto denote closures. The `load-closure` syntax is as follows:\n\n`(load-closure ((<argument> ...) <instruction> ...) ...)`\n\nThis syntax will load the equivalent of `(fn ((<argument> ...) <instruction> ...) ...)`\ninto CVR. Further note that closure expressions by default return the value left in \nCVR upon terminating execution.\n\nFor example, you may write:\n\n(define (my-function y) \n  (map (lambda (x) (* x y)) (list 1 2 3)))\n\nAs:\n\n(load-closure \n  ((y)\n    (push map)\n    (load-closure \n      ((x)\n        (push *)\n        (push x)\n        (push y)\n        (call 3)))\n    (push)\n    (push list)\n    (push 1)\n    (push 2)\n    (push 3)\n    (call 4)\n    (push)\n    (call 3)))\n(define my-function)\n\n\n### Object Access Chains\nThe escm VM has built-in support for interpretting object access chains, hence\n`(define obj.prop1.prop2)` is perfectly valid bytecode syntax.\n\nAs such, all instructions that set or evaluate a symbolic datum support this \nsyntax. These include: `define`, `set!`, `load`, `call`, `push`, & `return`.\nNote that `define-syntax` is NOT among their number.\n\n\n------------------------------------------------------------------------------\n# The EScheme Bytecode Instruction Set\n\n(define <symbol>) ; bind <symbol> to CVR [sets CVR to <void>]\n\n(set! <symbol>) ; set! <symbol> to CVR [sets CVR to <void>]\n\n(define-syntax <symbol>) ; bind <symbol> to the callable in CVR as a macro in the global env expanded by the escm compiler [sets CVR to <void>]\n\n(ifn <number>) ; if CVR is NOT truthy, jump <number> instructions [sets CVR to <void>]\n\n(jump <number>) ; jump <number> instructions\n\n(load <datum>)         ; evaluate <datum> and load it into CVR\n(load-symbol <symbol>) ; load <symbol> as a symbolic value into CVR rather than evaluating it\n\n(call <datum>) ; <datum> must evaluate to a number. get the fcn & arguments being applied from the stack. \n               ; positive <number> denotes pushes from left to right & negative denotes pushes from right to left (when compiling the application expressions). \n               ; pops (abs <datum>) items off of the stack after the call, and places the returned value of the fcn application in CVR.\n\n(push)         ; push CVR to the stack\n(push <datum>) ; push <datum> to the stack\n\n(pop) ; pop a value off of the stack into CVR\n\n(return)         ; returns the value in CVR (effectively jumps to the end of the function)\n(return <datum>) ; returns the value in <datum> (effectively jumps to the end of the function)\n\n\n------------------------------------------------------------------------------\n## Helper `bytecode` Syntax\n### Psuedo-instruction(s) converted into \"real\" instruction(s) by the assembler\n\n\n(load-closure ((<argument> ...) <instruction> ...) ...) ; syntax to load a closure\n\n\n------------------------------------------------------------------------------\n# Examples\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n;; Demoing the compilation of closures\n\n;; Source Code\n(define (my-function y) \n  (map (lambda (x) (* x y)) (list 1 2 3)))\n\n;; Compiled Bytecode\n(load-closure \n  ((y)\n    (push map)\n    (load-closure \n      ((x)\n        (push *)\n        (push x)\n        (push y)\n        (call 3)))\n    (push)\n    (push list)\n    (push 1)\n    (push 2)\n    (push 3)\n    (call 4)\n    (push)\n    (call 3)))\n(define my-function)\n\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n;; Defining a \"(while (<condition> <return-expr> ...) <body> ...)\" macro using\n;; inlined bytecode & compilation\n\n(define-syntax while\n  (lambda (condition-returns . body)\n    (define compiled-condition (compile (car condition-returns)))\n    (define compiled-body (apply append (map compile body)))\n    (define compiled-returns (apply append (map compile (cdr condition-returns))))\n    `(bytecode \n      ,@compiled-condition\n      (ifn ,(+ (length compiled-body) 2))\n      ,@compiled-body\n      (jump ,(- 0 (length compiled-condition) (length compiled-body) 1))\n      (load #void)\n      ,@compiled-returns)))\n\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n;; Implementing \"apply\" in bytecode (impossible in native Scheme!)\n\n(load-closure \n  ((f args-list)\n    (load 1)\n    (define count)\n    (push f)\n    (push null?)\n    (push args-list)\n    (call 2)\n    (ifn 2)\n    (jump 15)\n    (push car)\n    (push args-list)\n    (call 2)\n    (push) ; save an extracted value\n    (push cdr)\n    (push args-list)\n    (call 2)\n    (set! args-list)\n    (push +)\n    (push 1)\n    (push count)\n    (call 3)\n    (set! count)\n    (jump -18)\n    (call count)))\n(define apply)\n\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n;; Implementing factorial (because of course we do so)\n\n;; Source Code\n(define (factorial n)\n  (if (< n 2)\n      1\n      (* n (factorial (- n 1)))))\n\n;; Compiled Bytecode\n(load-closure \n  ((n)\n    (push <)\n    (push n)\n    (push 2)\n    (call 3)\n    (ifn 2)\n    (return 1)\n    (push *)\n    (push n)\n    (push factorial)\n    (push -)\n    (push n)\n    (push 1)\n    (call 3)\n    (push)\n    (call 2)\n    (push)\n    (call 3)))\n(define factorial)",
+  "example": null
+}, {
+  "name": "quote",
+  "aliases": ["'"],
+  "signatures": ["(quote <obj>)"],
+  "description": "Returns <obj> as a data structure.\nNote that the reader will expand \"'<obj>\" to \"(quote <obj>)\"",
+  "example": "(quote a)  ; a\n(quote 1)  ; 1\n(quote \"\") ; \"\"\n(quote #t) ; #t\n(quote ()) ; #nil\n(quote (1 2 . 3)) ; (cons 1 (cons 2 3))\n(quote (1 2 3))   ; (list 1 2 3)"
+}, {
+  "name": "define-syntax",
+  "aliases": null,
+  "signatures": ["(define-syntax <macro-name> <callable>)"],
+  "description": "Defines <macro-name> to be a macro that uses to <callable>\nto perform its code expansion.",
+  "example": "(define-syntax and\n  (lambda (. conditions)\n    (fold (lambda (acc item) (list (quote if) acc item #f))\n          #t\n          conditions)))"
+}, {
+  "name": "fn",
+  "aliases": null,
+  "signatures": ["(fn ((<param> ...) <body> ...) ...)", "(fn ((<param> ... . <variadic-param>) <body> ...) ...)", "(fn (<variadic-param> <body> ...) ...)"],
+  "description": "Create a multi-arity procedure, with support for optional parameters.\nDenote variadic parameters via the \"(<param> . <variadic-param>)\"\nor \"<variadic-param>\" syntax.",
+  "example": "; Using Mult-arity\n(define factorial \n  (fn ((n) (factorial n 1))\n      ((n p)\n        (if (< n 2)\n            p\n            (factorial (- n 1) (* n p))))))\n\n\n; Using optional parameters: p is <1> by default\n(define factorial\n  (fn ((n (p 1))\n        (if (< n 2)\n            p\n            (factorial (- n 1) (* n p))))))\n\n\n; Combine <fn> and <define> via <defn>:\n(defn factorial \n  ((n) (factorial n 1))\n  ((n p)\n    (if (< n 2)\n        p\n        (factorial (- n 1) (* n p)))))"
+}, {
+  "name": "lambda",
+  "aliases": ["\\"],
+  "signatures": ["(lambda (<param> ...) <body>)", "(lambda (<param> ... . <variadic-param>) <body>)", "(lambda <variadic-param> <body>)"],
+  "description": "Shorthand for single-arity procedures. Expands to <fn> under the hood.\nSupports optional parameters. Denote variadic parameters via the\n\"(<param> . <variadic-param>)\" or \"<variadic-param>\" syntax.\nReader-shorthand support via the <\\> syntax.",
+  "example": "; Using optional parameters: p is <1> by default\n(define factorial\n  (lambda (n (p 1))\n    (if (< n 2)\n        p\n        (factorial (- n 1) (* n p)))))\n\n\n; Combine <lambda> and <define> via:\n(define (factorial n (p 1))\n  (if (< n 2)\n      p\n      (factorial (- n 1) (* n p))))\n\n\n;; Reader-shorthand via <\\>: \\<expr> => (lambda () <expr>)\n;; Denote the Nth parameter via %N, with N starting at 1. \n;; Use %% to denote the variadic parameter.\n\n; Add 2:\n(define add2 \\(+ %1 2))\n\n; Get the 2nd parameter:\n(define get-2nd \\%2)\n\n; The 'id' procedure:\n(define id \\%1)\n\n; The 'list' procedure:\n(define list \\%%)"
+}, {
+  "name": "if",
+  "aliases": null,
+  "signatures": ["(if <condition> <consequence>)", "(if <condition> <consequence> <alternative>)"],
+  "description": "Conditional branching:\n  if (not (eq? #f <condition>)): execute <consequence>\n  else: execute <alternative> (defaults to #void).",
+  "example": null
+}, {
+  "name": "begin",
+  "aliases": null,
+  "signatures": ["(begin <expr> ...)"],
+  "description": "Combines a series of EScheme expressions into a single expression.\nSimilar to how {} is used in C++/Java, BUT <begin> does NOT have\nits own scope (use <let> for such instead).",
+  "example": null
+}, {
+  "name": "set!",
+  "aliases": null,
+  "signatures": ["(set! <variable-name> <value>)"],
+  "description": "Assigns <variable-name> to <value>. <variable-name> must have been\npreviously defined. Automatically sets object properties too, so\n\"obj.prop\" is a valid <variable-name>.",
+  "example": null
+}, {
+  "name": "define",
+  "aliases": ["def"],
+  "signatures": ["(define <variable-name> <value>)", "(define (<procedure-name> <parameter> ...) <value>)"],
+  "description": "Binds <variable-name> to <value> in the current environment.\nAliased by <def>. The 2nd signature is equivalent to:\n  (define <procedure-name> (lambda (<parameter> ...) <value>))",
+  "example": null
+}, {
+  "name": "defn",
+  "aliases": ["define-fn"],
+  "signatures": ["(defn <procedure-name> (<parameters> <body> ...) ...)"],
+  "description": "Combines <define> and <fn> by binding <procedure-name>\nto (fn (<parameters> <body> ...) ...)",
+  "example": null
+}, {
+  "name": "and",
+  "aliases": null,
+  "signatures": ["(and <obj> ...)"],
+  "description": "Returns whether none of \"<obj> ...\" are #f.",
+  "example": null
+}, {
+  "name": "or",
+  "aliases": null,
+  "signatures": ["(or <obj> ...)"],
+  "description": "Returns whether any of \"<obj> ...\" are #t.",
+  "example": null
+}, {
+  "name": "delay",
+  "aliases": null,
+  "signatures": ["(delay <expr>)"],
+  "description": "Delay <expr>'s evaluation until it is forced via <force>.",
+  "example": "(force (delay (+ 1 2))) ; => 3"
+}, {
+  "name": "cond",
+  "aliases": null,
+  "signatures": ["(cond (<condition> <body> ...) ...)", "(cond (<condition> <body> ...) ... (else <body> ...))"],
+  "description": "Conditional if-else chains. If <condition> is true, execute <body>.\n<else> is equivalent to #t.",
+  "example": null
+}, {
+  "name": "let",
+  "aliases": ["named-let", "nameless-let"],
+  "signatures": ["(let () <body> ...)", "(let ((<variable-name> <value>) ...) <body> ...)", "(let <procedure-name> ((<parameter-name> <initial-value>) ...) <body> ...)"],
+  "description": "Signature 1 (nameless let):\n  Bind \"(<variable-name> <value>) ...\" in a local scope and execute <body>.\nSignature 2 (named let):\n  Bind <procedure-name> to (lambda (<parameter-name> ...) <body> ...)\n  in a temporary scope, and call it with \"<initial-value> ...\".",
+  "example": null
+}, {
+  "name": "quasiquote",
+  "aliases": ["`",",",",@","unquote","unquote-splicing"],
+  "signatures": ["(quasiquote <obj>)"],
+  "description": "Returns <obj> as a data structure. Any <unquote>d <obj>s will be\nevaluated first, and <unquote-splicing>ed <obj>s will be\nevaluated and spliced into the list.\nNote that the reader will expand:\n  \"`<obj>\" => \"(quasiquote <obj>)\"\n  \",<obj>\" => \"(unquote <obj>)\"\n  \",@<obj>\" => \"(unquote-splicing <obj>)\"",
+  "example": null
+}, {
+  "name": "case",
+  "aliases": null,
+  "signatures": ["(case <value> ((<key> ...) <expr> ...) ...)", "(case <value> ((<key> ...) <expr> ...) ... (else <expr> ...))"],
+  "description": "Conditional \"switch\" dispatch. If <value> matches any key in \"<key> ...\",\nexecute <body>. <else> matches against all <value>s.",
+  "example": null
+}, {
+  "name": "let*",
+  "aliases": null,
+  "signatures": ["(let* () <body> ...)", "(let* ((<variable-name> <value>) ...) <body> ...)"],
+  "description": "Equivalent to <let>, but <variable-name>s may refer to one another.",
+  "example": null
+}, {
+  "name": "letrec",
+  "aliases": null,
+  "signatures": ["(letrec () ...) <body> ...)", "(letrec ((<variable-name> <value>) ...) <body> ...)"],
+  "description": "Like <let>, but <value> may be a recursive function that calls <variable-name>.",
+  "example": null
+}, {
+  "name": "while",
+  "aliases": null,
+  "signatures": ["(while (<condition>) <body> ...)", "(while (<condition> <return-expr> ...) <body> ...)"],
+  "description": "Execute \"<body> ...\" while <condition> is true.\nReturn \"<return-expr> ...\" (defaults to #void) upon completion.\nNote that <while> uses true iteration (not recursion!)",
+  "example": null
+}, {
+  "name": "dosync",
+  "aliases": null,
+  "signatures": ["(dosync <expr> ...)"],
+  "description": "Execute \"<expr> ...\" with a mutex lock around it as a critical section.\nLocks/Unlocks the lock via <dynamic-wind> to ensure that random\ncontinuations don't prevent us from unlocking the lock.",
+  "example": null
+}, {
+  "name": "dosync-with",
+  "aliases": null,
+  "signatures": ["(dosync-with <mutex> <expr> ...)"],
+  "description": "Like <dosync>, but with a lock of your choosing rather than *dosync-lock*.",
+  "example": null
+}, {
+  "name": "guard",
+  "aliases": null,
+  "signatures": ["(guard (<exception-symbol> (<condition> <guard-body> ...) ...) <body> ...)", "(guard (<variable> (<condition> <guard-body> ...) ... (else <guard-body>)) <body> ...)"],
+  "description": "Executes \"<body> ...\" while guarding against a <raise>d exception.\nThe <raise>d exception value is bound to <exception-symbol>, and\n<exception-symbol> is then passed to the <cond>-style\n\"(<condition> <guard-body> ...)\" clauses. If a condition is satisfied, then\n\"<guard-body> ...\" is executed. <else> matches against all exception types.",
+  "example": "(guard (condition\n         (else\n          (display \"condition: \")\n          (write condition)\n          (newline)\n          'exception))\n  (+ 1 (raise 'an-error)))"
+}, {
+  "name": "thread-define",
+  "aliases": null,
+  "signatures": ["(thread-define <variable-name> <value>) (thread-define <thread> <variable-name> <value>)"],
+  "description": "Bind <variable-name> to <value> in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.",
+  "example": null
+}, {
+  "name": "thread-set!",
+  "aliases": null,
+  "signatures": ["(thread-set! <variable-name> <value>) (thread-set! <thread> <variable-name> <value>)"],
+  "description": "Set <variable-name> to <value> in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.",
+  "example": null
+}, {
+  "name": "thread-get",
+  "aliases": null,
+  "signatures": ["(thread-get <variable-name>) (thread-get <thread> <variable-name>)"],
+  "description": "Get <variable-name>'s value in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.",
+  "example": null
+}, {
+  "name": "scons",
+  "aliases": ["cons-stream", "stream-cons"],
+  "signatures": ["(scons <obj> <obj>)"],
+  "description": "Create a stream-pair of \"<obj> <obj>\". Streams don't evaluate their\nitems until the items are accessed via <scar>, <scdr>, <scaar>, etc.\nCreate a stream by nesting stream pairs that end with (quote ()) [think lists].",
+  "example": null
+}, {
+  "name": "define-generator",
+  "aliases": null,
+  "signatures": ["(define-generator (<generator-constructor-name> <param> ...) <body> ...)"],
+  "description": "Define a generator constructor! Calling <generator-constructor-name>\nreturns a generator thunk, which can suspend its operation\n(until it gets invoked again) via the <yield> macro.\n\nNote that due to being a \"generator-constructor\", <generator-constructor-name>\nshould not be called recursively to emulate looping.\nInstead, define an inner procedure or use the \"named let\" construct.",
+  "example": ";; Printing Numbers and Strings:\n(define-generator (print-numbers start total)\n  (let loop ((i start))\n    (if (< i total)\n          (begin \n            (write i)\n            (display \" \")\n            (yield) ; pause execution until re-invoked\n            (loop (+ i 1))))))\n\n(define-generator (print-strings start total)\n  (let loop ((i start))\n    (if (< i total)\n          (begin \n            (write (number->string i))\n            (display \" \")\n            (yield) ; pause execution until re-invoked\n            (loop (+ i 1))))))\n\n(complete-all-generators! (print-numbers 0 10) (print-strings 0 10))\n(newline)\n\n\n;; Creating a stream of integers from a starting number (0 by default):\n(define-generator (ints-from (start 0))\n  (let loop ((n start))\n    (yield n)\n    (loop (+ n 1))))\n\n(define ints (ints-from 42))\n(display (ints)) \n(newline)\n(display (ints)) \n(newline)\n(display (ints)) \n(newline)"
+}, {
+  "name": "yield",
+  "aliases": null,
+  "signatures": ["(yield)", "(yield <value>)"],
+  "description": "Pause the current execution of the generator and return <value> (#void by\ndefault). Only valid within the \"<body> ...\" of <define-generator>.",
+  "example": null
+}, {
+  "name": "class",
+  "aliases": null,
+  "signatures": ["(class (:extends <super>) (:implements <interface> ...) <prop> ...)", "<prop> ::= (<name> <value>)", "         | ((<method-name> <param> ...) <body> ...)", "         | (:static <name> <value>)", "         | (:static (<method-name> <param> ...) <body> ...)"],
+  "description": "Creates an anonymous class. See <define-class> to bind a name to a class \nin one expression. See <oo> for more high-level object orientation details.\n\nRegarding inter-class/interface relations: \n  1. <super> MUST be an expression that evals to a class type.\n  2. <interface> MUST be an expression that evals to an interface type.\n  3. Both <super> and <interface> are optional.\n\n\nSimilar to Java, we support single inheritance for classes and multiple\ninheritance for interfaces.\n\nThe \"new\" pseudo-method acts as the class constructor (doesn't correlate \nto a real method). Invoke the class constructor by calling the class \nobject as if it were a procedure.\n\nThe \"->procedure\" method overloads applications for objects, making them\na \"functor\" (function object).\n\nThe \"name\" field is automatically defined for classes and interfaces.\n\nUse \"self\" and \"super\" in methods to refer to the calling object and the\nclass's super object respectively. Qualification of \"self.\" is required\nwhen referring to class fields in a method.\n  (define n 0) ; the \"global n\"\n  (class C\n    (n 1)      ; the \"local n\"\n    ((method)\n      n        ; refers to the \"global n\"\n      self.n)) ; refers to the \"local n\"\n\n\nRefer to a field via: object.property1.property2\nRefer to a method as: (object.inner-obj.method <arg> ...)\n\nObjects (classes and interfaces for static methods) support the following:\n  (define object.property <value>) ; define <property> as a new field\n  (set! object.property <value>)   ; set the existing <property> field\n\n\nUse the \":static\" keyword qualifier to indicate that the field/method belongs\nto the class, rather than one of its instances.\n  (define-class C (:static VALUE 10))\n  C.VALUE ; 10\n\n\nClass reflection is provided by primtive functions prefixed with \"oo-\".\n\nInitialization of the super object's non-nullary constructor is achieved\nvia the \"(super! <arg> ...)\" macro.\n\n  =================================================================\n  * NOTE THAT \"super!\", IF USED, MUST BE THE FIRST EXPRESSION IN A \n    CONSTRUCTOR IN ORDER TO AVOID INVOKING UNDEFINED BEHAVIOR !!!!\n  =================================================================\n\n  ((new)\n    (super! 42) ; valid\n    (define self.value)) \n\n  ((new)\n    (define self.value)\n    (super! 42)) ; undefined behavior\n\n\nSee <meta-object> for more type details.",
+  "example": "(define-class Rectangle\n  (length 0)\n  (width 0)\n  ((new l w)\n    (set! self.length l)\n    (set! self.width w))\n  ((area)\n    (* self.length self.width))\n  ((perimeter)\n    (* 2 (+ self.length self.width))))\n\n\n(define-class Square (:extends Rectangle)\n  ((new l)\n    (super! l l))) ; init the super object\n\n\n(define s (Square 5))\n\n(display (s.area)) ; Square \"inherited\" <area> method. Prints 25"
+}, {
+  "name": "define-class",
+  "aliases": ["defclass"],
+  "signatures": ["(define-class <class-name> (:extends <super>) (:implements <interface> ...) <prop> ...)", "<prop> ::= (<name> <value>)", "         | ((<method-name> <param> ...) <body> ...)", "         | (:static <name> <value>)", "         | (:static (<method-name> <param> ...) <body> ...)"],
+  "description": "Simple wrapper macro combining <define> and <class> to bind <class-name>.\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.",
+  "example": null
+}, {
+  "name": "interface",
+  "aliases": null,
+  "signatures": ["(interface (:extends <interface> ...) <prop> ...)", "<prop> ::= <name>", "         | (:static <name> <value>)", "         | (:static (<method-name> <param> ...) <body> ...)"],
+  "description": "Creates an anonymous interface. Similar to classes, BUT cannot be instantiated\nvia a constructor. Required property names are denoted by a symbolic property.\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.",
+  "example": "(define-interface IHasName\n  (:static VALUE 10)\n  name)\n\n(define-interface IHasAge\n  age)\n\n(define-interface IPerson (:extends IHasName IHasAge))\n\n(define-class Person (:implements IPerson)\n  (name \"\")\n  (age 0))"
+}, {
+  "name": "define-interface",
+  "aliases": ["definterface"],
+  "signatures": ["(define-interface <interface-name> (:extends <interface> ...) <prop> ...)", "<prop> ::= <name>", "         | (:static <name> <value>)", "         | (:static (<method-name> <param> ...) <body> ...)"],
+  "description": "Simple wrapper macro combining <define> and <interface> to bind <interface-name>.\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.",
+  "example": null
+}, {
+  "name": "super!",
+  "aliases": null,
+  "signatures": ["(super! <arg> ...)"],
+  "description": "Initialize the super object via its non-nullary constructor.\nONLY valid as the FIRST expression in a class constructor (any\nother use risks undefined behavior).\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.",
+  "example": null
+}]

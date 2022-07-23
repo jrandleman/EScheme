@@ -1,0 +1,49 @@
+[{
+  "name": "apply",
+  "aliases": null,
+  "signatures": ["(apply <callable> <obj-argument-list>)"],
+  "description": "Apply <callable> to the arguments stored in the <obj-argument-list> list.",
+  "example": null
+}, {
+  "name": "compile",
+  "aliases": null,
+  "signatures": ["(compile <quoted-escm-expression>)"],
+  "description": "Convert <quoted-escm-expression> into a list of its equivalent bytecode instructions.",
+  "example": null
+}, {
+  "name": "eval-bytecode",
+  "aliases": null,
+  "signatures": ["(eval-bytecode <quoted-escm-bytecode-list>)"],
+  "description": "Evaluate <quoted-escm-bytecode-list> to produce a result.",
+  "example": null
+}, {
+  "name": "eval",
+  "aliases": null,
+  "signatures": ["(eval <quoted-escm-expression>)"],
+  "description": "Evaluate <quoted-escm-expression> to produce a result. Equivalent to:\n  (eval-bytecode (compile <quoted-escm-expression>))",
+  "example": null
+}, {
+  "name": "gensym",
+  "aliases": null,
+  "signatures": ["(gensym)"],
+  "description": "Returns a fresh, unique symbol. Guarentees that the symbol is unique across\nthreads as well. Used extensively by macros.",
+  "example": null
+}, {
+  "name": "syntax?",
+  "aliases": null,
+  "signatures": ["(syntax? <macro-name-symbol>)"],
+  "description": "Returns whether <macro-name-symbol> is a valid macro name.",
+  "example": null
+}, {
+  "name": "expand-syntax",
+  "aliases": null,
+  "signatures": ["(expand-syntax <quoted-macro-expression>)"],
+  "description": "Returns the expansion of <quoted-macro-expression> by executing its macro.",
+  "example": null
+}, {
+  "name": "delete-syntax!",
+  "aliases": null,
+  "signatures": ["(delete-syntax! <macro-name-symbol>)"],
+  "description": "Remove <macro-name-symbol> from the compiler's macro registry.\nReturns whether succeeded in removal. Used for macro localization.",
+  "example": null
+}]

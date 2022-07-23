@@ -1,0 +1,223 @@
+[{
+  "name": "stream-pair?",
+  "aliases": null,
+  "signatures": ["(stream-pair? <obj>)"],
+  "description": "Returns whether <obj> is a stream-pair created by <scons>.",
+  "example": null
+}, {
+  "name": "stream?",
+  "aliases": null,
+  "signatures": ["(stream? <obj>)"],
+  "description": "Returns whether <obj> is a stream. Equivalent to:\n  (or (stream-pair? <obj>) (null? <obj>))",
+  "example": null
+}, {
+  "name": "scar",
+  "aliases": null,
+  "signatures": ["(scar <stream-pair>)"],
+  "description": "Access the first item in a stream-pair.",
+  "example": null
+}, {
+  "name": "scdr",
+  "aliases": null,
+  "signatures": ["(scdr <stream-pair>)"],
+  "description": "Access the second item in a stream-pair.",
+  "example": null
+}, {
+  "name": "scaar",
+  "aliases": null,
+  "signatures": ["(scaar <stream-pair>)"],
+  "description": "Equivalent to: (scar (scar <stream-pair>))",
+  "example": null
+}, {
+  "name": "scadr",
+  "aliases": null,
+  "signatures": ["(scadr <stream-pair>)"],
+  "description": "Equivalent to: (scar (scdr <stream-pair>))",
+  "example": null
+}, {
+  "name": "scdar",
+  "aliases": null,
+  "signatures": ["(scdar <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scar <stream-pair>))",
+  "example": null
+}, {
+  "name": "scddr",
+  "aliases": null,
+  "signatures": ["(scddr <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scdr <stream-pair>))",
+  "example": null
+}, {
+  "name": "scaaar",
+  "aliases": null,
+  "signatures": ["(scaaar <stream-pair>)"],
+  "description": "Equivalent to: (scar (scar (scar <stream-pair>)))",
+  "example": null
+}, {
+  "name": "scaadr",
+  "aliases": null,
+  "signatures": ["(scaadr <stream-pair>)"],
+  "description": "Equivalent to: (scar (scar (scdr <stream-pair>)))",
+  "example": null
+}, {
+  "name": "scadar",
+  "aliases": null,
+  "signatures": ["(scadar <stream-pair>)"],
+  "description": "Equivalent to: (scar (scdr (scar <stream-pair>)))",
+  "example": null
+}, {
+  "name": "scaddr",
+  "aliases": null,
+  "signatures": ["(scaddr <stream-pair>)"],
+  "description": "Equivalent to: (scar (scdr (scdr <stream-pair>)))",
+  "example": null
+}, {
+  "name": "scdaar",
+  "aliases": null,
+  "signatures": ["(scdaar <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scar (scar <stream-pair>)))",
+  "example": null
+}, {
+  "name": "scdadr",
+  "aliases": null,
+  "signatures": ["(scdadr <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scar (scdr <stream-pair>)))",
+  "example": null
+}, {
+  "name": "scddar",
+  "aliases": null,
+  "signatures": ["(scddar <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scdr (scar <stream-pair>)))",
+  "example": null
+}, {
+  "name": "scdddr",
+  "aliases": null,
+  "signatures": ["(scdddr <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scdr (scdr <stream-pair>)))",
+  "example": null
+}, {
+  "name": "scaaaar",
+  "aliases": null,
+  "signatures": ["(scaaaar <stream-pair>)"],
+  "description": "Equivalent to: (scar (scar (scar (scar <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scaaadr",
+  "aliases": null,
+  "signatures": ["(scaaadr <stream-pair>)"],
+  "description": "Equivalent to: (scar (scar (scar (scdr <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scaadar",
+  "aliases": null,
+  "signatures": ["(scaadar <stream-pair>)"],
+  "description": "Equivalent to: (scar (scar (scdr (scar <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scaaddr",
+  "aliases": null,
+  "signatures": ["(scaaddr <stream-pair>)"],
+  "description": "Equivalent to: (scar (scar (scdr (scdr <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scadaar",
+  "aliases": null,
+  "signatures": ["(scadaar <stream-pair>)"],
+  "description": "Equivalent to: (scar (scdr (scar (scar <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scadadr",
+  "aliases": null,
+  "signatures": ["(scadadr <stream-pair>)"],
+  "description": "Equivalent to: (scar (scdr (scar (scdr <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scaddar",
+  "aliases": null,
+  "signatures": ["(scaddar <stream-pair>)"],
+  "description": "Equivalent to: (scar (scdr (scdr (scar <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scadddr",
+  "aliases": null,
+  "signatures": ["(scadddr <stream-pair>)"],
+  "description": "Equivalent to: (scar (scdr (scdr (scdr <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scdaaar",
+  "aliases": null,
+  "signatures": ["(scdaaar <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scar (scar (scar <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scdaadr",
+  "aliases": null,
+  "signatures": ["(scdaadr <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scar (scar (scdr <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scdadar",
+  "aliases": null,
+  "signatures": ["(scdadar <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scar (scdr (scar <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scdaddr",
+  "aliases": null,
+  "signatures": ["(scdaddr <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scar (scdr (scdr <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scddaar",
+  "aliases": null,
+  "signatures": ["(scddaar <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scdr (scar (scar <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scddadr",
+  "aliases": null,
+  "signatures": ["(scddadr <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scdr (scar (scdr <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scdddar",
+  "aliases": null,
+  "signatures": ["(scdddar <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scdr (scdr (scar <stream-pair>))))",
+  "example": null
+}, {
+  "name": "scddddr",
+  "aliases": null,
+  "signatures": ["(scddddr <stream-pair>)"],
+  "description": "Equivalent to: (scdr (scdr (scdr (scdr <stream-pair>))))",
+  "example": null
+}, {
+  "name": "stream->list",
+  "aliases": null,
+  "signatures": ["(stream->list <stream> <list-length>)"],
+  "description": "Return the first <list-length> items in <stream> as a list.",
+  "example": null
+}, {
+  "name": "stream-map",
+  "aliases": null,
+  "signatures": ["(stream-map <callable> <stream>)"],
+  "description": "Generate a new stream by applying <callable> to each of the items in\n<stream>. Executes lazily.",
+  "example": null
+}, {
+  "name": "stream-filter",
+  "aliases": null,
+  "signatures": ["(stream-filter <predicate?> <stream>)"],
+  "description": "Generate a new stream by filtering out items in <stream> that don't\nsatisfy <predicate?>. Executes lazily.",
+  "example": null
+}, {
+  "name": "stream-ref",
+  "aliases": null,
+  "signatures": ["(stream-ref <stream> <index>)"],
+  "description": "Return the <index>th item in <stream>.",
+  "example": null
+}, {
+  "name": "stream->generator",
+  "aliases": null,
+  "signatures": ["(stream->generator <stream>)"],
+  "description": "Return a thunk (nullary procedure) that, upon invocation, returns the\nnext item in the stream.",
+  "example": null
+}]
