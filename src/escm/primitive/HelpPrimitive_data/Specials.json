@@ -122,7 +122,7 @@
   "name": "dosync",
   "aliases": null,
   "signatures": ["(dosync <expr> ...)"],
-  "description": "Execute \"<expr> ...\" with a mutex lock around it as a critical section.\nLocks/Unlocks the lock via <dynamic-wind> to ensure that random\ncontinuations don't prevent us from unlocking the lock.",
+  "description": "Execute \"<expr> ...\" with a mutex lock around it as a critical section.\nLocks/Unlocks the lock via <dynamic-wind> to ensure that random\ncontinuations don't prevent us from unlocking the lock.\n\n  NOTE: Locks via the *dosync-lock* global mutex variable.",
   "example": null
 }, {
   "name": "dosync-with",
