@@ -35,6 +35,7 @@ public abstract class Datum {
   // Serialization
   public abstract java.lang.String display();
   public abstract java.lang.String write();
+  public abstract java.lang.String pprint();
 
   // Define <toString> as an alias of <write>
   public java.lang.String toString() {

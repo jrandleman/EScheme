@@ -15,6 +15,23 @@ import escm.vm.runtime.GlobalState;
 
 public class IOPrimitives {
   ////////////////////////////////////////////////////////////////////////////
+  // pretty-print
+  public static class PrettyPrint implements Primitive {
+    public java.lang.String escmName() {
+      return "pretty-print";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1) 
+        throw new Exceptionf("'(pretty-print <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      System.out.print(parameters.get(0).pprint());
+      if(GlobalState.inREPL) GlobalState.setLastPrintedANewline(false);
+      return escm.type.Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // write
   public static class Write implements Primitive {
     public java.lang.String escmName() {

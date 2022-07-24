@@ -70,6 +70,10 @@ public class Boolean extends Datum {
     return display();
   }
 
+  public java.lang.String pprint() {
+    return write();
+  }
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter

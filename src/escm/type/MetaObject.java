@@ -163,6 +163,8 @@ public abstract class MetaObject extends Datum {
 
   public abstract java.lang.String write();
 
+  public abstract java.lang.String pprint();
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter

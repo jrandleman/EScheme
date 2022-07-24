@@ -1,4 +1,10 @@
 [{
+  "name": "pretty-print",
+  "aliases": ["pprint"],
+  "signatures": ["(pretty-print <obj>)"],
+  "description": "Pretty-print <obj> to the screen in indented, machine-readable form.\nAliased by \"pprint\".",
+  "example": null
+}, {
   "name": "write",
   "aliases": null,
   "signatures": ["(write <obj>)"],

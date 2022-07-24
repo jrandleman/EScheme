@@ -91,6 +91,7 @@
 ------------------------
 ## IO:
 ```scheme
+(pretty-print <obj>) ; aliased by <pprint>
 (write <obj>)
 (display <obj>)
 (newline)

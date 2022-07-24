@@ -125,6 +125,10 @@ public class ObjectAccessChain extends Datum {
     return display();
   }
 
+  public String pprint() {
+    return write();
+  }
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter

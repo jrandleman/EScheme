@@ -34,6 +34,8 @@
 ;
 ;   - call/cc [alias]
 ;
+;   - pprint [alias]
+;
 ;   - thread-define
 ;   - thread-set!
 ;   - thread-get
@@ -718,6 +720,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Aliasing <call-with-current-continuation>
 (define call/cc call-with-current-continuation)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Aliasing <pretty-print>
+(define pprint pretty-print)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

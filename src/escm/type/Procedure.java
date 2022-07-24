@@ -88,6 +88,10 @@ public abstract class Procedure extends Datum implements Callable {
     return display();
   }
 
+  public java.lang.String pprint() {
+    return write();
+  }
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying

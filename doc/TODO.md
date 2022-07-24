@@ -3,21 +3,8 @@
 ## MORE
 
 
+- CHANGE THE "Bye!" MSG @ THE END OF THE REPL
 
-- look up PATH variable then write escm to that? Have "installer" install the code in the path and rename Main to Escm so running "java Escm" launches it ???
-     => TEST THIS ON MAC AND RPI4
-
-
-
-
-
-
-
-- IMPLEMENT PRETTY PRINTING !!!
-
-- CONSIDER A `defined?` INSTRUCTION / MACRO THAT SUPPORTS INTROSPECTION
-
-- CHANGE RESUME TO SAY HAVE BEEN USING JAVA FOR 1 YEAR
 
 - ADD A `-q`  `--quiet` (quiet) CMD-LINE FLAG TO LAUNCH THE REPL W/O THE ASCII ART
 - ADD A `-h`  `--help` (help) CMD-LINE FLAG TO SHOW USE OF THE CMD-LINE
@@ -26,6 +13,13 @@
   
   * MENTION ALL OF THE CMD-LINE FORMS IN THE README !!!
   * ADD A SECTION ABOUT THIS IN `help`
+
+
+
+- CONSIDER A `defined?` INSTRUCTION / MACRO THAT SUPPORTS INTROSPECTION
+
+- CHANGE RESUME TO SAY HAVE BEEN USING JAVA FOR 1 YEAR
+
 
 
 

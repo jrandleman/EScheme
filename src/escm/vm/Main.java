@@ -123,7 +123,7 @@ public class Main {
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     printReplIntro();
     Trampoline.Continuation printContinuation = (value) -> () -> {
-      if(!(value instanceof escm.type.Void)) System.out.printf("%s\n", value.write());
+      if(!(value instanceof escm.type.Void)) System.out.printf("%s\n", value.pprint());
       return Trampoline.LAST_BOUNCE_SIGNAL;
     };
     while(true) {
