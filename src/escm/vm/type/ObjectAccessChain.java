@@ -131,7 +131,7 @@ public class ObjectAccessChain extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Loading-into-memory semantics for the VM's interpreter
+  // Define a new value in the object property chain
   public void define(ExecutionState state, Datum newPropValue) throws Exception {
     Datum result = state.env.get(value.get(0));
     if(!(result instanceof MetaObject))
@@ -146,7 +146,7 @@ public class ObjectAccessChain extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Loading-into-memory semantics for the VM's interpreter
+  // Set an existing value in the object property chain
   public void set(ExecutionState state, Datum newPropValue) throws Exception {
     Datum result = state.env.get(value.get(0));
     if(!(result instanceof MetaObject))
@@ -161,7 +161,22 @@ public class ObjectAccessChain extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Loading-into-memory semantics for the VM's interpreter
+  // Check if an object property chain is valid
+  public boolean has(ExecutionState state) throws Exception {
+    Datum result = state.env.get(value.get(0));
+    if(!(result instanceof MetaObject))
+      throw new Exceptionf("'ObjectAccessChain 'has? foremost item %s (%s) isn't a meta-object: %s", value.get(0), result.profile(), value);
+    for(int i = 1, n = value.size()-1; i < n; ++i) {
+      result = ((MetaObject)result).get(value.get(i));
+      if(!(result instanceof MetaObject))
+        throw new Exceptionf("'ObjectAccessChain 'has? property %s (%s) isn't a meta-object: %s", value.get(i), result.profile(), value);
+    }
+    return ((MetaObject)result).has(value.get(value.size()-1));
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Loading-into-memory semantics for the VM's interpreter (effectively "get")
   public Datum loadWithState(ExecutionState state) throws Exception {
     Datum result = state.env.get(value.get(0));
     if(!(result instanceof MetaObject))

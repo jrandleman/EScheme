@@ -44,13 +44,19 @@
   "name": "set!",
   "aliases": null,
   "signatures": ["(set! <variable-name> <value>)"],
-  "description": "Assigns <variable-name> to <value>. <variable-name> must have been\npreviously defined. Automatically sets object properties too, so\n\"obj.prop\" is a valid <variable-name>.",
+  "description": "Assigns <variable-name> to <value>. <variable-name> must have been previously\ndefined. Note that <variable-name> may be an object property chain too,\nhence (set! obj.prop 42) is valid syntax!",
   "example": null
 }, {
   "name": "define",
   "aliases": ["def"],
   "signatures": ["(define <variable-name> <value>)", "(define (<procedure-name> <parameter> ...) <value>)"],
-  "description": "Binds <variable-name> to <value> in the current environment.\nAliased by <def>. The 2nd signature is equivalent to:\n  (define <procedure-name> (lambda (<parameter> ...) <value>))",
+  "description": "Binds <variable-name> to <value> in the current environment.\nAliased by <def>. The 2nd signature is equivalent to:\n  (define <procedure-name> (lambda (<parameter> ...) <value>))\n\nNote that <variable-name> may be an object property chain too,\nhence (define obj.prop 42) is valid syntax!",
+  "example": null
+}, {
+  "name": "defined?",
+  "aliases": ["def?"],
+  "signatures": ["(defined? <variable-name>)"],
+  "description": "Checks if <variable-name> is defined in the current environment.\nAliased by <def?>. Note that <variable-name> may be an object\nproperty chain too, hence (defined? obj.prop) is valid syntax!",
   "example": null
 }, {
   "name": "defn",

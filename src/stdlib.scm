@@ -13,6 +13,7 @@
 ;   - begin
 ;   - set!
 ;   - define def
+;   - defined? def?
 ;   - defn
 ;
 ;   - and
@@ -455,6 +456,17 @@
                   (cdr bindings)
                   vals)))
             (list (list (quote define) (car bindings))))))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing DEFINED? (aliased by DEF?): (defined? <var>)
+(define-syntax defined?
+  (lambda (var)
+    (list (quote bytecode) (list (quote defined?) var))))
+
+(define-syntax def?
+  (lambda (var)
+    (list (quote bytecode) (list (quote defined?) var))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

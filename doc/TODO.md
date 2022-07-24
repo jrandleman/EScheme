@@ -4,22 +4,6 @@
 
 
 
-
-- CHANGE THE INSTALLER TO ADD NEW FILES TO A `installerGenerated` DIRECTORY IN `runtime`
-
-
-
-- TEST ON RPI4 !!!
-
-
-
-- CONSIDER A `defined?` INSTRUCTION / MACRO THAT SUPPORTS INTROSPECTION
-
-- CHANGE RESUME TO SAY HAVE BEEN USING JAVA FOR 1 YEAR
-
-
-
-
 - SOLVE THE "running escm via `system` problem"
   `*run-escm-cmd*`
 

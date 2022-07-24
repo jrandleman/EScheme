@@ -48,7 +48,7 @@ public class Environment {
   public boolean has(String name) throws Exception {
     Datum result = bindings.get(name);
     if(result == null) {
-      if(superEnv == null) return false;;
+      if(superEnv == null) return false;
       return superEnv.has(name);
     }
     return true;
