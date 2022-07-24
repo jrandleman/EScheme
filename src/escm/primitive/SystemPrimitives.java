@@ -26,7 +26,7 @@ public class SystemPrimitives {
   public static String getExitMessage() {
     int timeOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
     if(timeOfDay >= 4 && timeOfDay < 12){
-      return "Have a great rest of your morning!";
+      return "Have a great day!";
     } else if(timeOfDay >= 12 && timeOfDay < 16){
       return "Enjoy your afternoon!";
     } else if(timeOfDay >= 16 && timeOfDay < 21){

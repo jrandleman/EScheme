@@ -3,9 +3,9 @@
 ## MORE
 
 
-- ADD A `-q`  `--quiet` (quiet) CMD-LINE FLAG TO LAUNCH THE REPL W/O THE ASCII ART
-- ADD A `-h`  `--help` (help) CMD-LINE FLAG TO SHOW USE OF THE CMD-LINE
-- ADD A `--version` (verion information) CMD-LINE FLAG TO SHOW USE OF THE CMD-LINE
+- ADD A `-q` | `--quiet` (quiet) CMD-LINE FLAG TO LAUNCH THE REPL W/O THE ASCII ART
+- ADD A `-h` | `--help` (help) CMD-LINE FLAG TO SHOW USE OF THE CMD-LINE
+- ADD A `-v` | `--version` (verion information) CMD-LINE FLAG TO SHOW USE OF THE CMD-LINE
 - ADD `--load` AS AN ALT TO `-l`
   
   * MENTION ALL OF THE CMD-LINE FORMS IN THE README !!!
@@ -106,6 +106,7 @@
             ```scheme
             :number
             :integer
+            :real
             :string
             :keyword
             :boolean
