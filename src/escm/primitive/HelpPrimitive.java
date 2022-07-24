@@ -23,7 +23,7 @@ import escm.util.json.JsonNumber;
 import escm.util.json.JsonObject;
 import escm.util.json.JsonString;
 import escm.vm.type.Primitive;
-import escm.vm.runtime.EscmPath;
+import escm.vm.runtime.installerGenerated.EscmPath;
 
 public class HelpPrimitive {
   public static class Help implements Primitive {

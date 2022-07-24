@@ -7,6 +7,9 @@ import java.util.Random;
 import java.io.File;
 import escm.type.Datum;
 import escm.vm.type.Environment;
+import escm.vm.runtime.installerGenerated.EscmPath;
+import escm.vm.runtime.installerGenerated.JavaStdLibLoader;
+import escm.vm.runtime.installerGenerated.EscmStdLibLoader;
 
 public class GlobalState {
   ////////////////////////////////////////////////////////////////////////////

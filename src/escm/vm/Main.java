@@ -11,9 +11,9 @@ import escm.util.Trampoline;
 import escm.vm.type.ExecutionState;
 import escm.vm.type.Environment;
 import escm.vm.runtime.CallStack;
-import escm.vm.runtime.EscmPath;
 import escm.vm.runtime.EscmThread;
 import escm.vm.runtime.GlobalState;
+import escm.vm.runtime.installerGenerated.EscmPath;
 import escm.primitive.SystemPrimitives;
 
 public class Main {
