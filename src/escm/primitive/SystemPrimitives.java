@@ -22,7 +22,12 @@ import escm.vm.runtime.GlobalState;
 
 public class SystemPrimitives {
   ////////////////////////////////////////////////////////////////////////////
-  // static method to determine the EXIT message
+  // Get the EScheme version number
+  public static final double VERSION = 5.0;
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Get the EXIT message
   public static String getExitMessage() {
     int timeOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
     if(timeOfDay >= 4 && timeOfDay < 12){

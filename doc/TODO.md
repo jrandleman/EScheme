@@ -3,13 +3,10 @@
 ## MORE
 
 
-- ADD A `-q` | `--quiet` (quiet) CMD-LINE FLAG TO LAUNCH THE REPL W/O THE ASCII ART
-- ADD A `-h` | `--help` (help) CMD-LINE FLAG TO SHOW USE OF THE CMD-LINE
-- ADD A `-v` | `--version` (verion information) CMD-LINE FLAG TO SHOW USE OF THE CMD-LINE
-- ADD `--load` AS AN ALT TO `-l`
-  
-  * MENTION ALL OF THE CMD-LINE FORMS IN THE README !!!
-  * ADD A SECTION ABOUT THIS IN `help`
+
+
+- CHANGE THE INSTALLER TO ADD NEW FILES TO A `installerGenerated` DIRECTORY IN `runtime`
+
 
 
 
@@ -24,7 +21,7 @@
   `*run-escm-cmd*`
 
 - SUPPORT OFFERING POSSIBLY INTENDED VARIABLE NAMES UPON THE ENV NOT FINDING A NEEDED VARIABLE (LIKE W/ THE `help` MENU)
-  * USE `escm.util.GetClosestMatches.run()`
+  * USE `escm.util.GetClosestStringMatches.run()`
 
 - MENTION IN README THAT BLANK LINES IN THE ESCM CALL STACK DENOTE CALLS TO ANONYMOUS PROCEDURES
 
@@ -126,6 +123,7 @@
 
             :procedure
             :callable
+            :functor
 
             :metaobject
             :object

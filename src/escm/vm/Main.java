@@ -11,6 +11,7 @@ import escm.util.Trampoline;
 import escm.vm.type.ExecutionState;
 import escm.vm.type.Environment;
 import escm.vm.runtime.CallStack;
+import escm.vm.runtime.EscmPath;
 import escm.vm.runtime.EscmThread;
 import escm.vm.runtime.GlobalState;
 import escm.primitive.SystemPrimitives;
@@ -84,7 +85,7 @@ public class Main {
     sb.append("N    | |   |#| |###||||###|###|       |###|###||||###| |#|   | |    A@@@@@@@@@@@@@@ @@@@@@@@@@@@@        @@@@@@@@@@@@           @@@@@\n");
     sb.append("I   _|_|___|#|_|###|##|###|###|_______|###|###|##|###|_|#|___|_|_   @\n");
     sb.append("E   |###|###################################################|###|   V        Copyright (c) Jordan Candide Randleman 2021-2022\n");
-    sb.append("@   |###|###############/|=================|\\###############|###|   I                  Eerina's Scheme: Version 5.0\n");
+    sb.append(String.format("@   |###|###############/|=================|\\###############|###|   I                  Eerina's Scheme: Version %s\n",SystemPrimitives.VERSION));
     sb.append("@  /-------------------/ /=================\\ \\-------------------\\  E              Type (help) for Help, (exit) to Exit\n");
     sb.append("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
     System.out.print(sb.toString());
@@ -116,12 +117,16 @@ public class Main {
   }
 
 
-  private static void launchRepl() throws Exception {
+  private static void launchRepl(ParsedCommandLine parsedCmdLine) throws Exception {
     // Note that we DON'T set whether we're in the REPL here, as such risks
     //   causing a read/write race condition should a script loaded by "-l" 
     //   spawn a thread!
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    printReplIntro();
+    if(parsedCmdLine.launchingQuiet == false) {
+      printReplIntro();
+    } else {
+      GlobalState.setLastPrintedANewline(true); // to print opening ">" on the 1st line
+    }
     Trampoline.Continuation printContinuation = (value) -> () -> {
       if(!(value instanceof escm.type.Void)) System.out.printf("%s\n", value.pprint());
       return Trampoline.LAST_BOUNCE_SIGNAL;
@@ -139,30 +144,80 @@ public class Main {
 
   ////////////////////////////////////////////////////////////////////////////
   // Implementing our File Interpreter
-  private static void launchScript(String[] args) throws Exception {
-    boolean loadingIntoREPL = args[0].equals("-l");
-    int filenameIndex = loadingIntoREPL ? 1 : 0;
-    if(filenameIndex >= args.length) {
-      System.err.println("ERROR: No filename given to load into the REPL!");
-      return;
-    }
-    // Populate *argv*
-    String filename = args[filenameIndex];
-    Datum argvIterator = escm.type.Nil.VALUE;
-    for(int i = args.length-1; i > filenameIndex; --i)
-      argvIterator = new escm.type.Pair(new escm.type.String(args[i]),argvIterator);
-    GlobalState.setArgv(argvIterator);
+  private static void launchScript(ParsedCommandLine parsedCmdLine) throws Exception {
     // Initialize the runtime, load the file, & launch REPL if found "-l" prior the filename
     GlobalState.initialize();
     Trampoline.Continuation replIfReplingContinuation = (value) -> () -> {
-      if(loadingIntoREPL) launchRepl();
+      if(parsedCmdLine.loadingIntoREPL) launchRepl(parsedCmdLine);
       return Trampoline.LAST_BOUNCE_SIGNAL;
     };
     // Note that we set whether we're in the REPL here, as setting in <launchRepl>
     //   could cause a read/write race condition should the loaded script spawn a 
     //   thread!
-    if(loadingIntoREPL) GlobalState.inREPL = true; // trigger exit message to be printed
-    Trampoline.resolve(SystemPrimitives.Load.loadFileInEnvironment(GlobalState.globalEnvironment,filename,replIfReplingContinuation));
+    if(parsedCmdLine.loadingIntoREPL) GlobalState.inREPL = true; // trigger exit message to be printed
+    Trampoline.resolve(SystemPrimitives.Load.loadFileInEnvironment(GlobalState.globalEnvironment,parsedCmdLine.scriptName,replIfReplingContinuation));
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Parse the command-line
+  private static class ParsedCommandLine {
+    public boolean launchingQuiet  = false; // -q --quiet
+    public boolean loadingIntoREPL = false; // -l --load
+    public String scriptName = null;        // <null> denotes no script
+  }
+
+
+  private static void setArgv(int argvStart, String[] args) {
+    Datum argvIterator = escm.type.Nil.VALUE;
+    for(int i = args.length-1; i >= argvStart; --i)
+      argvIterator = new escm.type.Pair(new escm.type.String(args[i]),argvIterator);
+    GlobalState.setArgv(argvIterator);
+  }
+
+
+  private static ParsedCommandLine parseCommandLine(String[] args) {
+    ParsedCommandLine parsed = new ParsedCommandLine();
+    for(int i = 0; i < args.length; ++i) {
+      switch(args[i]) {
+        case "-v": case "--version": {
+          System.out.printf("Eerina's Scheme Version %s\n", SystemPrimitives.VERSION);
+          System.out.printf("Target: %s %s\n", System.getProperty("os.name"),System.getProperty("os.version"));
+          System.out.printf("InstalledDir: %s\n", EscmPath.VALUE);
+          System.exit(0);
+        }
+        case "-h": case "--help": {
+          System.out.println("Command-line flags may be used to modify EScheme's behavior:");
+          System.out.println("  1. -v, --version                  | Print EScheme version information");
+          System.out.println("  2. -h, --help                     | Print this information");
+          System.out.println("  3. -q, --quiet                    | Launch the REPL without ASCII art");
+          System.out.println("  4. -l, --load <script> <arg1> ... | Load <script> with <arg> ... as *argv* into the REPL");
+          System.out.println("  5. <script> <arg1> ...            | Interpret <script> with <arg> ... as *argv*");
+          System.out.println("  6. [no arguments]                 | Launch the REPL");
+          System.exit(0);
+        }
+        case "-q": case "--quiet": {
+          parsed.launchingQuiet = true;
+          break;
+        }
+        case "-l": case "--load": {
+          parsed.loadingIntoREPL = true;
+          if(i+1 == args.length) {
+            System.err.printf("ESCM ERROR: No filename given to load into the REPL with \"%s\"!\n", args[i]);
+            System.exit(1);
+          }
+          parsed.scriptName = args[i+1];
+          setArgv(i+2,args);
+          return parsed;
+        }
+        default: {
+          parsed.scriptName = args[i];
+          setArgv(i+1,args);
+          return parsed;
+        }
+      }
+    }
+    return parsed;
   }
 
 
@@ -172,13 +227,14 @@ public class Main {
     escm.type.Thread mainThread = new escm.type.Thread(
       "escm-main",
       (params, cont) -> {
+        ParsedCommandLine parsedCmdLine = parseCommandLine(args);
         try {
-          if(args.length == 0) {
+          if(parsedCmdLine.scriptName == null) {
             GlobalState.initialize();
             GlobalState.inREPL = true; // trigger exit message to be printed
-            launchRepl();
+            launchRepl(parsedCmdLine);
           } else {
-            launchScript(args);
+            launchScript(parsedCmdLine);
           }
         } catch(Exception e) {
           System.err.printf("Driver Loop Caught Error %s\n", e);
