@@ -3,9 +3,6 @@
 ## MORE
 
 
-- CHANGE THE "Bye!" MSG @ THE END OF THE REPL
-
-
 - ADD A `-q`  `--quiet` (quiet) CMD-LINE FLAG TO LAUNCH THE REPL W/O THE ASCII ART
 - ADD A `-h`  `--help` (help) CMD-LINE FLAG TO SHOW USE OF THE CMD-LINE
 - ADD A `--version` (verion information) CMD-LINE FLAG TO SHOW USE OF THE CMD-LINE
@@ -40,6 +37,10 @@
 
 - ADD THE `do` MACRO (MENTION IN `help`) !!!
 - ADD THE `letrec*` MACRO (ADD TO `help` TOO)
+
+
+- PRIMITIVE TO GET CURRENT DATE/TIME WITH OFFSETS
+  * ADD TO `primitives.md` AND `help`
 
 
 

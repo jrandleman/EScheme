@@ -105,7 +105,7 @@ public class Main {
         Datum readDatum = read(br);
         // Account for EOF => triggers REPL termination!
         if(readDatum == null) {
-          System.out.println('\n'+SystemPrimitives.EXIT_MESSAGE);
+          System.out.println('\n'+SystemPrimitives.getExitMessage());
           System.exit(0);
         }
         return readDatum;

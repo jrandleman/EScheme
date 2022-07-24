@@ -4,6 +4,7 @@
 
 package escm.primitive;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.File;
@@ -21,8 +22,19 @@ import escm.vm.runtime.GlobalState;
 
 public class SystemPrimitives {
   ////////////////////////////////////////////////////////////////////////////
-  // static field to determine the EXIT message
-  public static final String EXIT_MESSAGE = "Bye!";
+  // static method to determine the EXIT message
+  public static String getExitMessage() {
+    int timeOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+    if(timeOfDay >= 4 && timeOfDay < 12){
+      return "Have a great rest of your morning!";
+    } else if(timeOfDay >= 12 && timeOfDay < 16){
+      return "Enjoy your afternoon!";
+    } else if(timeOfDay >= 16 && timeOfDay < 21){
+      return "Have a nice evening!";
+    } else {
+      return "Good night! Sleep well :)";
+    }
+  }
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -44,7 +56,7 @@ public class SystemPrimitives {
       // Print the exit msg iff in a REPL session
       if(GlobalState.inREPL) {
         if(!GlobalState.getLastPrintedANewline()) System.out.println("");
-        System.out.println(EXIT_MESSAGE);
+        System.out.println(getExitMessage());
       }
       System.exit(code);
       return escm.type.Void.VALUE; // never triggered

@@ -2,7 +2,7 @@
   "name": "string-length",
   "aliases": null,
   "signatures": ["(string-length <str>)"],
-  "description": "Returns the length of <str>.",
+  "description": "Returns the length of <str>. Quite exciting.",
   "example": null
 }, {
   "name": "string-empty?",
