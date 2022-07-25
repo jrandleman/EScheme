@@ -1,5 +1,8 @@
 <!-- README.md -->
 
+# Eerina's Scheme
+
+------------------------------------------------------------------------------
 ## Installing and Running EScheme:
 ### Dependencies:
 * EScheme depends on [Java](https://adoptium.net) and [`git`](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git). Make sure they're both installed first!
@@ -11,7 +14,7 @@
 * Go to the `EScheme/installer` directory.
 * Run: `javac Installer.java`
 * Run: `java Installer`
-  - You can ignore warnings that occur here, they've been vetted.
+  - Use the `-v` or `--verbose` command-line flag to get print extra progress messages.
 * ___Optional:___ if you're using `bash` or `zsh` as your shell:
   - `bash`:
     1. Copy the `alias='...'` output by the installer.
@@ -31,11 +34,13 @@
 
 
 
+------------------------------------------------------------------------------
 ## On Reserved Symbols:
 * Anything with the `escm-` prefix is considered reserved for use by the runtime.
 
 
 
+------------------------------------------------------------------------------
 ## On Threading & Continuations:
 * Threads each have their own stack, and hence their own set of continuations.
 * Continuations are delimited by the execution of the thread that created them.
@@ -44,6 +49,7 @@
 
 
 
+------------------------------------------------------------------------------
 ## On Threading & Dynamic Environments:
 * Each thread has a so-called "dynamic environment", wherein a set of variable 
   bindings is kept globally within the thread while being hidden from other threads.
@@ -58,6 +64,7 @@
 
 
 
+------------------------------------------------------------------------------
 ## EScheme-Specific Concepts (Scheme Extension/Deviations)
 
 1. Support for `bytecode`, `compile`, `eval-bytecode`

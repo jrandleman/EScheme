@@ -1,4 +1,5 @@
 // Author: Jordan Randleman - Installer - MUST BE RUN WITHIN THE `EScheme/installer` DIRECTORY!
+//   => Command-Line Options: -v, --verbose (print status updates)
 /* Purpose:
 
   Compiles/Installs the EScheme runtime. This is done by accomplishing several tasks:
@@ -28,6 +29,28 @@ import java.util.ArrayList;
 
 public class Installer {
   ////////////////////////////////////////////////////////////////////////////
+  // "Verbose" Setting Satus
+  private static boolean VERBOSE_MODE = false;
+
+
+  private static void parseCommandLine(String[] args) {
+    if(args.length == 0) return;
+    for(int i = 0; i < args.length; ++i) {
+      switch(args[i]) {
+        case "-v": case "--verbose": {
+          VERBOSE_MODE = true;
+          break;
+        }
+        default: {
+          System.err.printf("ESCM INSTALLER ERROR: Invalid command-line argument \"%s\"!\n  => Use \"-v\" or \"--verbose\" to print extra messages!\n", args[i]);
+          System.exit(1);
+        }
+      }
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Terminal Command Execution
   private static class ExecuteCommandResult {
     public String out = null;
@@ -47,8 +70,10 @@ public class Installer {
 
 
   private static ExecuteCommandResult executeCommand(String command) throws Exception {
-    System.out.println("> Executing Command:");
-    System.out.println("  \"" + command + "\"");
+    if(VERBOSE_MODE) {
+      System.out.println("> Executing Command:");
+      System.out.println("  \"" + command + "\"");
+    }
     Process pro = Runtime.getRuntime().exec(command);
     ExecuteCommandResult res = new ExecuteCommandResult();
     res.out = getInputStreamLines(pro.getInputStream());
@@ -69,7 +94,7 @@ public class Installer {
 
   ////////////////////////////////////////////////////////////////////////////
   // Create the Directory for our Generated Files
-  private static String createInstallerNewFileDirectory(String escmDir) {
+  private static String createInstallerNewFilesDirectory(String escmDir) {
     String generatedFilesDir = escmDir+File.separator+"src"+File.separator+"escm"+
                                        File.separator+"vm"+File.separator+"runtime"+
                                        File.separator+"installerGenerated";
@@ -117,7 +142,9 @@ public class Installer {
       System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
-    System.out.println("> Successfully generated the path file to our EScheme implementation!");
+    if(VERBOSE_MODE) {
+      System.out.println("> Successfully generated the path file to our EScheme implementation!");
+    }
   }
 
 
@@ -159,7 +186,9 @@ public class Installer {
       System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
-    System.out.println("> Successfully generated the EScheme standard library loader!");
+    if(VERBOSE_MODE) {
+      System.out.println("> Successfully generated the EScheme standard library loader!");
+    }
   }
 
 
@@ -283,7 +312,9 @@ public class Installer {
       System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
-    System.out.println("> Successfully generated the Java standard library loader!");
+    if(VERBOSE_MODE) {
+      System.out.println("> Successfully generated the Java standard library loader!");
+    }
   }
 
 
@@ -300,7 +331,9 @@ public class Installer {
         System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
         System.exit(1);
       } else if(res.err.length() > 0) {
-        System.err.printf("> ESCM INSTALLER SRC COMPILATION WARNING(S) [ MAY IGNORE ]:\n  %s\n", res.err.replaceAll("\n","\n  "));
+        if(VERBOSE_MODE) {
+          System.err.printf("> [ NON FATAL ] EScheme Installer SRC Compilation Warning(s) :\n  %s\n", res.err.replaceAll("\n","\n  "));
+        }
       }
     } catch(Exception e) {
       System.err.println("> ESCM INSTALLER ERROR: Can't compile: "+escmDir+File.separator+"src"+File.separator+"Main.java");
@@ -314,7 +347,7 @@ public class Installer {
   ////////////////////////////////////////////////////////////////////////////
   // Generate the Shell Alias to Invoke EScheme
   private static void printEscmShellAliasString(String escmDir) {
-    System.out.println("> Alias for the REPL to put in `~/.bashrc` OR `~/.zshrc`:");
+    System.out.println("> [ OPTIONAL ] Alias for the REPL to put in `~/.bashrc` OR `~/.zshrc`:");
     System.out.println("  alias escm='java -classpath "+escmDir+File.separator+"bin Main'");
   }
 
@@ -322,8 +355,9 @@ public class Installer {
   ////////////////////////////////////////////////////////////////////////////
   // Main Dispatch
   public static void main(String[] args) {
+    parseCommandLine(args);
     String escmDir = getEscmDirectory();
-    String generatedFilesDir = createInstallerNewFileDirectory(escmDir);
+    String generatedFilesDir = createInstallerNewFilesDirectory(escmDir);
     generateEscmPath(escmDir,generatedFilesDir);
     generateEscmStdlibLoader(escmDir,generatedFilesDir);
     generateJavaStdlibLoader(escmDir,generatedFilesDir);
