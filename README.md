@@ -28,7 +28,7 @@
 
 ### Execution:
 * If you didn't do the optional step during installation:
-  - Run `java Main` within the `EScheme/bin` directory.
+  - Run `java Main` within the `EScheme/bin` directory!
 * Else:
   - Run `escm` anywhere in your terminal!
 
