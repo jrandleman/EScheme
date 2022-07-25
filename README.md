@@ -14,7 +14,7 @@
 * Go to the `EScheme/installer` directory.
 * Run: `javac Installer.java`
 * Run: `java Installer`
-  - Use the `-v` or `--verbose` command-line flag to get print extra progress messages.
+  - Use the `-v` or `--verbose` command-line flag to print extra progress messages.
 * ___Optional:___ if you're using `bash` or `zsh` as your shell:
   - `bash`:
     1. Copy the `alias='...'` output by the installer.
