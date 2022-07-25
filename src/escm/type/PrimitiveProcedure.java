@@ -10,7 +10,7 @@ import escm.util.Trampoline;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
 import escm.vm.type.ExecutionState;
-import escm.vm.runtime.CallStack;
+import escm.vm.runtime.EscmCallStack;
 
 public class PrimitiveProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
@@ -61,9 +61,9 @@ public class PrimitiveProcedure extends Procedure {
   // Application Abstraction
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
     return () -> {
-      CallStack.push(name);
+      EscmCallStack.push(name);
       Trampoline.Continuation popContinuation = (value) -> () -> {
-        CallStack.pop(name);
+        EscmCallStack.pop(name);
         return continuation.run(value);
       };
       return prm.callWith(arguments,popContinuation);

@@ -2,17 +2,6 @@
 
 ## MORE
 
-
-
-- SUPPORT OFFERING POSSIBLY INTENDED VARIABLE NAMES UPON THE ENV NOT FINDING A NEEDED VARIABLE (LIKE W/ THE `help` MENU)
-  * USE `escm.util.GetClosestStringMatches.run()`
-
-- MENTION IN README THAT BLANK LINES IN THE ESCM CALL STACK DENOTE CALLS TO ANONYMOUS PROCEDURES
-
-
-
-
-
 - SHOULD `define-syntax` REALLY BE AN INSTRUCTION? COULD IT NOT EXPAND TO A FUNCTION:  
   `(define-syntax <symbol> <procedure>)` => `(escm-define-syntax (quote <symbol>) <procedure>)`
 

@@ -10,7 +10,7 @@ import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.ExecutionState;
 import escm.vm.type.Environment;
-import escm.vm.runtime.CallStack;
+import escm.vm.runtime.EscmCallStack;
 import escm.vm.runtime.EscmThread;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.installerGenerated.EscmPath;
@@ -65,10 +65,20 @@ public class Main {
 
   ////////////////////////////////////////////////////////////////////////////
   // Implementing our REPL
+  public static void printJavaStackTraceWithoutMessage(Exception e) {
+    StackTraceElement[] stackTrace = e.getStackTrace();
+    if(stackTrace.length == 0) return;
+    System.err.printf(">> Java Call Stack: %s", stackTrace[0]);
+    for(int i = 1; i < stackTrace.length; ++i) {
+      System.err.printf("\n                    %s", stackTrace[i]);
+    }
+  }
+
+
   public static void reportTopLevelException(Exception e) {
-    System.err.printf("\nESCM ERROR: %s\n", e.getMessage());
-    CallStack.print();
-    e.printStackTrace();
+    System.err.printf("\nESCM ERROR: %s\n", e);
+    EscmCallStack.print();
+    printJavaStackTraceWithoutMessage(e);
     System.err.println("");
   }
 
@@ -146,7 +156,7 @@ public class Main {
     while(true) {
       try {
         eval(GlobalState.globalEnvironment,readFullExpression(br),printContinuation);
-        CallStack.clear(); // residue frames may reside after continuation nonsense
+        EscmCallStack.clear(); // residue frames may reside after continuation nonsense
       } catch(Exception e) {
         reportTopLevelException(e);
       }
@@ -246,8 +256,8 @@ public class Main {
         } catch(Exception e) {
           System.err.printf("Driver Loop Caught Error %s\n", e);
           System.err.print("\n  "+COMMAND_LINE_FLAGS.replaceAll("\n","\n  ")+"\n");
-          CallStack.print();
-          e.printStackTrace();
+          EscmCallStack.print();
+          printJavaStackTraceWithoutMessage(e);
         }
         return cont.run(escm.type.Void.VALUE); // never triggered
       }

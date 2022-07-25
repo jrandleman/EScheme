@@ -34,7 +34,7 @@ import escm.vm.Interpreter;
 import escm.vm.type.Instruction;
 import escm.vm.type.ExecutionState;
 import escm.vm.type.Environment;
-import escm.vm.runtime.CallStack;
+import escm.vm.runtime.EscmCallStack;
 
 public class CompoundProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
@@ -182,9 +182,9 @@ public class CompoundProcedure extends Procedure {
     return () -> {
       int clauseNumber = validateEnvironmentExtension(arguments);
       Environment extendedEnvironment = getExtendedEnvironment(clauseNumber,arguments);
-      CallStack.push(name);
+      EscmCallStack.push(name);
       Trampoline.Continuation popContinuation = (value) -> () -> {
-        CallStack.pop(name);
+        EscmCallStack.pop(name);
         return continuation.run(value);
       };
       return Interpreter.run(new ExecutionState(extendedEnvironment,state.compileTime.bodyList.get(clauseNumber)),popContinuation);

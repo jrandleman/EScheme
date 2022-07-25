@@ -6,9 +6,11 @@
 //    environment's "super" [enclosing] environment is <null>).
 
 package escm.vm.type;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.util.Exceptionf;
+import escm.util.GetClosestStringMatches;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
@@ -18,11 +20,16 @@ import escm.type.PrimitiveProcedure;
 
 public class Environment {
   ////////////////////////////////////////////////////////////////////////////
+  // Constant Fields
+  public static final int MAXIMUM_SUGGESTED_VARIABLE_ALTERNATIVES = 15;
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Fields
   private Environment superEnv;
   private ConcurrentHashMap<String,Datum> bindings;
 
-  public Datum bindingsAsAssocList() throws Exception {
+  public Datum bindingsAsAssocList() {
     Datum alist = Nil.VALUE;
     for(ConcurrentHashMap.Entry<String,Datum> binding : bindings.entrySet())
       alist = new Pair(Pair.List(new Symbol(binding.getKey()),binding.getValue().copy()),alist);
@@ -44,8 +51,34 @@ public class Environment {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Get Possible Variable Alternatives
+  private static final String reservedVarCode = new String(new char[]{116,97,115,110,105,109});
+
+
+  private void addCurrentVariableBindings(ArrayList<String> existingVariables) {
+    for(Map.Entry<String,Datum> e : bindings.entrySet()) {
+      String key = e.getKey();
+      if(!key.equals(reservedVarCode)) existingVariables.add(key);
+    }
+    if(superEnv != null) superEnv.addCurrentVariableBindings(existingVariables);
+  }
+
+
+  private String getPossibleVariableIntentions(String varName) {
+    ArrayList<String> existingVariables = new ArrayList<String>();
+    addCurrentVariableBindings(existingVariables);
+    ArrayList<String> potentialVariables = GetClosestStringMatches.run(varName,existingVariables,MAXIMUM_SUGGESTED_VARIABLE_ALTERNATIVES);
+    StringBuilder sb = new StringBuilder("\nNo matches found! Did you mean:");
+    for(int i = 0, n = potentialVariables.size(); i < n; ++i) {
+      sb.append(String.format("\n  %2d) %s", i+1, potentialVariables.get(i)));
+    }
+    return sb.toString();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Has value
-  public boolean has(String name) throws Exception {
+  public boolean has(String name) {
     Datum result = bindings.get(name);
     if(result == null) {
       if(superEnv == null) return false;
@@ -60,7 +93,7 @@ public class Environment {
   public Datum get(String name) throws Exception {
     Datum result = bindings.get(name);
     if(result == null) {
-      if(superEnv == null) throw new Exceptionf("escm.vm.type.Environment variable %s doesn't exist!", name);
+      if(superEnv == null) throw new Exceptionf("escm.vm.type.Environment [GET] variable %s doesn't exist!%s", name, getPossibleVariableIntentions(name));
       return superEnv.get(name);
     }
     return result;
@@ -72,7 +105,7 @@ public class Environment {
   public void set(String name, Datum newValue) throws Exception {
     Datum result = bindings.get(name);
     if(result == null) {
-      if(superEnv == null) throw new Exceptionf("escm.vm.type.Environment variable %s doesn't exist!", name);
+      if(superEnv == null) throw new Exceptionf("escm.vm.type.Environment [SET!] variable %s doesn't exist!%s", name, getPossibleVariableIntentions(name));
       superEnv.set(name,newValue);
     } else {
       bindings.put(name,newValue.loadWithName(name));
