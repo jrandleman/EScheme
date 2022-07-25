@@ -100,5 +100,6 @@
 7. Compile-time procedural macro system:
    - No run-time bindings, all global in scope, deletable for localization!
 8. Object System (classes, interfaces, and objects!)
-9. Multi-arity and optional-parameter support via `fn`
-10. No `eqv?`, `memv`, or `assv`: only `eq?` and `equal?` are present.
+9. Multithreading Support (threads and reentrant locks!)
+10. Multi-arity and optional-parameter support via `fn`
+11. No `eqv?`, `memv`, or `assv`: only `eq?` and `equal?` are present.
