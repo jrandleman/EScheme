@@ -1,6 +1,6 @@
 <!-- README.md -->
 
-# Eerina's Scheme
+# Eerina's Scheme (🚧 UNDER CONSTRUCTION 🚧)
 
 ------------------------------------------------------------------------------
 ## Installing and Running EScheme:
@@ -32,6 +32,22 @@
 * Else:
   - Run `escm` anywhere in your terminal!
 
+
+
+------------------------------------------------------------------------------
+## Command-line flags may be used to modify EScheme's behavior:
+1. `-v`, `--version`
+   * Print EScheme version information
+2. `-h`, `--help`
+   * Print this information
+3. `-q`, `--quiet`
+   * Launch the REPL without ASCII art
+4. `-l`, `--load <script> <arg1> ...`
+   * Load `<script>` with `<arg> ...` as `*argv*` into the REPL
+5. `<script> <arg1> ...`
+   * Interpret `<script>` with `<arg> ...` as `*argv*`
+6. \[no arguments\]
+   * Launch the REPL
 
 
 ------------------------------------------------------------------------------

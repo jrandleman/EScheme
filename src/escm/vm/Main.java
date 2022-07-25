@@ -18,6 +18,18 @@ import escm.primitive.SystemPrimitives;
 
 public class Main {
   ////////////////////////////////////////////////////////////////////////////
+  // Command-line flag options
+  public static final String COMMAND_LINE_FLAGS = 
+    "Command-line flags may be used to modify EScheme's behavior:\n"+
+    "  1. -v, --version                  | Print EScheme version information\n"+
+    "  2. -h, --help                     | Print this information\n"+
+    "  3. -q, --quiet                    | Launch the REPL without ASCII art\n"+
+    "  4. -l, --load <script> <arg1> ... | Load <script> with <arg> ... as *argv* into the REPL\n"+
+    "  5. <script> <arg1> ...            | Interpret <script> with <arg> ... as *argv*\n"+
+    "  6. [no arguments]                 | Launch the REPL\n";
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Evaluate an escm expression in the given environment
   public static void eval(Environment env, Datum d, Trampoline.Continuation continuation) throws Exception {
     Trampoline.resolve(Compiler.run(d,(compiled) -> () -> {
@@ -187,13 +199,7 @@ public class Main {
           System.exit(0);
         }
         case "-h": case "--help": {
-          System.out.println("Command-line flags may be used to modify EScheme's behavior:");
-          System.out.println("  1. -v, --version                  | Print EScheme version information");
-          System.out.println("  2. -h, --help                     | Print this information");
-          System.out.println("  3. -q, --quiet                    | Launch the REPL without ASCII art");
-          System.out.println("  4. -l, --load <script> <arg1> ... | Load <script> with <arg> ... as *argv* into the REPL");
-          System.out.println("  5. <script> <arg1> ...            | Interpret <script> with <arg> ... as *argv*");
-          System.out.println("  6. [no arguments]                 | Launch the REPL");
+          System.out.print(COMMAND_LINE_FLAGS);
           System.exit(0);
         }
         case "-q": case "--quiet": {
