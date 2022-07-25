@@ -293,12 +293,14 @@ public class Installer {
     String compileCmd = "javac -source 11 -target 11 -d "+escmDir+File.separator+"bin -classpath "+escmDir+File.separator+"src "+escmDir+File.separator+"src"+File.separator+"Main.java";
     try {
       ExecuteCommandResult res = executeCommand(compileCmd);
-      if(res.exit != 0 || res.err.length() > 0) {
+      if(res.exit != 0) {
         System.err.println("> ESCM INSTALLER ERROR: Can't compile: "+escmDir+File.separator+"src"+File.separator+"Main.java");
         System.err.println("  exit: " + String.valueOf(res.exit));
         System.err.println("  error: " + res.err);
         System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
         System.exit(1);
+      } else if(res.err.length() > 0) {
+        System.err.printf("> ESCM INSTALLER SRC COMPILATION WARNING(S) [ MAY IGNORE ]:\n  %s\n", res.err.replaceAll("\n","\n  "));
       }
     } catch(Exception e) {
       System.err.println("> ESCM INSTALLER ERROR: Can't compile: "+escmDir+File.separator+"src"+File.separator+"Main.java");

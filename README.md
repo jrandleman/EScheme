@@ -1,17 +1,48 @@
 <!-- README.md -->
 
 ## Installing and Running EScheme:
-* Installation: Compile and run `Installer.java` within `EScheme/installer`
-* Execution: Run `java Main` within `EScheme/bin`
+### Dependencies:
+* EScheme depends on [Java](https://adoptium.net) and [`git`](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git). Make sure they're both installed first!
+  - Note that EScheme supports both Java 11 and 17 (LTS releases)!
+
+### Installation:
+* Via the command-line, go to the directory you'd like to install `EScheme` in.
+* Run: `git clone https://github.com/jrandleman/EScheme`
+* Go to the `EScheme/installer` directory.
+* Run: `javac Installer.java`
+* Run: `java Installer`
+  - You can ignore warnings that occur here, they've been vetted.
+* ___Optional:___ if you're using `bash` or `zsh` as your shell:
+  - `bash`:
+    1. Copy the `alias` output by the installer.
+    2. Add it to your `~/.bashrc` (and/or `~/.bash_aliases`) file.
+    3. Run: `. ~/.bashrc` (and/or `~/.bash_aliases`)
+  - `zsh`:
+    1. Copy the `alias` output by the installer.
+    2. Add it to your `~/.zshrc` file.
+    3. Run: `. ~/.zshrc`
+  - You can now run `escm` anywhere in the command-line to run EScheme!
+
+### Execution:
+* If you didn't do the optional step during installation:
+  - Run `java Main` within the `EScheme/bin` directory.
+* Else:
+  - Run `escm` anywhere in your terminal.
+
+
 
 ## On Reserved Symbols:
 * Anything with the `escm-` prefix is considered reserved for use by the runtime.
+
+
 
 ## On Threading & Continuations:
 * Threads each have their own stack, and hence their own set of continuations.
 * Continuations are delimited by the execution of the thread that created them.
 * Hence a child thread's continuation will never "continue" back into the parent 
   thread, rather, it will terminate where the child thread terminated.
+
+
 
 ## On Threading & Dynamic Environments:
 * Each thread has a so-called "dynamic environment", wherein a set of variable 
@@ -24,6 +55,8 @@
   be shared & operated upon by many procedures without having to lock, since each
   thread only ever operates on a local copy of the state!
   * This is used by `dynamic-wind` in order to maintain thread-local winds!
+
+
 
 ## EScheme-Specific Concepts (Scheme Extension/Deviations)
 
