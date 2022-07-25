@@ -89,18 +89,6 @@ public class Interpreter {
         }
 
         //////////////////////////////////////////////////////////////////////
-        // (define-syntax <symbol>)
-        case Instruction.DEFINE_SYNTAX: {
-          if(!(state.cvr instanceof Callable))
-            throw new Exceptionf("VM ERROR: Invalid non-callable CVR %s in \"define-syntax\" instruction!", state.cvr.profile());
-          String name = ((escm.type.Symbol)instruction.argument).value();
-          Compiler.MACRO_REGISTRY.put(name,(Callable)state.cvr.loadWithName(name));
-          state.cvr = escm.type.Void.VALUE;
-          ++state.cii;
-          break;
-        }
-
-        //////////////////////////////////////////////////////////////////////
         // (defined? <symbol>)
         case Instruction.DEFINEDP: {
           if(instruction.argument instanceof escm.type.Symbol) {

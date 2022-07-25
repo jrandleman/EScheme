@@ -116,6 +116,29 @@ public class MetaPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // escm-define-syntax
+  public static class EscmDefineSyntax implements Primitive {
+    public java.lang.String escmName() {
+      return "escm-define-syntax";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2)
+        throw new Exceptionf("'(escmn-define-syntax <symbol> <callable>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum name = parameters.get(0);
+      if(!(name instanceof Symbol))
+        throw new Exceptionf("'(escmn-define-syntax <symbol> <callable>) 1st arg %s isn't a symbol: %s", name.profile(), Exceptionf.profileArgs(parameters));
+      Datum value = parameters.get(1);
+      if(!(value instanceof Callable))
+        throw new Exceptionf("'(escmn-define-syntax <symbol> <callable>) 2nd arg %s isn't a callable: %s", value.profile(), Exceptionf.profileArgs(parameters));
+      String macroName = ((Symbol)name).value();
+      Compiler.MACRO_REGISTRY.put(macroName,(Callable)value.loadWithName(macroName));
+      return escm.type.Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // expand-syntax
   public static class ExpandSyntax implements PrimitiveCallable {
     public java.lang.String escmName() {

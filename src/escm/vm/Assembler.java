@@ -31,8 +31,6 @@ public class Assembler {
     if(s.equals("define"))         return Instruction.DEFINE;
     if(s.equals("set!"))           return Instruction.SET;
 
-    if(s.equals("define-syntax"))  return Instruction.DEFINE_SYNTAX;
-
     if(s.equals("defined?"))       return Instruction.DEFINEDP;
 
     if(s.equals("ifn"))            return Instruction.IFN;
@@ -193,15 +191,6 @@ public class Assembler {
           return new Instruction(Instruction.SET,new ObjectAccessChain(argSymbol));
         }
         return new Instruction(Instruction.SET,arg);
-      }
-
-      ////////////////////////////////////////////////////////////////////////
-      // (define-syntax <symbol>)
-      case Instruction.DEFINE_SYNTAX: {
-        Datum arg = getInstructionArgument(instructionPair);
-        if(!(arg instanceof Symbol))
-          throw new Exceptionf("ASM ERROR: \"define-syntax\" instruction %s must have a symbolic arg!", instruction.profile());
-        return new Instruction(Instruction.DEFINE_SYNTAX,arg);
       }
 
       ////////////////////////////////////////////////////////////////////////

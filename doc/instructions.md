@@ -102,7 +102,6 @@ The escm VM has built-in support for interpretting object access chains, hence
 
 As such, all instructions that set or evaluate a symbolic datum support this 
 syntax. These include: `define`, `set!`, `load`, `call`, `push`, & `return`.
-Note that `define-syntax` is NOT among their number.
 
 
 
@@ -114,8 +113,6 @@ Note that `define-syntax` is NOT among their number.
 (define <symbol>) ; bind <symbol> to CVR [sets CVR to <void>]
 
 (set! <symbol>) ; set! <symbol> to CVR [sets CVR to <void>]
-
-(define-syntax <symbol>) ; bind <symbol> to the callable in CVR as a macro in the global env expanded by the escm compiler [sets CVR to <void>]
 
 (defined? <symbol>) ; determine if <symbol> is defined as a variable [sets CVR to the boolean result] (use the <syntax?> procedure for macros)
 

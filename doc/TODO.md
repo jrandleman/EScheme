@@ -2,12 +2,6 @@
 
 ## MORE
 
-- SHOULD `define-syntax` REALLY BE AN INSTRUCTION? COULD IT NOT EXPAND TO A FUNCTION:  
-  `(define-syntax <symbol> <procedure>)` => `(escm-define-syntax (quote <symbol>) <procedure>)`
-
-
-
-
 - ADD `=>` SUPPORT FOR `cond` AND `case`
   => ADD THIS TO THEIR `help` ENTRIES
 

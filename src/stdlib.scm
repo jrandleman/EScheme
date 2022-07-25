@@ -77,6 +77,9 @@
 ;         x))))
 
 (bytecode
+  (push escm-define-syntax)
+  (load-symbol quote)
+  (push)
   (load-closure 
     ((x)
       (push list)
@@ -95,7 +98,8 @@
       (call 3)
       (push)
       (call 3)))
-  (define-syntax quote))
+  (push)
+  (call 3))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -103,36 +107,27 @@
 
 ; (define-syntax define-syntax
 ;   (lambda (name procedure)
-;     (cons 
-;       (quote bytecode)
-;       (append 
-;         (compile procedure)
-;         (list (list (quote define-syntax) name))))))
+;     (list (quote escm-define-syntax) (list (quote quote) name) procedure)))
 
 (bytecode
+  (push escm-define-syntax)
+  (load-symbol define-syntax)
+  (push)
   (load-closure 
     ((name procedure)
-      (push cons)
-      (load-symbol bytecode)
-      (push)
-      (push append)
-      (push compile)
-      (push procedure)
-      (call 2) ; compile
+      (push list)
+      (load-symbol escm-define-syntax)
       (push)
       (push list)
-      (push list)
-      (load-symbol define-syntax)
+      (load-symbol quote)
       (push)
       (push name)
-      (call 3) ; list
+      (call 3)   ; list
       (push)
-      (call 2) ; list
-      (push)
-      (call 3) ; append
-      (push)
-      (call 3))) ; cons
-  (define-syntax define-syntax))
+      (push procedure)
+      (call 4))) ; list
+  (push)
+  (call 3))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -140,6 +135,9 @@
 ;;   => NOTE: Supports optional parameters via "(<param> <dflt-value>)" syntax
 
 (bytecode
+  (push escm-define-syntax)
+  (load-symbol fn)
+  (push)
 
   ; (define (escm-fn-has-optional-parameters? params)
   ;   (if (pair? params) 
@@ -348,7 +346,8 @@
       (call 3)
       (push)
       (call 3)))
-  (define-syntax fn))
+  (push)
+  (call 3))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
