@@ -117,6 +117,8 @@ Note that `define-syntax` is NOT among their number.
 
 (define-syntax <symbol>) ; bind <symbol> to the callable in CVR as a macro in the global env expanded by the escm compiler [sets CVR to <void>]
 
+(defined? <symbol>) ; determine if <symbol> is defined [sets CVR to the boolean result]
+
 (ifn <number>) ; if CVR is NOT truthy, jump <number> instructions [sets CVR to <void>]
 
 (jump <number>) ; jump <number> instructions
