@@ -210,6 +210,7 @@ public class Main {
           parsed.loadingIntoREPL = true;
           if(i+1 == args.length) {
             System.err.printf("ESCM ERROR: No filename given to load into the REPL with \"%s\"!\n", args[i]);
+            System.out.print(COMMAND_LINE_FLAGS);
             System.exit(1);
           }
           parsed.scriptName = args[i+1];
@@ -244,6 +245,7 @@ public class Main {
           }
         } catch(Exception e) {
           System.err.printf("Driver Loop Caught Error %s\n", e);
+          System.err.print("\n  "+COMMAND_LINE_FLAGS.replaceAll("\n","\n  ")+"\n");
           CallStack.print();
           e.printStackTrace();
         }

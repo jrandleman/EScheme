@@ -42,7 +42,7 @@ public class Installer {
           break;
         }
         default: {
-          System.err.printf("ESCM INSTALLER ERROR: Invalid command-line argument \"%s\"!\n  => Use \"-v\" or \"--verbose\" to print extra messages!\n", args[i]);
+          System.err.printf("> [ FATAL ] ESCM INSTALLER ERROR: Invalid command-line argument \"%s\"!\n  >> Use \"-v\" or \"--verbose\" to print extra messages!\n", args[i]);
           System.exit(1);
         }
       }
@@ -105,13 +105,13 @@ public class Installer {
         Files.deleteIfExists(generatedFilesPath);
       }
     } catch(Exception e) {
-      System.err.println("> ESCM INSTALLER ERROR: Can't clear directory to store generated files: "+generatedFilesDir);
+      System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Can't clear directory to store generated files: "+generatedFilesDir);
       System.err.println("  error: "+e);
       System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
     if((new File(generatedFilesDir)).mkdirs() == false) {
-      System.err.println("> ESCM INSTALLER ERROR: Can't create directory for generated file: "+generatedFilesDir);
+      System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Can't create directory for generated file: "+generatedFilesDir);
       System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
@@ -138,7 +138,7 @@ public class Installer {
       Files.deleteIfExists(escmPathPath);
       Files.writeString(escmPathPath,escmPath.toString());
     } catch(Exception e) {
-      System.err.println("> ESCM INSTALLER ERROR: Can't create escm path file: " + e);
+      System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Can't create escm path file: " + e);
       System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
@@ -182,7 +182,7 @@ public class Installer {
       Files.deleteIfExists(stdlibLoaderPath);
       Files.writeString(stdlibLoaderPath,escmStdlibLoader.toString());
     } catch(Exception e) {
-      System.err.println("> ESCM INSTALLER ERROR: Can't create escm stdlib loader file: " + e);
+      System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Can't create escm stdlib loader file: " + e);
       System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
@@ -308,7 +308,7 @@ public class Installer {
       Files.deleteIfExists(stdlibLoaderPath);
       Files.writeString(stdlibLoaderPath,contents);
     } catch(Exception e) {
-      System.err.println("> ESCM INSTALLER ERROR: Can't create java stdlib loader file: " + e);
+      System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Can't create java stdlib loader file: " + e);
       System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
@@ -325,7 +325,7 @@ public class Installer {
     try {
       ExecuteCommandResult res = executeCommand(compileCmd);
       if(res.exit != 0) {
-        System.err.println("> ESCM INSTALLER ERROR: Can't compile: "+escmDir+File.separator+"src"+File.separator+"Main.java");
+        System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Can't compile: "+escmDir+File.separator+"src"+File.separator+"Main.java");
         System.err.println("  exit: " + String.valueOf(res.exit));
         System.err.println("  error: " + res.err);
         System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
@@ -336,7 +336,7 @@ public class Installer {
         }
       }
     } catch(Exception e) {
-      System.err.println("> ESCM INSTALLER ERROR: Can't compile: "+escmDir+File.separator+"src"+File.separator+"Main.java");
+      System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Can't compile: "+escmDir+File.separator+"src"+File.separator+"Main.java");
       System.err.println("  error: " + e);
       System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);

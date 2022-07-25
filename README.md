@@ -1,6 +1,6 @@
 <!-- README.md -->
 
-# Eerina's Scheme (🚧 UNDER CONSTRUCTION 🚧)
+# Eerina's Scheme (🚧 Work In Progress 🚧)
 
 ------------------------------------------------------------------------------
 ## Installing and Running EScheme:
@@ -42,7 +42,7 @@
    * Print this information
 3. `-q`, `--quiet`
    * Launch the REPL without ASCII art
-4. `-l`, `--load <script> <arg1> ...`
+4. `-l <script> <arg1> ...`, `--load <script> <arg1> ...`
    * Load `<script>` with `<arg> ...` as `*argv*` into the REPL
 5. `<script> <arg1> ...`
    * Interpret `<script>` with `<arg> ...` as `*argv*`
