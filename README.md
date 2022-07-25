@@ -14,14 +14,14 @@
   - You can ignore warnings that occur here, they've been vetted.
 * ___Optional:___ if you're using `bash` or `zsh` as your shell:
   - `bash`:
-    1. Copy the `alias` output by the installer.
+    1. Copy the `alias='...'` output by the installer.
     2. Add it to your `~/.bashrc` (and/or `~/.bash_aliases`) file.
     3. Run: `. ~/.bashrc` (and/or `~/.bash_aliases`)
   - `zsh`:
-    1. Copy the `alias` output by the installer.
+    1. Copy the `alias='...'` output by the installer.
     2. Add it to your `~/.zshrc` file.
     3. Run: `. ~/.zshrc`
-  - You can now run `escm` anywhere in the command-line to run EScheme!
+  - You can now run `escm` anywhere in the command-line to launch EScheme!
 
 ### Execution:
 * If you didn't do the optional step during installation:
@@ -66,11 +66,16 @@
    - `eval-bytecode`: evaluate the given quoted bytecode list in the global environment
      * Hence `eval` is equivalent to `(compose eval-bytecode compile)`!
 2. `#void` `#nil` reader literals for their respective values
-3. Keyword primitive types (like symbols, but prefixed with `:`, & they always evaluate to themselves)
-4. Immutable core strings & pairs (mutable `<pair>` alternative may be implemented by users via escm's object system)
-5. `\` reader lambda literal support with 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
+3. Keyword primitive types
+   - Like symbols, but prefixed with `:`, & they always evaluate to themselves
+4. Immutable core strings & pairs:
+   - Mutable `<pair>` alternative may be implemented by users via escm's object system
+5. `\` reader lambda literal support:
+   - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
+   - `\%1` => `(lambda (%1) %1)`, `\(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
 6. `(. <obj>)` is equivalent to `<obj>` for the reader
-7. Compile-time procedural macro system (no run-time bindings, all global in scope, deletable for localization)
+7. Compile-time procedural macro system:
+   - No run-time bindings, all global in scope, deletable for localization!
 8. Object System (classes, interfaces, and objects!)
 9. Multi-arity and optional-parameter support via `fn`
 10. No `eqv?`, `memv`, or `assv`: only `eq?` and `equal?` are present.
