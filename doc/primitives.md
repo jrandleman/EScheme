@@ -21,9 +21,14 @@
 
 *os-name*
 *os-version*
-*os-arch*
+*os-architecture*
 
 *escm-path*
+*escm-execution-command*
+
+*dosync-lock*
+
+*generator-complete*
 ```
 
 

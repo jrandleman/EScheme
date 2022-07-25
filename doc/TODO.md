@@ -3,10 +3,6 @@
 ## MORE
 
 
-
-- SOLVE THE "running escm via `system` problem"
-  `*run-escm-cmd*`
-
 - SUPPORT OFFERING POSSIBLY INTENDED VARIABLE NAMES UPON THE ENV NOT FINDING A NEEDED VARIABLE (LIKE W/ THE `help` MENU)
   * USE `escm.util.GetClosestStringMatches.run()`
 

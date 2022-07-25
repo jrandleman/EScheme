@@ -73,6 +73,18 @@ public class Installer {
     String generatedFilesDir = escmDir+File.separator+"src"+File.separator+"escm"+
                                        File.separator+"vm"+File.separator+"runtime"+
                                        File.separator+"installerGenerated";
+    try {
+      Path generatedFilesPath = Paths.get(generatedFilesDir);
+      if(Files.exists(generatedFilesPath) == true) {
+        for(File entry : (new File(generatedFilesDir)).listFiles()) entry.delete();
+        Files.deleteIfExists(generatedFilesPath);
+      }
+    } catch(Exception e) {
+      System.err.println("> ESCM INSTALLER ERROR: Can't clear directory to store generated files: "+generatedFilesDir);
+      System.err.println("  error: "+e);
+      System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
+      System.exit(1);
+    }
     if((new File(generatedFilesDir)).mkdirs() == false) {
       System.err.println("> ESCM INSTALLER ERROR: Can't create directory for generated file: "+generatedFilesDir);
       System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");

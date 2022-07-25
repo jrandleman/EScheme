@@ -29,8 +29,8 @@
   "description": "String of the host operating system's version.",
   "example": null
 }, {
-  "name": "*os-arch*",
-  "aliases": ["os-arch"],
+  "name": "*os-architecture*",
+  "aliases": ["os-arch", "*os-arch*"],
   "signatures": null,
   "description": "String of the host operating system's architecture.",
   "example": null
@@ -39,6 +39,12 @@
   "aliases": ["escm-path", "escheme-path", "*escheme-path*"],
   "signatures": null,
   "description": "Path string to the hosting EScheme implementation's location.",
+  "example": null
+}, {
+  "name": "*escm-execution-command*",
+  "aliases": ["escm-exec-command", "escm-exec-cmd", "escm-execution-cmd", "*escheme-exec-command*", "*escheme-exec-cmd*", "*escheme-execution-cmd*"],
+  "signatures": null,
+  "description": "Execution command to run EScheme on the host machine. For example,\nthe below would run \"script.scm\" in a seperate process:\n  (system (string-append *escm-execution-command* \"script.scm\"))",
   "example": null
 }, {
   "name": "*dosync-lock*",

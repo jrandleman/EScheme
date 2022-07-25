@@ -53,9 +53,10 @@ public class GlobalState {
     globalEnvironment.define("*file-separator*",new escm.type.String(File.separator));
     globalEnvironment.define("*path-separator*",new escm.type.String(File.pathSeparator));
     globalEnvironment.define("*os-name*",new escm.type.String(System.getProperty("os.name")));
-    globalEnvironment.define("*os-version*",new escm.type.String(System.getProperty("os.arch")));
-    globalEnvironment.define("*os-arch*",new escm.type.String(System.getProperty("os.version")));
+    globalEnvironment.define("*os-version*",new escm.type.String(System.getProperty("os.version")));
+    globalEnvironment.define("*os-architecture*",new escm.type.String(System.getProperty("os.arch")));
     globalEnvironment.define("*escm-path*",new escm.type.String(EscmPath.VALUE));
+    globalEnvironment.define("*escm-execution-command*",new escm.type.String(" java -classpath "+EscmPath.VALUE+File.separator+"bin Main "));
     JavaStdLibLoader.load();
     EscmStdLibLoader.load();
   }
