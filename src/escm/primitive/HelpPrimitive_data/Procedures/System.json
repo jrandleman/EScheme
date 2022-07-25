@@ -52,11 +52,8 @@
   "signatures": [
                   "(system <cmd-str>)",
                   "(system <cmd-str> <env-var-str-list>)",
-                  "(system <cmd-str> <env-var-str-list> <dir-str>)",
-                  "(system <cmd-str-list>)",
-                  "(system <cmd-str-list> <env-var-str-list>)",
-                  "(system <cmd-str-list> <env-var-str-list> <dir-str>)"
+                  "(system <cmd-str> <env-var-str-list> <dir-str>)"
                 ],
-  "description": "Executes a command (or list of commands), using the environment variable\nbindings in <env-var-str-list> (defaults to the current environment), in\nthe <dir-str> directory (defaults to the current working directory).\nReturns a list:\n  (<cmd-stdout-str> <cmd-stderr-str> <cmd-exit-code>)",
+  "description": "Executes a command, using the environment variable bindings in\n<env-var-str-list> (defaults to the current environment), in\nthe <dir-str> directory (defaults to the current working directory).\nPassed to Java's <Runtime.getRuntime().exec()>.\nReturns a list:\n  (<cmd-stdout-str> <cmd-stderr-str> <cmd-exit-code>)",
   "example": null
 }]

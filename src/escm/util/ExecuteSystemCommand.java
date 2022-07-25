@@ -26,8 +26,8 @@ public class ExecuteSystemCommand {
     return buffer.substring(1);
   }
 
-  public static Result run(String[] commands, String[] environmentVariableSettings, File workingDirectory) throws Exception {
-    Process pro = Runtime.getRuntime().exec(commands,environmentVariableSettings,workingDirectory);
+  public static Result run(String command, String[] environmentVariableSettings, File workingDirectory) throws Exception {
+    Process pro = Runtime.getRuntime().exec(command,environmentVariableSettings,workingDirectory);
     Result res = new Result();
     res.out = getInputStreamLines(pro.getInputStream());
     res.err = getInputStreamLines(pro.getErrorStream());
@@ -36,23 +36,11 @@ public class ExecuteSystemCommand {
     return res;
   }
 
-  public static Result run(String[] commands, String[] environmentVariableSettings) throws Exception {
-    return run(commands, environmentVariableSettings, null);
-  }
-
-  public static Result run(String[] commands) throws Exception {
-    return run(commands, null, null);
-  }
-
-  public static Result run(String command, String[] environmentVariableSettings, File workingDirectory) throws Exception {
-    return run(new String[]{command}, environmentVariableSettings, null);
-  }
-
   public static Result run(String command, String[] environmentVariableSettings) throws Exception {
-    return run(new String[]{command}, environmentVariableSettings, null);
+    return run(command, environmentVariableSettings, null);
   }
 
   public static Result run(String command) throws Exception {
-    return run(new String[]{command}, null, null);
+    return run(command, null, null);
   }
 }

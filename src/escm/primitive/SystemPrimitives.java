@@ -256,55 +256,45 @@ public class SystemPrimitives {
         escm.type.Pair par = (escm.type.Pair)list;
         Datum content = par.car();
         if(!(content instanceof escm.type.String))
-          throw new Exceptionf("'(system <cmd-str/str-list> <optional-env-var-str-list> <optional-dir-str>) %s list value %s isn't a string: %s", listContentType, content.profile(), Exceptionf.profileArgs(parameters));
+          throw new Exceptionf("'(system <cmd-str> <optional-env-var-str-list> <optional-dir-str>) %s list value %s isn't a string: %s", listContentType, content.profile(), Exceptionf.profileArgs(parameters));
         strs.add(((escm.type.String)content).value());
         list = par.cdr();
       }
-      return (String[])strs.toArray();
+      return strs.toArray(new String[strs.size()]);
     }
 
-    private static Datum parseCommands(ArrayList<Datum> parameters) throws Exception {
-      Datum cmds = parameters.get(0);
-      if(cmds instanceof escm.type.String || cmds instanceof escm.type.Pair) return cmds;
-      throw new Exceptionf("'(system <cmd-str/str-list> <optional-env-var-str-list> <optional-dir-str>) <cmds> isn't a str or str list: %s", Exceptionf.profileArgs(parameters));
+    private static String parseCommands(ArrayList<Datum> parameters) throws Exception {
+      Datum cmd = parameters.get(0);
+      if(cmd instanceof escm.type.String) return ((escm.type.String)cmd).value();
+      throw new Exceptionf("'(system <cmd-str> <optional-env-var-str-list> <optional-dir-str>) <cmds> isn't a string: %s", Exceptionf.profileArgs(parameters));
     }
 
     private static Datum parseEnvironmentVariables(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 2) return null;
       Datum envp = parameters.get(1);
       if(envp instanceof escm.type.Pair) return envp;
-      throw new Exceptionf("'(system <cmd-str/str-list> <optional-env-var-str-list> <optional-dir-str>) <env-vars> isn't a str list: %s", Exceptionf.profileArgs(parameters));
+      throw new Exceptionf("'(system <cmd-str> <optional-env-var-str-list> <optional-dir-str>) <env-vars> isn't a str list: %s", Exceptionf.profileArgs(parameters));
     }
 
     private static File parseWorkingDirectory(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 3) return null;
       Datum dir = parameters.get(2);
       if(dir instanceof escm.type.String) return new File(((escm.type.String)dir).value());
-      throw new Exceptionf("'(system <cmd-str/str-list> <optional-env-var-str-list> <optional-dir-str>) <dir> isn't a str: %s", Exceptionf.profileArgs(parameters));
+      throw new Exceptionf("'(system <cmd-str> <optional-env-var-str-list> <optional-dir-str>) <dir> isn't a str: %s", Exceptionf.profileArgs(parameters));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1 || parameters.size() > 3) 
-        throw new Exceptionf("'(system <cmd-str/str-list> <optional-env-var-str-list> <optional-dir-str>) didn't receive correct number of args: %s", Exceptionf.profileArgs(parameters));
-      Datum cmds = parseCommands(parameters);
+        throw new Exceptionf("'(system <cmd-str> <optional-env-var-str-list> <optional-dir-str>) didn't receive correct number of args: %s", Exceptionf.profileArgs(parameters));
+      String cmd = parseCommands(parameters);
       Datum envp = parseEnvironmentVariables(parameters);
       File dir = parseWorkingDirectory(parameters);
       ExecuteSystemCommand.Result result = null;
-      if(cmds instanceof escm.type.String) {
-        if(envp == null) {
-          result = ExecuteSystemCommand.run(((escm.type.String)cmds).value());
-        } else {
-          String[] envArray = convertStringListToStringArray(envp,"environment variables",parameters);
-          result = ExecuteSystemCommand.run(((escm.type.String)cmds).value(),envArray,dir);
-        }
+      if(envp == null) {
+        result = ExecuteSystemCommand.run(cmd);
       } else {
-        String[] cmdArray = convertStringListToStringArray(cmds,"commands",parameters);
-        if(envp == null) {
-          result = ExecuteSystemCommand.run(cmdArray);
-        } else {
-          String[] envArray = convertStringListToStringArray(envp,"environment variables",parameters);
-          result = ExecuteSystemCommand.run(cmdArray,envArray,dir);
-        }
+        String[] envArray = convertStringListToStringArray(envp,"environment variables",parameters);
+        result = ExecuteSystemCommand.run(cmd,envArray,dir);
       }
       return escm.type.Pair.List(new escm.type.String(result.out),new escm.type.String(result.err),new escm.type.Number(result.exit));
     }
