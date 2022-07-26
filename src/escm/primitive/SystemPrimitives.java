@@ -222,7 +222,10 @@ public class SystemPrimitives {
       if(i+1 == n) {
         nextContinuation = continuation;
       } else {
-        nextContinuation = (value) -> () -> evalEachExpression(env,exprs,i+1,continuation);
+        nextContinuation = (value) -> () -> {
+          if(value instanceof escm.type.Eof) return continuation.run(escm.type.Void.VALUE);
+          return evalEachExpression(env,exprs,i+1,continuation);
+        };
       }
       return escm.vm.Compiler.run(exprs.get(i),(compiled) -> () -> {
         return escm.vm.Interpreter.run(new ExecutionState(env,escm.vm.Assembler.run(compiled)),nextContinuation);

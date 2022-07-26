@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import escm.type.Datum;
+import escm.type.Port;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.ExecutionState;
@@ -36,31 +37,6 @@ public class Main {
     Trampoline.resolve(Compiler.run(d,(compiled) -> () -> {
       return Interpreter.run(new ExecutionState(env,Assembler.run(compiled)),continuation);
     }));
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Read an expression from <br> (returns <null> if reads EOF)
-  public static Datum read(BufferedReader br) throws Exception {
-    StringBuilder sb = new StringBuilder();
-    while(true) {
-      try {
-        String input = br.readLine();
-        if(input == null) { // EOF detected
-          if(sb.length() == 0) return null;
-          sb = new StringBuilder();
-          printReplPrompt();
-          continue;
-        }
-        if(input.length() == 0) continue;
-        sb.append(input);
-        escm.util.Pair<Datum,Integer> result = Reader.read(sb.toString());
-        if(GlobalState.inREPL) GlobalState.setLastPrintedANewline(true); // from the newline input by the user's <enter>/<return> key stroke
-        return result.first;
-      } catch(Reader.IncompleteException e) {
-        continue;
-      }
-    }
   }
 
 
@@ -115,21 +91,16 @@ public class Main {
   }
 
 
-  private static void printReplPrompt() {
-    if(!GlobalState.getLastPrintedANewline()) System.out.println("");
-    System.out.print("> ");
-    if(GlobalState.inREPL) GlobalState.setLastPrintedANewline(false); // from the newline input by the user's <enter>/<return> key stroke
-  }
-
-
-  private static Datum readFullExpression(BufferedReader br) {
+  private static Datum readFullExpression() {
     while(true) {
       try {
-        printReplPrompt();
-        Datum readDatum = read(br);
+        Datum readDatum = Port.STDIN.readReplDatum();
         // Account for EOF => triggers REPL termination!
         if(readDatum == null) {
-          System.out.println('\n'+SystemPrimitives.getExitMessage());
+          if(GlobalState.getLastPrintedANewline() == false) {
+            System.out.print('\n');
+          }
+          System.out.println(SystemPrimitives.getExitMessage());
           System.exit(0);
         }
         return readDatum;
@@ -144,7 +115,6 @@ public class Main {
     // Note that we DON'T set whether we're in the REPL here, as such risks
     //   causing a read/write race condition should a script loaded by "-l" 
     //   spawn a thread!
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     if(parsedCmdLine.launchingQuiet == false) {
       printReplIntro();
     } else {
@@ -156,7 +126,7 @@ public class Main {
     };
     while(true) {
       try {
-        eval(GlobalState.globalEnvironment,readFullExpression(br),printContinuation);
+        eval(GlobalState.globalEnvironment,readFullExpression(),printContinuation);
         EscmCallStack.clear(); // residue frames may reside after continuation nonsense
       } catch(Exception e) {
         reportTopLevelException(e);

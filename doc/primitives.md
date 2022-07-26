@@ -192,6 +192,7 @@
 (typeof <obj>) ; returns a symbol of obj's typename
 (void? <obj>)
 (boolean? <obj>)
+(eof? <obj>)
 ```
 
 

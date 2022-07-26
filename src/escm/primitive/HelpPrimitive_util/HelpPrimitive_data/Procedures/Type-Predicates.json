@@ -16,4 +16,10 @@
   "signatures": ["(boolean? <obj>)"],
   "description": "Returns whether <obj> is a boolean value (#t or #f).",
   "example": null
+}, {
+  "name": "eof?",
+  "aliases": null,
+  "signatures": ["(eof? <obj>)"],
+  "description": "Returns whether <obj> is the #eof object.",
+  "example": null
 }]

@@ -251,6 +251,25 @@ public class Reader {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // EOF Literal Identification & Parsing Helpers
+  // @precondition: sourceCode.charAt(i) == '#'
+  // @param: <i> is where to start parsing
+  // @param: <n> is <sourceCode.size()>
+  private static boolean isEofLiteral(String sourceCode, int i, int n) {
+    return i+3 < n && sourceCode.charAt(i+1) == 'e' && 
+                      sourceCode.charAt(i+2) == 'o' && 
+                      sourceCode.charAt(i+3) == 'f' && 
+                      (i+4 == n || isDelimiter(sourceCode.charAt(i+4)));
+  }
+
+
+  // @return: pair of parsed literal & position in <sourceCode> after the literal
+  private static Pair<Datum,Integer> parseEofLiteral(String sourceCode, int i) {
+    return new Pair<Datum,Integer>(escm.type.Eof.VALUE,i+4);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // String Literal Parsing Helper
   // @param: <i> is where to start parsing
   // @return: pair of parsed string & position in <sourceCode> after the closing <">
@@ -376,6 +395,10 @@ public class Reader {
         // Parse Void Literals
         if(isVoidLiteral(sourceCode,i,n)) 
           return parseVoidLiteral(sourceCode,i);
+
+        // Parse EOF Literals
+        if(isEofLiteral(sourceCode,i,n)) 
+          return parseEofLiteral(sourceCode,i);
       }
 
       // Parse String Literals

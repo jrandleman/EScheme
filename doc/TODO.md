@@ -9,20 +9,36 @@
 
 
 - PROPER PORTS
-  
-  * USE JAVA'S `java.io.InputStreamReader` `java.io.OutputStreamWriter`
-    => CAN HOLD `java.io.FileReader`, `java.io.FileWriter`, `java.io.InputStream` (`System.in`), `java.io.PrintStream` (`System.out`, `System.err`)
 
-  * HAVE AN ABSTRACT BASE `Port` THEN EXTEND WITH CONCRETE `InputPort` `OutputPort`
+
+
+
+
+  => ADD `(eof? <obj>)`
+  
+
 
   * UPDATE I/O PRIMITIVES TO WORK WITH SUCH TOO !!!
-  * HAVE DIRECTORY SUPPORT !!!
-  * CERTAIN OTHER SYSTEM COMMANDS: `(getcwd)`
+
   * SEPERATE `SystemPrimitives` TO BE `SystemPrimitives` `FilePrimitives` AND ADD `PortPrimitives`
+
+  * REPLACE ALL `System.out`, `System.err`, `System.in` WITH PORTS
+
+  * ADD TO `primitives.md` AND `help` THE TYPE INFORMATION IN `Types` ABOUT PORTS & THE ACTION INFO IN `Procedures`
+
+
+
+
   * SUPPORT A `dosync`-LIKE MACRO FOR FILES TO CLEAN UP VIA `do-wind`: 
-    `(with-ports ((<port-name> <port-expr>) ...) <body> ...)`
-
-
+    `(let-ports ((<port-name> <port-expr>) ...) <body> ...)`
+    =>
+    ```
+    (let ((<port-name> <port-expr>) ...)
+      (dynamic-wind 
+        (lambda () #void)
+        (lambda () <body> ...)
+        (lambda () (close-port! <port-name>) ...)))
+    ```
 
 
 

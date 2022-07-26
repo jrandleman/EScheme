@@ -73,7 +73,7 @@ public abstract class Procedure extends Datum implements Callable {
   ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
-    return Objects.hash(this);
+    return Objects.hash(type(),this);
   }
 
 

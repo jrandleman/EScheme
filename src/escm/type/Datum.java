@@ -7,7 +7,6 @@
 
 package escm.type;
 import escm.vm.type.ExecutionState;
-import escm.vm.type.Environment;
 
 public abstract class Datum {
   ////////////////////////////////////////////////////////////////////////////

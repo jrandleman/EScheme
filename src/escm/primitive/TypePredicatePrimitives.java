@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.Boolean;
+import escm.type.Eof;
 import escm.type.Void;
 import escm.util.Exceptionf;
 import escm.vm.type.Primitive;
@@ -53,6 +54,21 @@ public class TypePredicatePrimitives {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(boolean? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
       return Boolean.valueOf(parameters.get(0) instanceof Boolean);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // eof?
+  public static class IsEof implements Primitive {
+    public java.lang.String escmName() {
+      return "eof?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1) 
+        throw new Exceptionf("'(eof? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(parameters.get(0) instanceof Eof);
     }
   }
 }

@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
+import escm.type.Port;
 import escm.util.Exceptionf;
 import escm.vm.type.Primitive;
 import escm.vm.runtime.GlobalState;
@@ -99,7 +100,7 @@ public class IOPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) 
         throw new Exceptionf("'(read) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
-      Datum readDatum = escm.vm.Main.read(new BufferedReader(new InputStreamReader(System.in)));
+      Datum readDatum = Port.STDIN.readDatum();
       if(readDatum == null) return escm.type.Void.VALUE; // EOF in a <read> call yields a <void> object
       return readDatum;
     }
