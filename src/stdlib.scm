@@ -514,16 +514,27 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Implementing COND: (cond (<condition> <expr> ...) ...) (cond (<condition> <expr> ...) ... (else <expr> ...))
+;; Implementing COND: (cond (<condition> <expr> ...) ...) 
+;;                    (cond (<condition> <expr> ...) ... (<condition> => <callable>) ...) 
+;;                    (cond (<condition> <expr> ...) ... (else <expr> ...))
 (define-syntax cond
   (lambda (. clauses)
     (define (make-condition c) (if (eq? c (quote else)) #t c))
     (define (make-consequence c) (cons (quote begin) c))
+    (define (arrow-syntax? c) (and (= (length c) 3) (eq? (quote =>) (cadr c))))
+    (define (arrow->let c a) 
+      (define condition-result (gensym))
+      (list (quote let) (list (list condition-result (car c)))
+        (list (quote if) condition-result
+            (list (caddr c) condition-result)
+            a)))
     (fold-right (lambda (clause acc)
-                  (list (quote if) (make-condition (car clause))
-                        (make-consequence (cdr clause))
-                        acc))
-                (quote (if #f #f)) ; innermost expr yields a <void> value
+                  (if (arrow-syntax? clause)
+                      (arrow->let clause acc)
+                      (list (quote if) (make-condition (car clause))
+                            (make-consequence (cdr clause))
+                            acc)))
+                (quote (if #f #f)) ; inner expression yields #void
                 clauses)))
 
 
@@ -601,20 +612,24 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Implementing CASE: (case <value> ((<key> ...) <expr> ...) ...) (case <value> ((<key> ...) <expr> ...) ... (else <expr> ...))
+;; Implementing CASE: (case <value> ((<key> ...) <expr> ...) ...) 
+;;                    (case <value> ((<key> ...) <expr> ...) ... (else <expr> ...))
 (define-syntax case
   (lambda (value . clauses)
-    (define (make-consequence c) (cons (quote begin) c))
-    (define (make-condition c) 
-      (if (eq? c (quote else)) 
-          #t 
-          (list (quote member) value (cons (quote list) c))))
-    (fold-right (lambda (clause acc)
-                  (list (quote if) (make-condition (car clause))
-                        (make-consequence (cdr clause))
-                        acc))
-                (quote (if #f #f)) ; innermost expr yields a <void> value
-                clauses)))
+    (define (rest-of-clause c)
+      (if (and (= (length c) 3) (eq? (cadr c) (quote =>)))
+          (cdr c)
+          (list (cons (quote begin) (cdr c)))))
+    (define cached-value (gensym))
+      (define converted-clauses
+        (map (lambda (c) 
+              (if (list? (car c))
+                  (cons (list (quote member) cached-value (cons (quote list) (car c))) 
+                        (rest-of-clause c))
+                  c))
+             clauses))
+      (list (quote let) (list (list cached-value value))
+        (cons (quote cond) converted-clauses))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

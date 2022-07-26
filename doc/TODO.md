@@ -2,13 +2,6 @@
 
 ## MORE
 
-
-
-- ADD `=>` SUPPORT FOR `cond` AND `case`
-  => ADD THIS TO THEIR `help` ENTRIES
-
-
-
 - ADD THE `do` MACRO (MENTION IN `help`) !!!
 - ADD THE `letrec*` MACRO (ADD TO `help` TOO)
 

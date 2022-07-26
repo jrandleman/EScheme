@@ -85,8 +85,8 @@
 }, {
   "name": "cond",
   "aliases": null,
-  "signatures": ["(cond (<condition> <body> ...) ...)", "(cond (<condition> <body> ...) ... (else <body> ...))"],
-  "description": "Conditional if-else chains. If <condition> is true, execute <body>.\n<else> is equivalent to #t.",
+  "signatures": ["(cond (<condition> <body> ...) ...)", "(cond (<condition> <body> ...) ... (<condition>  => <callable>) ...)", "(cond (<condition> <body> ...) ... (else <body> ...))"],
+  "description": "Conditional if-else chains. If <condition> is true, execute <body>.\nWith '=>' syntax, <condition> is passed to <callable> iff <condition> is #t.\n<else> is equivalent to #t.",
   "example": null
 }, {
   "name": "let",
@@ -103,8 +103,8 @@
 }, {
   "name": "case",
   "aliases": null,
-  "signatures": ["(case <value> ((<key> ...) <expr> ...) ...)", "(case <value> ((<key> ...) <expr> ...) ... (else <expr> ...))"],
-  "description": "Conditional \"switch\" dispatch. If <value> matches any key in \"<key> ...\",\nexecute <body>. <else> matches against all <value>s.",
+  "signatures": ["(case <value> ((<key> ...) <expr> ...) ...)", "(case <value> ((<key> ...) <expr> ...) ... ((<key> ...)  => <callable>) ...)", "(case <value> ((<key> ...) <expr> ...) ... (else <expr> ...))"],
+  "description": "Conditional \"switch\" dispatch. If <value> matches any key in \"<key> ...\",\nexecute <body>. With '=>' syntax, (member <value> (list <key> ...)) is passed\nto <callable> iff <value> matches any key in \"<key> ...\".\n<else> matches against all <value>s.",
   "example": null
 }, {
   "name": "let*",

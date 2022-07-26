@@ -1,19 +1,49 @@
-; (define data (cdr (file-read "stdlib.scm")))
 
-; (for-each 
-;   (lambda (expr)
-;     (write (compile expr))
-;     (newline)
-;     (newline))
-;   data)
+
+
+(pprint
+  (id (case (* 2 21)
+          ((-42 2 3) "1" "2")
+          ((2 -42 4) "3" "5")
+          ((-42) => id)
+          (else "4" "6"))))
+
+
+
+; (define-syntax case
+;   (lambda (value . clauses)
+;     (define (make-consequence c) (cons (quote begin) c))
+;     (define (make-condition c) 
+;       (if (eq? c (quote else)) 
+;           #t 
+;           (list (quote member) value (cons (quote list) c))))
+;     (define (arrow-syntax? c) (and (= (length c) 3) (eq? (quote =>) (cadr c))))
+;     (define (arrow->let c a) 
+;       (define condition-result (gensym))
+;       (list (quote let) (list (list condition-result (list (quote member) value (cons (quote list) c))))
+;         (list (quote if) condition-result
+;             (list (caddr c) condition-result)
+;             a)))
+;     (fold-right (lambda (clause acc)
+;                   (if (arrow-syntax? clause)
+;                       (arrow->let clause acc)
+;                       (list (quote if) (make-condition (car clause))
+;                             (make-consequence (cdr clause))
+;                             acc)))
+;                 (quote (if #f #f)) ; inner expression yields #void
+;                 clauses)))
+
+
+
+
+
+
 
 
 
 
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; ;; TESTING THREADS + CALL/CC
-
-
 
 
 ; (define *end* 26)
@@ -61,6 +91,7 @@
 
 
 
+
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; ;; TESTING OO
 
@@ -88,12 +119,4 @@
 ; (newline)
 ; (write (s.perimeter))
 ; (newline)
-
-
-
-
-
-
-
-
 

@@ -93,7 +93,7 @@ public class Environment {
   public Datum get(String name) throws Exception {
     Datum result = bindings.get(name);
     if(result == null) {
-      if(superEnv == null) throw new Exceptionf("escm.vm.type.Environment [GET] variable %s doesn't exist!%s", name, getPossibleVariableIntentions(name));
+      if(superEnv == null) throw new Exceptionf("escm.vm.type.Environment [GET] variable \"%s\" doesn't exist!%s", name, getPossibleVariableIntentions(name));
       return superEnv.get(name);
     }
     return result;
@@ -105,7 +105,7 @@ public class Environment {
   public void set(String name, Datum newValue) throws Exception {
     Datum result = bindings.get(name);
     if(result == null) {
-      if(superEnv == null) throw new Exceptionf("escm.vm.type.Environment [SET!] variable %s doesn't exist!%s", name, getPossibleVariableIntentions(name));
+      if(superEnv == null) throw new Exceptionf("escm.vm.type.Environment [SET!] variable \"%s\" doesn't exist!%s", name, getPossibleVariableIntentions(name));
       superEnv.set(name,newValue);
     } else {
       bindings.put(name,newValue.loadWithName(name));

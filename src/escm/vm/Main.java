@@ -3,6 +3,7 @@
 //    Main file to start the VM. Call via "launchESchemeSession()".
 
 package escm.vm;
+import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import escm.type.Datum;
@@ -86,12 +87,12 @@ public class Main {
   private static void printReplIntro() {
     StringBuilder sb = new StringBuilder();
     sb.append("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-    sb.append("J               _.._              _                                 T\n");
-    sb.append("E             .'@@'`` *          / *                                U\n");
-    sb.append("@            /@@/   *****        \\_/                                @ EEEEEEEEEEEEEE   SSSSSSSSSSSSS      CCCCCCCMMMM             MMMM\n");
-    sb.append("T     |      @@(     * *          |                           |     E E::::::::::::E SS:::::::::::::S  CCC::::::CM:::M           M:::M\n");
-    sb.append("'    /#\\     \\@@'.___.;          /#\\                         /#\\    S E::::::::::::ES::::SSSSSS:::::S C:::::::::CM::::M         M::::M\n");
-    sb.append("A   (###)     '.@@@@.'         /#####\\                      (###)   @ EE:::EEEEEE::ES::::S     SSSSSSC::::CCCC::CM:::::M       M:::::M\n");
+    sb.append("J               _.._              _        @@@@@@@@@@@@@@           T\n");
+    sb.append("E             .'@@'`` *          / *       @     __     @           U\n");
+    sb.append("@            /@@/   *****        \\_/       @    /@@\\    @           @ EEEEEEEEEEEEEE   SSSSSSSSSSSSS      CCCCCCCMMMM             MMMM\n");
+    sb.append("T     |      @@(     * *          |        @    \\@@/    @     |     E E::::::::::::E SS:::::::::::::S  CCC::::::CM:::M           M:::M\n");
+    sb.append("'    /#\\     \\@@'.___.;          /#\\       @            @    /#\\    S E::::::::::::ES::::SSSSSS:::::S C:::::::::CM::::M         M::::M\n");
+    sb.append("A   (###)     '.@@@@.'         /#####\\     @@@@@@@@@@@@@@   (###)   @ EE:::EEEEEE::ES::::S     SSSSSSC::::CCCC::CM:::::M       M:::::M\n");
     sb.append("D    | |    |    ``          /#########\\                |    | |    L   E::E    EEEES::::S          C:::C   CCCCCM::::::M     M::::::M\n");
     sb.append("O    |@|   /#\\|     /\\     /#############\\     /\\     |/#\\   |@|    '   E::E        S::::S          C:::C        M:::::::M   M:::::::M\n");
     sb.append("R    | |  (##/#\\   /##\\   (###############)   /##\\   /#\\##)  | |    A   E::E         S:::SSSS       C:::C        M:::M::::M M::: M:::M\n");
@@ -107,7 +108,7 @@ public class Main {
     sb.append("N    | |   |#| |###||||###|###|       |###|###||||###| |#|   | |    A@@@@@@@@@@@@@@ @@@@@@@@@@@@@        @@@@@@@@@@@@           @@@@@\n");
     sb.append("I   _|_|___|#|_|###|##|###|###|_______|###|###|##|###|_|#|___|_|_   @\n");
     sb.append("E   |###|###################################################|###|   V        Copyright (c) Jordan Candide Randleman 2021-2022\n");
-    sb.append(String.format("@   |###|###############/|=================|\\###############|###|   I                  Eerina's Scheme: Version %s\n",SystemPrimitives.VERSION));
+    sb.append("@   |###|###############/|=================|\\###############|###|   I                  Eerina's Scheme: Version 5.0\n");
     sb.append("@  /-------------------/ /=================\\ \\-------------------\\  E              Type (help) for Help, (exit) to Exit\n");
     sb.append("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
     System.out.print(sb.toString());
@@ -177,7 +178,14 @@ public class Main {
     //   could cause a read/write race condition should the loaded script spawn a 
     //   thread!
     if(parsedCmdLine.loadingIntoREPL) GlobalState.inREPL = true; // trigger exit message to be printed
-    Trampoline.resolve(SystemPrimitives.Load.loadFileInEnvironment(GlobalState.globalEnvironment,parsedCmdLine.scriptName,replIfReplingContinuation));
+    String buffer = null;
+    try {
+      buffer = SystemPrimitives.FileRead.slurpFile(parsedCmdLine.scriptName,"escm-load-script");
+    } catch(Exception e) {
+      throw new Exceptionf("%s\n  %s", e, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
+    }
+    ArrayList<Datum> exprs = SystemPrimitives.FileRead.readBufferAsArrayList(buffer);
+    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,replIfReplingContinuation));
   }
 
 
@@ -255,7 +263,6 @@ public class Main {
           }
         } catch(Exception e) {
           System.err.printf("Driver Loop Caught Error %s\n", e);
-          System.err.print("\n  "+COMMAND_LINE_FLAGS.replaceAll("\n","\n  ")+"\n");
           EscmCallStack.print();
           printJavaStackTraceWithoutMessage(e);
         }
