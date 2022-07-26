@@ -10,19 +10,13 @@
 
 - PROPER PORTS
 
-
-
-
-
-  => ADD `(eof? <obj>)`
   
-
 
   * UPDATE I/O PRIMITIVES TO WORK WITH SUCH TOO !!!
 
   * SEPERATE `SystemPrimitives` TO BE `SystemPrimitives` `FilePrimitives` AND ADD `PortPrimitives`
 
-  * REPLACE ALL `System.out`, `System.err`, `System.in` WITH PORTS
+  * REPLACE ALL `System.out`, `System.err`, `System.in` (AND `STDIN` IN `read` AND `escm.vm.Main.readFullExpression`) WITH PORTS
 
   * ADD TO `primitives.md` AND `help` THE TYPE INFORMATION IN `Types` ABOUT PORTS & THE ACTION INFO IN `Procedures`
 
