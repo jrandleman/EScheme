@@ -12,6 +12,7 @@ import escm.type.Boolean;
 import escm.type.Symbol;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
+import escm.primitive.UtilityPrimitives_util.ContinuationProcedure;
 import escm.primitive.FunctionalPrimitives;
 import escm.primitive.MetaPrimitives;
 import escm.vm.type.Callable;
@@ -101,7 +102,7 @@ public class UtilityPrimitives {
 
     public static Trampoline.Bounce r4rs(Callable procedure, Trampoline.Continuation continuation) throws Exception {
       ArrayList<Datum> args = new ArrayList<Datum>(1);
-      args.add(new escm.type.ContinuationProcedure(continuation));
+      args.add(new ContinuationProcedure(continuation));
       return procedure.callWith(args,continuation);
     }
 

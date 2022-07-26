@@ -32,7 +32,7 @@
   "name": "dynamic-wind",
   "aliases": null,
   "signatures": ["(dynamic-wind <thunk1> <thunk2> <thunk3>)"],
-  "description": "Executes <thunk1>, <thunk2>, <thunk3> in that order. <thunk3> is guarenteed\nto execute even if if <thunk2> escapes via a continuation.",
+  "description": "Executes <thunk1>, <thunk2>, <thunk3> in that order. <thunk3> is guarenteed\nto execute even if <thunk2> escapes via a continuation.",
   "example": null
 }, {
   "name": "values",

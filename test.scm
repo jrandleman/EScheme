@@ -6,13 +6,17 @@
 ;;                      <body> ...)
 
 
-(define-syntax profile
-  (lambda (x)
-    `(begin
-        (write ',x)
-        (display " = ")
-        (pprint ,x)
-        (newline))))
+; (define-syntax profile
+;   (lambda (x)
+;     `(begin
+;         (write ',x)
+;         (display " = ")
+;         (pprint ,x)
+;         (newline))))
+
+
+
+
 
 
 

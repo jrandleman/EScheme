@@ -4,18 +4,62 @@
 
 
 
-- PRIMITIVE TO GET CURRENT DATE/TIME WITH OFFSETS
-  * ADD TO `primitives.md` AND `help`
+
 
 
 
 - PROPER PORTS
+  
+  * USE JAVA'S `java.io.InputStreamReader` `java.io.OutputStreamWriter`
+    => CAN HOLD `java.io.FileReader`, `java.io.FileWriter`, `java.io.InputStream` (`System.in`), `java.io.PrintStream` (`System.out`, `System.err`)
+
+  * HAVE AN ABSTRACT BASE `Port` THEN EXTEND WITH CONCRETE `InputPort` `OutputPort`
+
   * UPDATE I/O PRIMITIVES TO WORK WITH SUCH TOO !!!
   * HAVE DIRECTORY SUPPORT !!!
   * CERTAIN OTHER SYSTEM COMMANDS: `(getcwd)`
   * SEPERATE `SystemPrimitives` TO BE `SystemPrimitives` `FilePrimitives` AND ADD `PortPrimitives`
   * SUPPORT A `dosync`-LIKE MACRO FOR FILES TO CLEAN UP VIA `do-wind`: 
     `(with-ports ((<port-name> <port-expr>) ...) <body> ...)`
+
+
+
+
+
+```
+help> PORTS
+
+OPEN-PORT?              CLOSED-PORT?             CURRENT-INPUT-PORT      CURRENT-OUTPUT-PORT
+CALL-WITH-INPUT-FILE    CALL-WITH-OUTPUT-FILE    WITH-INPUT-FROM-FILE    WITH-OUTPUT-TO-FILE
+OPEN-INPUT-FILE         OPEN-OUTPUT-FILE         OPEN-OUTPUT-FILE+       OPEN-OUTPUT-FILE!  
+REWIND-PORT!            PORT-SEEK!               PORT-SEEK-FRONT!        CLOSE-PORT         
+
+help> FILES
+
+GETCWD                 DIRNAME           MKDIR                  CHDIR              
+FILE?                  DIRECTORY?        PATH?                  DIRECTORY-ENTRIES  
+DIRECTORY-ENTRIES*     DELETE-PATH!      RENAME-PATH!           COPY-PATH          
+FILE-SIZE              FILE-EXTENSION    HAS-FILE-EXTENSION?    SET-FILE-EXTENSION!
+SWAP-FILE-EXTENSION
+
+help> IO // THESE SHOULD ACCEPT OPTIONAL PORTS AS THEIR FIRST ARGUMENT
+
+PRETTY-PRINT    WRITE    DISPLAY    NEWLINE
+WRITE-CHAR 
+
+READ         READ-STRING    READ-LINE     READ-CHAR 
+PEEK-CHAR    CHAR-READY?    SLURP-PORT    SLURP-FILE
+READ-PORT    READ-FILE
+```
+
+
+
+
+
+
+
+- PRIMITIVE TO GET CURRENT DATE/TIME WITH OFFSETS
+  * ADD TO `primitives.md` AND `help`
 
 - VECTORS `(vector )` -- MUST USE ONE OF JAVA'S THREAD-SAFE DATA STRUCTS UNDER THE HOOD
 - HASH MAPS `(hashmap )` -- MUST USE ONE OF JAVA'S THREAD-SAFE DATA STRUCTS UNDER THE HOOD
@@ -26,7 +70,7 @@
 
 - ADD CSV SUPPORT PRIMITIVES
 
-- STRING FORMATTING PROCEDURES `displayf`, `writef`, `stringf`
+- STRING FORMATTING PROCEDURES `displayf`, `writef`, `stringf`, `pprintf` (`pretty-printf`)
 
 - FRACTIONS, `BigInteger`, `BigDecimal`, COMPLEX NUMERICS
   * INCLUDE `#e` `#i` `#b` `#o` `#x` `#NNr` SUPPORT
@@ -39,6 +83,9 @@
 
 
 - RUNTIME TYPING
+  
+  * NOTE: THE BELOW SHOULD ALSO BE AVAILABLE FOR INTERFACE DEFINITIONS !!!
+
   BASICS: `(def :string (f :string s :any a))` use keywords to denote basic type checks
                 ^          ^         ^
             return value  string     any-type!
@@ -72,6 +119,10 @@
             :number
             :integer
             :real
+            :complex
+            :exact
+            :inexact
+
             :string
             :keyword
             :boolean
@@ -93,10 +144,14 @@
             :callable
             :functor
 
-            :metaobject
+            :meta-object
             :object
             :class
             :interface
+
+            :port ; ONCE IMPLEMENTED
+            :input-port ; ONCE IMPLEMENTED
+            :output-port ; ONCE IMPLEMENTED
             ```
 
 
