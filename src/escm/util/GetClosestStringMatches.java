@@ -51,9 +51,8 @@ public class GetClosestStringMatches {
         return -1;
       }
     });
-    String lowerStr = str.toLowerCase();
     for(String alt : alts) {
-      sortedSimilarities.add(new Pair<String,Double>(alt,levenshteinSimilarity(lowerStr,alt.toLowerCase())));
+      sortedSimilarities.add(new Pair<String,Double>(alt,levenshteinSimilarity(str,alt)));
     }
     int count = 0;
     ArrayList<String> similarItems = new ArrayList<String>();
