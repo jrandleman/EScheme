@@ -25,7 +25,10 @@
 ;   - case
 ;   - let*
 ;   - letrec
+;   - letrec*
 ;   - while
+;   - do
+;   - -<>
 ;
 ;   - *dosync-lock*
 ;   - dosync
@@ -653,6 +656,15 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing LETREC*: (letrec* ((<var> <value>) ...) <body> ...)
+(define-syntax letrec*
+  (lambda (bindings . body)
+    (fold-right (lambda (binding acc) (list (quote letrec) (list binding) acc))
+                (cons (quote begin) body)
+                bindings)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Implementing WHILE: (while (<condition> <return-expr> ...) <body> ...)
 (define-syntax while
   (lambda (condition-returns . body)
@@ -666,6 +678,45 @@
       (jump ,(- 0 (length compiled-condition) (length compiled-body) 1))
       (load #void)
       ,@compiled-returns)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing DO: (do ((<var> <initial-val> <update-expr>) ...) ; contents are optional 
+;;                      (<break-condition> <return-expr> ...)     ; contents are optional 
+;;                      <body> ...)                               ; body is optional 
+(define-syntax do
+  (lambda (var-bindings break-returns . body)
+    (define vars (map car var-bindings))
+    (define vals (map cadr var-bindings))
+    (define updates 
+      (map (lambda (e) `(set! ,(car e) ,(caddr e)))
+           (filter (lambda (e) (= (length e) 3)) var-bindings)))
+    (define break-cond
+      (if (pair? break-returns)
+          (car break-returns)
+          #f))
+    (define return-exprs
+      (if (pair? break-returns)
+          (cdr break-returns)
+          (quote ())))
+    (define loop-procedure-name (gensym))
+    `(letrec ((,loop-procedure-name 
+                (lambda ,vars
+                  (if ,break-cond
+                      (begin ,@return-exprs)
+                      (begin ,@body ,@updates (,loop-procedure-name ,@vars))))))
+              (,loop-procedure-name ,@vals))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing -<>: (-<> <expression> ...)
+;;   => Example: (-<> (* 2 2) (+ <> <>) (* <> <>)) ; => 64
+(define-syntax -<> ; Note: the "<>" value is cached!
+  (fn
+    ((a) a)
+    ((a op) (list (list (quote lambda) (list (quote <>)) op) a))
+    ((a op . ops) 
+      (cons (quote -<>) (cons (list (list (quote lambda) (list (quote <>)) op) a) ops)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

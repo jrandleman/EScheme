@@ -2,8 +2,6 @@
 
 ## MORE
 
-- ADD THE `do` MACRO (MENTION IN `help`) !!!
-- ADD THE `letrec*` MACRO (ADD TO `help` TOO)
 
 
 - PRIMITIVE TO GET CURRENT DATE/TIME WITH OFFSETS

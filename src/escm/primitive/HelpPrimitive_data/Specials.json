@@ -110,13 +110,19 @@
   "name": "let*",
   "aliases": null,
   "signatures": ["(let* () <body> ...)", "(let* ((<variable-name> <value>) ...) <body> ...)"],
-  "description": "Equivalent to <let>, but <variable-name>s may refer to one another.",
+  "description": "Equivalent to <let>, but later <variable-name>s may refer\nto earlier ones.",
   "example": null
 }, {
   "name": "letrec",
   "aliases": null,
   "signatures": ["(letrec () ...) <body> ...)", "(letrec ((<variable-name> <value>) ...) <body> ...)"],
-  "description": "Like <let>, but <value> may be a recursive function that calls <variable-name>.",
+  "description": "Like <let>, but <value> may be a recursive function that\ncalls <variable-name>.",
+  "example": null
+}, {
+  "name": "letrec*",
+  "aliases": null,
+  "signatures": ["(letrec* () ...) <body> ...)", "(letrec* ((<variable-name> <value>) ...) <body> ...)"],
+  "description": "Equivalent to <letrec>, but later <variable-name>s may refer\nto earlier ones.",
   "example": null
 }, {
   "name": "while",
@@ -124,6 +130,18 @@
   "signatures": ["(while (<condition>) <body> ...)", "(while (<condition> <return-expr> ...) <body> ...)"],
   "description": "Execute \"<body> ...\" while <condition> is true.\nReturn \"<return-expr> ...\" (defaults to #void) upon completion.\nNote that <while> uses true iteration (not recursion!)",
   "example": null
+}, {
+  "name": "do",
+  "aliases": null,
+  "signatures": ["(do ((<var> <initial-val> <update-expr>) ...)", "    (<break-condition> <return-expr> ...)", "    <body> ...)"],
+  "description": "(do ((<var> <initial-val> <update-expr>) ...) \n    (<break-condition> <return-expr> ...) \n    <body> ...)\n\nExecute \"<body> ...\" while <break-condition> is #f. Once <break-condition> is\n#t, return \"<return-expr> ...\". \"<var>\" is set to \"<initial-val>\" at first, then\nto \"<update-expr>\" repeatedly after each iteration.\n\nNote: \n  1. \"<update-expr>\" is optional\n  2. If \"<update-expr>\" is ommited, \"<var> <initial-val>\" is optional\n  3. \"<return-expr> ...\" is optional\n  4. If \"<return-expr> ...\" is ommited, \"<break-condition>\" is optional\n  5. \"<body> ...\" is optional\n\nHence the most minimal form of \"do\" is \"(do () ())\" (an infinite loop).",
+  "example": null
+}, {
+  "name": "-<>",
+  "aliases": ["diamond-wand", "magic-wand"],
+  "signatures": ["(-<> <expression> ...)"],
+  "description": "Execute each expression, with \"<>\" bound as the result of the last expression.",
+  "example": "; The below results in 64:\n(-<> (* 2 2)\n     (+ <> <>)\n     (* <> <>))"
 }, {
   "name": "dosync",
   "aliases": null,

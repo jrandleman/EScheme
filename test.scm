@@ -1,12 +1,31 @@
 
 
 
-(pprint
-  (id (case (* 2 21)
-          ((-42 2 3) "1" "2")
-          ((2 -42 4) "3" "5")
-          ((-42) => id)
-          (else "4" "6"))))
+;; Implementing DO: (do ((<var> <initial-val> <update-val>) ...) 
+;;                      (<break-condition> <return-expr> ...) 
+;;                      <body> ...)
+
+
+(define-syntax profile
+  (lambda (x)
+    `(begin
+        (write ',x)
+        (display " = ")
+        (pprint ,x)
+        (newline))))
+
+
+
+
+; (define result
+;   (do ((l '()) (count 0 (+ count 1)))
+;     ((> (length l) 10) l count)
+;     (set! l (cons count l))))
+
+
+
+; (profile result)
+
 
 
 
