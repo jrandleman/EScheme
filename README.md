@@ -88,7 +88,7 @@
    - `compile`: convert a quoted escm expression into a quoted bytecode list
    - `eval-bytecode`: evaluate the given quoted bytecode list in the global environment
      * Hence `eval` is equivalent to `(compose eval-bytecode compile)`!
-2. `#eof` `#void` `#nil` reader literals for their respective values
+2. `#eof`, `#void`, `#nil` reader literals for their respective values
 3. Keyword primitive types
    - Like symbols, but prefixed with `:`, & they always evaluate to themselves
 4. Immutable core strings & pairs:

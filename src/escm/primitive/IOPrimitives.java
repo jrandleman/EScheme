@@ -101,7 +101,7 @@ public class IOPrimitives {
       if(parameters.size() != 0) 
         throw new Exceptionf("'(read) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
       Datum readDatum = Port.STDIN.readDatum();
-      if(readDatum == null) return escm.type.Void.VALUE; // EOF in a <read> call yields a <void> object
+      if(readDatum == null) return escm.type.Eof.VALUE; // EOF in a <read> call yields an #eof
       return readDatum;
     }
   }
