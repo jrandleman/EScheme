@@ -126,17 +126,20 @@ public class ListPrimitives {
       return "reverse";
     }
 
+    public static Datum logic(Datum lis) {
+      Datum reversed = Nil.VALUE;
+      while(lis instanceof Pair) {
+        Pair pair = (Pair)lis;
+        reversed = new Pair(pair.car(),reversed);
+        lis = pair.cdr();
+      }
+      return reversed;
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !Pair.isList(parameters.get(0)))
         throw new Exceptionf("'(reverse <list>) didn't receive exactly 1 list: %s", Exceptionf.profileArgs(parameters));
-      Datum reversed = Nil.VALUE;
-      Datum iterator = parameters.get(0);
-      while(iterator instanceof Pair) {
-        Pair iteratorPair = (Pair)iterator;
-        reversed = new Pair(iteratorPair.car(),reversed);
-        iterator = iteratorPair.cdr();
-      }
-      return reversed;
+      return logic(parameters.get(0));
     }
   }
 

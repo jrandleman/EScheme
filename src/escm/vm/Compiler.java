@@ -53,7 +53,7 @@ public class Compiler {
   ////////////////////////////////////////////////////////////////////////////
   // Compiling Applications
   private static Trampoline.Bounce compileProcedureApplication(Datum app, int count, Trampoline.Continuation continuation) throws Exception {
-    if(!(app instanceof Pair)) return continuation.run(Pair.List(Pair.List(CALL,new Number(count))));
+    if(!(app instanceof Pair)) return continuation.run(Pair.List(Pair.List(CALL,new Number(-count))));
     Pair appPair = (Pair)app;
     if(!(appPair.car() instanceof Pair)) {
       return () -> compileProcedureApplication(appPair.cdr(),count+1,(applicationInstructions) -> {
@@ -69,6 +69,7 @@ public class Compiler {
     }
   }
 
+
   private static Trampoline.Bounce compileApplication(Pair d, Trampoline.Continuation continuation) throws Exception {
     // Expand Macro
     if(d.car() instanceof Symbol && MACRO_REGISTRY.containsKey(((Symbol)d.car()).value())) {
@@ -76,7 +77,8 @@ public class Compiler {
       return MACRO_REGISTRY.get(((Symbol)d.car()).value()).callWith(args,(expandedExpr) -> () -> run(expandedExpr,continuation));
     // Compile procedure application
     } else {
-      return compileProcedureApplication(d,0,continuation);
+      // Reverse the application expression to use the faster negative <call> argument @ runtime
+      return compileProcedureApplication(ListPrimitives.Reverse.logic(d),0,continuation);
     }
   }
 
