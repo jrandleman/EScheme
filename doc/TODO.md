@@ -6,29 +6,14 @@
 
 
 
+- REORGANIZE PRIMITIVES TO HAVE ONE DIRECTORY EXTRA (FURTHER CLASSIFICATION)
+
+
+
+
 
 
 - PROPER PORTS
-
-
-
-
-
-  
-
-
-  * ADD TO `primitives.md` AND `help` THE TYPE INFORMATION IN `Types` ABOUT PORTS & THE ACTION INFO IN `Procedures`
-
-
-
-
-
-
-      
-
-
-
-
 
 * ADD THE BELOW PRIMITIVES
 
@@ -41,6 +26,8 @@
 ```scheme
 
 FILES:
+
+// RM FROM `help` AND `primitives.md` "System" SECTION
 
 
 
@@ -71,19 +58,6 @@ READ-PORT     READ-FILE
 
 
 ```
-
-
-
-  * SUPPORT A `dosync`-LIKE MACRO FOR FILES TO CLEAN UP VIA `do-wind`: 
-    `(let-ports ((<port-name> <port-expr>) ...) <body> ...)`
-    =>
-    ```scheme
-    (let ((<port-name> <port-expr>) ...)
-      (dynamic-wind 
-        (lambda () #void)
-        (lambda () <body> ...)
-        (lambda () (close-port! <port-name>) ...)))
-    ```
 
 
 
