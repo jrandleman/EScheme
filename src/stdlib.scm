@@ -1089,7 +1089,7 @@
   (lambda (name . class-components)
     (define obj (gensym))
     `(begin
-      (define (,(symbol-append name '?) ,obj) (oo-is? ,obj ,name)) ; predicate generation!
+      (define (,(symbol-append name '?) ,obj) (and (object? ,obj) (oo-is? ,obj ,name))) ; predicate generation!
       (define ,name (class ,@class-components)))))
 
 
@@ -1141,7 +1141,7 @@
   (lambda (name . interface-components)
     (define obj (gensym))
     `(begin
-      (define (,(symbol-append name '?) ,obj) (oo-is? ,obj ,name)) ; predicate generation!
+      (define (,(symbol-append name '?) ,obj) (and (object? ,obj) (oo-is? ,obj ,name))) ; predicate generation!
       (define ,name (interface ,@interface-components)))))
 
 

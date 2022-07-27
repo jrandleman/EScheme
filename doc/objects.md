@@ -37,6 +37,8 @@
 
 ------------------------
 ## Named Class Syntax:
+### Also generates a `(<class-name>? <obj>)` predicate procedure!
+
 ```scheme
 (define-class <class-name> 
   (:extends <class>) (:implements <interface> ...) ; both ":extends" and ":implements" are optional
@@ -60,6 +62,8 @@
 
 ------------------------
 ## Named Interface Syntax:
+### Also generates an `(<interface-name>? <obj>)` predicate procedure!
+
 ```scheme
 (define-interface <interface-name> 
   (:extends <interface> ...) ; ":extends" is optional
