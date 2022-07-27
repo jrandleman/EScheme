@@ -46,7 +46,6 @@ public class Main {
   private static void resetCurrentPorts() {
     InputPort.setCurrent(InputPort.STDIN);
     OutputPort.setCurrent(OutputPort.STDOUT);
-    OutputPort.setCurrentError(OutputPort.STDERR);
   }
 
 

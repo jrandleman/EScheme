@@ -5,13 +5,9 @@
 //
 //    Provides:
 //      - static STDOUT [System.out]
-//      - static STDERR [System.err]
 //
 //      - static OutputPort getCurrent()
 //      - static void setCurrent(OutputPort o)
-//
-//      - static OutputPort getCurrentError()
-//      - static void setCurrentError(OutputPort e)
 //
 //      - void newline()
 //
@@ -50,20 +46,13 @@ public class OutputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Static STDIN field
-  private OutputPort(boolean out) {
-    if(out) {
-      bw = new BufferedWriter(new OutputStreamWriter(System.out));
-      name = "System.out";
-    } else {
-      bw = new BufferedWriter(new OutputStreamWriter(System.err));
-      name = "System.err";
-    }
+  private OutputPort() {
+    bw = new BufferedWriter(new OutputStreamWriter(System.out));
+    name = "System.out";
   }
 
 
-  public static final OutputPort STDOUT = new OutputPort(true);
-
-  public static final OutputPort STDERR = new OutputPort(false);
+  public static final OutputPort STDOUT = new OutputPort();
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -74,17 +63,6 @@ public class OutputPort extends Port {
 
   public static void setCurrent(OutputPort o) {
     ((EscmThread)java.lang.Thread.currentThread()).currentOutputPort = o;
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Handle the Current Error Port
-  public static OutputPort getCurrentError() {
-    return ((EscmThread)java.lang.Thread.currentThread()).currentErrorPort;
-  }
-
-  public static void setCurrentError(OutputPort e) {
-    ((EscmThread)java.lang.Thread.currentThread()).currentErrorPort = e;
   }
 
 

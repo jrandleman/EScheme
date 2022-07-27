@@ -26,12 +26,6 @@
 
 
 
-  
-
-
-  * ADD `WITH-ERROR-TO-FILE` `CALL-WITH-ERROR-FILE` `CURRENT-ERROR-PORT` `(input-port? <obj>)` `(output-port? <obj>)` `(error-port? <obj>)`
-
-
 ```
 help> PORTS
 

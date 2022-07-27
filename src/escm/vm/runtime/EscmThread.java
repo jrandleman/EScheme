@@ -50,12 +50,10 @@ public abstract class EscmThread extends Thread {
   public Environment dynamicEnvironment = new Environment();
 
 
-  // <escm.type.Port> thread-local current input/output/error ports
+  // <escm.type.Port> thread-local current input & output ports
   public InputPort currentInputPort = InputPort.STDIN;
   
   public OutputPort currentOutputPort = OutputPort.STDOUT;
-
-  public OutputPort currentErrorPort = OutputPort.STDERR;
 
 
   // Other <EscmThread> properties
