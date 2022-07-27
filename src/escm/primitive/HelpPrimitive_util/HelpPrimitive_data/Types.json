@@ -70,4 +70,10 @@
   "signatures": null,
   "description": "The \"end-of-file\" value terminating files.\nDenoted via #eof and detected via (eof? <obj>).\nEnds file/REPL evaluation early if read in as a single expression.",
   "example": null
+}, {
+  "name": "port",
+  "aliases": ["input-port", "output-port"],
+  "signatures": null,
+  "description": "Input and output ports are handles for read and write files (respectively).\nNote that output functions that end in \"+\" append to the port, whereas the\nalternative clears it out first.",
+  "example": null
 }]

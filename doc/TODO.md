@@ -14,26 +14,48 @@
 
 
 
-  * SEPERATE `SystemPrimitives` TO BE `SystemPrimitives` `FilePrimitives` AND ADD `PortPrimitives`
+  
 
-
-
-
-  * UPDATE I/O PRIMITIVES TO WORK WITH SUCH TOO !!!
 
   * ADD TO `primitives.md` AND `help` THE TYPE INFORMATION IN `Types` ABOUT PORTS & THE ACTION INFO IN `Procedures`
 
 
 
 
+
+
+      
+
+
+
+
+
+* ADD THE BELOW PRIMITIVES
+
+    => SEPERATE `SystemPrimitives` TO BE `SystemPrimitives` `FilePrimitives` AND ADD `PortPrimitives`
+
+    => ADD THEM TO `primitives.md` AND `help`
+  
+
+
+```scheme
+
+FILES:
+
+
+
+
+IO:
+
+
+
+
 ```
-help> PORTS
 
-OPEN-PORT?              CLOSED-PORT?             CURRENT-INPUT-PORT      CURRENT-OUTPUT-PORT
-CALL-WITH-INPUT-FILE    CALL-WITH-OUTPUT-FILE    WITH-INPUT-FROM-FILE    WITH-OUTPUT-TO-FILE
-OPEN-INPUT-FILE         OPEN-OUTPUT-FILE         OPEN-OUTPUT-FILE+       OPEN-OUTPUT-FILE!  
-REWIND-PORT!            PORT-SEEK!               PORT-SEEK-FRONT!        CLOSE-PORT         
 
+  
+
+```scheme
 help> FILES
 
 GETCWD                 DIRNAME           MKDIR                  CHDIR              
@@ -42,14 +64,12 @@ DIRECTORY-ENTRIES*     DELETE-PATH!      RENAME-PATH!           COPY-PATH
 FILE-SIZE              FILE-EXTENSION    HAS-FILE-EXTENSION?    SET-FILE-EXTENSION!
 SWAP-FILE-EXTENSION
 
-help> IO // THESE SHOULD ACCEPT OPTIONAL PORTS AS THEIR FIRST ARGUMENT
+help> IO
 
-PRETTY-PRINT    WRITE    DISPLAY    NEWLINE
-WRITE-CHAR 
+READ-LINE     READ-CHAR    SLURP-PORT    SLURP-FILE 
+READ-PORT     READ-FILE
 
-READ         READ-STRING    READ-LINE     READ-CHAR 
-PEEK-CHAR    CHAR-READY?    SLURP-PORT    SLURP-FILE
-READ-PORT    READ-FILE
+
 ```
 
 
@@ -74,6 +94,11 @@ READ-PORT    READ-FILE
 
 
 
+- FRACTIONS, `BigInteger`, `BigDecimal`, COMPLEX NUMERICS
+  * INCLUDE `#e` `#i` `#b` `#o` `#x` `#NNr` SUPPORT
+  * DETERMINE WHETHER REALLY WANT BIGDECIMAL OR NOT !!!
+  * UPDATE THE `number` `help` ENTRY !!!
+
 - PRIMITIVE TO GET CURRENT DATE/TIME WITH OFFSETS
   * ADD TO `primitives.md` AND `help`
 
@@ -87,11 +112,6 @@ READ-PORT    READ-FILE
 - ADD CSV SUPPORT PRIMITIVES
 
 - STRING FORMATTING PROCEDURES `displayf`, `writef`, `stringf`, `pprintf` (`pretty-printf`)
-
-- FRACTIONS, `BigInteger`, `BigDecimal`, COMPLEX NUMERICS
-  * INCLUDE `#e` `#i` `#b` `#o` `#x` `#NNr` SUPPORT
-  * DETERMINE WHETHER REALLY WANT BIGDECIMAL OR NOT !!!
-  * UPDATE THE `number` `help` ENTRY !!!
 
 - MORE STREAM PRIMITIVES
 

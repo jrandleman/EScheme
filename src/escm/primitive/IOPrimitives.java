@@ -24,10 +24,22 @@ public class IOPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1) 
-        throw new Exceptionf("'(pretty-print <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      OutputPort.getCurrent().print(parameters.get(0).pprint());
-      if(GlobalState.inREPL) GlobalState.setLastPrintedANewline(false);
+      if(parameters.size() != 1 && parameters.size() != 2) 
+        throw new Exceptionf("'(pretty-print <optional-output-port> <obj>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      Datum printed = null;
+      OutputPort port = null;
+      if(parameters.size() == 2) {
+        Datum portDatum = parameters.get(0);
+        if(!(portDatum instanceof OutputPort))
+          throw new Exceptionf("'(pretty-print <optional-output-port> <obj>) 1st arg isn't an output port: %s", Exceptionf.profileArgs(parameters));
+        port = (OutputPort)portDatum;
+        printed = parameters.get(1);
+      } else {
+        port = OutputPort.getCurrent();
+        printed = parameters.get(0);
+      }
+      port.print(printed.pprint());
+      if(GlobalState.inREPL && port.isStdout()) GlobalState.setLastPrintedANewline(false);
       return escm.type.Void.VALUE;
     }
   }
@@ -41,10 +53,22 @@ public class IOPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1) 
-        throw new Exceptionf("'(write <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      OutputPort.getCurrent().print(parameters.get(0).write());
-      if(GlobalState.inREPL) GlobalState.setLastPrintedANewline(false);
+      if(parameters.size() != 1 && parameters.size() != 2) 
+        throw new Exceptionf("'(write <optional-output-port> <obj>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      Datum printed = null;
+      OutputPort port = null;
+      if(parameters.size() == 2) {
+        Datum portDatum = parameters.get(0);
+        if(!(portDatum instanceof OutputPort))
+          throw new Exceptionf("'(write <optional-output-port> <obj>) 1st arg isn't an output port: %s", Exceptionf.profileArgs(parameters));
+        port = (OutputPort)portDatum;
+        printed = parameters.get(1);
+      } else {
+        port = OutputPort.getCurrent();
+        printed = parameters.get(0);
+      }
+      port.print(printed.write());
+      if(GlobalState.inREPL && port.isStdout()) GlobalState.setLastPrintedANewline(false);
       return escm.type.Void.VALUE;
     }
   }
@@ -58,14 +82,26 @@ public class IOPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1) 
-        throw new Exceptionf("'(display <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      OutputPort.getCurrent().print(parameters.get(0).display());
-      if(GlobalState.inREPL) {
-        if(!(parameters.get(0) instanceof escm.type.String)) {
+      if(parameters.size() != 1 && parameters.size() != 2) 
+        throw new Exceptionf("'(display <optional-output-port> <obj>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      Datum printed = null;
+      OutputPort port = null;
+      if(parameters.size() == 2) {
+        Datum portDatum = parameters.get(0);
+        if(!(portDatum instanceof OutputPort))
+          throw new Exceptionf("'(display <optional-output-port> <obj>) 1st arg isn't an output port: %s", Exceptionf.profileArgs(parameters));
+        port = (OutputPort)portDatum;
+        printed = parameters.get(1);
+      } else {
+        port = OutputPort.getCurrent();
+        printed = parameters.get(0);
+      }
+      port.print(printed.display());
+      if(GlobalState.inREPL && port.isStdout()) {
+        if(!(printed instanceof escm.type.String)) {
           GlobalState.setLastPrintedANewline(false);
         } else {
-          String str = ((escm.type.String)parameters.get(0)).value();
+          String str = ((escm.type.String)printed).value();
           GlobalState.setLastPrintedANewline(str.charAt(str.length()-1) == '\n');
         }
       }
@@ -82,10 +118,19 @@ public class IOPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 0) 
-        throw new Exceptionf("'(newline) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
-      OutputPort.getCurrent().newline();
-      if(GlobalState.inREPL) GlobalState.setLastPrintedANewline(true);
+      if(parameters.size() > 1) 
+        throw new Exceptionf("'(newline <optional-output-port>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      OutputPort port = null;
+      if(parameters.size() == 1) {
+        Datum portDatum = parameters.get(0);
+        if(!(portDatum instanceof OutputPort))
+          throw new Exceptionf("'(newline <optional-output-port>) arg isn't an output port: %s", Exceptionf.profileArgs(parameters));
+        port = (OutputPort)portDatum;
+      } else {
+        port = OutputPort.getCurrent();
+      }
+      port.newline();
+      if(GlobalState.inREPL && port.isStdout()) GlobalState.setLastPrintedANewline(true);
       return escm.type.Void.VALUE;
     }
   }
@@ -99,9 +144,18 @@ public class IOPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 0) 
-        throw new Exceptionf("'(read) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
-      Datum readDatum = InputPort.getCurrent().readDatum();
+      if(parameters.size() > 1) 
+        throw new Exceptionf("'(read <optional-input-port>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      InputPort port = null;
+      if(parameters.size() == 1) {
+        Datum portDatum = parameters.get(0);
+        if(!(portDatum instanceof InputPort))
+          throw new Exceptionf("'(read <optional-input-port>) arg isn't an input port: %s", Exceptionf.profileArgs(parameters));
+        port = (InputPort)portDatum;
+      } else {
+        port = InputPort.getCurrent();
+      }
+      Datum readDatum = port.readDatum();
       if(readDatum == null) return escm.type.Eof.VALUE; // EOF in a <read> call yields an #eof
       return readDatum;
     }

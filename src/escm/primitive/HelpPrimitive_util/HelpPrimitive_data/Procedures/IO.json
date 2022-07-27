@@ -1,32 +1,32 @@
 [{
   "name": "pretty-print",
   "aliases": ["pprint"],
-  "signatures": ["(pretty-print <obj>)"],
-  "description": "Pretty-print <obj> to the screen in indented, machine-readable form.\nAliased by \"pprint\".",
+  "signatures": ["(pretty-print <obj>)", "(pretty-print <output-port> <obj>)"],
+  "description": "Pretty-print <obj> to <output-port> in indented, machine-readable form.\n<output-port> defaults to (current-output-port).\nAliased by \"pprint\".",
   "example": null
 }, {
   "name": "write",
   "aliases": null,
-  "signatures": ["(write <obj>)"],
-  "description": "Print <obj> to the screen in machine-readable form.",
+  "signatures": ["(write <obj>)", "(write <output-port> <obj>)"],
+  "description": "Print <obj> to <output-port> in machine-readable form.\n<output-port> defaults to (current-output-port).",
   "example": null
 }, {
   "name": "display",
   "aliases": null,
-  "signatures": ["(display <obj>)"],
-  "description": "Print <obj> to the screen in human-readable form.",
+  "signatures": ["(display <obj>)", "(display <output-port> <obj>)"],
+  "description": "Print <obj> to <output-port> in human-readable form.\n<output-port> defaults to (current-output-port).",
   "example": null
 }, {
   "name": "newline",
   "aliases": ["terpri"],
-  "signatures": ["(newline)"],
-  "description": "Print a newline to the screen. Equivalent to: (display \"\\n\")",
+  "signatures": ["(newline)", "(newline <output-port>)"],
+  "description": "Print a newline to <output-port>. Equivalent to: (display \"\\n\").\n<output-port> defaults to (current-output-port).",
   "example": null
 }, {
   "name": "read",
   "aliases": null,
-  "signatures": ["(read)"],
-  "description": "Read an EScheme datum as input from the keyboard.",
+  "signatures": ["(read)", "(read <input-port>)"],
+  "description": "Read an EScheme datum as input from <input-port>.\n<input-port> defaults to (current-input-port).",
   "example": null
 }, {
   "name": "read-string",

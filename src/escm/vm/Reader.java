@@ -430,4 +430,12 @@ public class Reader {
     if(result.first != null) return result;
     return new Pair<Datum,Integer>(escm.type.Void.VALUE,result.second);
   }
+
+
+  // Same as the above, but returns <null> if only read comments/whitespace (rather than #void)
+  public static Pair<Datum,Integer> nullableRead(String sourceCode) throws Exception {
+    Pair<Datum,Integer> result = readLoop(sourceCode,0,0);
+    if(result.first != null) return result;
+    return null;
+  }
 }

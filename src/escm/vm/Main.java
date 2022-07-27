@@ -71,12 +71,12 @@ public class Main {
   private static void printReplIntro() {
     StringBuilder sb = new StringBuilder();
     sb.append("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-    sb.append("J               _.._              _        @@@@@@@@@@@@@@           T\n");
-    sb.append("E             .'@@'`` *          / *       @     __     @           U\n");
-    sb.append("@            /@@/   *****        \\_/       @    /@@\\    @           @ EEEEEEEEEEEEEE   SSSSSSSSSSSSS      CCCCCCCMMMM             MMMM\n");
-    sb.append("T     |      @@(     * *          |        @    \\@@/    @     |     E E::::::::::::E SS:::::::::::::S  CCC::::::CM:::M           M:::M\n");
-    sb.append("'    /#\\     \\@@'.___.;          /#\\       @            @    /#\\    S E::::::::::::ES::::SSSSSS:::::S C:::::::::CM::::M         M::::M\n");
-    sb.append("A   (###)     '.@@@@.'         /#####\\     @@@@@@@@@@@@@@   (###)   @ EE:::EEEEEE::ES::::S     SSSSSSC::::CCCC::CM:::::M       M:::::M\n");
+    sb.append("J               _.._              _       @@@@@@@@@@@@@@@@          T\n");
+    sb.append("E             .'@@'`` *          / *      @      __      @          U\n");
+    sb.append("@            /@@/   *****        \\_/      @     /@@\\     @          @ EEEEEEEEEEEEEE   SSSSSSSSSSSSS      CCCCCCCMMMM             MMMM\n");
+    sb.append("T     |      @@(     * *          |       @     \\@@/     @    |     E E::::::::::::E SS:::::::::::::S  CCC::::::CM:::M           M:::M\n");
+    sb.append("'    /#\\     \\@@'.___.;          /#\\      @              @   /#\\    S E::::::::::::ES::::SSSSSS:::::S C:::::::::CM::::M         M::::M\n");
+    sb.append("A   (###)     '.@@@@.'         /#####\\    @@@@@@@@@@@@@@@@  (###)   @ EE:::EEEEEE::ES::::S     SSSSSSC::::CCCC::CM:::::M       M:::::M\n");
     sb.append("D    | |    |    ``          /#########\\                |    | |    L   E::E    EEEES::::S          C:::C   CCCCCM::::::M     M::::::M\n");
     sb.append("O    |@|   /#\\|     /\\     /#############\\     /\\     |/#\\   |@|    '   E::E        S::::S          C:::C        M:::::::M   M:::::::M\n");
     sb.append("R    | |  (##/#\\   /##\\   (###############)   /##\\   /#\\##)  | |    A   E::E         S:::SSSS       C:::C        M:::M::::M M::: M:::M\n");

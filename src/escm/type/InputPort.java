@@ -8,6 +8,8 @@
 //      - static InputPort getCurrent()
 //      - static void setCurrent(InputPort o)
 //
+//      - boolean isStdin()
+//
 //      - long skip(long n)
 //
 //      - void mark(int readAheadLimit)
@@ -81,6 +83,13 @@ public class InputPort extends Port {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Whether Reading from STDIN
+  public boolean isStdin() {
+    return this == STDIN;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Whether can Read
   public boolean ready() throws Exception {
     try {
@@ -140,12 +149,12 @@ public class InputPort extends Port {
     StringBuilder sb = new StringBuilder();
     while(true) {
       try {
-        java.lang.String input = br.readLine();
-        if(input == null) return null;
-        if(input.length() == 0) continue;
-        sb.append(input);
-        escm.util.Pair<Datum,Integer> result = Reader.read(sb.toString());
-        if(this == STDIN) GlobalState.setLastPrintedANewline(true); // from the newline input by the user's <enter>/<return> key stroke
+        int input = br.read();
+        if(input == -1) return null;
+        sb.append((char)input);
+        escm.util.Pair<Datum,Integer> result = Reader.nullableRead(sb.toString());
+        if(isStdin()) GlobalState.setLastPrintedANewline(true); // from the newline input by the user's <enter>/<return> key stroke
+        if(result == null) continue;
         if(result.first instanceof Eof) return null; // only reading #eof is equivalent to typing ^D
         return result.first;
       } catch(Reader.IncompleteException e) {
@@ -193,7 +202,11 @@ public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Marker Support
   public void mark(int readAheadLimit) throws Exception {
-    br.mark(readAheadLimit);
+    try {
+      br.mark(readAheadLimit);
+    } catch(Exception e) {
+      throw new Exceptionf("Can't mark port \"%s\" with read-ahead-limit %d: %s", name, readAheadLimit, e);
+    }
   }
 
 
@@ -211,16 +224,20 @@ public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Port Closing Semantics
   public void close() throws Exception {
-    br.close();
+    try {
+      if(isClosed() == false) br.close();
+    } catch(Exception e) {
+      throw new Exceptionf("Can't close port \"%s\": %s", name, e);
+    }
   }
 
 
   public boolean isClosed() {
     try {
       br.ready();
-      return true;
-    } catch(Exception e) {
       return false;
+    } catch(Exception e) {
+      return true;
     }
   }
 

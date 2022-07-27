@@ -1,0 +1,115 @@
+[{
+  "name": "open-input-file",
+  "aliases": null,
+  "signatures": ["(open-input-file <filename-string>)"],
+  "description": "Returns an input-port file handle to read from <filename-string>.",
+  "example": null
+}, {
+  "name": "open-output-file",
+  "aliases": null,
+  "signatures": ["(open-output-file <filename-string>)"],
+  "description": "Returns an output-port file handle to write to <filename-string>.\nIf <filename-string> exists, it is cleared.",
+  "example": null
+}, {
+  "name": "open-output-file+",
+  "aliases": null,
+  "signatures": ["(open-output-file+ <filename-string>)"],
+  "description": "Returns an output-port file handle to write to <filename-string>.\nIf <filename-string> exists, it is appended to.",
+  "example": null
+}, {
+  "name": "close-port!",
+  "aliases": null,
+  "signatures": ["(close-port! <port>)"],
+  "description": "Closes <port> if it hasn't been closed yet.",
+  "example": null
+}, {
+  "name": "port?",
+  "aliases": null,
+  "signatures": ["(port? <obj>)"],
+  "description": "Returns whether <obj> is a port.",
+  "example": null
+}, {
+  "name": "input-port?",
+  "aliases": null,
+  "signatures": ["(input-port? <obj>)"],
+  "description": "Returns whether <obj> is an input-port.",
+  "example": null
+}, {
+  "name": "output-port?",
+  "aliases": null,
+  "signatures": ["(output-port? <obj>)"],
+  "description": "Returns whether <obj> is an output-port.",
+  "example": null
+}, {
+  "name": "open-port?",
+  "aliases": null,
+  "signatures": ["(open-port? <port>)"],
+  "description": "Returns whether <port> is still open.",
+  "example": null
+}, {
+  "name": "closed-port?",
+  "aliases": null,
+  "signatures": ["(closed-port? <port>)"],
+  "description": "Returns whether <port> is closed.",
+  "example": null
+}, {
+  "name": "current-input-port",
+  "aliases": null,
+  "signatures": ["(current-input-port)"],
+  "description": "Returns the current input-port, used as the default value for <read> etc.",
+  "example": null
+}, {
+  "name": "current-output-port",
+  "aliases": null,
+  "signatures": ["(current-output-port)"],
+  "description": "Returns the current output-port, used as the default value for <write> etc.",
+  "example": null
+}, {
+  "name": "call-with-input-file",
+  "aliases": null,
+  "signatures": ["(call-with-input-file <filename-string> <unary-callable>)"],
+  "description": "Invoke <unary-callable> with (open-input-file <filename-string>) as its argument.\nAutomatically close that given port upon <unary-callable>'s return, and yield\n<unary-callable>'s return value.",
+  "example": null
+}, {
+  "name": "call-with-output-file",
+  "aliases": null,
+  "signatures": ["(call-with-output-file <filename-string> <unary-callable>)"],
+  "description": "Invoke <unary-callable> with (open-output-file <filename-string>) as its argument.\nAutomatically close that given port upon <unary-callable>'s return, and yield\n<unary-callable>'s return value.\nNote that <filename-string> is cleared if it exists.",
+  "example": null
+}, {
+  "name": "call-with-output-file+",
+  "aliases": null,
+  "signatures": ["(call-with-output-file+ <filename-string> <unary-callable>)"],
+  "description": "Invoke <unary-callable> with (open-output-file <filename-string>) as its argument.\nAutomatically close that given port upon <unary-callable>'s return, and yield\n<unary-callable>'s return value.\nNote that <filename-string> is appended to if it exists.",
+  "example": null
+}, {
+  "name": "with-input-from-file",
+  "aliases": null,
+  "signatures": ["(with-input-from-file <filename-string> <thunk-callable>)"],
+  "description": "Invoke <thunk-callable> with (open-input-file <filename-string>) as the\ncurrent-input-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.",
+  "example": null
+}, {
+  "name": "with-output-to-file",
+  "aliases": null,
+  "signatures": ["(with-output-to-file <filename-string> <thunk-callable>)"],
+  "description": "Invoke <thunk-callable> with (open-output-file <filename-string>) as the\ncurrent-output-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.\nNote that <filename-string> is cleared if it exists.",
+  "example": null
+}, {
+  "name": "with-output-to-file+",
+  "aliases": null,
+  "signatures": ["(with-output-to-file+ <filename-string> <thunk-callable>)"],
+  "description": "Invoke <thunk-callable> with (open-output-file <filename-string>) as the\ncurrent-output-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.\nNote that <filename-string> is appended to if it exists.",
+  "example": null
+}, {
+  "name": "mark-input-port",
+  "aliases": null,
+  "signatures": ["(mark-input-port <input-port> <read-ahead-limit-integer>)"],
+  "description": "Marks the current position in <input-port> to jump back to via <reset-input-port>.\n<read-ahead-limit-integer> determines the maxmimum number of characters to read\nprior to invalidating the set mark.",
+  "example": null
+}, {
+  "name": "reset-input-port",
+  "aliases": null,
+  "signatures": ["(reset-input-port <input-port>)"],
+  "description": "Tries to reset <input-port> to the mark set by <mark-input-port>.\nReturns whether succeeded in the reset.",
+  "example": null
+}]

@@ -9,6 +9,8 @@
 //      - static OutputPort getCurrent()
 //      - static void setCurrent(OutputPort o)
 //
+//      - boolean isStdout()
+//
 //      - void newline()
 //
 //      - void print(Object o)
@@ -67,14 +69,21 @@ public class OutputPort extends Port {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Constructor
-  public OutputPort(java.lang.String filename) throws Exception {
+  // Factory Functions
+  public OutputPort(java.lang.String filename, boolean append) throws Exception {
     try {
-      bw = new BufferedWriter(new FileWriter(filename));
+      bw = new BufferedWriter(new FileWriter(filename,append));
       name = filename;
     } catch(Exception e) {
       throw new Exceptionf("Can't open port \"%s\" for output: %s", filename, e);
     }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Whether Writing to STDOUT
+  public boolean isStdout() {
+    return this == STDOUT;
   }
 
 
@@ -161,16 +170,20 @@ public class OutputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Port Closing Semantics
   public void close() throws Exception {
-    bw.close();
+    try {
+      if(isClosed() == false) bw.close();
+    } catch(Exception e) {
+      throw new Exceptionf("Can't close port \"%s\": %s", name, e);
+    }
   }
 
 
   public boolean isClosed() {
     try {
       bw.flush();
-      return true;
-    } catch(Exception e) {
       return false;
+    } catch(Exception e) {
+      return true;
     }
   }
 

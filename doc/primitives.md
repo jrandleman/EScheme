@@ -96,11 +96,11 @@
 ------------------------
 ## IO:
 ```scheme
-(pretty-print <obj>) ; aliased by <pprint>
-(write <obj>)
-(display <obj>)
-(newline)
-(read)
+(pretty-print <optional-output-port> <obj>) ; aliased by <pprint>
+(write <optional-output-port> <obj>)
+(display <optional-output-port> <obj>)
+(newline <optional-output-port>)
+(read <optional-input-port>)
 (read-string <str>) ; returns a pair: (cons <read-datum> <str-without-serialized-read-datum>)
 ```
 
@@ -123,6 +123,38 @@
 (load <filename-str>)
 
 (system <cmd-str/str-list> <optional-env-var-str-list> <optional-dir-str>)
+```
+
+
+------------------------
+## Ports:
+```scheme
+(open-input-file <filename-string>)
+(open-output-file <filename-string>)
+(open-output-file+ <filename-string>)
+
+(close-port! <port>)
+
+(port? <obj>)
+(input-port? <obj>)
+(output-port? <obj>)
+
+(open-port? <port>)
+(closed-port? <port>)
+
+(current-input-port)
+(current-output-port)
+
+(call-with-input-file <filename-string> <unary-callable>)
+(call-with-output-file <filename-string> <unary-callable>)
+(call-with-output-file+ <filename-string> <unary-callable>)
+
+(with-input-from-file <filename-string> <thunk-callable>)
+(with-output-to-file <filename-string> <thunk-callable>)
+(with-output-to-file+ <filename-string> <thunk-callable>)
+
+(mark-input-port <input-port> <read-ahead-limit-integer>)
+(reset-input-port <input-port>)
 ```
 
 
