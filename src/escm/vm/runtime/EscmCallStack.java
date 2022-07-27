@@ -48,6 +48,6 @@ public class EscmCallStack {
       sb.append("\n                    ");
       sb.append(popReadableCallableName(callStack));
     }
-    System.out.println(sb.toString());
+    System.err.println(sb.toString());
   }
 };

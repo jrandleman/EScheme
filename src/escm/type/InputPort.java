@@ -5,6 +5,9 @@
 //    Provides:
 //      - static STDIN [System.in]
 //
+//      - static InputPort getCurrent()
+//      - static void setCurrent(InputPort o)
+//
 //      - long skip(long n)
 //
 //      - void mark(int readAheadLimit)
@@ -26,6 +29,7 @@ import java.io.FileReader;
 import escm.util.Exceptionf;
 import escm.vm.Reader;
 import escm.vm.runtime.GlobalState;
+import escm.vm.runtime.EscmThread;
 
 public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
@@ -51,6 +55,17 @@ public class InputPort extends Port {
 
 
   public static final InputPort STDIN = new InputPort();
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Handle the Current Input Port
+  public static InputPort getCurrent() {
+    return ((EscmThread)java.lang.Thread.currentThread()).currentInputPort;
+  }
+
+  public static void setCurrent(InputPort o) {
+    ((EscmThread)java.lang.Thread.currentThread()).currentInputPort = o;
+  }
 
 
   ////////////////////////////////////////////////////////////////////////////

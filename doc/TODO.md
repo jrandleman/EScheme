@@ -10,30 +10,26 @@
 
 - PROPER PORTS
 
-  
 
-  * UPDATE I/O PRIMITIVES TO WORK WITH SUCH TOO !!!
+
+
 
   * SEPERATE `SystemPrimitives` TO BE `SystemPrimitives` `FilePrimitives` AND ADD `PortPrimitives`
 
-  * REPLACE ALL `System.out`, `System.err`, `System.in` (AND `STDIN` IN `read` AND `escm.vm.Main.readFullExpression`) WITH PORTS
+
+
+
+  * UPDATE I/O PRIMITIVES TO WORK WITH SUCH TOO !!!
 
   * ADD TO `primitives.md` AND `help` THE TYPE INFORMATION IN `Types` ABOUT PORTS & THE ACTION INFO IN `Procedures`
 
 
 
 
-  * SUPPORT A `dosync`-LIKE MACRO FOR FILES TO CLEAN UP VIA `do-wind`: 
-    `(let-ports ((<port-name> <port-expr>) ...) <body> ...)`
-    =>
-    ```
-    (let ((<port-name> <port-expr>) ...)
-      (dynamic-wind 
-        (lambda () #void)
-        (lambda () <body> ...)
-        (lambda () (close-port! <port-name>) ...)))
-    ```
+  
 
+
+  * ADD `WITH-ERROR-TO-FILE` `CALL-WITH-ERROR-FILE` `CURRENT-ERROR-PORT` `(input-port? <obj>)` `(output-port? <obj>)` `(error-port? <obj>)`
 
 
 ```
@@ -61,6 +57,22 @@ READ         READ-STRING    READ-LINE     READ-CHAR
 PEEK-CHAR    CHAR-READY?    SLURP-PORT    SLURP-FILE
 READ-PORT    READ-FILE
 ```
+
+
+
+  * SUPPORT A `dosync`-LIKE MACRO FOR FILES TO CLEAN UP VIA `do-wind`: 
+    `(let-ports ((<port-name> <port-expr>) ...) <body> ...)`
+    =>
+    ```scheme
+    (let ((<port-name> <port-expr>) ...)
+      (dynamic-wind 
+        (lambda () #void)
+        (lambda () <body> ...)
+        (lambda () (close-port! <port-name>) ...)))
+    ```
+
+
+
 
 
 

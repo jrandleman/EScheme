@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import escm.type.Datum;
-import escm.type.Port;
+import escm.type.InputPort;
+import escm.type.OutputPort;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.ExecutionState;
@@ -42,7 +43,14 @@ public class Main {
 
   ////////////////////////////////////////////////////////////////////////////
   // Implementing our REPL
-  public static void printJavaStackTraceWithoutMessage(Exception e) {
+  private static void resetCurrentPorts() {
+    InputPort.setCurrent(InputPort.STDIN);
+    OutputPort.setCurrent(OutputPort.STDOUT);
+    OutputPort.setCurrentError(OutputPort.STDERR);
+  }
+
+
+  private static void printJavaStackTraceWithoutMessage(Exception e) {
     StackTraceElement[] stackTrace = e.getStackTrace();
     if(stackTrace.length == 0) return;
     System.err.printf(">> Java Call Stack: %s", stackTrace[0]);
@@ -53,6 +61,7 @@ public class Main {
 
 
   public static void reportTopLevelException(Exception e) {
+    resetCurrentPorts();
     System.err.printf("\nESCM ERROR: %s\n", e);
     EscmCallStack.print();
     printJavaStackTraceWithoutMessage(e);
@@ -94,7 +103,7 @@ public class Main {
   private static Datum readFullExpression() {
     while(true) {
       try {
-        Datum readDatum = Port.STDIN.readReplDatum();
+        Datum readDatum = InputPort.STDIN.readReplDatum();
         // Account for EOF => triggers REPL termination!
         if(readDatum == null) {
           if(GlobalState.getLastPrintedANewline() == false) {
@@ -198,7 +207,7 @@ public class Main {
           parsed.loadingIntoREPL = true;
           if(i+1 == args.length) {
             System.err.printf("ESCM ERROR: No filename given to load into the REPL with \"%s\"!\n", args[i]);
-            System.out.print(COMMAND_LINE_FLAGS);
+            System.err.print(COMMAND_LINE_FLAGS);
             System.exit(1);
           }
           parsed.scriptName = args[i+1];
@@ -236,7 +245,7 @@ public class Main {
           EscmCallStack.print();
           printJavaStackTraceWithoutMessage(e);
         }
-        return cont.run(escm.type.Void.VALUE); // never triggered
+        return cont.run(escm.type.Void.VALUE);
       }
     );
     mainThread.start();

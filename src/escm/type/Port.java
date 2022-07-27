@@ -2,11 +2,6 @@
 // Purpose:
 //    Abstract Base Class for Scheme input and output ports.
 //
-//    Provides:
-//      - static STDIN  [System.in]
-//      - static STDOUT [System.out]
-//      - static STDERR [System.err]
-//
 //    Guarentees:
 //      - String sourceName()
 //
@@ -18,13 +13,6 @@ package escm.type;
 import escm.vm.type.ExecutionState;
 
 public abstract class Port extends Datum {
-  ////////////////////////////////////////////////////////////////////////////
-  // Static Fields
-  public static final InputPort STDIN = InputPort.STDIN;
-  public static final OutputPort STDOUT = OutputPort.STDOUT;
-  public static final OutputPort STDERR = OutputPort.STDERR;
-
-
   ////////////////////////////////////////////////////////////////////////////
   // Type
   public abstract java.lang.String type();

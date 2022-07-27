@@ -9,7 +9,8 @@ import java.io.InputStreamReader;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
-import escm.type.Port;
+import escm.type.InputPort;
+import escm.type.OutputPort;
 import escm.util.Exceptionf;
 import escm.vm.type.Primitive;
 import escm.vm.runtime.GlobalState;
@@ -25,7 +26,7 @@ public class IOPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(pretty-print <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      System.out.print(parameters.get(0).pprint());
+      OutputPort.getCurrent().print(parameters.get(0).pprint());
       if(GlobalState.inREPL) GlobalState.setLastPrintedANewline(false);
       return escm.type.Void.VALUE;
     }
@@ -42,7 +43,7 @@ public class IOPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(write <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      System.out.print(parameters.get(0).write());
+      OutputPort.getCurrent().print(parameters.get(0).write());
       if(GlobalState.inREPL) GlobalState.setLastPrintedANewline(false);
       return escm.type.Void.VALUE;
     }
@@ -59,7 +60,7 @@ public class IOPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(display <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      System.out.print(parameters.get(0).display());
+      OutputPort.getCurrent().print(parameters.get(0).display());
       if(GlobalState.inREPL) {
         if(!(parameters.get(0) instanceof escm.type.String)) {
           GlobalState.setLastPrintedANewline(false);
@@ -83,7 +84,7 @@ public class IOPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) 
         throw new Exceptionf("'(newline) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
-      System.out.println("");
+      OutputPort.getCurrent().newline();
       if(GlobalState.inREPL) GlobalState.setLastPrintedANewline(true);
       return escm.type.Void.VALUE;
     }
@@ -100,7 +101,7 @@ public class IOPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) 
         throw new Exceptionf("'(read) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
-      Datum readDatum = Port.STDIN.readDatum();
+      Datum readDatum = InputPort.getCurrent().readDatum();
       if(readDatum == null) return escm.type.Eof.VALUE; // EOF in a <read> call yields an #eof
       return readDatum;
     }

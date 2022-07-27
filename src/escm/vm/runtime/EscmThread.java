@@ -11,6 +11,8 @@ import java.math.BigInteger;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
+import escm.type.InputPort;
+import escm.type.OutputPort;
 import escm.type.PrimitiveProcedure;
 import escm.primitive.UtilityPrimitives;
 import escm.vm.type.Environment;
@@ -18,10 +20,16 @@ import escm.vm.type.Environment;
 public abstract class EscmThread extends Thread {
   // <escm.type.Thread> thread-local object
   public escm.type.Thread currentThread = null;
+
+
   // <CallStack> thread-local call stack
   public Stack<String> callStack = new Stack<String>();
+
+
   // <escm.primitive.UtilityPrimitives.DynamicWind> thread-local set of winds
   public Datum dynamicWinds = Nil.VALUE;
+
+
   // <escm.primitive.UtilityPrimitives.WithExceptionHandler> thread-local set of winds
   public Datum currentExceptionHandlers = Pair.List(
     new PrimitiveProcedure(
@@ -32,22 +40,42 @@ public abstract class EscmThread extends Thread {
         args.addAll(params);
         return cont.run(UtilityPrimitives.Error.logic(args));
       }));
+
+
   // <escm.util.UniqueSymbolString> thread-local counter
   public BigInteger uniqueCounter = BigInteger.ZERO;
+
+
   // <escm.type.Thread> thread-local dynamic environment
   public Environment dynamicEnvironment = new Environment();
+
+
+  // <escm.type.Port> thread-local current input/output/error ports
+  public InputPort currentInputPort = InputPort.STDIN;
+  
+  public OutputPort currentOutputPort = OutputPort.STDOUT;
+
+  public OutputPort currentErrorPort = OutputPort.STDERR;
+
+
   // Other <EscmThread> properties
   public EscmThread(escm.type.Thread currentThread){
     super();
     this.currentThread = currentThread;
   }
+
+  
   public EscmThread(escm.type.Thread currentThread, String name){
     super((Runnable)null,name);
     this.currentThread = currentThread;
   }
+
+  
   public EscmThread(escm.type.Thread currentThread, Runnable runnable, String name){
     super(runnable,name);
     this.currentThread = currentThread;
   }
+
+  
   public abstract void run();
 };

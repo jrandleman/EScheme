@@ -1,6 +1,10 @@
 // Author: Jordan Randleman - escm.primitive.HelpPrimitive
 // Purpose:
 //    Java primitive to help explain language features.
+//
+//      => NOTE: <help> only prints to STDOUT & accepts from STDIN
+//         -> eg NOT (current-output-port) & (current-input-port)
+//
 
 package escm.primitive;
 import java.util.ArrayList;
