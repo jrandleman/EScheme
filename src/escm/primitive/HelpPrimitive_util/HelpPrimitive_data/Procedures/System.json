@@ -5,42 +5,6 @@
   "description": "Terminate the current EScheme session with <integer-exit-code> (defaults to 0).",
   "example": null
 }, {
-  "name": "file-read",
-  "aliases": null,
-  "signatures": ["(file-read <filename-str>)"],
-  "description": "Get the contents of <filename-str> as an EScheme data structure.",
-  "example": null
-}, {
-  "name": "file-read-string",
-  "aliases": ["file-read-str"],
-  "signatures": ["(file-read-string <filename-str>)"],
-  "description": "Get the contents of <filename-str> as a string.",
-  "example": null
-}, {
-  "name": "file-write",
-  "aliases": null,
-  "signatures": ["(file-write <filename-str> <obj>)"],
-  "description": "Write <obj> to <filename-str> using machine-readable syntax.",
-  "example": null
-}, {
-  "name": "file-display",
-  "aliases": null,
-  "signatures": ["(file-display <filename-str> <obj>)"],
-  "description": "Write <obj> to <filename-str> using human-readable syntax.",
-  "example": null
-}, {
-  "name": "file-delete!",
-  "aliases": null,
-  "signatures": ["(file-delete! <filename-str>)"],
-  "description": "Deletes <filename-str> if it exists. Returns the deletion's success status.",
-  "example": null
-}, {
-  "name": "file?",
-  "aliases": null,
-  "signatures": ["(file? <str>)"],
-  "description": "Returns whether <str> is a file.",
-  "example": null
-}, {
   "name": "load",
   "aliases": null,
   "signatures": ["(load <filename-str>)"],
@@ -50,10 +14,10 @@
   "name": "system",
   "aliases": null,
   "signatures": [
-                  "(system <cmd-str>)",
-                  "(system <cmd-str> <env-var-str-list>)",
-                  "(system <cmd-str> <env-var-str-list> <dir-str>)"
+                  "(system <command-str>)",
+                  "(system <command-str> <env-var-str-list>)",
+                  "(system <command-str> <env-var-str-list> <directory-str>)"
                 ],
-  "description": "Executes a command, using the environment variable bindings in\n<env-var-str-list> (defaults to the current environment), in\nthe <dir-str> directory (defaults to the current working directory).\nPassed to Java's <Runtime.getRuntime().exec()>.\nReturns a list:\n  (<cmd-stdout-str> <cmd-stderr-str> <cmd-exit-code>)",
+  "description": "Executes a command, using the environment variable bindings in\n<env-var-str-list> (defaults to the current environment), in\nthe <directory-str> directory (defaults to the current working directory).\nPassed to Java's <Runtime.getRuntime().exec()>.\nReturns a list:\n  (<command-stdout-str> <command-stderr-str> <command-exit-code>)",
   "example": null
 }]

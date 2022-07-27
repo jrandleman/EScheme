@@ -6,32 +6,14 @@
 
 
 
-- REORGANIZE PRIMITIVES TO HAVE ONE DIRECTORY EXTRA (FURTHER CLASSIFICATION)
-
-
-
-
-
-
 - PROPER PORTS
 
 * ADD THE BELOW PRIMITIVES
 
-    => SEPERATE `SystemPrimitives` TO BE `SystemPrimitives` `FilePrimitives` AND ADD `PortPrimitives`
-
     => ADD THEM TO `primitives.md` AND `help`
   
 
-
 ```scheme
-
-FILES:
-
-// RM FROM `help` AND `primitives.md` "System" SECTION
-
-
-
-
 IO:
 
 
@@ -40,20 +22,11 @@ IO:
 ```
 
 
-  
-
 ```scheme
-help> FILES
-
-GETCWD                 DIRNAME           MKDIR                  CHDIR              
-FILE?                  DIRECTORY?        PATH?                  DIRECTORY-ENTRIES  
-DIRECTORY-ENTRIES*     DELETE-PATH!      RENAME-PATH!           COPY-PATH          
-FILE-SIZE              FILE-EXTENSION    HAS-FILE-EXTENSION?    SET-FILE-EXTENSION!
-SWAP-FILE-EXTENSION
-
 help> IO
 
-READ-LINE     READ-CHAR    SLURP-PORT    SLURP-FILE 
+READ-LINE     READ-CHAR    
+SLURP-PORT    SLURP-FILE ;; POSSIBLY RENAME THESE
 READ-PORT     READ-FILE
 
 
@@ -66,6 +39,11 @@ READ-PORT     READ-FILE
 
 
 
+- CONSIDER CHANGING `InputPort` TO USE `PushbackReader` AS ITS INTERNAL TYPE INSTEAD
+  * ALLOWS MORE EFFICIENT `read` FROM FILES
+  * MUST ELIMINATE THE `mark-` AND `reset-` PRIMITIVES
+  * CAN LIKELY ELIMINATE `escm.vm.Reader.nullableRead()`
+  * CAN ADD IN NEW PUSH-BACK ALTERNATIVE PRIMITIVES
 
 
 - FRACTIONS, `BigInteger`, `BigDecimal`, COMPLEX NUMERICS

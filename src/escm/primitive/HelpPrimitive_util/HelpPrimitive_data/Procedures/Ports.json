@@ -17,9 +17,9 @@
   "description": "Returns an output-port file handle to write to <filename-string>.\nIf <filename-string> exists, it is appended to.",
   "example": null
 }, {
-  "name": "close-port!",
+  "name": "port-close!",
   "aliases": null,
-  "signatures": ["(close-port! <port>)"],
+  "signatures": ["(port-close! <port>)"],
   "description": "Closes <port> if it hasn't been closed yet.",
   "example": null
 }, {
@@ -41,15 +41,15 @@
   "description": "Returns whether <obj> is an output-port.",
   "example": null
 }, {
-  "name": "open-port?",
+  "name": "port-open?",
   "aliases": null,
-  "signatures": ["(open-port? <port>)"],
+  "signatures": ["(port-open? <port>)"],
   "description": "Returns whether <port> is still open.",
   "example": null
 }, {
-  "name": "closed-port?",
+  "name": "port-closed?",
   "aliases": null,
-  "signatures": ["(closed-port? <port>)"],
+  "signatures": ["(port-closed? <port>)"],
   "description": "Returns whether <port> is closed.",
   "example": null
 }, {

@@ -100,6 +100,7 @@
 (write <optional-output-port> <obj>)
 (display <optional-output-port> <obj>)
 (newline <optional-output-port>)
+
 (read <optional-input-port>)
 (read-string <str>) ; returns a pair: (cons <read-datum> <str-without-serialized-read-datum>)
 ```
@@ -110,19 +111,60 @@
 ```scheme
 (exit <optional-integer-exit-code>)
 
-(file-read <filename-str>) ; read file contents as a data structure
-(file-read-string <filename-str>) ; read file contents as a string
-
-(file-write <filename-str> <obj>)
-(file-display <filename-str> <obj>)
-
-(file-delete! <filename-str>)
-
-(file? <str>)
-
 (load <filename-str>)
 
-(system <cmd-str/str-list> <optional-env-var-str-list> <optional-dir-str>)
+(system <command-str> <optional-env-var-str-list> <optional-directory-str>)
+```
+
+
+------------------------
+## Files:
+```scheme
+(file-read <file-path-str>) ; read file contents as a data structure
+(file-read-string <file-path-str>) ; read file contents as a string
+
+(file-write <file-path-str> <obj>)
+(file-display <file-path-str> <obj>)
+(file-pretty-print <file-path-str> <obj>)
+
+(file-write+ <file-path-str> <obj>)
+(file-display+ <file-path-str> <obj>)
+(file-pretty-print+ <file-path-str> <obj>)
+
+(path? <path-str>)
+(directory? <path-str>)
+(file? <path-str>)
+
+(file-delete! <file-path-str>)
+(directory-delete! <directory-path-str>)
+(directory-recursive-delete! <directory-path-str>)
+(path-delete! <path-str>)
+(path-recursive-delete! <path-str>)
+
+(directory-entries <directory-path-str>) ; with dot-files
+(directory-entries* <directory-path-str>) ; no dot-files
+
+(current-directory)
+
+(path-parent <path-str>)
+(path-file <path-str>)
+
+(make-directory <path-str>) ; triggers error if directories in <path-str> don't exist
+(make-directory! <path-str>) ; creates directories as needed to make this directory exist
+
+(absolute-path <path-str>)
+
+(file-extension <path-str>)
+(has-file-extension? <path-str> <extension-str>)
+(swap-file-extension <path-str> <new-extension-str>)
+
+(file-size <file-path-str>)
+
+(move-file <old-path-str> <new-path-str>) ; triggers error if directories in <new-path-str> don't exist
+(move-file! <old-path-str> <new-path-str>) ; creates directories & overwrites files as needed to make this path exist
+
+(copy-file <old-path-str> <new-path-str>) ; triggers error if <new-path-str> already exists
+(copy-file! <old-path-str> <new-path-str>) ; creates directories & overwrites files as needed to make this path exist
 ```
 
 
@@ -133,14 +175,14 @@
 (open-output-file <filename-string>)
 (open-output-file+ <filename-string>)
 
-(close-port! <port>)
+(port-close! <port>)
 
 (port? <obj>)
 (input-port? <obj>)
 (output-port? <obj>)
 
-(open-port? <port>)
-(closed-port? <port>)
+(port-open? <port>)
+(port-closed? <port>)
 
 (current-input-port)
 (current-output-port)

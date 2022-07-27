@@ -35,6 +35,8 @@ public class HelpPrimitive {
     // Constants
     private static final int MAXIMUM_SUGGESTED_SEARCH_ALTERNATIVES = 25;
 
+    private static final int HELP_MENU_COLUMNS = 5;
+
     private static final File dbDirectory = new File(EscmPath.VALUE + File.separator + "src"       
                                                                     + File.separator + "escm" 
                                                                     + File.separator + "primitive" 
@@ -209,10 +211,10 @@ public class HelpPrimitive {
 
     private static synchronized void showOptionsMenu(ArrayList<String> options) throws Exception {
       // Get the lengths of each menu column
-      int[] col_lengths = new int[]{0,0,0,0,0};
+      int[] col_lengths = new int[HELP_MENU_COLUMNS];
       int totalOptions = options.size();
-      for(int col = 0; col < 5; ++col) {
-        for(int i = col; i < totalOptions; i += 5) {
+      for(int col = 0; col < HELP_MENU_COLUMNS; ++col) {
+        for(int i = col; i < totalOptions; i += HELP_MENU_COLUMNS) {
           int entryLength = options.get(i).length();
           if(col_lengths[col] < entryLength) {
             col_lengths[col] = entryLength;
@@ -226,11 +228,11 @@ public class HelpPrimitive {
         StringBuilder sb = new StringBuilder();
         sb.append(option);
         sb.append("  ");
-        for(int space = 0, n = col_lengths[i%5]-option.length(); space < n; ++space) {
+        for(int space = 0, n = col_lengths[i%HELP_MENU_COLUMNS]-option.length(); space < n; ++space) {
           sb.append(' ');
         }
         System.out.print(sb.toString());
-        if((i+1)%5 == 0) {
+        if((i+1)%HELP_MENU_COLUMNS == 0) {
           System.out.print("\n  ");
         } else if(i+1 == totalOptions) {
           System.out.print('\n');

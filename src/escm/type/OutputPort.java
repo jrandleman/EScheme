@@ -17,9 +17,9 @@
 //      - void println(Object o)
 //      - void printf(String fmt, Object... args)
 //
-//      - void writeDatum(Datum d)
-//      - void displayDatum(Datum d)
-//      - void pprintDatum(Datum d)
+//      - void write(Datum d)
+//      - void display(Datum d)
+//      - void pprint(Datum d)
 
 package escm.type;
 import java.util.Objects;
@@ -134,7 +134,7 @@ public class OutputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Datum Printing Functionality
-  public void writeDatum(Datum d) throws Exception {
+  public void write(Datum d) throws Exception {
     try {
       java.lang.String s = d.write();
       bw.write(s,0,s.length());
@@ -145,7 +145,7 @@ public class OutputPort extends Port {
   }
 
 
-  public void displayDatum(Datum d) throws Exception {
+  public void display(Datum d) throws Exception {
     try {
       java.lang.String s = d.display();
       bw.write(s,0,s.length());
@@ -156,7 +156,7 @@ public class OutputPort extends Port {
   }
 
 
-  public void pprintDatum(Datum d) throws Exception {
+  public void pprint(Datum d) throws Exception {
     try {
       java.lang.String s = d.pprint();
       bw.write(s,0,s.length());

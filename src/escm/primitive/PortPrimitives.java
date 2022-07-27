@@ -63,15 +63,15 @@ public class PortPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // close-port!
-  public static class ClosePortBang implements Primitive {
+  // port-close!
+  public static class PortCloseBang implements Primitive {
     public java.lang.String escmName() {
-      return "close-port!";
+      return "port-close!";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Port))
-        throw new Exceptionf("'(close-port! <port>) didn't receive 1 port: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(port-close! <port>) didn't receive 1 port: %s", Exceptionf.profileArgs(parameters));
       ((Port)parameters.get(0)).close();
       return Void.VALUE;
     }
@@ -124,30 +124,30 @@ public class PortPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // open-port?
-  public static class OpenPortP implements Primitive {
+  // port-open?
+  public static class PortOpenP implements Primitive {
     public java.lang.String escmName() {
-      return "open-port?";
+      return "port-open?";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Port))
-        throw new Exceptionf("'(open-port? <port>) didn't receive 1 port: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(port-open? <port>) didn't receive 1 port: %s", Exceptionf.profileArgs(parameters));
       return Boolean.valueOf(((Port)parameters.get(0)).isOpen());
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // closed-port?
-  public static class ClosedPortP implements Primitive {
+  // port-closed?
+  public static class PortClosedP implements Primitive {
     public java.lang.String escmName() {
-      return "closed-port?";
+      return "port-closed?";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Port))
-        throw new Exceptionf("'(closed-port? <port>) didn't receive 1 port: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(port-closed? <port>) didn't receive 1 port: %s", Exceptionf.profileArgs(parameters));
       return Boolean.valueOf(((Port)parameters.get(0)).isClosed());
     }
   }

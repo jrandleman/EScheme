@@ -18,6 +18,7 @@ import escm.vm.runtime.EscmThread;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.installerGenerated.EscmPath;
 import escm.primitive.SystemPrimitives;
+import escm.primitive.FilePrimitives;
 
 public class Main {
   ////////////////////////////////////////////////////////////////////////////
@@ -158,11 +159,11 @@ public class Main {
     if(parsedCmdLine.loadingIntoREPL) GlobalState.inREPL = true; // trigger exit message to be printed
     String buffer = null;
     try {
-      buffer = SystemPrimitives.FileRead.slurpFile(parsedCmdLine.scriptName,"escm-load-script");
+      buffer = FilePrimitives.FileRead.slurpFile(parsedCmdLine.scriptName,"escm-load-script");
     } catch(Exception e) {
       throw new Exceptionf("%s\n  %s", e, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
     }
-    ArrayList<Datum> exprs = SystemPrimitives.FileRead.readBufferAsArrayList(buffer);
+    ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(buffer);
     Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,replIfReplingContinuation));
   }
 

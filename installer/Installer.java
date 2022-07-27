@@ -164,6 +164,7 @@ public class Installer {
     escmStdlibLoader.append("import java.nio.file.Path;\n");
     escmStdlibLoader.append("import escm.type.Datum;\n");
     escmStdlibLoader.append("import escm.util.Trampoline;\n");
+    escmStdlibLoader.append("import escm.primitive.FilePrimitives;\n");
     escmStdlibLoader.append("import escm.primitive.SystemPrimitives;\n");
     escmStdlibLoader.append("import escm.vm.runtime.GlobalState;\n");
     escmStdlibLoader.append("\n");
@@ -173,7 +174,7 @@ public class Installer {
     escmStdlibLoader.append("    // Note that we know our stdlib don't store any continuations using call/cc \n");
     escmStdlibLoader.append("    //   upon loading, so we can afford evaluating it with a dummy continuation.\n");
     escmStdlibLoader.append("    Trampoline.Continuation terminalContinuation = (ignored) -> () -> Trampoline.LAST_BOUNCE_SIGNAL;\n");
-    escmStdlibLoader.append("    ArrayList<Datum> exprs = SystemPrimitives.FileRead.readBufferAsArrayList(escmCode);\n");
+    escmStdlibLoader.append("    ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(escmCode);\n");
     escmStdlibLoader.append("    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,terminalContinuation));\n");
     escmStdlibLoader.append("  }\n");
     escmStdlibLoader.append("}\n");

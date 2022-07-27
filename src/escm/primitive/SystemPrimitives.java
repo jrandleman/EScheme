@@ -5,11 +5,8 @@
 package escm.primitive;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.io.File;
 import escm.type.Datum;
-import escm.type.Boolean;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.ExecuteSystemCommand;
@@ -70,145 +67,6 @@ public class SystemPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // file-read
-  public static class FileRead implements Primitive {
-    public java.lang.String escmName() {
-      return "file-read";
-    }
-    
-    private static Datum convertReadExpressionsToReadExpression(ArrayList<Datum> contents) {
-      if(contents.size() == 1) return contents.get(0);
-      Datum expression = escm.type.Nil.VALUE;
-      for(int i = contents.size()-1; i >= 0; --i)
-        expression = new escm.type.Pair(contents.get(i),expression);
-      return new escm.type.Pair(new escm.type.Symbol("begin"),expression);
-    }
-
-    public static String slurpFile(String filename, String callerName) throws Exception {
-      try {
-        return Files.readString(Path.of(filename));
-      } catch(Exception e) {
-        throw new Exceptionf("'%s couldn't read from file \"%s\"", callerName, filename);
-      }
-    }
-
-    public static ArrayList<Datum> readBufferAsArrayList(String buffer) throws Exception {
-      ArrayList<Datum> contents = new ArrayList<Datum>();
-      buffer = buffer.trim();
-      if(buffer.length() == 0) return contents;
-      Integer n = buffer.length();
-      escm.util.Pair<Datum,Integer> result = escm.vm.Reader.read(buffer);
-      contents.add(result.first);
-      buffer = buffer.substring(result.second).trim();
-      while(result.second != n && buffer.length() > 0) {
-        n = buffer.length();
-        result = escm.vm.Reader.read(buffer);
-        contents.add(result.first);
-        buffer = buffer.substring(result.second).trim();
-      }
-      return contents;
-    }
-
-    public static Datum readBuffer(String buffer) throws Exception {
-      ArrayList<Datum> contents = readBufferAsArrayList(buffer);
-      if(contents.size() == 0) return escm.type.Void.VALUE;
-      return convertReadExpressionsToReadExpression(contents);
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
-        throw new Exceptionf("'(file-read <filename>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return readBuffer(slurpFile(((escm.type.String)parameters.get(0)).value(),"file-read"));
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // file-read-string
-  public static class FileReadString implements Primitive {
-    public java.lang.String escmName() {
-      return "file-read-string";
-    }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
-        throw new Exceptionf("'(file-read-string <filename>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.String(FileRead.slurpFile(((escm.type.String)parameters.get(0)).value(),"file-read-string"));
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // file-write
-  public static class FileWrite implements Primitive {
-    public java.lang.String escmName() {
-      return "file-write";
-    }
-    
-    public static void writeStringToFile(String filename, String str, String callerName) throws Exception {
-      try {
-        Files.writeString(Path.of(filename),str);
-      } catch(Exception e) {
-        throw new Exceptionf("'%s couldn't write to file \"%s\"", filename, callerName);
-      }
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String)) 
-        throw new Exceptionf("'(file-write <filename> <obj>) didn't receive exactly 1 string & 1 obj: %s", Exceptionf.profileArgs(parameters));
-      writeStringToFile(((escm.type.String)parameters.get(0)).value(),parameters.get(1).write(),"file-write");
-      return escm.type.Void.VALUE;
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // file-display
-  public static class FileDisplay implements Primitive {
-    public java.lang.String escmName() {
-      return "file-display";
-    }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String)) 
-        throw new Exceptionf("'(file-display <filename> <obj>) didn't receive exactly 1 string & 1 obj: %s", Exceptionf.profileArgs(parameters));
-      FileWrite.writeStringToFile(((escm.type.String)parameters.get(0)).value(),parameters.get(1).display(),"file-display");
-      return escm.type.Void.VALUE;
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // file-delete!
-  public static class FileDelete implements Primitive {
-    public java.lang.String escmName() {
-      return "file-delete!";
-    }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
-        throw new Exceptionf("'(file-delete! <filename>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(Files.deleteIfExists(Path.of(((escm.type.String)parameters.get(0)).value())));
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // file?
-  public static class IsFile implements Primitive {
-    public java.lang.String escmName() {
-      return "file?";
-    }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
-        throw new Exceptionf("'(file? <filename>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(Files.exists(Path.of(((escm.type.String)parameters.get(0)).value())));
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // load
   public static class Load implements PrimitiveCallable {
     public java.lang.String escmName() {
@@ -233,8 +91,8 @@ public class SystemPrimitives {
     }
 
     public static Trampoline.Bounce loadFileInEnvironment(Environment env, String filename, Trampoline.Continuation continuation) throws Exception {
-      String buffer = FileRead.slurpFile(filename,"load");
-      ArrayList<Datum> exprs = FileRead.readBufferAsArrayList(buffer);
+      String buffer = FilePrimitives.FileRead.slurpFile(filename,"load");
+      ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(buffer);
       return evalEachExpression(env,exprs,0,continuation);
     }
 
