@@ -105,7 +105,7 @@ public class InputPort extends Port {
       int c = pr.read();
       pr.unread(c);
       if(c == -1) return null;
-      return new java.lang.String(new char[]{(char)c});
+      return java.lang.String.valueOf((char)c);
     } catch(Exception e) {
       throw new Exceptionf("Can't peek port \"%s\": %s", name, e);
     }
@@ -125,7 +125,7 @@ public class InputPort extends Port {
     try {
       int c = pr.read();
       if(c == -1) return null;
-      return new java.lang.String(new char[]{(char)c});
+      return java.lang.String.valueOf((char)c);
     } catch(Exception e) {
       throw new Exceptionf("Can't read a char from port \"%s\": %s", name, e);
     }
@@ -194,7 +194,7 @@ public class InputPort extends Port {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Datum Readers
+  // Datum Reader
   public Datum readDatum() throws Exception {
     StringBuilder sb = new StringBuilder();
     while(true) {
@@ -208,7 +208,12 @@ public class InputPort extends Port {
             if(input != -1) pr.unread(input);
             break;
           }
-          if(input == -1) return null;
+          if(input == -1) {
+            if(parenCount > 0) {
+              throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a ')' prior an associated '('!", write());
+            }
+            return null;
+          }
           // register open paren
           if(input == '(') {
             sb.append((char)input);
@@ -217,7 +222,10 @@ public class InputPort extends Port {
           } else if(input == ')') {
             sb.append((char)input);
             --parenCount;
-            if(parenCount <= 0) break;
+            if(parenCount < 0) {
+              throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a ')' prior an associated '('!", write());
+            }
+            if(parenCount == 0) break;
           // account for whitespace
           } else if(Character.isWhitespace((char)input)) {
             sb.append((char)input);
@@ -247,14 +255,18 @@ public class InputPort extends Port {
               }
               input = pr.read();
             }
-            if(input == -1) return null;
+            if(input == -1) {
+              throw new Exceptionf("READ ERROR (for %s): Unterminating string literal detected!", write());
+            }
             if(parenCount == 0) break;
           // account for reader shorthands
           } else if(Reader.isReaderShorthand((char)input) || input == '\\') {
             sb.append((char)input);
             if(input == ',') {
               input = pr.read();
-              if(input == -1) return null;
+              if(input == -1) {
+                throw new Exceptionf("READ ERROR (for %s): Incomplete \"unquote\" reader shorthand literal!", write());
+              }
               if(input == '@') {
                 sb.append((char)input);
               } else {

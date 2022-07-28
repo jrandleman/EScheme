@@ -21,7 +21,7 @@ import escm.type.PrimitiveProcedure;
 public class Environment {
   ////////////////////////////////////////////////////////////////////////////
   // Constant Fields
-  public static final int MAXIMUM_SUGGESTED_VARIABLE_ALTERNATIVES = 15;
+  public static final int MAXIMUM_SUGGESTED_VARIABLE_ALTERNATIVES = 10;
 
 
   ////////////////////////////////////////////////////////////////////////////

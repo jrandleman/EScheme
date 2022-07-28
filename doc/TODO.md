@@ -4,13 +4,6 @@
 
 
 
-
-- `InputPort :: readDatum` => THROW ERRORS WHEN FOUND AN INCOMPLETE EXPRESSION, RATHER THAN JUST RETURNING `null` !!!
-
-
-
-
-
 - FRACTIONS, `BigInteger`, `BigDecimal`, COMPLEX NUMERICS
   * INCLUDE `#e` `#i` `#b` `#o` `#x` `#NNr` SUPPORT
   * DETERMINE WHETHER REALLY WANT BIGDECIMAL OR NOT !!!
