@@ -176,14 +176,14 @@
 (open-output-file <filename-string>)
 (open-output-file+ <filename-string>)
 
-(port-close! <port>)
+(close-port! <port>)
 
 (port? <obj>)
 (input-port? <obj>)
 (output-port? <obj>)
 
-(port-open? <port>)
-(port-closed? <port>)
+(open-port? <port>)
+(closed-port? <port>)
 
 (current-input-port)
 (current-output-port)
