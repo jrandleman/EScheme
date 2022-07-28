@@ -332,38 +332,18 @@ public class PortPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // mark-input-port!
-  public static class MarkInputPortBang implements Primitive {
-    public java.lang.String escmName() {
-      return "mark-input-port!";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 2)
-        throw new Exceptionf("'(mark-input-port! <input-port> <read-ahead-limit-number>) didn't receive 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum ipDatum = parameters.get(0);
-      if(!(ipDatum instanceof InputPort))
-        throw new Exceptionf("'(mark-input-port! <input-port> <read-ahead-limit-number>) 1st arg isn't an input-port: %s", Exceptionf.profileArgs(parameters));
-      Datum readAheadLimitDatum = parameters.get(1);
-      if(!(readAheadLimitDatum instanceof escm.type.Number))
-        throw new Exceptionf("'(mark-input-port! <input-port> <read-ahead-limit-number>) 2nd arg isn't a number: %s", Exceptionf.profileArgs(parameters));
-      ((InputPort)ipDatum).mark(((escm.type.Number)readAheadLimitDatum).intValue());
-      return Void.VALUE;
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // reset-input-port!
+  // peek-port
   public static class ResetInputPortBang implements Primitive {
     public java.lang.String escmName() {
-      return "reset-input-port!";
+      return "peek-port";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof InputPort))
-        throw new Exceptionf("'(reset-input-port! <input-port> <read-ahead-limit-number>) didn't receive 1 input-port: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(((InputPort)parameters.get(0)).reset());
+        throw new Exceptionf("'(peek-port <input-port>) didn't receive 1 input-port: %s", Exceptionf.profileArgs(parameters));
+      String c = ((InputPort)parameters.get(0)).peek();
+      if(c == null) return escm.type.Eof.VALUE;
+      return new escm.type.String(c);
     }
   }
 }

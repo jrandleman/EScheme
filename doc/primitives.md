@@ -196,8 +196,7 @@
 (with-output-to-file <filename-string> <thunk-callable>)
 (with-output-to-file+ <filename-string> <thunk-callable>)
 
-(mark-input-port! <input-port> <read-ahead-limit-integer>)
-(reset-input-port! <input-port>)
+(peek-port <input-port>)
 ```
 
 

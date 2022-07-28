@@ -101,15 +101,9 @@
   "description": "Invoke <thunk-callable> with (open-output-file <filename-string>) as the\ncurrent-output-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.\nNote that <filename-string> is appended to if it exists.",
   "example": null
 }, {
-  "name": "mark-input-port!",
+  "name": "peek-port",
   "aliases": null,
-  "signatures": ["(mark-input-port! <input-port> <read-ahead-limit-integer>)"],
-  "description": "Marks the current position in <input-port> to jump back to via <reset-input-port>.\n<read-ahead-limit-integer> determines the maxmimum number of characters to read\nprior to invalidating the set mark.",
-  "example": null
-}, {
-  "name": "reset-input-port!",
-  "aliases": null,
-  "signatures": ["(reset-input-port! <input-port>)"],
-  "description": "Tries to reset <input-port> to the mark set by <mark-input-port>.\nReturns whether succeeded in the reset.",
+  "signatures": ["(peek-port <input-port>)"],
+  "description": "Peek the first character (as a string) in <input-port>. Returns #eof if empty.",
   "example": null
 }]

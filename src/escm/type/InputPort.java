@@ -12,11 +12,9 @@
 //
 //      - long skip(long n)
 //
-//      - void mark(int readAheadLimit)
-//      - boolean reset()
-//
 //      - boolean ready()
 //
+//      - String peek()                // returns <null> if reached EOF
 //      - String readCharacter()       // returns <null> if reached EOF
 //      - String readCharacters(int n) // returns <null> if reached EOF
 //      - String readLine()            // returns <null> if reached EOF
@@ -25,7 +23,7 @@
 
 package escm.type;
 import java.util.Objects;
-import java.io.BufferedReader;
+import java.io.PushbackReader;
 import java.io.InputStreamReader;
 import java.io.FileReader;
 import escm.util.Exceptionf;
@@ -36,7 +34,7 @@ import escm.vm.runtime.EscmThread;
 public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Internal reader value
-  private BufferedReader br = null;
+  private PushbackReader pr = null;
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -51,7 +49,7 @@ public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Static STDIN field
   private InputPort() {
-    br = new BufferedReader(new InputStreamReader(System.in));
+    pr = new PushbackReader(new InputStreamReader(System.in));
     name = "System.in";
   }
 
@@ -74,7 +72,7 @@ public class InputPort extends Port {
   // Constructor
   public InputPort(java.lang.String filename) throws Exception {
     try {
-      br = new BufferedReader(new FileReader(filename));
+      pr = new PushbackReader(new FileReader(filename));
       name = filename;
     } catch(Exception e) {
       throw new Exceptionf("Can't open port \"%s\" for input: %s", filename, e);
@@ -93,7 +91,7 @@ public class InputPort extends Port {
   // Whether can Read
   public boolean ready() throws Exception {
     try {
-      return br.ready();
+      return pr.ready();
     } catch(Exception e) {
       throw new Exceptionf("Can't check if port \"%s\" is ready: %s", name, e);
     }
@@ -101,7 +99,21 @@ public class InputPort extends Port {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Readers
+  // Peek Logic
+  public java.lang.String peek() throws Exception {
+    try {
+      int c = pr.read();
+      pr.unread(c);
+      if(c == -1) return null;
+      return new java.lang.String(new char[]{(char)c});
+    } catch(Exception e) {
+      throw new Exceptionf("Can't peek port \"%s\": %s", name, e);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Various Readers
   private static void printReplPrompt() {
     if(!GlobalState.getLastPrintedANewline()) System.out.println("");
     System.out.print("> ");
@@ -111,7 +123,7 @@ public class InputPort extends Port {
 
   public java.lang.String readCharacter() throws Exception {
     try {
-      int c = br.read();
+      int c = pr.read();
       if(c == -1) return null;
       return new java.lang.String(new char[]{(char)c});
     } catch(Exception e) {
@@ -127,7 +139,7 @@ public class InputPort extends Port {
     }
     try {
       char[] chars = new char[n];
-      int readCount = br.read(chars,0,n);
+      int readCount = pr.read(chars,0,n);
       if(readCount == -1) return null;
       return new java.lang.String(chars);
     } catch(Exception e) {
@@ -138,28 +150,17 @@ public class InputPort extends Port {
 
   public java.lang.String readLine() throws Exception {
     try {
-      return br.readLine();
+      StringBuilder sb = new StringBuilder();
+      int c = pr.read();
+      while(c != '\n' && c != -1) {
+        sb.append((char)c);
+        c = pr.read();
+      }
+      if(c == -1) return null;
+      sb.append((char)c);
+      return sb.toString();
     } catch(Exception e) {
       throw new Exceptionf("Can't read line from port \"%s\": %s", name, e);
-    }
-  }
-
-
-  public Datum readDatum() throws Exception {
-    StringBuilder sb = new StringBuilder();
-    while(true) {
-      try {
-        int input = br.read();
-        if(input == -1) return null;
-        sb.append((char)input);
-        escm.util.Pair<Datum,Integer> result = Reader.nullableRead(sb.toString());
-        if(isStdin()) GlobalState.setLastPrintedANewline(true); // from the newline input by the user's <enter>/<return> key stroke
-        if(result == null) continue;
-        if(result.first instanceof Eof) return null; // only reading #eof is equivalent to typing ^D
-        return result.first;
-      } catch(Reader.IncompleteException e) {
-        continue;
-      }
     }
   }
 
@@ -169,7 +170,7 @@ public class InputPort extends Port {
     StringBuilder sb = new StringBuilder();
     while(true) {
       try {
-        java.lang.String input = br.readLine();
+        java.lang.String input = readLine();
         if(input == null) { // EOF detected
           if(sb.length() == 0) {
             GlobalState.setLastPrintedANewline(false);
@@ -193,31 +194,99 @@ public class InputPort extends Port {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Skip past N Characters
-  public long skip(long n) throws Exception {
-    return br.skip(n);
+  // Datum Readers
+  public Datum readDatum() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    while(true) {
+      try {
+        int parenCount = 0;
+        boolean foundLoneAtom = false;
+        while(true) {
+          int input = pr.read();
+          // check for atom
+          if(foundLoneAtom && parenCount == 0 && (input == -1 || Reader.isDelimiter((char)input))) {
+            if(input != -1) pr.unread(input);
+            break;
+          }
+          if(input == -1) return null;
+          // register open paren
+          if(input == '(') {
+            sb.append((char)input);
+            ++parenCount;
+          // register close paren
+          } else if(input == ')') {
+            sb.append((char)input);
+            --parenCount;
+            if(parenCount <= 0) break;
+          // account for whitespace
+          } else if(Character.isWhitespace((char)input)) {
+            sb.append((char)input);
+          // skip comment
+          } else if(input == ';') {
+            input = pr.read();
+            while(input != '\n' && input != -1) input = pr.read();
+            if(input == -1) return null;
+            sb.append('\n');
+          // get string
+          } else if(input == '"') {
+            sb.append((char)input);
+            int start = sb.length()-1;
+            input = pr.read();
+            while(input != -1) {
+              if(input == '"') {
+                // verify a non-escaped quote
+                int j = sb.length()-1, escapeCount = 0;
+                while(j > start && sb.charAt(j) == '\\') {
+                  ++escapeCount;
+                  --j;
+                }
+                sb.append((char)input);
+                if(escapeCount % 2 == 0) break; // non-escaped <">
+              } else {
+                sb.append((char)input);
+              }
+              input = pr.read();
+            }
+            if(input == -1) return null;
+            if(parenCount == 0) break;
+          // account for reader shorthands
+          } else if(Reader.isReaderShorthand((char)input) || input == '\\') {
+            sb.append((char)input);
+            if(input == ',') {
+              input = pr.read();
+              if(input == -1) return null;
+              if(input == '@') {
+                sb.append((char)input);
+              } else {
+                pr.unread(input);
+              }
+            }
+          // account for regular token
+          } else {
+            sb.append((char)input);
+            foundLoneAtom = true;
+          }
+        }
+        // eat the rest of the line if reading from STDIN
+        if(isStdin()) {
+          int c = pr.read();
+          while(c != '\n' && c != -1) c = pr.read();
+        }
+        escm.util.Pair<Datum,Integer> result = Reader.read(sb.toString());
+        if(isStdin()) GlobalState.setLastPrintedANewline(true); // from the newline input by the user's <enter>/<return> key stroke
+        if(result.first instanceof Eof) return null; // only reading #eof is equivalent to typing ^D
+        return result.first;
+      } catch(Reader.IncompleteException e) {
+        continue;
+      }
+    }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Marker Support
-  public void mark(int readAheadLimit) throws Exception {
-    try {
-      br.mark(readAheadLimit);
-    } catch(Exception e) {
-      throw new Exceptionf("Can't mark port \"%s\" with read-ahead-limit %d: %s", name, readAheadLimit, e);
-    }
-  }
-
-
-  // Returns whether succeeded
-  public boolean reset() {
-    try {
-      br.reset();
-      return true;
-    } catch(Exception e) {
-      return false;
-    }
+  // Skip past N Characters
+  public long skip(long n) throws Exception {
+    return pr.skip(n);
   }
 
 
@@ -225,7 +294,7 @@ public class InputPort extends Port {
   // Port Closing Semantics
   public void close() throws Exception {
     try {
-      if(isClosed() == false) br.close();
+      if(isClosed() == false) pr.close();
     } catch(Exception e) {
       throw new Exceptionf("Can't close port \"%s\": %s", name, e);
     }
@@ -234,7 +303,7 @@ public class InputPort extends Port {
 
   public boolean isClosed() {
     try {
-      br.ready();
+      pr.ready();
       return false;
     } catch(Exception e) {
       return true;
@@ -252,14 +321,14 @@ public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Equality
   public boolean eq(Object o) {
-    return o instanceof InputPort && ((InputPort)o).br.equals(br);
+    return o instanceof InputPort && ((InputPort)o).pr.equals(pr);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
-    return Objects.hash(type(),name,br);
+    return Objects.hash(type(),name,pr);
   }
 
 

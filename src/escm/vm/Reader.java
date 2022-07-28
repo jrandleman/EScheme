@@ -29,17 +29,17 @@ public class Reader {
   }
 
 
-  private static boolean isDelimiter(char c) {
+  public static boolean isDelimiter(char c) {
     return Character.isWhitespace(c) || c=='(' || c==')' || c=='"' || c==';';
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Reader Shorthand Literal Parsing Helpers
-  private static boolean isReaderShorthand(String sourceCode, int i, int n) {
-    if(sourceCode.charAt(i) == '\'') return true;
-    if(sourceCode.charAt(i) == '`') return true;
-    if(sourceCode.charAt(i) == ',') return true;
+  public static boolean isReaderShorthand(char c) {
+    if(c == '\'') return true;
+    if(c == '`') return true;
+    if(c == ',') return true;
     return false;
   }
 
@@ -375,7 +375,7 @@ public class Reader {
         return parseReaderLambdaLiteralLogic(sourceCode,i,parenCount);
 
       // Expand reader shorthand literals
-      if(isReaderShorthand(sourceCode,i,n)) 
+      if(isReaderShorthand(sourceCode.charAt(i))) 
         return parseReaderShorthandLiteral(sourceCode,i,n,parenCount);
 
       // Parse List/Pair
@@ -429,13 +429,5 @@ public class Reader {
     Pair<Datum,Integer> result = readLoop(sourceCode,0,0);
     if(result.first != null) return result;
     return new Pair<Datum,Integer>(escm.type.Void.VALUE,result.second);
-  }
-
-
-  // Same as the above, but returns <null> if only read comments/whitespace (rather than #void)
-  public static Pair<Datum,Integer> nullableRead(String sourceCode) throws Exception {
-    Pair<Datum,Integer> result = readLoop(sourceCode,0,0);
-    if(result.first != null) return result;
-    return null;
   }
 }
