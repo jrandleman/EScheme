@@ -103,6 +103,7 @@
 
 (read <optional-input-port>)
 (read-string <str>) ; returns a pair: (cons <read-datum> <str-without-serialized-read-datum>)
+(read-line <optional-input-port>)
 ```
 
 

@@ -179,4 +179,30 @@ public class IOPrimitives {
       return new escm.type.Pair(result.first,new escm.type.String(restOfString));
     }
   }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // read-line
+  public static class ReadLine implements Primitive {
+    public java.lang.String escmName() {
+      return "read-line";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() > 1) 
+        throw new Exceptionf("'(read-line <optional-input-port>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      InputPort port = null;
+      if(parameters.size() == 1) {
+        Datum portDatum = parameters.get(0);
+        if(!(portDatum instanceof InputPort))
+          throw new Exceptionf("'(read-line <optional-input-port>) arg isn't an input port: %s", Exceptionf.profileArgs(parameters));
+        port = (InputPort)portDatum;
+      } else {
+        port = InputPort.getCurrent();
+      }
+      String line = port.readLine();
+      if(line == null) return escm.type.Eof.VALUE; // EOF in a <read> call yields an #eof
+      return new escm.type.String(line);
+    }
+  }
 }

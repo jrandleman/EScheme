@@ -3,53 +3,29 @@
 ## MORE
 
 
-
-
-
-- PROPER PORTS
-
-* ADD THE BELOW PRIMITIVES
-
-    => ADD THEM TO `primitives.md` AND `help`
-  
-
-```scheme
-IO:
-
-
-
-
-```
-
-
-```scheme
-help> IO
-
-READ-LINE     READ-CHAR    
-SLURP-PORT    SLURP-FILE ;; POSSIBLY RENAME THESE
-READ-PORT     READ-FILE
-
-
-```
-
-
-
-
-
-
-
-
 - CONSIDER CHANGING `InputPort` TO USE `PushbackReader` AS ITS INTERNAL TYPE INSTEAD
   * ALLOWS MORE EFFICIENT `read` FROM FILES
+
+    => RUN TESTS TO VERIFY THIS !!!
+
   * MUST ELIMINATE THE `mark-` AND `reset-` PRIMITIVES
   * CAN LIKELY ELIMINATE `escm.vm.Reader.nullableRead()`
   * CAN ADD IN NEW PUSH-BACK ALTERNATIVE PRIMITIVES
+
+
+
 
 
 - FRACTIONS, `BigInteger`, `BigDecimal`, COMPLEX NUMERICS
   * INCLUDE `#e` `#i` `#b` `#o` `#x` `#NNr` SUPPORT
   * DETERMINE WHETHER REALLY WANT BIGDECIMAL OR NOT !!!
   * UPDATE THE `number` `help` ENTRY !!!
+
+    => NOTE: TEST EFFICIENCY OF THIS !!!
+
+
+
+
 
 - PRIMITIVE TO GET CURRENT DATE/TIME WITH OFFSETS
   * ADD TO `primitives.md` AND `help`
@@ -88,8 +64,8 @@ READ-PORT     READ-FILE
                                                                                                               `type` IS IN THE TYPE SEQUENCE
           COULD THEN HAVE:
             ```scheme
-            (defn fun
-              ((:string s) s) ; !!! can dispatch on type !!!
+            (defn :integer fun
+              ((:string s) (length s)) ; !!! can dispatch on type !!!
               ((:number n) n))
             ```
 

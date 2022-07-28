@@ -26,12 +26,18 @@
   "name": "read",
   "aliases": null,
   "signatures": ["(read)", "(read <input-port>)"],
-  "description": "Read an EScheme datum as input from <input-port>.\n<input-port> defaults to (current-input-port).",
+  "description": "Read an EScheme datum from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.",
   "example": null
 }, {
   "name": "read-string",
   "aliases": ["read-str"],
   "signatures": ["(read-string <str>)"],
   "description": "Read an EScheme datum from the string. Returns a pair:\n  (cons <read-datum> <str-w/o-serialized-read-datum>)",
+  "example": null
+}, {
+  "name": "read-line",
+  "aliases": null,
+  "signatures": ["(read-line)", "(read-line <input-port>)"],
+  "description": "Read a line of text as a string from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.",
   "example": null
 }]
