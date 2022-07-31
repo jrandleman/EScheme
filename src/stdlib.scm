@@ -30,6 +30,8 @@
 ;   - do
 ;   - -<>
 ;
+;   - curry
+;
 ;   - *dosync-lock*
 ;   - dosync
 ;   - dosync-with
@@ -717,6 +719,30 @@
     ((a op) (list (list (quote lambda) (list (quote <>)) op) a))
     ((a op . ops) 
       (cons (quote -<>) (cons (list (list (quote lambda) (list (quote <>)) op) a) ops)))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing CURRY: (curry (<param> ...) <body> ...)
+;;   => APPLICATION: Both ((K 1) 2) and (K 1 2) are valid!
+;;   => NOTE: It is UNDEFINED BEHAVIOR to have a VARIADIC CURRIED lambda
+;;            IE: (curry (x . xs) x) ; INVALID!
+(define-syntax curry 
+  (lambda (params . body)
+    (define curried-lambdas (gensym))
+    (cond ((null? params) 
+            `(lambda () ,@body))
+          ((null? (cdr params))
+            `(lambda (x . xs)
+              (fold (lambda (f a) (f a)) 
+                    (lambda ,params ,@body)
+                    (cons x xs))))
+          (else
+            `(let ((,curried-lambdas 
+              (lambda (,(car params)) (curry ,(cdr params) ,@body))))
+                (lambda (x . xs)
+                  (fold (lambda (f a) (f a)) 
+                        ,curried-lambdas
+                        (cons x xs))))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

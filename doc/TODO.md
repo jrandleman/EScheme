@@ -3,9 +3,6 @@
 ## MORE
 
 
-
-
-
 - PRIMITIVE TO GET CURRENT DATE/TIME WITH OFFSETS
   * ADD TO `primitives.md` AND `help`
 
@@ -20,6 +17,8 @@
 
 - STRING FORMATTING PROCEDURES `displayf`, `writef`, `stringf`, `pprintf` (`pretty-printf`)
 
+- A CHARACTER TYPE ???
+
 - MORE STREAM PRIMITIVES
 
 
@@ -29,7 +28,7 @@
   
   * NOTE: THE BELOW SHOULD ALSO BE AVAILABLE FOR INTERFACE DEFINITIONS !!!
 
-  * CONSIDER: `(define-type <keyword> <unary-predicate-callable>)` `(type? <keyword>)` `(delete-type! <keyword>)`
+  * CONSIDER: `(define-type <keyword> <unary-predicate-callable>)` `(type? <keyword>)` `(delete-type! <keyword>)` `(type-predicate <keyword>)`
 
   BASICS: `(def :string (f :string s :any a))` use keywords to denote basic type checks
                 ^          ^         ^

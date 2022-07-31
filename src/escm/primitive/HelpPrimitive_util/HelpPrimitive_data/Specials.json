@@ -143,6 +143,12 @@
   "description": "Execute each expression, with \"<>\" bound as the result of the last expression.",
   "example": "; The below results in 64:\n(-<> (* 2 2)\n     (+ <> <>)\n     (* <> <>))"
 }, {
+  "name": "curry",
+  "aliases": null,
+  "signatures": ["(curry (<param> ...) <body> ...)"],
+  "description": "<lambda> alternative to create a curried procedure! Suppose\n(define fcn (curry (a b) a)). <fcn> may be invoked as either\n(fcn 1 2) or ((fcn 1) 2).\n\n  => NOTE: It is UNDEFINED BEHAVIOR to have a VARIADIC CURRIED procedure!",
+  "example": null
+}, {
   "name": "dosync",
   "aliases": null,
   "signatures": ["(dosync <expr> ...)"],
