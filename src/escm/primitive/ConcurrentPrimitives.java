@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Void;
 import escm.type.Boolean;
+import escm.type.number.Real;
+import escm.type.number.Exact;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.Main;
@@ -42,8 +44,8 @@ public class ConcurrentPrimitives {
         name = ((escm.type.String)parameters.get(0)).value();
         callable = parameters.get(1);
       }
-      if(name == null) return new escm.type.Thread(callable);
-      return new escm.type.Thread(name,callable);
+      if(name == null) return new escm.type.concurrent.Thread(callable);
+      return new escm.type.concurrent.Thread(name,callable);
     }
   }
 
@@ -58,7 +60,7 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1)
         throw new Exceptionf("'(thread? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(parameters.get(0) instanceof escm.type.Thread);
+      return Boolean.valueOf(parameters.get(0) instanceof escm.type.concurrent.Thread);
     }
   }
 
@@ -71,9 +73,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Thread))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-name <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.String(((escm.type.Thread)parameters.get(0)).getName());
+      return new escm.type.String(((escm.type.concurrent.Thread)parameters.get(0)).getName());
     }
   }
 
@@ -86,9 +88,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Thread))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-id <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.Number(((escm.type.Thread)parameters.get(0)).getId());
+      return new Exact(((escm.type.concurrent.Thread)parameters.get(0)).getId());
     }
   }
 
@@ -101,9 +103,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Thread))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-runnable <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      return ((escm.type.Thread)parameters.get(0)).getRunnable();
+      return ((escm.type.concurrent.Thread)parameters.get(0)).getRunnable();
     }
   }
 
@@ -116,9 +118,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Thread))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-status <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.Symbol(((escm.type.Thread)parameters.get(0)).getStatus());
+      return new escm.type.Symbol(((escm.type.concurrent.Thread)parameters.get(0)).getStatus());
     }
   }
 
@@ -133,7 +135,7 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0)
         throw new Exceptionf("'(thread-yield) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
-      escm.type.Thread.yield();
+      escm.type.concurrent.Thread.yield();
       return Void.VALUE;
     }
   }
@@ -147,9 +149,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.Thread) || !(parameters.get(1) instanceof Boolean))
+      if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.concurrent.Thread) || !(parameters.get(1) instanceof Boolean))
         throw new Exceptionf("'(thread-set-daemon! <thread> <status>) didn't receive exactly 1 thread & 1 boolean: %s", Exceptionf.profileArgs(parameters));
-      ((escm.type.Thread)parameters.get(0)).setDaemon(((Boolean)parameters.get(1)) == Boolean.TRUE);
+      ((escm.type.concurrent.Thread)parameters.get(0)).setDaemon(((Boolean)parameters.get(1)) == Boolean.TRUE);
       return Void.VALUE;
     }
   }
@@ -163,9 +165,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Thread))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-daemon? <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(((escm.type.Thread)parameters.get(0)).isDaemon());
+      return Boolean.valueOf(((escm.type.concurrent.Thread)parameters.get(0)).isDaemon());
     }
   }
 
@@ -178,9 +180,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Thread))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-priority <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.Number(((escm.type.Thread)parameters.get(0)).getPriority());
+      return new Exact(((escm.type.concurrent.Thread)parameters.get(0)).getPriority());
     }
   }
 
@@ -193,9 +195,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.Thread) || !(parameters.get(1) instanceof escm.type.Number))
-        throw new Exceptionf("'(thread-set-priority! <thread> <priority>) didn't receive exactly 1 thread & 1 number: %s", Exceptionf.profileArgs(parameters));
-      ((escm.type.Thread)parameters.get(0)).setPriority(((escm.type.Number)parameters.get(1)).intValue());
+      if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.concurrent.Thread) || !(parameters.get(1) instanceof Real) || !((Real)parameters.get(1)).isInteger())
+        throw new Exceptionf("'(thread-set-priority! <thread> <priority>) didn't receive exactly 1 thread & 1 integer: %s", Exceptionf.profileArgs(parameters));
+      ((escm.type.concurrent.Thread)parameters.get(0)).setPriority(((Real)parameters.get(1)).intValue());
       return Void.VALUE;
     }
   }
@@ -209,9 +211,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Thread))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-start! <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      ((escm.type.Thread)parameters.get(0)).start();
+      ((escm.type.concurrent.Thread)parameters.get(0)).start();
       return Void.VALUE;
     }
   }
@@ -227,18 +229,18 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int totalParams = parameters.size();
       int millisToWaitAtMostFor = -1;
-      escm.type.Thread thread;
+      escm.type.concurrent.Thread thread;
       if(totalParams == 1) {
-        if(!(parameters.get(0) instanceof escm.type.Thread))
+        if(!(parameters.get(0) instanceof escm.type.concurrent.Thread))
           throw new Exceptionf("'(thread-join! <thread> <optional-millis-max-wait>) arg %s isn't a thread!", parameters.get(0).profile());
-        thread = (escm.type.Thread)parameters.get(0);
+        thread = (escm.type.concurrent.Thread)parameters.get(0);
       } else if(totalParams == 2) {
-        if(!(parameters.get(0) instanceof escm.type.Thread))
+        if(!(parameters.get(0) instanceof escm.type.concurrent.Thread))
           throw new Exceptionf("'(thread-join! <thread> <optional-millis-max-wait>) 1st arg %s isn't a thread!", parameters.get(0).profile());
-        thread = (escm.type.Thread)parameters.get(0);
-        if(!(parameters.get(1) instanceof escm.type.Number))
-          throw new Exceptionf("'(thread-join! <thread> <optional-millis-max-wait>) 2nd arg %s isn't a number!", parameters.get(1).profile());
-        millisToWaitAtMostFor = ((escm.type.Number)parameters.get(1)).intValue();
+        thread = (escm.type.concurrent.Thread)parameters.get(0);
+        if(!(parameters.get(1) instanceof Real) || !((Real)parameters.get(1)).isInteger())
+          throw new Exceptionf("'(thread-join! <thread> <optional-millis-max-wait>) 2nd arg %s isn't an integer!", parameters.get(1).profile());
+        millisToWaitAtMostFor = ((Real)parameters.get(1)).intValue();
       } else {
         throw new Exceptionf("'(thread-join! <thread> <optional-millis-max-wait>) expects 1 or 2 args: %s", Exceptionf.profileArgs(parameters));
       }
@@ -256,9 +258,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Thread))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-interrupted? <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(((escm.type.Thread)parameters.get(0)).isInterrupted());
+      return Boolean.valueOf(((escm.type.concurrent.Thread)parameters.get(0)).isInterrupted());
     }
   }
 
@@ -271,9 +273,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Thread))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-interrupt! <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      ((escm.type.Thread)parameters.get(0)).interrupt();
+      ((escm.type.concurrent.Thread)parameters.get(0)).interrupt();
       return Void.VALUE;
     }
   }
@@ -289,7 +291,7 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0)
         throw new Exceptionf("'(interrupted?!) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(escm.type.Thread.interrupted());
+      return Boolean.valueOf(escm.type.concurrent.Thread.interrupted());
     }
   }
 
@@ -302,9 +304,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Number))
-        throw new Exceptionf("'(sleep <sleep-millis-time>) didn't receive exactly 1 number: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(escm.type.Thread.sleep(((escm.type.Number)parameters.get(0)).intValue()));
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Real) || !((Real)parameters.get(0)).isInteger())
+        throw new Exceptionf("'(sleep <sleep-millis-time>) didn't receive exactly 1 integer: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(escm.type.concurrent.Thread.sleep(((Real)parameters.get(0)).intValue()));
     }
   }
 
@@ -319,7 +321,7 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0)
         throw new Exceptionf("'(current-thread) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
-      return escm.type.Thread.currentThread();
+      return escm.type.concurrent.Thread.currentThread();
     }
   }
 
@@ -334,13 +336,13 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 0)
         throw new Exceptionf("'(parallel <callable> ...) expects at least 1 thunk callable: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<escm.type.Thread> threads = new ArrayList<escm.type.Thread>();
+      ArrayList<escm.type.concurrent.Thread> threads = new ArrayList<escm.type.concurrent.Thread>();
       for(Datum param : parameters) {
         if(!(param instanceof Callable))
           throw new Exceptionf("'(parallel <callable> ...) arg %s isn't a thunk callable: %s", param.profile(), Exceptionf.profileArgs(parameters));
-        threads.add(new escm.type.Thread(param));
+        threads.add(new escm.type.concurrent.Thread(param));
       }
-      for(escm.type.Thread thread : threads) thread.start();
+      for(escm.type.concurrent.Thread thread : threads) thread.start();
       return Void.VALUE;
     }
   }
@@ -364,13 +366,13 @@ public class ConcurrentPrimitives {
             parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
         GlobalState.metaThreadDynamicEnvironment.define(((escm.type.Symbol)parameters.get(0)).value(),parameters.get(1));
       } else {
-        if(!(parameters.get(0) instanceof escm.type.Thread))
+        if(!(parameters.get(0) instanceof escm.type.concurrent.Thread))
           throw new Exceptionf("'(thread-define' <optional-thread> <var-name> <value>) 1st arg %s isn't a thread: %s", 
             parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
         if(!(parameters.get(1) instanceof escm.type.Symbol))
           throw new Exceptionf("'(thread-define' <optional-thread> <var-name> <value>) 2nd arg %s isn't a symbol: %s", 
             parameters.get(1).profile(), Exceptionf.profileArgs(parameters));
-        ((escm.type.Thread)parameters.get(0)).define(((escm.type.Symbol)parameters.get(1)).value(),parameters.get(2));
+        ((escm.type.concurrent.Thread)parameters.get(0)).define(((escm.type.Symbol)parameters.get(1)).value(),parameters.get(2));
       }
       return Void.VALUE;
     }
@@ -399,13 +401,13 @@ public class ConcurrentPrimitives {
             varName, Exceptionf.profileArgs(parameters));
         GlobalState.metaThreadDynamicEnvironment.set(varName,parameters.get(1));
       } else {
-        if(!(parameters.get(0) instanceof escm.type.Thread))
+        if(!(parameters.get(0) instanceof escm.type.concurrent.Thread))
           throw new Exceptionf("'(thread-set!' <optional-thread> <var-name> <value>) 1st arg %s isn't a thread: %s", 
             parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
         if(!(parameters.get(1) instanceof escm.type.Symbol))
           throw new Exceptionf("'(thread-set!' <optional-thread> <var-name> <value>) 2nd arg %s isn't a symbol: %s", 
             parameters.get(1).profile(), Exceptionf.profileArgs(parameters));
-        ((escm.type.Thread)parameters.get(0)).set(((escm.type.Symbol)parameters.get(1)).value(),parameters.get(2));
+        ((escm.type.concurrent.Thread)parameters.get(0)).set(((escm.type.Symbol)parameters.get(1)).value(),parameters.get(2));
       }
       return Void.VALUE;
     }
@@ -434,13 +436,13 @@ public class ConcurrentPrimitives {
             varName, Exceptionf.profileArgs(parameters));
         return GlobalState.metaThreadDynamicEnvironment.get(varName);
       } else {
-        if(!(parameters.get(0) instanceof escm.type.Thread))
+        if(!(parameters.get(0) instanceof escm.type.concurrent.Thread))
           throw new Exceptionf("'(thread-get' <optional-thread> <var-name>) 1st arg %s isn't a thread: %s", 
             parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
         if(!(parameters.get(1) instanceof escm.type.Symbol))
           throw new Exceptionf("'(thread-get' <optional-thread> <var-name>) 2nd arg %s isn't a symbolic variable name: %s", 
             parameters.get(1).profile(), Exceptionf.profileArgs(parameters));
-        return ((escm.type.Thread)parameters.get(0)).get(((escm.type.Symbol)parameters.get(1)).value());
+        return ((escm.type.concurrent.Thread)parameters.get(0)).get(((escm.type.Symbol)parameters.get(1)).value());
       }
     }
   }
@@ -461,10 +463,10 @@ public class ConcurrentPrimitives {
       if(totalParams == 0) {
         return GlobalState.metaThreadDynamicEnvironment.bindingsAsAssocList();
       } else {
-        if(!(parameters.get(0) instanceof escm.type.Thread))
+        if(!(parameters.get(0) instanceof escm.type.concurrent.Thread))
           throw new Exceptionf("'(thread-dynamic-environment <optional-thread>) 1st arg %s isn't a thread: %s", 
             parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
-        return ((escm.type.Thread)parameters.get(0)).dynamicEnvironment();
+        return ((escm.type.concurrent.Thread)parameters.get(0)).dynamicEnvironment();
       }
     }
   }
@@ -480,12 +482,12 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int totalParams = parameters.size();
       if(totalParams == 0) {
-        return new escm.type.Mutex();
+        return new escm.type.concurrent.Mutex();
       } else if(totalParams == 1) {
         Datum param = parameters.get(0);
         if(!(param instanceof escm.type.String))
           throw new Exceptionf("'(mutex <optional-name-string>) 1st arg %s isn't a name string: %s", param.profile(), Exceptionf.profileArgs(parameters));
-        return new escm.type.Mutex(((escm.type.String)param).value());
+        return new escm.type.concurrent.Mutex(((escm.type.String)param).value());
       } else {
         throw new Exceptionf("'(mutex <optional-name-string>) didn't receive either 0 or 1 args: %s", Exceptionf.profileArgs(parameters));
       }
@@ -503,7 +505,7 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1)
         throw new Exceptionf("'(mutex? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(parameters.get(0) instanceof escm.type.Mutex);
+      return Boolean.valueOf(parameters.get(0) instanceof escm.type.concurrent.Mutex);
     }
   }
 
@@ -516,9 +518,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Mutex))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-name <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
-      String name = ((escm.type.Mutex)parameters.get(0)).getName();
+      String name = ((escm.type.concurrent.Mutex)parameters.get(0)).getName();
       if(name == null) return Boolean.FALSE;
       return new escm.type.String(name);
     }
@@ -533,9 +535,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Mutex))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-specific <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
-      return ((escm.type.Mutex)parameters.get(0)).getSpecific();
+      return ((escm.type.concurrent.Mutex)parameters.get(0)).getSpecific();
     }
   }
 
@@ -547,9 +549,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.Mutex))
+      if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-set-specific! <mutex> <value>) didn't receive exactly 1 mutex & 1 obj: %s", Exceptionf.profileArgs(parameters));
-      ((escm.type.Mutex)parameters.get(0)).setSpecific(parameters.get(1));
+      ((escm.type.concurrent.Mutex)parameters.get(0)).setSpecific(parameters.get(1));
       return Void.VALUE;
     }
   }
@@ -565,15 +567,15 @@ public class ConcurrentPrimitives {
       if(parameters.size() != 1 && parameters.size() != 2)
         throw new Exceptionf("'(mutex-lock! <mutex> <optional-millis-timeout>) didn't receive exactly 1 or 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum lock = parameters.get(0);
-      if(!(lock instanceof escm.type.Mutex))
+      if(!(lock instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-lock! <mutex> <optional-millis-timeout>) 1st arg %s isn't a mutex: %s", lock.profile(), Exceptionf.profileArgs(parameters));
       if(parameters.size() == 2) {
         Datum timeout = parameters.get(1);
-        if(!(timeout instanceof escm.type.Number))
-          throw new Exceptionf("'(mutex-lock! <mutex> <optional-millis-timeout>) 2nd arg %s isn't a number: %s", timeout.profile(), Exceptionf.profileArgs(parameters));
-        return Boolean.valueOf(((escm.type.Mutex)lock).lock(((escm.type.Number)timeout).intValue()));
+        if(!(timeout instanceof Real) || !((Real)timeout).isInteger())
+          throw new Exceptionf("'(mutex-lock! <mutex> <optional-millis-timeout>) 2nd arg %s isn't an integer: %s", timeout.profile(), Exceptionf.profileArgs(parameters));
+        return Boolean.valueOf(((escm.type.concurrent.Mutex)lock).lock(((Real)timeout).intValue()));
       } else {
-        ((escm.type.Mutex)lock).lock();
+        ((escm.type.concurrent.Mutex)lock).lock();
         return Boolean.TRUE;
       }
     }
@@ -588,9 +590,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Mutex))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-unlock! <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(((escm.type.Mutex)parameters.get(0)).unlock());
+      return Boolean.valueOf(((escm.type.concurrent.Mutex)parameters.get(0)).unlock());
     }
   }
 
@@ -603,9 +605,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Mutex))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-locked? <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(((escm.type.Mutex)parameters.get(0)).isLocked());
+      return Boolean.valueOf(((escm.type.concurrent.Mutex)parameters.get(0)).isLocked());
     }
   }
 
@@ -618,9 +620,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Mutex))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-queue-length <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.Number(((escm.type.Mutex)parameters.get(0)).queueLength());
+      return new Exact(((escm.type.concurrent.Mutex)parameters.get(0)).queueLength());
     }
   }
 
@@ -633,9 +635,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Mutex))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-queued? <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(((escm.type.Mutex)parameters.get(0)).isQueued());
+      return Boolean.valueOf(((escm.type.concurrent.Mutex)parameters.get(0)).isQueued());
     }
   }
 
@@ -648,9 +650,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Mutex))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-hold-count <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.Number(((escm.type.Mutex)parameters.get(0)).holdCount());
+      return new Exact(((escm.type.concurrent.Mutex)parameters.get(0)).holdCount());
     }
   }
 
@@ -663,9 +665,9 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Mutex))
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-held? <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(((escm.type.Mutex)parameters.get(0)).isHeld());
+      return Boolean.valueOf(((escm.type.concurrent.Mutex)parameters.get(0)).isHeld());
     }
   }
 }

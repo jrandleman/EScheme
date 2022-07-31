@@ -6,6 +6,8 @@ package escm.vm.runtime;
 import java.util.Random;
 import java.io.File;
 import escm.type.Datum;
+import escm.type.number.Number;
+import escm.type.number.Exact;
 import escm.vm.type.Environment;
 import escm.vm.runtime.installerGenerated.EscmPath;
 import escm.vm.runtime.installerGenerated.JavaStdLibLoader;
@@ -57,6 +59,8 @@ public class GlobalState {
     globalEnvironment.define("*os-architecture*",new escm.type.String(System.getProperty("os.arch")));
     globalEnvironment.define("*escm-path*",new escm.type.String(EscmPath.VALUE));
     globalEnvironment.define("*escm-execution-command*",new escm.type.String(" java -classpath "+EscmPath.VALUE+File.separator+"bin Main "));
+    globalEnvironment.define("*min-radix*",new Exact(Number.MIN_RADIX));
+    globalEnvironment.define("*max-radix*",new Exact(Number.MAX_RADIX));
     JavaStdLibLoader.load();
     EscmStdLibLoader.load();
   }

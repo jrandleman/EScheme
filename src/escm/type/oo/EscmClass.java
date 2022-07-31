@@ -1,36 +1,39 @@
-// Author: Jordan Randleman - escm.type.EscmClass
+// Author: Jordan Randleman - escm.type.oo.EscmClass
 // Purpose:
 //    Escm Class class, implements "escm.vm.type.Callable" to double as a ctor!
 //
 // Includes:
-//    - java.lang.String name()         // returns <""> if an anonymous class
-//    - java.lang.String readableName() // returns <"#<anonymous>"> if an anonymous class
+//    - String name()         // returns <""> if an anonymous class
+//    - String readableName() // returns <"#<anonymous>"> if an anonymous class
 //
-//    - ArrayList<java.lang.String> instanceProps() // returns instance property names
+//    - ArrayList<String> instanceProps() // returns instance property names
 //
 //    - callWith(...) // overloads constructing an object instance of this class!
 
-package escm.type;
+package escm.type.oo;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
+import escm.type.Datum;
+import escm.type.Symbol;
+import escm.type.procedure.CompoundProcedure;
 import escm.vm.type.Callable;
 import escm.vm.type.ExecutionState;
 
 public class EscmClass extends MetaObject implements Callable {
   ////////////////////////////////////////////////////////////////////////////
   // Name
-  public java.lang.String name() {
+  public String name() {
     Datum val = props.get("name");
     if(val == null || !(val instanceof Symbol)) return "";
     return ((Symbol)val).value();
   }
 
 
-  public java.lang.String readableName() {
-    java.lang.String name = name();
+  public String readableName() {
+    String name = name();
     if(name.length() == 0) return "#<anonymous>";
     return name;
   }
@@ -56,13 +59,13 @@ public class EscmClass extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Instance Properties
-  private ConcurrentHashMap<java.lang.String,Datum> objectProps = null;
+  private ConcurrentHashMap<String,Datum> objectProps = null;
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
   private void bindImmediateMethodsWithName() {
-    java.lang.String currentName = name();
+    String currentName = name();
     MetaObject.bindMethodsWithName("[class::static] "+currentName+".",props);
     MetaObject.bindMethodsWithName("[class::instance] "+currentName+".",objectProps);
     // NOTE: We don't need to bind the super class's method names, since 
@@ -71,7 +74,7 @@ public class EscmClass extends MetaObject implements Callable {
   }
 
 
-  public EscmClass(EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<java.lang.String,Datum> props, ConcurrentHashMap<java.lang.String,Datum> objectProps) throws Exception {
+  public EscmClass(EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) throws Exception {
     this.superClass = superClass;
     this.interfaces = interfaces;
     this.props = props;
@@ -86,8 +89,8 @@ public class EscmClass extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Instance Property Serialization Operations
-  public ArrayList<java.lang.String> instanceProps() {
-    return new ArrayList<java.lang.String>(objectProps.keySet());
+  public ArrayList<String> instanceProps() {
+    return new ArrayList<String>(objectProps.keySet());
   }
 
 
@@ -135,7 +138,7 @@ public class EscmClass extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Type
-  public java.lang.String type() {
+  public String type() {
     return "class";
   }
 
@@ -153,17 +156,17 @@ public class EscmClass extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
-  public java.lang.String display() {
-    java.lang.String name = name();
+  public String display() {
+    String name = name();
     if(name.length() == 0) return "#<class>";
     return "#<class " + name + '>';
   }
 
-  public java.lang.String write() {
+  public String write() {
     return display();
   }
 
-  public java.lang.String pprint() {
+  public String pprint() {
     return write();
   }
 
@@ -179,7 +182,7 @@ public class EscmClass extends MetaObject implements Callable {
   // Loading-into-environment semantics for the VM's interpreter
 
   // NOTE: <ignore> here just distinguishes this private ctor from the public one
-  private EscmClass(int ignore, EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<java.lang.String,Datum> props, ConcurrentHashMap<java.lang.String,Datum> objectProps) throws Exception {
+  private EscmClass(int ignore, EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) throws Exception {
     this.superClass = superClass;
     this.interfaces = interfaces;
     this.props = props;
@@ -188,8 +191,8 @@ public class EscmClass extends MetaObject implements Callable {
   }
 
 
-  public EscmClass loadWithName(java.lang.String name) throws Exception {
-    java.lang.String currentName = name();
+  public EscmClass loadWithName(String name) throws Exception {
+    String currentName = name();
     if(currentName.length() > 0) return this;
     EscmClass c = new EscmClass(0,this.superClass,this.interfaces,MetaObject.copyProps(this.props),this.objectProps);
     c.props.put("name",new Symbol(name));

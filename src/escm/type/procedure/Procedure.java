@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.type.Procedure
+// Author: Jordan Randleman - escm.type.procedure.Procedure
 // Purpose:
 //    Abstract Base Class for EScheme procedures -- the contract all EScheme procedure
 //    types must implement to be used applied by the core interpreter. Note that
@@ -10,10 +10,11 @@
 //    and EScheme compound procedures (defined by EScheme programmers) must be applied 
 //    differently under the hood, but to the EScheme programmer, they are indistinguishable.
 
-package escm.type;
+package escm.type.procedure;
 import java.util.ArrayList;
 import java.util.Objects;
 import escm.util.Trampoline;
+import escm.type.Datum;
 import escm.vm.type.ExecutionState;
 import escm.vm.type.Callable;
 

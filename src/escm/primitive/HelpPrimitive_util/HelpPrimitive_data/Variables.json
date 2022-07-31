@@ -58,4 +58,16 @@
   "signatures": null,
   "description": "Variable that resolves to the value returned by generators\n(see <define-generator>) upon completion.",
   "example": null
+}, {
+  "name": "*min-radix*",
+  "aliases": null,
+  "signatures": null,
+  "description": "Variable that denotes the smallest radix supported by\n<string->number> and <number->string>. Generally 2.\nAlso check out <*max-radix*>!",
+  "example": null
+}, {
+  "name": "*max-radix*",
+  "aliases": null,
+  "signatures": null,
+  "description": "Variable that denotes the largest radix supported by\n<string->number> and <number->string>. Generally 36.\nAlso check out <*min-radix*>!",
+  "example": null
 }]

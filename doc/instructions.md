@@ -44,10 +44,10 @@ iteration (such is outlined as an example below)!
 
 ## Writing Bytecode
 In order to write out bytecode, simply follow the instruction syntax outlined below.
-Note that any arguments specified as `<symbol>` or `<number>` MUST be symbolic or 
-numeric literals respectively. For example, `jump` and `call` both accept numbers, 
-but whereas `jump` requires that it's argument is a numeric literal, `call` also 
-accepts variables that evaluate to numbers.
+Note that any arguments specified as `<symbol>` or `<integer>` MUST be symbolic or 
+integer literals respectively. For example, `jump` and `call` both accept integers, 
+but whereas `jump` requires that it's argument is an integer literal, `call` also 
+accepts variables that evaluate to integers.
 
 ### NIL
 A note on writing NIL literals: use `()`. For example, `(define n (quote ()))`
@@ -116,15 +116,15 @@ syntax. These include: `define`, `set!`, `load`, `call`, `push`, & `return`.
 
 (defined? <symbol>) ; determine if <symbol> is defined as a variable [sets CVR to the boolean result] (use the <syntax?> procedure for macros)
 
-(ifn <number>) ; if CVR is NOT truthy, jump <number> instructions [sets CVR to <void>]
+(ifn <integer>) ; if CVR is NOT truthy, jump <integer> instructions [sets CVR to <void>]
 
-(jump <number>) ; jump <number> instructions
+(jump <integer>) ; jump <integer> instructions
 
 (load <datum>)         ; evaluate <datum> and load it into CVR
 (load-symbol <symbol>) ; load <symbol> as a symbolic value into CVR rather than evaluating it
 
-(call <datum>) ; <datum> must evaluate to a number. get the fcn & arguments being applied from the stack. 
-               ; positive <number> denotes pushes from left to right & negative denotes pushes from right to left (when compiling the application expressions). 
+(call <datum>) ; <datum> must evaluate to an integer. get the fcn & arguments being applied from the stack. 
+               ; positive <integer> denotes pushes from left to right & negative denotes pushes from right to left (when compiling the application expressions). 
                ; pops (abs <datum>) items off of the stack after the call, and places the returned value of the fcn application in CVR.
 
 (push)         ; push CVR to the stack

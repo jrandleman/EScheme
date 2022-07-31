@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.Boolean;
-import escm.type.Eof;
+import escm.type.port.Eof;
 import escm.type.Void;
 import escm.util.Exceptionf;
 import escm.vm.type.Primitive;

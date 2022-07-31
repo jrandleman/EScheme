@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Symbol;
-import escm.type.Number;
+import escm.type.number.Exact;
 import escm.util.Trampoline;
 import escm.primitive.ListPrimitives;
 import escm.primitive.MetaPrimitives;
@@ -53,7 +53,7 @@ public class Compiler {
   ////////////////////////////////////////////////////////////////////////////
   // Compiling Applications
   private static Trampoline.Bounce compileProcedureApplication(Datum app, int count, Trampoline.Continuation continuation) throws Exception {
-    if(!(app instanceof Pair)) return continuation.run(Pair.List(Pair.List(CALL,new Number(-count))));
+    if(!(app instanceof Pair)) return continuation.run(Pair.List(Pair.List(CALL,new Exact(-count))));
     Pair appPair = (Pair)app;
     if(!(appPair.car() instanceof Pair)) {
       return () -> compileProcedureApplication(appPair.cdr(),count+1,(applicationInstructions) -> {

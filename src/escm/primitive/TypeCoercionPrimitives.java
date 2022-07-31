@@ -5,6 +5,8 @@
 package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
+import escm.type.number.Number;
+import escm.type.number.Real;
 import escm.util.Exceptionf;
 import escm.vm.type.Primitive;
 
@@ -17,10 +19,26 @@ public class TypeCoercionPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
-        throw new Exceptionf("'(string->number <string>) expects exactly 1 string arg: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() < 1 || parameters.size() > 2) 
+        throw new Exceptionf("'(string->number <string> <optional-radix>) didn't receive 1 or 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum str = parameters.get(0);
+      if(!(str instanceof escm.type.String))
+        throw new Exceptionf("'(string->number <string> <optional-radix>) 1st arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+      int radix = -1;
+      if(parameters.size() == 2) {
+        Datum radixDatum = parameters.get(1);
+        if(!(radixDatum instanceof Real) || !((Real)radixDatum).isInteger())
+          throw new Exceptionf("'(string->number <string> <optional-radix>) invalid radix (only %d-%d): %s", Number.MIN_RADIX, Number.MAX_RADIX, Exceptionf.profileArgs(parameters));
+        radix = ((Real)radixDatum).intValue();
+        if(radix < Number.MIN_RADIX || radix > Number.MAX_RADIX)
+          throw new Exceptionf("'(string->number <string> <optional-radix>) invalid radix (only %d-%d): %s", Number.MIN_RADIX, Number.MAX_RADIX, Exceptionf.profileArgs(parameters));
+      }
       try {
-        return new escm.type.Number(Double.parseDouble(((escm.type.String)parameters.get(0)).value()));
+        if(radix == -1) {
+          return Number.valueOf(((escm.type.String)str).value());
+        } else {
+          return Number.valueOf(((escm.type.String)str).value(),radix);
+        }
       } catch(Exception e) {
         return escm.type.Boolean.FALSE;
       }
@@ -36,9 +54,29 @@ public class TypeCoercionPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Number)) 
-        throw new Exceptionf("'(number->string <number>) expects exactly 1 number arg: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.String(String.valueOf(((escm.type.Number)parameters.get(0)).doubleValue()));
+      if(parameters.size() < 1 || parameters.size() > 2) 
+        throw new Exceptionf("'(number->string <number> <optional-radix>) didn't receive 1 or 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum num = parameters.get(0);
+      if(!(num instanceof Number))
+        throw new Exceptionf("'(number->string <number> <optional-radix>) 1st arg isn't a number: %s", Exceptionf.profileArgs(parameters));
+      int radix = -1;
+      if(parameters.size() == 2) {
+        Datum radixDatum = parameters.get(1);
+        if(!(radixDatum instanceof Real) || !((Real)radixDatum).isInteger())
+          throw new Exceptionf("'(number->string <number> <optional-radix>) invalid radix (only %d-%d): %s", Number.MIN_RADIX, Number.MAX_RADIX, Exceptionf.profileArgs(parameters));
+        radix = ((Real)radixDatum).intValue();
+        if(radix < Number.MIN_RADIX || radix > Number.MAX_RADIX)
+          throw new Exceptionf("'(number->string <number> <optional-radix>) invalid radix (only %d-%d): %s", Number.MIN_RADIX, Number.MAX_RADIX, Exceptionf.profileArgs(parameters));
+      }
+      try {
+        if(radix == -1) {
+          return new escm.type.String(((Number)num).toString());
+        } else {
+          return new escm.type.String(((Number)num).toString(radix));
+        }
+      } catch(Exception e) {
+        return escm.type.Boolean.FALSE;
+      }
     }
   }
 

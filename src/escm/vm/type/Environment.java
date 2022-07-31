@@ -15,8 +15,8 @@ import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Symbol;
-import escm.type.Procedure;
-import escm.type.PrimitiveProcedure;
+import escm.type.procedure.Procedure;
+import escm.type.procedure.PrimitiveProcedure;
 
 public class Environment {
   ////////////////////////////////////////////////////////////////////////////

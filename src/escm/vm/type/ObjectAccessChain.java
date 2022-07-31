@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import escm.type.Datum;
 import escm.type.Symbol;
-import escm.type.MetaObject;
+import escm.type.oo.MetaObject;
 import escm.util.Exceptionf;
 
 public class ObjectAccessChain extends Datum {

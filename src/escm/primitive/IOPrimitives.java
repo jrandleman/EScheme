@@ -9,8 +9,8 @@ import java.io.InputStreamReader;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
-import escm.type.InputPort;
-import escm.type.OutputPort;
+import escm.type.port.InputPort;
+import escm.type.port.OutputPort;
 import escm.util.Exceptionf;
 import escm.vm.type.Primitive;
 import escm.vm.runtime.GlobalState;
@@ -156,7 +156,7 @@ public class IOPrimitives {
         port = InputPort.getCurrent();
       }
       Datum readDatum = port.readDatum();
-      if(readDatum == null) return escm.type.Eof.VALUE; // EOF in a <read> call yields an #eof
+      if(readDatum == null) return escm.type.port.Eof.VALUE; // EOF in a <read> call yields an #eof
       return readDatum;
     }
   }
@@ -201,7 +201,7 @@ public class IOPrimitives {
         port = InputPort.getCurrent();
       }
       String line = port.readLine();
-      if(line == null) return escm.type.Eof.VALUE; // EOF in a <read> call yields an #eof
+      if(line == null) return escm.type.port.Eof.VALUE; // EOF in a <read> call yields an #eof
       return new escm.type.String(line);
     }
   }

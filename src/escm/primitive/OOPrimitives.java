@@ -7,14 +7,14 @@ import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.type.Datum;
-import escm.type.MetaObject;
-import escm.type.EscmInterface;
-import escm.type.EscmClass;
-import escm.type.EscmObject;
+import escm.type.oo.MetaObject;
+import escm.type.oo.EscmInterface;
+import escm.type.oo.EscmClass;
+import escm.type.oo.EscmObject;
 import escm.type.Symbol;
 import escm.type.Keyword;
 import escm.type.Boolean;
-import escm.type.CompoundProcedure;
+import escm.type.procedure.CompoundProcedure;
 import escm.type.Void;
 import escm.type.Nil;
 import escm.util.Exceptionf;
@@ -197,7 +197,7 @@ public class OOPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(meta-object? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      if(parameters.get(0) instanceof escm.type.MetaObject) return Boolean.TRUE;
+      if(parameters.get(0) instanceof escm.type.oo.MetaObject) return Boolean.TRUE;
       return Boolean.FALSE;
     }
   }

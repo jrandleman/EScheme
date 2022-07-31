@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.type.InputPort
+// Author: Jordan Randleman - escm.type.port.InputPort
 // Purpose:
 //    Input port primitive type, to read from a file/stdin.
 //
@@ -21,12 +21,13 @@
 //      - Datum readDatum()            // returns <null> if reached EOF
 //      - Datum readReplDatum()        // returns <null> if reached EOF
 
-package escm.type;
+package escm.type.port;
 import java.util.Objects;
 import java.io.PushbackReader;
 import java.io.InputStreamReader;
 import java.io.FileReader;
 import escm.util.Exceptionf;
+import escm.type.Datum;
 import escm.vm.Reader;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.EscmThread;
@@ -39,9 +40,9 @@ public class InputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Name
-  private java.lang.String name = null;
+  private String name = null;
 
-  public java.lang.String sourceName() {
+  public String sourceName() {
     return name;
   }
 
@@ -70,7 +71,7 @@ public class InputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  public InputPort(java.lang.String filename) throws Exception {
+  public InputPort(String filename) throws Exception {
     try {
       pr = new PushbackReader(new FileReader(filename));
       name = filename;
@@ -100,12 +101,12 @@ public class InputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Peek Logic
-  public java.lang.String peek() throws Exception {
+  public String peek() throws Exception {
     try {
       int c = pr.read();
       pr.unread(c);
       if(c == -1) return null;
-      return java.lang.String.valueOf((char)c);
+      return String.valueOf((char)c);
     } catch(Exception e) {
       throw new Exceptionf("Can't peek port \"%s\": %s", name, e);
     }
@@ -121,18 +122,18 @@ public class InputPort extends Port {
   }
 
 
-  public java.lang.String readCharacter() throws Exception {
+  public String readCharacter() throws Exception {
     try {
       int c = pr.read();
       if(c == -1) return null;
-      return java.lang.String.valueOf((char)c);
+      return String.valueOf((char)c);
     } catch(Exception e) {
       throw new Exceptionf("Can't read a char from port \"%s\": %s", name, e);
     }
   }
 
 
-  public java.lang.String readCharacters(int n) throws Exception {
+  public String readCharacters(int n) throws Exception {
     if(n == 0) return "";
     if(n < 0) {
       throw new Exceptionf("Can't read chars from port \"%s\" with negative char-count %d!", name, n);
@@ -141,14 +142,14 @@ public class InputPort extends Port {
       char[] chars = new char[n];
       int readCount = pr.read(chars,0,n);
       if(readCount == -1) return null;
-      return new java.lang.String(chars);
+      return new String(chars);
     } catch(Exception e) {
       throw new Exceptionf("Can't read chars from port \"%s\": %s", name, e);
     }
   }
 
 
-  public java.lang.String readLine() throws Exception {
+  public String readLine() throws Exception {
     try {
       StringBuilder sb = new StringBuilder();
       int c = pr.read();
@@ -170,7 +171,7 @@ public class InputPort extends Port {
     StringBuilder sb = new StringBuilder();
     while(true) {
       try {
-        java.lang.String input = readLine();
+        String input = readLine();
         if(input == null) { // EOF detected
           if(sb.length() == 0) {
             GlobalState.setLastPrintedANewline(false);
@@ -325,7 +326,7 @@ public class InputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Type
-  public java.lang.String type() {
+  public String type() {
     return "input-port";
   }
 
@@ -346,7 +347,7 @@ public class InputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
-  public java.lang.String display() {
+  public String display() {
     return "#<input-port ["+name+"]>";
   }
 }

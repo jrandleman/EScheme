@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.type.EscmObject
+// Author: Jordan Randleman - escm.type.oo.EscmObject
 // Purpose:
 //    Escm Object class, implements "escm.vm.type.Callable" to allow application overloading!
 //
@@ -9,12 +9,14 @@
 //
 //    - callWith(...) // overloads application via a "->procedure" method!
 
-package escm.type;
+package escm.type.oo;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.util.Trampoline;
 import escm.util.Exceptionf;
+import escm.type.Datum;
+import escm.type.procedure.CompoundProcedure;
 import escm.vm.type.Callable;
 import escm.vm.type.ExecutionState;
 
@@ -48,7 +50,7 @@ public class EscmObject extends MetaObject implements Callable {
   // Constructor
   // @PRECONDITION: <superObject> MUST ALREADY BE INITIALIZED!
   // @PRECONDITION: <props> MUST HAVE <self> AND <super> BOUND TO METHODS EXTERNALLY
-  public EscmObject(EscmClass prototypeClass, EscmObject superObject, ConcurrentHashMap<java.lang.String,Datum> props) {
+  public EscmObject(EscmClass prototypeClass, EscmObject superObject, ConcurrentHashMap<String,Datum> props) {
     this.prototypeClass = prototypeClass;
     this.superObject = superObject;
     this.props = props;
@@ -130,7 +132,7 @@ public class EscmObject extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Type
-  public java.lang.String type() {
+  public String type() {
     return "object";
   }
 
@@ -146,7 +148,7 @@ public class EscmObject extends MetaObject implements Callable {
     EscmObject that = (EscmObject)o;
     // Check Equality of Props
     if(this.props.size() != that.props.size()) return false;
-    for(ConcurrentHashMap.Entry<java.lang.String,Datum> e : this.props.entrySet()) {
+    for(ConcurrentHashMap.Entry<String,Datum> e : this.props.entrySet()) {
       Datum thisProp = e.getValue();
       Datum thatProp = that.props.get(e.getKey());
       if(thatProp == null) {
@@ -167,15 +169,15 @@ public class EscmObject extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
-  private java.lang.String getPropertiesAsString() {
-    HashSet<java.lang.String> propNames = new HashSet<java.lang.String>();
+  private String getPropertiesAsString() {
+    HashSet<String> propNames = new HashSet<String>();
     EscmObject obj = this;
     while(obj != null) {
       propNames.addAll(obj.props());
       obj = obj.getSuper();
     }
     StringBuilder sb = new StringBuilder("{");
-    for(java.lang.String propName : propNames) {
+    for(String propName : propNames) {
       sb.append(propName);
       sb.append("=");
       try {
@@ -193,15 +195,15 @@ public class EscmObject extends MetaObject implements Callable {
   }
 
 
-  public java.lang.String display() {
+  public String display() {
     return "#<object " + getPropertiesAsString() + '>';
   }
 
-  public java.lang.String write() {
+  public String write() {
     return display();
   }
 
-  public java.lang.String pprint() {
+  public String pprint() {
     return write();
   }
 
@@ -215,7 +217,7 @@ public class EscmObject extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public EscmObject loadWithName(java.lang.String name) throws Exception {
+  public EscmObject loadWithName(String name) throws Exception {
     return this;
   }
 
@@ -223,7 +225,7 @@ public class EscmObject extends MetaObject implements Callable {
   ////////////////////////////////////////////////////////////////////////////
   // Copying
   // <ignore> is used to distinguish this ctor from the above public one
-  private EscmObject(int ignore, EscmClass prototypeClass, EscmObject superObject, ConcurrentHashMap<java.lang.String,Datum> props) {
+  private EscmObject(int ignore, EscmClass prototypeClass, EscmObject superObject, ConcurrentHashMap<String,Datum> props) {
     this.prototypeClass = prototypeClass;
     if(superObject == null) {
       this.superObject = null;

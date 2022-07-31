@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import escm.type.Datum;
-import escm.type.InputPort;
-import escm.type.OutputPort;
+import escm.type.port.InputPort;
+import escm.type.port.OutputPort;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.ExecutionState;
@@ -93,7 +93,7 @@ public class Main {
     sb.append("N    | |   |#| |###||||###|###|       |###|###||||###| |#|   | |    A@@@@@@@@@@@@@@ @@@@@@@@@@@@@        @@@@@@@@@@@@           @@@@@\n");
     sb.append("I   _|_|___|#|_|###|##|###|###|_______|###|###|##|###|_|#|___|_|_   @\n");
     sb.append("E   |###|###################################################|###|   V        Copyright (c) Jordan Candide Randleman 2021-2022\n");
-    sb.append("@   |###|###############/|=================|\\###############|###|   I                  Eerina's Scheme: Version 5.0\n");
+    sb.append(String.format("@   |###|###############/|=================|\\###############|###|   I                  Eerina's Scheme: Version %.1f\n",SystemPrimitives.VERSION));
     sb.append("@  /-------------------/ /=================\\ \\-------------------\\  E              Type (help) for Help, (exit) to Exit\n");
     sb.append("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
     System.out.print(sb.toString());
@@ -228,7 +228,7 @@ public class Main {
   ////////////////////////////////////////////////////////////////////////////
   // Implementing our Interpreter
   public static void launchESchemeSession(String[] args) {
-    escm.type.Thread mainThread = new escm.type.Thread(
+    escm.type.concurrent.Thread mainThread = new escm.type.concurrent.Thread(
       "escm-main",
       (params, cont) -> {
         ParsedCommandLine parsedCmdLine = parseCommandLine(args);

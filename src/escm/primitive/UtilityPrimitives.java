@@ -97,7 +97,7 @@ public class UtilityPrimitives {
     }
     
     public static Datum convertCallableToProcedure(Callable c, String name) {
-      return new escm.type.PrimitiveProcedure(name,c);
+      return new escm.type.procedure.PrimitiveProcedure(name,c);
     }
 
     public static Trampoline.Bounce r4rs(Callable procedure, Trampoline.Continuation continuation) throws Exception {
@@ -327,7 +327,7 @@ public class UtilityPrimitives {
           return cont.run(Error.logic(args2));
         });
       };
-      return WithExceptionHandler.WithExceptionHandlers(handlers.cdr(),new escm.type.PrimitiveProcedure("raise-lambda",lambda),continuation);
+      return WithExceptionHandler.WithExceptionHandlers(handlers.cdr(),new escm.type.procedure.PrimitiveProcedure("raise-lambda",lambda),continuation);
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

@@ -1,14 +1,14 @@
 [{
   "name": "number->string",
   "aliases": ["number->str"],
-  "signatures": ["(number->string <num>)"],
-  "description": "Convert a number to a string.",
+  "signatures": ["(number->string <num>)", "(number->string <num> <radix>)"],
+  "description": "Convert a number to a string in base <radix> (defaults to 10).\n<radix> must be between <*min-radix*> and <*max-radix*>.\nReturns #f if failed coercion.",
   "example": null
 }, {
   "name": "string->number",
   "aliases": ["str->number"],
-  "signatures": ["(string->number <str>)"],
-  "description": "Convert a string to a number.",
+  "signatures": ["(string->number <str>)", "(string->number <str> <radix>)"],
+  "description": "Convert a string to a number in base <radix> (defaults to 10).\n<radix> must be between <*min-radix*> and <*max-radix*>.\nReturns #f if failed coercion.",
   "example": null
 }, {
   "name": "keyword->symbol",

@@ -1,36 +1,27 @@
-// Author: Jordan Randleman - escm.type.Port
+// Author: Jordan Randleman - escm.type.port.Eof
 // Purpose:
-//    Abstract Base Class for Scheme input and output ports.
-//
-//    Guarentees:
-//      - String sourceName()
-//
-//      - void close()
-//      - boolean isClosed()
-//      - boolean isOpen()
+//    Single value to represent EOF.
 
-package escm.type;
+package escm.type.port;
+import java.util.Objects;
+import escm.type.Datum;
 import escm.vm.type.ExecutionState;
 
-public abstract class Port extends Datum {
+public class Eof extends Datum {
+  ////////////////////////////////////////////////////////////////////////////
+  // Static Value
+  public static final Eof VALUE = new Eof();
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Private Constructor (use <VALUE>)
+  private Eof(){}
+
+
   ////////////////////////////////////////////////////////////////////////////
   // Type
-  public abstract java.lang.String type();
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Name
-  public abstract java.lang.String sourceName();
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Port Closing Semantics
-  public abstract void close() throws Exception;
-
-  public abstract boolean isClosed();
-
-  public boolean isOpen() {
-    return isClosed() == false;
+  public String type() {
+    return "eof";
   }
 
 
@@ -43,7 +34,10 @@ public abstract class Port extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Equality
-  public abstract boolean eq(Object o);
+  public boolean eq(Object o) {
+    return o instanceof Eof;
+  }
+
 
   public boolean equals(Object o) {
     return eq(o);
@@ -52,18 +46,24 @@ public abstract class Port extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Hash code
-  public abstract int hashCode();
+  public int hashCode() {
+    return Objects.hash(type());
+  }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
-  public abstract java.lang.String display();
+  public String display() {
+    return "#eof";
+  }
 
-  public java.lang.String write() {
+
+  public String write() {
     return display();
   }
 
-  public java.lang.String pprint() {
+
+  public String pprint() {
     return write();
   }
 
@@ -77,7 +77,7 @@ public abstract class Port extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Datum loadWithName(java.lang.String name) throws Exception {
+  public Datum loadWithName(String name) throws Exception {
     return this;
   }
 

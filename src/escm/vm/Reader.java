@@ -10,6 +10,7 @@ import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.Keyword;
 import escm.type.Nil;
+import escm.type.number.Number;
 import escm.util.Pair;
 import escm.util.StringParser;
 
@@ -265,7 +266,7 @@ public class Reader {
 
   // @return: pair of parsed literal & position in <sourceCode> after the literal
   private static Pair<Datum,Integer> parseEofLiteral(String sourceCode, int i) {
-    return new Pair<Datum,Integer>(escm.type.Eof.VALUE,i+4);
+    return new Pair<Datum,Integer>(escm.type.port.Eof.VALUE,i+4);
   }
 
 
@@ -317,15 +318,15 @@ public class Reader {
   ////////////////////////////////////////////////////////////////////////////
   // Number Literal Parsing Helper
   // @param: <i> is where to start parsing
-  // @return: pair of parsed double & position in <sourceCode> after the parsed double
-  private static Pair<Double,Integer> parseNumberLiteral(String sourceCode, int i, int n) {
+  // @return: pair of parsed number & position in <sourceCode> after the parsed double
+  private static Pair<Number,Integer> parseNumberLiteral(String sourceCode, int i, int n) {
     StringBuilder sb = new StringBuilder();
     while(i < n && !isDelimiter(sourceCode.charAt(i))) {
       sb.append(sourceCode.charAt(i));
       ++i;
     }
     try {
-      return new Pair<Double,Integer>(Double.parseDouble(sb.toString()),i);
+      return new Pair<Number,Integer>(Number.valueOf(sb.toString()),i);
     } catch(Exception e) {
       return null;
     }
@@ -410,9 +411,9 @@ public class Reader {
         return parseKeywordLiteral(sourceCode,i+1,n);
 
       // Parse Number Literals
-      Pair<Double,Integer> numberParseObject = parseNumberLiteral(sourceCode,i,n);
+      Pair<Number,Integer> numberParseObject = parseNumberLiteral(sourceCode,i,n);
       if(numberParseObject != null)
-        return new Pair<Datum,Integer>(new escm.type.Number(numberParseObject.first),numberParseObject.second);
+        return new Pair<Datum,Integer>(numberParseObject.first,numberParseObject.second);
 
       // Parse Symbol Literals
       return parseSymbolLiteral(sourceCode,i,n);

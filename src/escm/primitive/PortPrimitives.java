@@ -5,9 +5,9 @@
 package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
-import escm.type.Port;
-import escm.type.InputPort;
-import escm.type.OutputPort;
+import escm.type.port.Port;
+import escm.type.port.InputPort;
+import escm.type.port.OutputPort;
 import escm.type.Void;
 import escm.type.Boolean;
 import escm.util.Exceptionf;
@@ -342,7 +342,7 @@ public class PortPrimitives {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof InputPort))
         throw new Exceptionf("'(peek-port <input-port>) didn't receive 1 input-port: %s", Exceptionf.profileArgs(parameters));
       String c = ((InputPort)parameters.get(0)).peek();
-      if(c == null) return escm.type.Eof.VALUE;
+      if(c == null) return escm.type.port.Eof.VALUE;
       return new escm.type.String(c);
     }
   }

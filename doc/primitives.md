@@ -29,6 +29,9 @@
 *dosync-lock*
 
 *generator-complete*
+
+*min-radix*
+*max-radix*
 ```
 
 
@@ -36,10 +39,10 @@
 ## Numbers:
 ```scheme
 (= <num> <num> ...)
-(< <num> <num> ...)
-(> <num> <num> ...)
-(<= <num> <num> ...)
-(>= <num> <num> ...)
+(< <real> <real> ...)
+(> <real> <real> ...)
+(<= <real> <real> ...)
+(>= <real> <real> ...)
 
 (+ <num> <num> ...)
 (- <num> <num> ...) (- <num>)
@@ -48,40 +51,53 @@
 
 (expt <num> <num> ...)
 (exp <num>)
-(log <num>)
+(log <num> <optional-base>)
 (sqrt <num>)
-(abs <num>)
+(abs <real>)
 
-(quotient <num1> <num2>)
-(remainder <num1> <num2>)
+(expt-mod <base-real> <power-real> <mod-real>)
 
-(round <num>)
-(floor <num>)
-(ceiling <num>)
-(truncate <num>)
+(quotient <real1> <real2>)
+(remainder <real1> <real2>)
+(modulo <real1> <real2>)
+(divrem <real1> <real2>)
 
-(min <num> ...)
-(max <num> ...)
+(modf <real1> <real2>)
+
+(gcd <integer1> <integer2>)
+(lcm <integer1> <integer2>)
+
+(round <real>)
+(floor <real>)
+(ceiling <real>)
+(truncate <real>)
+
+(min <real> ...)
+(max <real> ...)
 
 (number? <obj>)
-(integer? <num>)
-(finite? <num>)
-(infinite? <num>)
-(nan? <num>)
+(complex? <obj>)
+(real? <obj>)
+(inexact? <obj>)
+(exact? <obj>)
+(integer? <obj>)
+(finite? <obj>)
+(infinite? <obj>)
+(nan? <obj>)
 
-(odd? <num>)
-(even? <num>)
+(odd? <real>)
+(even? <real>)
 
-(positive? <num>)
-(negative? <num>)
-(zero? <num>)
+(positive? <real>)
+(negative? <real>)
+(zero? <real>)
 
 (sin <num>)
 (cos <num>)
 (tan <num>)
 (asin <num>)
 (acos <num>)
-(atan <num>) (atan <num> <num>)
+(atan <num>) (atan <real> <real>)
 (sinh <num>)
 (cosh <num>)
 (tanh <num>)
@@ -89,7 +105,20 @@
 (acosh <num>)
 (atanh <num>)
 
+(npr <n-integer> <r-integer>)
+(ncr <n-integer> <r-integer>)
+
 (random) ; random number between 0.0 and 1.0
+
+(make-rectangular <real-real> <imag-real>)
+(make-polar <magnitude-real> <angle-real>)
+
+(real-part <number>)
+(imag-part <number>)
+
+(magnitude <number>)
+(angle <number>)
+(conjugate <number>)
 ```
 
 
@@ -273,8 +302,8 @@
 ------------------------
 ## Type Coercions:
 ```scheme
-(number->string <num>)
-(string->number <str>)
+(number->string <num> <optional-radix>)
+(string->number <str> <optional-radix>)
 
 (keyword->symbol <keyword>)
 (symbol->keyword <sym>)

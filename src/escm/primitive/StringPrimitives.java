@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import escm.type.Datum;
 import escm.type.Boolean;
+import escm.type.number.Real;
+import escm.type.number.Exact;
 import escm.util.Exceptionf;
 import escm.util.StringParser;
 import escm.vm.type.Primitive;
@@ -22,7 +24,7 @@ public class StringPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(string-length <string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.Number(((escm.type.String)parameters.get(0)).value().length());
+      return new Exact(((escm.type.String)parameters.get(0)).value().length());
     }
   }
 
@@ -96,11 +98,11 @@ public class StringPrimitives {
         throw new Exceptionf("'(string-ref <string> <index>) 1st arg %s isn't a string!", str.profile());
       if(!ListPrimitives.isValidSize(index))
         throw new Exceptionf("'(string-ref <string> <index>) 2nd arg %s isn't a non-negative integer!", index.profile());
-      double indexValue = ((escm.type.Number)index).doubleValue();
+      int indexValue = ((Real)index).intValue();
       String strValue = ((escm.type.String)str).value();
       if(indexValue >= strValue.length())
         throw new Exceptionf("'(string-ref <string> <index>) index %f exceeds length of string %s", indexValue, str.write());
-      return new escm.type.String(String.valueOf(strValue.charAt((int)indexValue)));
+      return new escm.type.String(String.valueOf(strValue.charAt(indexValue)));
     }
   }
 
@@ -117,7 +119,7 @@ public class StringPrimitives {
       Datum endIndex = parameters.get(2);
       if(!ListPrimitives.isValidSize(endIndex)) 
         throw new Exceptionf("'(substring <string> <start-index> <optional-length>) 3rd arg %s isn't a non-negative integer!", endIndex.profile());
-      return ((escm.type.Number)endIndex).doubleValue();
+      return ((Real)endIndex).doubleValue();
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -130,7 +132,7 @@ public class StringPrimitives {
         throw new Exceptionf("'(substring <string> <start-index> <optional-length>) 1st arg %s isn't a string!", str.profile());
       if(!ListPrimitives.isValidSize(startIndex)) 
         throw new Exceptionf("'(substring <string> <start-index> <optional-length>) 2nd %s arg isn't a non-negative integer!", startIndex.profile());
-      double startIndexValue = ((escm.type.Number)startIndex).doubleValue();
+      double startIndexValue = ((Real)startIndex).doubleValue();
       String strValue = ((escm.type.String)str).value();
       if(startIndexValue >= strValue.length() || substringLength == 0) 
         return new escm.type.String("");
@@ -245,9 +247,9 @@ public class StringPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String) || !(parameters.get(1) instanceof escm.type.String)) 
         throw new Exceptionf("'(string-contains <string> <substring>) didn't receive exactly 2 strings: %s", Exceptionf.profileArgs(parameters));
-      double result = (double)((escm.type.String)parameters.get(0)).value().indexOf(((escm.type.String)parameters.get(1)).value());
+      int result = ((escm.type.String)parameters.get(0)).value().indexOf(((escm.type.String)parameters.get(1)).value());
       if(result < 0) return Boolean.FALSE;
-      return new escm.type.Number(result);
+      return new Exact(result);
     }
   }
 
@@ -262,9 +264,9 @@ public class StringPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String) || !(parameters.get(1) instanceof escm.type.String)) 
         throw new Exceptionf("'(string-contains-right <string> <substring>) didn't receive exactly 2 strings: %s", Exceptionf.profileArgs(parameters));
-      double result = (double)((escm.type.String)parameters.get(0)).value().lastIndexOf(((escm.type.String)parameters.get(1)).value());
+      int result = ((escm.type.String)parameters.get(0)).value().lastIndexOf(((escm.type.String)parameters.get(1)).value());
       if(result < 0) return Boolean.FALSE;
-      return new escm.type.Number(result);
+      return new Exact(result);
     }
   }
 

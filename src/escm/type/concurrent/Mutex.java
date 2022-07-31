@@ -1,11 +1,14 @@
-// Author: Jordan Randleman - escm.type.Mutex
+// Author: Jordan Randleman - escm.type.concurrent.Mutex
 // Purpose:
 //    Mutex primitive type (wraps java.util.concurrent.locks.ReentrantLock).
 
-package escm.type;
+package escm.type.concurrent;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.TimeUnit;
 import java.util.Objects;
+import escm.type.Datum;
+import escm.type.Boolean;
+import escm.type.Void;
 import escm.vm.type.ExecutionState;
 
 public class Mutex extends Datum {
@@ -16,12 +19,12 @@ public class Mutex extends Datum {
     private Datum specific = Void.VALUE;
   };
   private State state = new State();
-  private java.lang.String name = null;
+  private String name = null;
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Internal Lock Field Public Accessors
-  public java.lang.String getName() {
+  public String getName() {
     return name;
   }
 
@@ -77,13 +80,13 @@ public class Mutex extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor(s)
-  public Mutex(java.lang.String name, Datum specific) {
+  public Mutex(String name, Datum specific) {
     this.name = name;
     this.state.specific = specific;
   }
 
 
-  public Mutex(java.lang.String name) {
+  public Mutex(String name) {
     this.name = name;
   }
 
@@ -98,7 +101,7 @@ public class Mutex extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Type
-  public java.lang.String type() {
+  public String type() {
     return "mutex";
   }
 
@@ -130,16 +133,16 @@ public class Mutex extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
-  public java.lang.String display() {
+  public String display() {
     if(name == null) return "#<mutex-" + Boolean.valueOf(isLocked()).display() + ">";
     return "#<mutex-" + Boolean.valueOf(isLocked()).display() + "-" + name + ">";
   }
 
-  public java.lang.String write() {
+  public String write() {
     return display();
   }
 
-  public java.lang.String pprint() {
+  public String pprint() {
     return write();
   }
 
@@ -153,12 +156,12 @@ public class Mutex extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  private Mutex(java.lang.String name, State state) {
+  private Mutex(String name, State state) {
     this.name = name;
     this.state = state;
   }
 
-  public Mutex loadWithName(java.lang.String name) throws Exception {
+  public Mutex loadWithName(String name) throws Exception {
     if(this.name != null) return this;
     return new Mutex(name,this.state);
   }

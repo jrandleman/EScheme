@@ -8,9 +8,10 @@ import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Void;
-import escm.type.Number;
+import escm.type.number.Real;
+import escm.type.number.Exact;
 import escm.type.Boolean;
-import escm.type.PrimitiveProcedure;
+import escm.type.procedure.PrimitiveProcedure;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.Callable;
@@ -19,11 +20,9 @@ import escm.vm.type.PrimitiveCallable;
 
 public class ListPrimitives {
   ////////////////////////////////////////////////////////////////////////////
-  // Size Number Validation Helper
+  // Size Integer Validation Helper
   public static boolean isValidSize(Datum d) throws Exception {
-    if(!(d instanceof Number)) return false;
-    double value = ((Number)d).doubleValue();
-    return value >= 0.0 && value % 1 == 0.0;
+    return (d instanceof Real) && ((Real)d).isInteger() && !((Real)d).isNegative();
   }
 
 
@@ -114,7 +113,7 @@ public class ListPrimitives {
         ++count;
         iterator = ((Pair)iterator).cdr();
       }
-      return new Number((double)count);
+      return new Exact(count);
     }
   }
 
@@ -201,8 +200,8 @@ public class ListPrimitives {
         throw new Exceptionf("'(ref <list> <index>) 1st arg %s isn't a non-empty list!", lis.profile());
       if(!isValidSize(index)) 
         throw new Exceptionf("'(ref <list> <index>) 2nd arg %s isn't a non-negative integer!", index.profile());
-      double indexValue = ((Number)index).doubleValue();
-      for(double count = 0; lis instanceof Pair; ++count, lis = ((Pair)lis).cdr())
+      int indexValue = ((Real)index).intValue();
+      for(int count = 0; lis instanceof Pair; ++count, lis = ((Pair)lis).cdr())
         if(count == indexValue)
           return ((Pair)lis).car();
       throw new Exceptionf("'(ref <list> <index>) index %f is out of bounds for list %s", indexValue, parameters.get(0).write());
@@ -222,7 +221,7 @@ public class ListPrimitives {
       Datum endIndex = parameters.get(2);
       if(!isValidSize(endIndex)) 
         throw new Exceptionf("'(sublist <list> <start-index> <optional-length>) 3rd arg %s isn't a non-negative integer!", endIndex.profile());
-      return ((Number)endIndex).doubleValue();
+      return ((Real)endIndex).doubleValue();
     }
 
     private static Datum sublistRecur(Datum lis, double count, double startIndex, double length) throws Exception {
@@ -242,7 +241,7 @@ public class ListPrimitives {
         throw new Exceptionf("'(sublist <list> <start-index> <optional-length>) 1st arg %s isn't a list!", lis.profile());
       if(!isValidSize(startIndex)) 
         throw new Exceptionf("'(sublist <list> <start-index> <optional-length>) 2nd arg %s isn't a non-negative integer!", startIndex.profile());
-      double startIndexValue = ((Number)startIndex).doubleValue();
+      double startIndexValue = ((Real)startIndex).doubleValue();
       return sublistRecur(lis,0,startIndexValue,length+startIndexValue);
     }
   }

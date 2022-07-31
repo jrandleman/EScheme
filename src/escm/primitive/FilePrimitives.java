@@ -607,7 +607,7 @@ public class FilePrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(file-size <file-path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.Number(Files.size(Path.of(((escm.type.String)parameters.get(0)).value())));
+      return new escm.type.number.Exact(Files.size(Path.of(((escm.type.String)parameters.get(0)).value())));
     }
   }
 

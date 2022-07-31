@@ -4,15 +4,9 @@
 
 
 
-- FRACTIONS, `BigInteger`, `BigDecimal`, COMPLEX NUMERICS
-  * INCLUDE `#e` `#i` `#b` `#o` `#x` `#NNr` SUPPORT
-  * DETERMINE WHETHER REALLY WANT BIGDECIMAL OR NOT !!!
-  * UPDATE THE `number` `help` ENTRY !!!
 
-    => NOTE: TEST EFFICIENCY OF THIS !!!
-
-
-
+- CONSIDER NEW COMMAND-LINE FLAGS: `-e`, `--eval` (interpret the rest of the command line, dump result to STDOUT, terminate escm)
+  * equivalent to launching REPL, evaling the code, then calling `(exit)`
 
 
 - PRIMITIVE TO GET CURRENT DATE/TIME WITH OFFSETS
@@ -34,9 +28,11 @@
 
 
 
-- RUNTIME TYPING
+- RUNTIME TYPING ___!!! THIS WOULD WARRANT A VERSION UPGRADE TO `7.0` !!!___
   
   * NOTE: THE BELOW SHOULD ALSO BE AVAILABLE FOR INTERFACE DEFINITIONS !!!
+
+  * CONSIDER: `(define-type <keyword> <unary-predicate-callable>)` `(type? <keyword>)` `(delete-type! <keyword>)`
 
   BASICS: `(def :string (f :string s :any a))` use keywords to denote basic type checks
                 ^          ^         ^

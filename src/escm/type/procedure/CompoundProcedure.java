@@ -1,6 +1,6 @@
-// Author: Jordan Randleman - escm.type.CompoundProcedure
+// Author: Jordan Randleman - escm.type.procedure.CompoundProcedure
 // Purpose:
-//    EScheme compound procedure specialization of "escm.type.Procedure".
+//    EScheme compound procedure specialization of "escm.type.procedure.Procedure".
 //    Compound procedures have 3 main components:
 //      0) Definition Environment
 //         => This is critical - since all EScheme compound procedures are closures,
@@ -26,10 +26,15 @@
 //    Lastly, observe that ALL escm procedures are multi-arity, supporting several parameter
 //    signatures and associated function bodies.
 
-package escm.type;
+package escm.type.procedure;
 import java.util.ArrayList;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
+import escm.type.Datum;
+import escm.type.Pair;
+import escm.type.Nil;
+import escm.type.Boolean;
+import escm.type.oo.MetaObject;
 import escm.vm.Interpreter;
 import escm.vm.type.Instruction;
 import escm.vm.type.ExecutionState;
@@ -105,7 +110,7 @@ public class CompoundProcedure extends Procedure {
   }
 
 
-  // (used by escm.type.MetaObject)
+  // (used by escm.type.oo.MetaObject)
   public CompoundProcedure loadWithForcedName(java.lang.String name) {
     return new CompoundProcedure(name,state);
   }
@@ -148,14 +153,14 @@ public class CompoundProcedure extends Procedure {
   // @RETURN: the clause (param/body) index these args can be processed with
   protected int validateEnvironmentExtension(ArrayList<Datum> arguments) throws Exception {
     if(state.definitionEnvironment == null)
-      throw new Exceptionf("escm.type.CompoundProcedure can't apply procedure %s with a null definition environment!", name);
+      throw new Exceptionf("escm.type.procedure.CompoundProcedure can't apply procedure %s with a null definition environment!", name);
     int totalArguments = arguments.size();
     for(int i = 0, n = state.compileTime.parametersList.size(); i < n; ++i) {
       int totalParameters = state.compileTime.parametersList.get(i).size();
       if(totalArguments == totalParameters) return i;
       if(totalArguments > totalParameters && state.compileTime.variadicParameterList.get(i) != null) return i;
     }
-    throw new Exceptionf("escm.type.CompoundProcedure args %s don't match any signatures in procedure \"%s\":%s", Exceptionf.profileArgs(arguments), name, stringifyParameterSignatures());
+    throw new Exceptionf("escm.type.procedure.CompoundProcedure args %s don't match any signatures in procedure \"%s\":%s", Exceptionf.profileArgs(arguments), name, stringifyParameterSignatures());
   }
 
 
@@ -196,7 +201,7 @@ public class CompoundProcedure extends Procedure {
   // <super> Binding (done updon object creation)
   public CompoundProcedure loadWithSuper(MetaObject supr) throws Exception {
     if(state.definitionEnvironment == null)
-      throw new Exceptionf("escm.type.CompoundProcedure can't bind <super> %s to procedure %s with a null definition environment!", supr.profile(), name);
+      throw new Exceptionf("escm.type.procedure.CompoundProcedure can't bind <super> %s to procedure %s with a null definition environment!", supr.profile(), name);
     Environment extendedEnvironment = new Environment(state.definitionEnvironment);
     if(supr == null) { // note that <super> is <null> for interfaces!
       extendedEnvironment.define("super",Boolean.FALSE);
@@ -211,7 +216,7 @@ public class CompoundProcedure extends Procedure {
   // <self> Binding (done updon method invocation)
   public CompoundProcedure loadWithSelf(MetaObject self) throws Exception {
     if(state.definitionEnvironment == null)
-      throw new Exceptionf("escm.type.CompoundProcedure can't bind <self> %s to procedure %s with a null definition environment!", self.profile(), name);
+      throw new Exceptionf("escm.type.procedure.CompoundProcedure can't bind <self> %s to procedure %s with a null definition environment!", self.profile(), name);
     Environment extendedEnvironment = new Environment(state.definitionEnvironment);
     extendedEnvironment.define("self",self);
     return new CompoundProcedure(name,new State(extendedEnvironment,state.compileTime));

@@ -17,8 +17,9 @@ import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Symbol;
-import escm.type.Number;
-import escm.type.CompoundProcedure;
+import escm.type.number.Real;
+import escm.type.procedure.CompoundProcedure;
+import escm.type.number.Inexact;
 import escm.util.Exceptionf;
 import escm.vm.type.Instruction;
 import escm.vm.type.ExecutionState;
@@ -74,9 +75,9 @@ public class Assembler {
     for(int i = 0, n = instructions.size(); i < n; ++i) {
       Instruction instruction = instructions.get(i);
       if(instruction.operation == Instruction.IFN || instruction.operation == Instruction.JUMP) {
-        int branchAmount = ((Number)instruction.argument).intValue();
+        int branchAmount = ((Inexact)instruction.argument).intValue();
         if(branchAmount < 0 && Math.abs(branchAmount) > i) {
-          instruction.argument = new Number(-i);
+          instruction.argument = new Inexact(-i);
         } else if(branchAmount > 0 && branchAmount > n-i) {
           instruction.operation = Instruction.RETURN;
           instruction.argument = null;
@@ -207,25 +208,28 @@ public class Assembler {
       }
 
       ////////////////////////////////////////////////////////////////////////
-      // (ifn <number>)
+      // (ifn <integer>)
       case Instruction.IFN: {
         Datum arg = getInstructionArgument(instructionPair);
-        if(!(arg instanceof Number))
-          throw new Exceptionf("ASM ERROR: \"if\" instruction %s must have a numeric arg!", instruction.profile());
-        if(((Number)arg).doubleValue() == 0)
+        if(!(arg instanceof Real) || !((Real)arg).isInteger())
+          throw new Exceptionf("ASM ERROR: \"if\" instruction %s must have an integer arg!", instruction.profile());
+        int branchAmount = ((Real)arg).intValue();
+        if(branchAmount == 0)
           throw new Exceptionf("ASM ERROR: \"if\" instruction %s must have a non-0 arg!", instruction.profile());
-        return new Instruction(Instruction.IFN,arg);
+        return new Instruction(Instruction.IFN,new Inexact(branchAmount));
       }
 
       ////////////////////////////////////////////////////////////////////////
-      // (jump <number>)
+      // (jump <integer>)
       case Instruction.JUMP: {
         Datum arg = getInstructionArgument(instructionPair);
-        if(!(arg instanceof Number))
-          throw new Exceptionf("ASM ERROR: \"jump\" instruction %s must have a numeric arg!", instruction.profile());
-        if(((Number)arg).doubleValue() == 0)
+        if(!(arg instanceof Real) || !((Real)arg).isInteger())
+          throw new Exceptionf("ASM ERROR: \"jump\" instruction %s must have an integer arg!", instruction.profile());
+        int branchAmount = ((Real)arg).intValue();
+        if(branchAmount == 0)
+        if(branchAmount == 0)
           throw new Exceptionf("ASM ERROR: \"jump\" instruction %s must have a non-0 arg!", instruction.profile());
-        return new Instruction(Instruction.JUMP,arg);
+        return new Instruction(Instruction.JUMP,new Inexact(branchAmount));
       }
 
       ////////////////////////////////////////////////////////////////////////

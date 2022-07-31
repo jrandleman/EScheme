@@ -1,12 +1,13 @@
-// Author: Jordan Randleman - escm.type.PrimitiveProcedure
+// Author: Jordan Randleman - escm.type.procedure.PrimitiveProcedure
 // Purpose:
-//    Java primitive procedure specialization of "escm.type.Procedure".
+//    Java primitive procedure specialization of "escm.type.procedure.Procedure".
 //    Wraps a "escm.vm.type.Callable" object under the hood.
 
-package escm.type;
+package escm.type.procedure;
 import java.util.ArrayList;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
+import escm.type.Datum;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
 import escm.vm.type.ExecutionState;

@@ -1,34 +1,36 @@
-// Author: Jordan Randleman - escm.type.EscmInterface
+// Author: Jordan Randleman - escm.type.oo.EscmInterface
 // Purpose:
 //    Escm Interface class, supporting a list of instance property names 
 //    that implementing classes MUST provide.
 //
 // Includes:
-//    - java.lang.String name()         // returns <""> if an anonymous interface
-//    - java.lang.String readableName() // returns <"#<anonymous>"> if an anonymous interface
+//    - String name()         // returns <""> if an anonymous interface
+//    - String readableName() // returns <"#<anonymous>"> if an anonymous interface
 //
-//    - ArrayList<java.lang.String> instanceProps() // returns instance property names
+//    - ArrayList<String> instanceProps() // returns instance property names
 //
 //    - void confirmSatisfiedBy(EscmClass class) // throws an error if the given class doesn't satisfy <this>
 
-package escm.type;
+package escm.type.oo;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.util.Exceptionf;
+import escm.type.Datum;
+import escm.type.Symbol;
 import escm.vm.type.ExecutionState;
 
 public class EscmInterface extends MetaObject {
   ////////////////////////////////////////////////////////////////////////////
   // Name
-  public java.lang.String name() {
+  public String name() {
     Datum val = props.get("name");
     if(val == null || !(val instanceof Symbol)) return "";
     return ((Symbol)val).value();
   }
 
 
-  public java.lang.String readableName() {
-    java.lang.String name = name();
+  public String readableName() {
+    String name = name();
     if(name.length() == 0) return "#<anonymous>";
     return name;
   }
@@ -52,7 +54,7 @@ public class EscmInterface extends MetaObject {
 
   ////////////////////////////////////////////////////////////////////////////
   // Object-Construction Template
-  private ArrayList<java.lang.String> requiredProps = null;
+  private ArrayList<String> requiredProps = null;
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -65,7 +67,7 @@ public class EscmInterface extends MetaObject {
   }
 
 
-  public EscmInterface(ArrayList<EscmInterface> interfaces, ConcurrentHashMap<java.lang.String,Datum> props, ArrayList<java.lang.String> requiredProps) throws Exception {
+  public EscmInterface(ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) throws Exception {
     this.interfaces = interfaces;
     this.props = props;
     this.requiredProps = requiredProps;
@@ -76,14 +78,14 @@ public class EscmInterface extends MetaObject {
 
   ////////////////////////////////////////////////////////////////////////////
   // Instance Property Serialization Operations
-  public ArrayList<java.lang.String> instanceProps() {
-    return new ArrayList<java.lang.String>(requiredProps);
+  public ArrayList<String> instanceProps() {
+    return new ArrayList<String>(requiredProps);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Class Satisfaction Verification
-  private java.lang.String stringifyArrayListString(ArrayList<java.lang.String> al) {
+  private String stringifyArrayListString(ArrayList<String> al) {
     StringBuilder sb = new StringBuilder("{");
     for(int i = 0, n = al.size(); i < n; ++i) {
       sb.append(al.get(i));
@@ -93,9 +95,9 @@ public class EscmInterface extends MetaObject {
   }
 
 
-  private java.lang.String generateSatisfactionError(EscmClass topmostClass, ArrayList<java.lang.String> inheritanceChain, java.lang.String missedReqProp) {
+  private String generateSatisfactionError(EscmClass topmostClass, ArrayList<String> inheritanceChain, String missedReqProp) {
     if(inheritanceChain.size() > 0) inheritanceChain.remove(0);
-    return java.lang.String.format("Class with instance props %s inheriting %s doesn't have required prop \"%s\" for interface \"%s\"", 
+    return String.format("Class with instance props %s inheriting %s doesn't have required prop \"%s\" for interface \"%s\"", 
                                    stringifyArrayListString(topmostClass.instanceProps()), 
                                    stringifyArrayListString(inheritanceChain), 
                                    missedReqProp, 
@@ -103,7 +105,7 @@ public class EscmInterface extends MetaObject {
   }
 
 
-  private void confirmSatisfiedBy(EscmClass cls, ArrayList<java.lang.String> inheritanceChain, EscmClass topmostClass, java.lang.String missedReqProp) throws Exception {
+  private void confirmSatisfiedBy(EscmClass cls, ArrayList<String> inheritanceChain, EscmClass topmostClass, String missedReqProp) throws Exception {
     if(cls == null) {
       if(missedReqProp != null) {
         throw new Exception(generateSatisfactionError(topmostClass,inheritanceChain,missedReqProp));
@@ -111,8 +113,8 @@ public class EscmInterface extends MetaObject {
       return;
     }
     inheritanceChain.add(cls.readableName());
-    ArrayList<java.lang.String> objProps = cls.instanceProps();
-    for(java.lang.String prop : requiredProps) {
+    ArrayList<String> objProps = cls.instanceProps();
+    for(String prop : requiredProps) {
       if(!objProps.contains(prop)) {
         confirmSatisfiedBy(cls.getSuper(),inheritanceChain,topmostClass,prop);
       }
@@ -121,7 +123,7 @@ public class EscmInterface extends MetaObject {
 
 
   public void confirmSatisfiedBy(EscmClass cls) throws Exception {
-    confirmSatisfiedBy(cls,new ArrayList<java.lang.String>(),cls,null);
+    confirmSatisfiedBy(cls,new ArrayList<String>(),cls,null);
     for(EscmInterface superIface : interfaces) {
       superIface.confirmSatisfiedBy(cls);
     }
@@ -130,7 +132,7 @@ public class EscmInterface extends MetaObject {
 
   ////////////////////////////////////////////////////////////////////////////
   // Type
-  public java.lang.String type() {
+  public String type() {
     return "interface";
   }
 
@@ -148,17 +150,17 @@ public class EscmInterface extends MetaObject {
 
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
-  public java.lang.String display() {
-    java.lang.String name = name();
+  public String display() {
+    String name = name();
     if(name.length() == 0) return "#<interface>";
     return "#<interface " + name  + '>';
   }
 
-  public java.lang.String write() {
+  public String write() {
     return display();
   }
 
-  public java.lang.String pprint() {
+  public String pprint() {
     return write();
   }
 
@@ -174,7 +176,7 @@ public class EscmInterface extends MetaObject {
   // Loading-into-environment semantics for the VM's interpreter
 
   // NOTE: <ignore> here just distinguishes this private ctor from the public one
-  private EscmInterface(int ignore, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<java.lang.String,Datum> props, ArrayList<java.lang.String> requiredProps) throws Exception {
+  private EscmInterface(int ignore, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) throws Exception {
     this.interfaces = interfaces;
     this.props = props;
     this.requiredProps = requiredProps;
@@ -182,8 +184,8 @@ public class EscmInterface extends MetaObject {
   }
 
 
-  public EscmInterface loadWithName(java.lang.String name) throws Exception {
-    java.lang.String currentName = name();
+  public EscmInterface loadWithName(String name) throws Exception {
+    String currentName = name();
     if(currentName.length() > 0) return this;
     EscmInterface i = new EscmInterface(0,this.interfaces,MetaObject.copyProps(this.props),this.requiredProps);
     i.props.put("name",new Symbol(name));

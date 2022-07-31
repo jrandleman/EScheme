@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.type.OutputPort
+// Author: Jordan Randleman - escm.type.port.OutputPort
 // Purpose:
 //    Output port primitive type, to write to a file.
 //    Note that ALL write operations also flush automatically.
@@ -21,13 +21,14 @@
 //      - void display(Datum d)
 //      - void pprint(Datum d)
 
-package escm.type;
+package escm.type.port;
 import java.util.Objects;
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.FileWriter;
 import escm.util.Exceptionf;
 import escm.util.StringParser;
+import escm.type.Datum;
 import escm.vm.runtime.EscmThread;
 
 public class OutputPort extends Port {
@@ -38,10 +39,10 @@ public class OutputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Name
-  private java.lang.String name = null;
+  private String name = null;
 
 
-  public java.lang.String sourceName() {
+  public String sourceName() {
     return name;
   }
 
@@ -70,7 +71,7 @@ public class OutputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Factory Functions
-  public OutputPort(java.lang.String filename, boolean append) throws Exception {
+  public OutputPort(String filename, boolean append) throws Exception {
     try {
       bw = new BufferedWriter(new FileWriter(filename,append));
       name = filename;
@@ -100,7 +101,7 @@ public class OutputPort extends Port {
 
 
   public void print(Object o) throws Exception {
-    java.lang.String s = o.toString();
+    String s = o.toString();
     try {
       bw.write(s,0,s.length());
       bw.flush();
@@ -111,7 +112,7 @@ public class OutputPort extends Port {
 
 
   public void println(Object o) throws Exception {
-    java.lang.String s = o.toString()+"\n";
+    String s = o.toString()+"\n";
     try {
       bw.write(s,0,s.length());
       bw.flush();
@@ -121,8 +122,8 @@ public class OutputPort extends Port {
   }
 
 
-  public void printf(java.lang.String fmt, Object... args) throws Exception {
-    java.lang.String s = java.lang.String.format(fmt,args);
+  public void printf(String fmt, Object... args) throws Exception {
+    String s = String.format(fmt,args);
     try {
       bw.write(s,0,s.length());
       bw.flush();
@@ -136,7 +137,7 @@ public class OutputPort extends Port {
   // Datum Printing Functionality
   public void write(Datum d) throws Exception {
     try {
-      java.lang.String s = d.write();
+      String s = d.write();
       bw.write(s,0,s.length());
       bw.flush();
     } catch(Exception e) {
@@ -147,7 +148,7 @@ public class OutputPort extends Port {
 
   public void display(Datum d) throws Exception {
     try {
-      java.lang.String s = d.display();
+      String s = d.display();
       bw.write(s,0,s.length());
       bw.flush();
     } catch(Exception e) {
@@ -158,7 +159,7 @@ public class OutputPort extends Port {
 
   public void pprint(Datum d) throws Exception {
     try {
-      java.lang.String s = d.pprint();
+      String s = d.pprint();
       bw.write(s,0,s.length());
       bw.flush();
     } catch(Exception e) {
@@ -190,7 +191,7 @@ public class OutputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Type
-  public java.lang.String type() {
+  public String type() {
     return "output-port";
   }
 
@@ -211,7 +212,7 @@ public class OutputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
-  public java.lang.String display() {
+  public String display() {
     return "#<output-port ["+name+"]>";
   }
 }

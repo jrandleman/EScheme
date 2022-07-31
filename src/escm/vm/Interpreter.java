@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 import java.util.Collections;
 import escm.type.Datum;
+import escm.type.number.Real;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.Callable;
@@ -19,17 +20,15 @@ import escm.vm.type.ObjectAccessChain;
 public class Interpreter {
   ////////////////////////////////////////////////////////////////////////////
   // Application helper
-  private static Trampoline.Bounce executeApplication(Stack<Datum> stack, escm.type.Number applicationItemCount, Trampoline.Continuation continuation) throws Exception {
-    // Get number of application items
-    int count = applicationItemCount.intValue();
-    if(count == 0)
+  private static Trampoline.Bounce executeApplication(Stack<Datum> stack, int applicationItemCount, Trampoline.Continuation continuation) throws Exception {
+    if(applicationItemCount == 0)
       throw new Exception("VM ERROR: Invalid application count 0 in \"call\" instruction!");
     // Extract application items
-    int absCount = Math.abs(count);
+    int absCount = Math.abs(applicationItemCount);
     Datum procedure = null;
     ArrayList<Datum> args = new ArrayList<Datum>(absCount-1);
     try {
-      if(count < 0) {
+      if(applicationItemCount < 0) {
         procedure = stack.pop();
         for(int i = 0; i < absCount-1; ++i)
           args.add(stack.pop());
@@ -101,20 +100,20 @@ public class Interpreter {
         }
 
         //////////////////////////////////////////////////////////////////////
-        // (ifn <number>)
+        // (ifn <integer>)
         case Instruction.IFN: {
           if(state.cvr.isTruthy()) {
             ++state.cii;
           } else {
-            state.cii += ((escm.type.Number)instruction.argument).intValue();
+            state.cii += ((Real)instruction.argument).intValue();
           }
           break;
         }
 
         //////////////////////////////////////////////////////////////////////
-        // (jump <number>)
+        // (jump <integer>)
         case Instruction.JUMP: {
-          state.cii += ((escm.type.Number)instruction.argument).intValue();
+          state.cii += ((Real)instruction.argument).intValue();
           break;
         }
 
@@ -139,11 +138,11 @@ public class Interpreter {
         case Instruction.CALL: {
           state.cvr = instruction.argument.loadWithState(state);
           ++state.cii;
-          if(!(state.cvr instanceof escm.type.Number))
-            throw new Exceptionf("VM ERROR: Invalid application count %s in \"call\" instruction!", state.cvr.profile());
+          if(!(state.cvr instanceof Real) || !((Real)state.cvr).isInteger())
+            throw new Exceptionf("VM ERROR: Invalid application non-integer count %s in \"call\" instruction!", state.cvr.profile());
           return executeApplication(
             state.stack,
-            (escm.type.Number)state.cvr,
+            ((Real)state.cvr).intValue(),
             (value) -> () -> Interpreter.run(state.getContinuationState(value),continuation)
           );
         }

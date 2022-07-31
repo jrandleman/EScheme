@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.io.File;
 import escm.type.Datum;
+import escm.type.number.Real;
+import escm.type.number.Exact;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.ExecuteSystemCommand;
@@ -20,7 +22,7 @@ import escm.vm.runtime.GlobalState;
 public class SystemPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // Get the EScheme version number
-  public static final double VERSION = 5.0;
+  public static final double VERSION = 6.0;
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -51,9 +53,9 @@ public class SystemPrimitives {
       int code = 0;
       if(parameters.size() == 1) {
         Datum exitCode = parameters.get(0);
-        if(!(exitCode instanceof escm.type.Number))
+        if(!(exitCode instanceof Real) || !((Real)exitCode).isInteger())
           throw new Exceptionf("'(exit <optional-code>) code %s isn't an integer: %s", exitCode.profile(), Exceptionf.profileArgs(parameters));
-        code = ((escm.type.Number)exitCode).intValue();
+        code = ((Real)exitCode).intValue();
       }
       // Print the exit msg iff in a REPL session
       if(GlobalState.inREPL) {
@@ -81,7 +83,7 @@ public class SystemPrimitives {
         nextContinuation = continuation;
       } else {
         nextContinuation = (value) -> () -> {
-          if(value instanceof escm.type.Eof) return continuation.run(escm.type.Void.VALUE);
+          if(value instanceof escm.type.port.Eof) return continuation.run(escm.type.Void.VALUE);
           return evalEachExpression(env,exprs,i+1,continuation);
         };
       }
@@ -157,7 +159,7 @@ public class SystemPrimitives {
         String[] envArray = convertStringListToStringArray(envp,"environment variables",parameters);
         result = ExecuteSystemCommand.run(cmd,envArray,dir);
       }
-      return escm.type.Pair.List(new escm.type.String(result.out),new escm.type.String(result.err),new escm.type.Number(result.exit));
+      return escm.type.Pair.List(new escm.type.String(result.out),new escm.type.String(result.err),new Exact(result.exit));
     }
   }
 }

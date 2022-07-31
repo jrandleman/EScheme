@@ -7,26 +7,26 @@
 }, {
   "name": "<",
   "aliases": null,
-  "signatures": ["(< <num> <num> ...)"],
-  "description": "Returns whether \"<num> <num> ...\" are < one another.",
+  "signatures": ["(< <real> <real> ...)"],
+  "description": "Returns whether \"<real> <real> ...\" are < one another.",
   "example": null
 }, {
   "name": ">",
   "aliases": null,
-  "signatures": ["(> <num> <num> ...)"],
-  "description": "Returns whether \"<num> <num> ...\" are > one another.",
+  "signatures": ["(> <real> <real> ...)"],
+  "description": "Returns whether \"<real> <real> ...\" are > one another.",
   "example": null
 }, {
   "name": "<=",
   "aliases": null,
-  "signatures": ["(<= <num> <num> ...)"],
-  "description": "Returns whether \"<num> <num> ...\" are <= one another.",
+  "signatures": ["(<= <real> <real> ...)"],
+  "description": "Returns whether \"<real> <real> ...\" are <= one another.",
   "example": null
 }, {
   "name": ">=",
   "aliases": null,
-  "signatures": ["(>= <num> <num> ...)"],
-  "description": "Returns whether \"<num> <num> ...\" are >= one another.",
+  "signatures": ["(>= <real> <real> ...)"],
+  "description": "Returns whether \"<real> <real> ...\" are >= one another.",
   "example": null
 }, {
   "name": "+",
@@ -67,8 +67,8 @@
 }, {
   "name": "log",
   "aliases": null,
-  "signatures": ["(log <num>)"],
-  "description": "Returns the natural log of <num>.",
+  "signatures": ["(log <num>)", "(log <num> <base>)"],
+  "description": "Returns the log base-<base> of <num>. <base> defaults to (exp 1).",
   "example": null
 }, {
   "name": "sqrt",
@@ -79,116 +79,176 @@
 }, {
   "name": "abs",
   "aliases": null,
-  "signatures": ["(abs <num>)"],
-  "description": "Returns the absolute value of <num>.",
+  "signatures": ["(abs <real>)"],
+  "description": "Returns the absolute value of <real>.",
+  "example": null
+}, {
+  "name": "expt-mod",
+  "aliases": null,
+  "signatures": ["(expt-mod <base-real> <power-real> <mod-real>)"],
+  "description": "Efficiently performs (modulo (expt <base-real> <power-real>) <mod-real>).",
   "example": null
 }, {
   "name": "quotient",
   "aliases": null,
-  "signatures": ["(quotient <num1> <num2>)"],
-  "description": "Returns the quotient of (/ <num1> <num2>).",
+  "signatures": ["(quotient <real1> <real2>)"],
+  "description": "Returns the quotient of (/ <real1> <real2>).",
   "example": null
 }, {
   "name": "remainder",
   "aliases": null,
-  "signatures": ["(remainder <num1> <num2>)"],
-  "description": "Returns the remainder of (/ <num1> <num2>).",
+  "signatures": ["(remainder <real1> <real2>)"],
+  "description": "Returns the remainder of (/ <real1> <real2>).",
+  "example": null
+}, {
+  "name": "modulo",
+  "aliases": null,
+  "signatures": ["(modulo <real1> <real2>)"],
+  "description": "Returns <real1> modulo <real2>.",
+  "example": null
+}, {
+  "name": "divrem",
+  "aliases": null,
+  "signatures": ["(divrem <real1> <real2>)"],
+  "description": "Returns a pair: the quotient & remainder of (/ <real1> <real2>).",
+  "example": null
+}, {
+  "name": "modf",
+  "aliases": null,
+  "signatures": ["(modf <real>)"],
+  "description": "Returns a pair: the integral & factional components of <real> as an inexact.",
+  "example": null
+}, {
+  "name": "gcd",
+  "aliases": null,
+  "signatures": ["(gcd <integer1> <integer2>)"],
+  "description": "Returns the greatest common denominator of <integer1> & <integer2>.",
+  "example": null
+}, {
+  "name": "lcm",
+  "aliases": null,
+  "signatures": ["(lcm <integer1> <integer2>)"],
+  "description": "Returns the least common multiple of <integer1> & <integer2>.",
   "example": null
 }, {
   "name": "round",
   "aliases": null,
-  "signatures": ["(round <num>)"],
-  "description": "Returns the rounded value of <num>.",
+  "signatures": ["(round <real>)"],
+  "description": "Returns the rounded value of <real>.",
   "example": null
 }, {
   "name": "floor",
   "aliases": null,
-  "signatures": ["(floor <num>)"],
-  "description": "Returns the floored value of <num>.",
+  "signatures": ["(floor <real>)"],
+  "description": "Returns the floored value of <real>.",
   "example": null
 }, {
   "name": "ceiling",
   "aliases": null,
-  "signatures": ["(ceiling <num>)"],
-  "description": "Returns the ceiling value of <num>.",
+  "signatures": ["(ceiling <real>)"],
+  "description": "Returns the ceiling value of <real>.",
   "example": null
 }, {
   "name": "truncate",
   "aliases": null,
-  "signatures": ["(truncate <num>)"],
-  "description": "Returns the truncated value of <num>.",
+  "signatures": ["(truncate <real>)"],
+  "description": "Returns the truncated value of <real>.",
   "example": null
 }, {
   "name": "min",
   "aliases": null,
-  "signatures": ["(min <num> ...)"],
-  "description": "Returns the min value of \"<num> ...\".",
+  "signatures": ["(min <real> ...)"],
+  "description": "Returns the min value of \"<real> ...\".",
   "example": null
 }, {
   "name": "max",
   "aliases": null,
-  "signatures": ["(max <num> ...)"],
-  "description": "Returns the max value of \"<num> ...\".",
+  "signatures": ["(max <real> ...)"],
+  "description": "Returns the max value of \"<real> ...\".",
   "example": null
 }, {
   "name": "number?",
   "aliases": null,
   "signatures": ["(number? <obj>)"],
-  "description": "Returns whether <num> is a number.",
+  "description": "Returns whether <obj> is a number.",
+  "example": null
+}, {
+  "name": "complex?",
+  "aliases": null,
+  "signatures": ["(complex? <obj>)"],
+  "description": "Returns whether <obj> is a complex number. Equivalent to <number?>.",
+  "example": null
+}, {
+  "name": "real?",
+  "aliases": null,
+  "signatures": ["(real? <obj>)"],
+  "description": "Returns whether <obj> is a real (non-complex) number.",
+  "example": null
+}, {
+  "name": "inexact?",
+  "aliases": null,
+  "signatures": ["(inexact? <obj>)"],
+  "description": "Returns whether <obj> is an inexact number.",
+  "example": null
+}, {
+  "name": "exact?",
+  "aliases": null,
+  "signatures": ["(exact? <obj>)"],
+  "description": "Returns whether <obj> is an exact number.",
   "example": null
 }, {
   "name": "integer?",
   "aliases": null,
-  "signatures": ["(integer? <num>)"],
-  "description": "Returns whether <num> is an integer.",
+  "signatures": ["(integer? <obj>)"],
+  "description": "Returns whether <obj> is an integer.",
   "example": null
 }, {
   "name": "finite?",
   "aliases": null,
-  "signatures": ["(finite? <num>)"],
-  "description": "Returns whether <num> is a finite value.",
+  "signatures": ["(finite? <obj>)"],
+  "description": "Returns whether <obj> is a finite value.",
   "example": null
 }, {
   "name": "infinite?",
   "aliases": null,
-  "signatures": ["(infinite? <num>)"],
-  "description": "Returns whether <num> is <Infinite>.",
+  "signatures": ["(infinite? <obj>)"],
+  "description": "Returns whether <obj> is <Infinite>.",
   "example": null
 }, {
   "name": "nan?",
   "aliases": null,
-  "signatures": ["(nan? <num>)"],
-  "description": "Returns whether <num> is <NaN>.",
+  "signatures": ["(nan? <obj>)"],
+  "description": "Returns whether <obj> is <NaN>.",
   "example": null
 }, {
   "name": "odd?",
   "aliases": null,
-  "signatures": ["(odd? <num>)"],
-  "description": "Returns whether <num> is odd.",
+  "signatures": ["(odd? <real>)"],
+  "description": "Returns whether <real> is odd.",
   "example": null
 }, {
   "name": "even?",
   "aliases": null,
-  "signatures": ["(even? <num>)"],
-  "description": "Returns whether <num> is even.",
+  "signatures": ["(even? <real>)"],
+  "description": "Returns whether <real> is even.",
   "example": null
 }, {
   "name": "positive?",
   "aliases": null,
-  "signatures": ["(positive? <num>)"],
-  "description": "Returns whether <num> is positive.",
+  "signatures": ["(positive? <real>)"],
+  "description": "Returns whether <real> is positive.",
   "example": null
 }, {
   "name": "negative?",
   "aliases": null,
-  "signatures": ["(negative? <num>)"],
-  "description": "Returns whether <num> is negative.",
+  "signatures": ["(negative? <real>)"],
+  "description": "Returns whether <real> is negative.",
   "example": null
 }, {
   "name": "zero?",
   "aliases": null,
-  "signatures": ["(zero? <num>)"],
-  "description": "Returns whether <num> is zero.",
+  "signatures": ["(zero? <real>)"],
+  "description": "Returns whether <real> is zero.",
   "example": null
 }, {
   "name": "sin",
@@ -223,8 +283,8 @@
 }, {
   "name": "atan",
   "aliases": null,
-  "signatures": ["(atan <num>)", "(atan <num1 <num2>)"],
-  "description": "Returns the atan of <num>. If given 2 arguments, returns the atan in\nradians of (/ <num1> <num2>) based on the signs of both values\nto determine the correct quadrant.",
+  "signatures": ["(atan <num>)", "(atan <real1 <real2>)"],
+  "description": "Returns the atan of <num>. If given 2 arguments, returns the atan in\nradians of (/ <real1> <real2>) based on the signs of both values\nto determine the correct quadrant.",
   "example": null
 }, {
   "name": "sinh",
@@ -263,9 +323,63 @@
   "description": "Returns the atanh of <num>.",
   "example": null
 }, {
+  "name": "npr",
+  "aliases": null,
+  "signatures": ["(npr <n-integer> <r-integer>)"],
+  "description": "Returns the number of ways in which <r> different things\ncan be selected and arranged out of <n> different things.\nBoth integers must be non-negative.",
+  "example": null
+}, {
+  "name": "ncr",
+  "aliases": null,
+  "signatures": ["(ncr <n-integer> <r-integer>)"],
+  "description": "Returns the number of ways in which <r> different things\ncan be selected out of <n> different things.\nBoth integers must be non-negative.",
+  "example": null
+}, {
   "name": "random",
   "aliases": null,
   "signatures": ["(random)"],
   "description": "Returns a random number between 0.0 and 1.0.\nGuarenteed to be unique across threads.",
+  "example": null
+}, {
+  "name": "make-rectangular",
+  "aliases": null,
+  "signatures": ["(make-rectangular <real-real> <imag-real>)"],
+  "description": "Returns a complex number with <real> & <imag> as real & imaginary components.",
+  "example": null
+}, {
+  "name": "make-polar",
+  "aliases": null,
+  "signatures": ["(make-rectangular <magnitude-real> <angle-real>)"],
+  "description": "Returns a complex number with <magnitude> & <angle> as its magnitude & angle.",
+  "example": null
+}, {
+  "name": "real-part",
+  "aliases": null,
+  "signatures": ["(real-part <number>)"],
+  "description": "Returns the real component of <number>.",
+  "example": null
+}, {
+  "name": "imag-part",
+  "aliases": null,
+  "signatures": ["(imag-part <number>)"],
+  "description": "Returns the imaginary component of <number>.",
+  "example": null
+}, {
+  "name": "magnitude",
+  "aliases": null,
+  "signatures": ["(magnitude <number>)"],
+  "description": "Returns the magnitude of <number>.",
+  "example": null
+}, {
+  "name": "angle",
+  "aliases": null,
+  "signatures": ["(angle <number>)"],
+  "description": "Returns the angle of <number>.",
+  "example": null
+}, {
+  "name": "conjugate",
+  "aliases": null,
+  "signatures": ["(conjugate <number>)"],
+  "description": "Returns the conjugate of <number>.",
   "example": null
 }]

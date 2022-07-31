@@ -1,12 +1,14 @@
-// Author: Jordan Randleman - escm.type.Thread
+// Author: Jordan Randleman - escm.type.concurrent.Thread
 // Purpose:
 //    Thread primitive type (wraps escm.vm.runtime.EscmThread).
 
-package escm.type;
+package escm.type.concurrent;
 import java.util.ArrayList;
 import java.util.Objects;
 import escm.util.Trampoline;
 import escm.util.Exceptionf;
+import escm.type.Datum;
+import escm.type.procedure.PrimitiveProcedure;
 import escm.vm.Main;
 import escm.vm.type.Callable;
 import escm.vm.type.ExecutionState;
@@ -56,7 +58,7 @@ public class Thread extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Internal Thread Field Public Accessors
-  public java.lang.String getName() {
+  public String getName() {
     return thread.getName();
   }
 
@@ -68,7 +70,7 @@ public class Thread extends Datum {
     return runnable;
   }
 
-  public java.lang.String getStatus() {
+  public String getStatus() {
     switch(thread.getState()) {
       case NEW: return "ready";
       case RUNNABLE: return "running";
@@ -131,7 +133,7 @@ public class Thread extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor Helper Procedures
-  private void initializeValues(java.lang.String name, Datum thunk) {
+  private void initializeValues(String name, Datum thunk) {
     Trampoline.Continuation terminalContinuation = (value) -> () -> Trampoline.LAST_BOUNCE_SIGNAL;
     this.runnable = thunk;
     this.thread = new EscmThread(this,name) {
@@ -162,20 +164,20 @@ public class Thread extends Datum {
 
 
   private Datum generateDatumFromCallable(Callable c) {
-    return new escm.type.PrimitiveProcedure("runnable",c);
+    return new PrimitiveProcedure("runnable",c);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor(s)
-  public Thread(java.lang.String name, Callable thunk) {
+  public Thread(String name, Callable thunk) {
     initializeValues(name,generateDatumFromCallable(thunk));
   }
 
 
-  public Thread(java.lang.String name, Datum thunk) throws Exceptionf {
+  public Thread(String name, Datum thunk) throws Exceptionf {
     if(!(thunk instanceof Callable)) 
-      throw new Exceptionf("escm.type.Thread %s can't be created with non-callable: %s", name, thunk.profile());
+      throw new Exceptionf("escm.type.concurrent.Thread %s can't be created with non-callable: %s", name, thunk.profile());
     initializeValues(name,thunk);
   }
 
@@ -187,24 +189,24 @@ public class Thread extends Datum {
 
   public Thread(Datum thunk) throws Exceptionf {
     if(!(thunk instanceof Callable)) 
-      throw new Exceptionf("escm.type.Thread can't be created with non-callable: %s", thunk.profile());
+      throw new Exceptionf("escm.type.concurrent.Thread can't be created with non-callable: %s", thunk.profile());
     initializeValues(thunk);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Defining a Variable in the Dynamic Environment
-  public void define(java.lang.String name, Datum value) throws Exception {
+  public void define(String name, Datum value) throws Exception {
     thread.dynamicEnvironment.define(name,value);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Setting a Variable in the Dynamic Environment
-  public void set(java.lang.String name, Datum value) throws Exception {
+  public void set(String name, Datum value) throws Exception {
     if(!thread.dynamicEnvironment.has(name)) {
       if(!GlobalState.metaThreadDynamicEnvironment.has(name)) 
-        throw new Exceptionf("Variable %s doesn't exist in escm.type.Thread \"%s\"'s dynamic environment!", getName());
+        throw new Exceptionf("Variable %s doesn't exist in escm.type.concurrent.Thread \"%s\"'s dynamic environment!", getName());
       thread.dynamicEnvironment.define(name,value);
     } else {
       thread.dynamicEnvironment.set(name,value);
@@ -214,10 +216,10 @@ public class Thread extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Getting a Variable from the Dynamic Environment
-  public Datum get(java.lang.String name) throws Exception {
+  public Datum get(String name) throws Exception {
     if(!thread.dynamicEnvironment.has(name)) {
       if(!GlobalState.metaThreadDynamicEnvironment.has(name)) 
-        throw new Exceptionf("Variable %s doesn't exist in escm.type.Thread \"%s\"'s dynamic environment!", getName());
+        throw new Exceptionf("Variable %s doesn't exist in escm.type.concurrent.Thread \"%s\"'s dynamic environment!", getName());
       Datum cachedCopy = GlobalState.metaThreadDynamicEnvironment.get(name).copy();
       thread.dynamicEnvironment.define(name,cachedCopy);
       return cachedCopy;
@@ -236,7 +238,7 @@ public class Thread extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Type
-  public java.lang.String type() {
+  public String type() {
     return "thread";
   }
 
@@ -268,15 +270,15 @@ public class Thread extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
-  public java.lang.String display() {
+  public String display() {
     return "#<thread " + thread.getName() + ">";
   }
 
-  public java.lang.String write() {
+  public String write() {
     return display();
   }
 
-  public java.lang.String pprint() {
+  public String pprint() {
     return write();
   }
 
@@ -290,7 +292,7 @@ public class Thread extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Thread loadWithName(java.lang.String name) throws Exception {
+  public Thread loadWithName(String name) throws Exception {
     return this;
   }
 
