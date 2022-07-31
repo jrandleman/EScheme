@@ -5,9 +5,6 @@
 
 
 
-- CONSIDER NEW COMMAND-LINE FLAGS: `-e`, `--eval` (interpret the rest of the command line, dump result to STDOUT, terminate escm)
-  * equivalent to launching REPL, evaling the code, then calling `(exit)`
-
 
 - PRIMITIVE TO GET CURRENT DATE/TIME WITH OFFSETS
   * ADD TO `primitives.md` AND `help`
