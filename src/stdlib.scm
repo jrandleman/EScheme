@@ -29,7 +29,6 @@
 ;   - while
 ;   - do
 ;   - -<>
-;
 ;   - curry
 ;
 ;   - *dosync-lock*
