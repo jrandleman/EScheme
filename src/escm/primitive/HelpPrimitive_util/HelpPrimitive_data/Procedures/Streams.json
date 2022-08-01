@@ -218,7 +218,7 @@
   "name": "stream-iterate",
   "aliases": null,
   "signatures": ["(stream-iterate <update-callable> <seed>)"],
-  "description": "Generate a new stream by starting with <seed> and updating it with\n<update-callable>. Executes lazily.",
+  "description": "Generate an infinite stream by starting with <seed> and updating it\nwith <update-callable>. Executes lazily.",
   "example": null
 }, {
   "name": "stream-constant",
