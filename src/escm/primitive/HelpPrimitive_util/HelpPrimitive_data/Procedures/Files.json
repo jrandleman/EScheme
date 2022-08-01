@@ -6,7 +6,7 @@
   "example": null
 }, {
   "name": "file-read-string",
-  "aliases": ["file-read-str"],
+  "aliases": null,
   "signatures": ["(file-read-string <file-path-str>)"],
   "description": "Get the contents of <file-path-str> as a string.",
   "example": null

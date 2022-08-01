@@ -30,7 +30,7 @@
   "example": null
 }, {
   "name": "read-string",
-  "aliases": ["read-str"],
+  "aliases": null,
   "signatures": ["(read-string <str>)"],
   "description": "Read an EScheme datum from the string. Returns a pair:\n  (cons <read-datum> <str-w/o-serialized-read-datum>)",
   "example": null

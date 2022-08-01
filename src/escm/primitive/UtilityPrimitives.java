@@ -4,12 +4,14 @@
 
 package escm.primitive;
 import java.util.ArrayList;
+import java.util.Calendar;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Void;
 import escm.type.Boolean;
 import escm.type.Symbol;
+import escm.type.number.Exact;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.primitive.UtilityPrimitives_util.ContinuationProcedure;
@@ -334,6 +336,30 @@ public class UtilityPrimitives {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(raise <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
       return logic(parameters.get(0),continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // time
+  public static class Time implements PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "time";
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(time <callable> <arg> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
+      Datum callable = parameters.get(0);
+      if(!(callable instanceof Callable))
+        throw new Exceptionf("'(time <callable> <arg> ...) invalid non-callable 1st arg: %s", Exceptionf.profileArgs(parameters));
+      ArrayList<Datum> args = new ArrayList<Datum>(parameters);
+      args.remove(0);
+      long start = Calendar.getInstance().getTimeInMillis();
+      return ((Callable)callable).callWith(args,(result) -> () -> {
+        long end = Calendar.getInstance().getTimeInMillis();
+        return continuation.run(new Pair(new Exact(end-start),result));
+      });
     }
   }
 }

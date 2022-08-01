@@ -2,10 +2,6 @@
 
 ## MORE
 
-
-- PRIMITIVE TO GET CURRENT DATE/TIME WITH OFFSETS
-  * ADD TO `primitives.md` AND `help`
-
 - VECTORS `(vector )` -- MUST USE ONE OF JAVA'S THREAD-SAFE DATA STRUCTS UNDER THE HOOD
 - HASH MAPS `(hashmap )` -- MUST USE ONE OF JAVA'S THREAD-SAFE DATA STRUCTS UNDER THE HOOD
 
@@ -15,11 +11,13 @@
 
 - ADD CSV SUPPORT PRIMITIVES
 
-- STRING FORMATTING PROCEDURES `displayf`, `writef`, `stringf`, `pprintf` (`pretty-printf`)
+- STRING FORMATTING PROCEDURES `displayf`, `writef`, `stringf`, `pprintf` (`pretty-printf`), `(stringf )`
+  => ACCOUNT FOR THIS IN THE `error` PROCEDURE
 
 - A CHARACTER TYPE ???
 
 - MORE STREAM PRIMITIVES
+  => EXTEND PROCS LIKE `stream-map` TO ACCEPT MULTIPLE STREAMS !!!
 
 
 
@@ -97,6 +95,22 @@
             :input-port ; ONCE IMPLEMENTED
             :output-port ; ONCE IMPLEMENTED
             ```
+
+
+
+
+
+
+
+
+
+
+- AFTER RUNTIME TYPING, CONSIDER RUNTIME ACCESS MODIFIERS FOR OBJECTS (NOTE THAT `:public` MUST BE ___FAST___ !!!)
+
+
+
+
+
 
 
 

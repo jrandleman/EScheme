@@ -64,4 +64,10 @@
   "signatures": ["(help)", "(help <symbol>)", "(help <obj>)"],
   "description": "Our obligatory meta entry!\nNo Arguments:\n  Launch the interactive help menu.\nSymbol Argument:\n  Query for <symbol>'s help entry.\nObj Argument:\n  Get information about <obj>.",
   "example": null
+}, {
+  "name": "time",
+  "aliases": null,
+  "signatures": ["(time <callable> <arg> ...)"],
+  "description": "Returns a pair after applying <callable> to \"<arg> ...\":\n  (<execution-time-in-milliseconds> . <result>)",
+  "example": null
 }]

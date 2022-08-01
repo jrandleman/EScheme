@@ -1,6 +1,6 @@
 [{
   "name": "typeof",
-  "aliases": ["typename","type-of","type-name"],
+  "aliases": ["typename"],
   "signatures": ["(typeof <obj>)"],
   "description": "Returns <obj>'s type name as a symbol.",
   "example": null

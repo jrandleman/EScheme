@@ -42,7 +42,7 @@
   "example": null
 }, {
   "name": "for-each",
-  "aliases": ["foreach"],
+  "aliases": null,
   "signatures": ["(for-each <callable> <list> ...)"],
   "description": "Applies <callable> to each item in \"<list> ...\".",
   "example": null
@@ -78,7 +78,7 @@
   "example": null
 }, {
   "name": "sublist",
-  "aliases": ["sub-list"],
+  "aliases": null,
   "signatures": ["(sublist <list> <index-num>)", "(sublist <list> <index-num> <length-num>)"],
   "description": "Returns a sublist from <list> starting at <index-num> and spanning\n<length-num> items (defaults to end of <list>).",
   "example": null

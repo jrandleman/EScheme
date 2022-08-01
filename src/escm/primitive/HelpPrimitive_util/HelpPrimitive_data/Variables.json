@@ -30,7 +30,7 @@
   "example": null
 }, {
   "name": "*os-architecture*",
-  "aliases": ["os-arch", "*os-arch*"],
+  "aliases": ["os-arch", "*os-arch*", "os-architecture"],
   "signatures": null,
   "description": "String of the host operating system's architecture.",
   "example": null
@@ -42,7 +42,7 @@
   "example": null
 }, {
   "name": "*escm-execution-command*",
-  "aliases": ["escm-exec-command", "escm-exec-cmd", "escm-execution-cmd", "*escheme-exec-command*", "*escheme-exec-cmd*", "*escheme-execution-cmd*"],
+  "aliases": ["escm-execution-command", "escm-exec-command", "escm-exec-cmd", "escm-execution-cmd", "*escm-exec-command*", "*escm-exec-cmd*", "*escm-execution-cmd*"],
   "signatures": null,
   "description": "Execution command to run EScheme on the host machine. For example,\nthe below would run \"script.scm\" in a seperate process:\n  (system (string-append *escm-execution-command* \"script.scm\"))",
   "example": null

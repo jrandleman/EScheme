@@ -1,6 +1,6 @@
 [{
   "name": "meta-object",
-  "aliases": ["metaobject", "meta-obj", "metaobj", "object"],
+  "aliases": ["metaobject", "object"],
   "signatures": null,
   "description": "Super type of objects, classes, and interfaces.\nRefers to any entity that supports dot-notation to access a property.",
   "example": null

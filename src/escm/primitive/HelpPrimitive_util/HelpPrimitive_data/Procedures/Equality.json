@@ -1,12 +1,12 @@
 [{
   "name": "eq?",
-  "aliases": ["eq"],
+  "aliases": null,
   "signatures": ["(eq? <obj> <obj> ...)"],
   "description": "Determines shallow (pointer) equality for objects that maintain state.",
   "example": null
 }, {
   "name": "equal?",
-  "aliases": ["equal"],
+  "aliases": null,
   "signatures": ["(equal? <obj> <obj> ...)"],
   "description": "Determines deep (value) equality for objects.",
   "example": null

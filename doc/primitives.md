@@ -395,6 +395,8 @@
 
 (with-exception-handler <unary-callable-handler> <callable-thunk>)
 (raise <obj>)
+
+(time <callable> <arg> ...) ; (<time-taken-in-milliseconds> . <result>)
 ```
 
 
@@ -533,4 +535,19 @@
 (oo-super <class-or-object>)  ; returns the super obj
 (oo-interfaces <meta-object>) ; returns list of interface objs
 (oo-properties <meta-object>) ; returns list of name symbols (and-for classes and interfaces-whether they're static or not)
+```
+
+
+------------------------
+## Date-Time:
+```scheme
+(current-time) ; (<hour> <minute> <second> <millisecond>)
+(current-date) ; (<year> <month> <day>)
+
+(epoch-time) ; the current number of milliseconds from the epoch
+
+(time-zone) ; time zone name as a string (#f if unknown)
+(day)       ; name of the current week-day as a string (#f if unknown)
+(month)     ; name of the current month as a string (#f if unknown)
+(year)      ; number of the current year as a string (#f if unknown)
 ```
