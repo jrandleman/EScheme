@@ -24,16 +24,16 @@ import escm.vm.runtime.EscmThread;
 
 public class UtilityPrimitives {
   ////////////////////////////////////////////////////////////////////////////
-  // not
-  public static class Not implements Primitive {
+  // typeof
+  public static class Typeof implements Primitive {
     public java.lang.String escmName() {
-      return "not";
+      return "typeof";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
-        throw new Exceptionf("'(not <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(!parameters.get(0).isTruthy());
+        throw new Exceptionf("'(typeof <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return new Symbol(parameters.get(0).type());
     }
   }
 

@@ -133,6 +133,8 @@
 (read <optional-input-port>)
 (read-string <str>) ; returns a pair: (cons <read-datum> <str-without-serialized-read-datum>)
 (read-line <optional-input-port>)
+
+(eof? <obj>)
 ```
 
 
@@ -290,16 +292,6 @@
 
 
 ------------------------
-## Type Predicates:
-```scheme
-(typeof <obj>) ; returns a symbol of obj's typename
-(void? <obj>)
-(boolean? <obj>)
-(eof? <obj>)
-```
-
-
-------------------------
 ## Type Coercions:
 ```scheme
 (number->string <num> <optional-radix>)
@@ -316,6 +308,7 @@
 
 (write-to-string <obj>)
 (display-to-string <obj>)
+(pretty-print-to-string <obj>)
 ```
 
 
@@ -380,11 +373,29 @@
 
 
 ------------------------
+## Booleans:
+```scheme
+(boolean? <obj>)
+(not <obj>)
+```
+
+
+------------------------
+## Void:
+```scheme
+(void? <obj>)
+```
+
+
+------------------------
 ## Utilities:
 ```scheme
-(not <obj>)
+(typeof <obj>) ; returns a symbol of obj's typename
+
 (error <reason> <arg> ...)
+
 (copy <obj>)
+
 (force <delayed-expression>)
 
 (call-with-current-continuation <unary-callable>) ; aliased by <call/cc>

@@ -3,19 +3,8 @@
 ## MORE
 
 
-
 - VECTORS `(vector )` -- MUST USE ONE OF JAVA'S THREAD-SAFE DATA STRUCTS UNDER THE HOOD
 
-<!-- 
-  => CONSIDER IMPACT OF HAVING BOTH IMMUTABLE `vector` WITH READER `[]` SUPPORT, AND A MUTABLE `mutable-vector` W/O READER SUPPORT  
-     * `(vector->mutable-vector <vector>)` `(mutable-vector->vector <vector>)`
-
-       * OR HAVE THE ONLY WAY TO GET A MUTABLE VECTOR BE `(vector->mutable <vector>)` `(mutable->vector <mutable-vector>)`
-
-     => THEN COULD ALSO HAVE `hashmap`, `{}` AND `mutmap`
-
-       * OR HAVE THE ONLY WAY TO GET A MUTABLE MAP BE `(hashmap->mutable <hashmap>)` `(mutable->hashmap <mutable-hashmap>)`
- -->
 
 ```java
 synchronized(vector) {
@@ -24,6 +13,39 @@ synchronized(vector) {
 ```
 
   * CONSIDER `[]` SYNTAX (ACCOUNT FOR IN READER & `quasiquote`)
+
+
+  * NOTE: `[]` and `{}` reader syntax creates an immutable vector and hashmap. Manipulate these via `builder` equivalents.
+
+
+```
+(list-builder <seed-vector>)    ; <key> is an index!
+(vector-builder <seed-vector>)  ; <key> is an index!
+(string-builder <seed-string>)  ; <key> is an index! <val> is a string (<key> will refer to a single-char substring)
+(hashmap-builder <seed-string>) ; <key> is an obj!
+
+(builder-append! <builder> <appended-builder> ...)
+(builder-insert! <builder> <key> <elt>)
+(builder-delete! <builder> <key>) ; returns success status
+
+(builder-key <builder> <elt> <optional-default-value>) ; returns index if <elt> in <builder>, else reutrns <optional-default-value> (or triggers error if none given)
+(builder-value <builder> <key>) ; value of the key
+
+(builder-key? <builder> <key>)
+(builder-value? <builder> <value>)
+
+(builder-length <builder>)
+
+(builder->value <builder>) ; convert internal builder to a value (actual list/vector/string/hashmap)
+
+(builder? <obj>)
+(list-builder? <obj>)
+(vector-builder? <obj>)
+(string-builder? <obj>)
+(hashmap-builder? <obj>)
+```
+
+
 
 
 
@@ -132,6 +154,12 @@ vector?   vector-empty?
             :vector ; ONCE IMPLEMENTED
             :hashmap ; ONCE IMPLEMENTED
 
+            :builder ; ONCE IMPLEMENTED
+            :list-builder ; ONCE IMPLEMENTED
+            :vector-builder ; ONCE IMPLEMENTED
+            :string-builder ; ONCE IMPLEMENTED
+            :hashmap-builder ; ONCE IMPLEMENTED
+
             :thread
             :mutex
 
@@ -149,9 +177,9 @@ vector?   vector-empty?
             :class
             :interface
 
-            :port ; ONCE IMPLEMENTED
-            :input-port ; ONCE IMPLEMENTED
-            :output-port ; ONCE IMPLEMENTED
+            :port
+            :input-port
+            :output-port
             ```
 
 
@@ -171,7 +199,7 @@ vector?   vector-empty?
 
 
 
-
+- LOGIC PROGRAMMING FUNCTIONS ???
 
 - NETWORKING PRIMITIVES
 

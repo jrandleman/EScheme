@@ -9,8 +9,10 @@ import java.io.InputStreamReader;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
+import escm.type.Boolean;
 import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
+import escm.type.port.Eof;
 import escm.util.Exceptionf;
 import escm.vm.type.Primitive;
 import escm.vm.runtime.GlobalState;
@@ -203,6 +205,21 @@ public class IOPrimitives {
       String line = port.readLine();
       if(line == null) return escm.type.port.Eof.VALUE; // EOF in a <read> call yields an #eof
       return new escm.type.String(line);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // eof?
+  public static class IsEof implements Primitive {
+    public java.lang.String escmName() {
+      return "eof?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1) 
+        throw new Exceptionf("'(eof? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(parameters.get(0) instanceof Eof);
     }
   }
 }

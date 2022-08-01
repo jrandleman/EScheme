@@ -58,4 +58,10 @@
   "signatures": ["(display-to-string <obj>)"],
   "description": "Serialize <obj> in human-readable form.",
   "example": null
+}, {
+  "name": "pretty-print-to-string",
+  "aliases": ["pprint-to-string"],
+  "signatures": ["(pretty-print-to-string <obj>)"],
+  "description": "Serialize <obj> in indented, machine-readable form.\nAliased by <pprint-to-string>.",
+  "example": null
 }]

@@ -40,4 +40,10 @@
   "signatures": ["(read-line)", "(read-line <input-port>)"],
   "description": "Read a line of text as a string from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.",
   "example": null
+}, {
+  "name": "eof?",
+  "aliases": null,
+  "signatures": ["(eof? <obj>)"],
+  "description": "Returns whether <obj> is the #eof object.",
+  "example": null
 }]

@@ -23,17 +23,17 @@ import escm.vm.type.ExecutionState;
 public class EscmObject extends MetaObject implements Callable {
   ////////////////////////////////////////////////////////////////////////////
   // Class
-  private EscmClass prototypeClass = null;
+  private EscmClass superClass = null;
 
   public EscmClass getEscmClass() {
-    return prototypeClass;
+    return superClass;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Interfaces Implemented
   public ArrayList<EscmInterface> getEscmInterfaces() {
-    return prototypeClass.getEscmInterfaces();
+    return superClass.getEscmInterfaces();
   }
 
 
@@ -50,11 +50,11 @@ public class EscmObject extends MetaObject implements Callable {
   // Constructor
   // @PRECONDITION: <superObject> MUST ALREADY BE INITIALIZED!
   // @PRECONDITION: <props> MUST HAVE <self> AND <super> BOUND TO METHODS EXTERNALLY
-  public EscmObject(EscmClass prototypeClass, EscmObject superObject, ConcurrentHashMap<String,Datum> props) {
-    this.prototypeClass = prototypeClass;
+  public EscmObject(EscmClass superClass, EscmObject superObject, ConcurrentHashMap<String,Datum> props) {
+    this.superClass = superClass;
     this.superObject = superObject;
     this.props = props;
-    this.props.put("class",this.prototypeClass);
+    this.props.put("class",this.superClass);
   }
 
 
@@ -62,10 +62,10 @@ public class EscmObject extends MetaObject implements Callable {
   // Functor Logic (Application Overload)
   public Trampoline.Bounce callWith(ArrayList<Datum> args, Trampoline.Continuation continuation) throws Exception {
     if(!has("->procedure"))
-      throw new Exceptionf("Object of class %s error: can't be applied without an \"->procedure\" method!", prototypeClass.readableName());
+      throw new Exceptionf("Object of class %s error: can't be applied without an \"->procedure\" method!", superClass.readableName());
     Datum procedure = get("->procedure");
     if(!(procedure instanceof CompoundProcedure))
-      throw new Exceptionf("Object of class %s error: \"->procedure\" property %s isn't a method!", prototypeClass.readableName(),procedure.profile());
+      throw new Exceptionf("Object of class %s error: \"->procedure\" property %s isn't a method!", superClass.readableName(),procedure.profile());
     return ((CompoundProcedure)procedure).loadWithSelf(this).callWith(args,continuation);
   }
 
@@ -81,8 +81,8 @@ public class EscmObject extends MetaObject implements Callable {
   // Update the Super Object (& return the updated super) (equivalent to the "super!" macro)
   public Trampoline.Bounce updateSuper(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
     if(superObject == null)
-      throw new Exceptionf("'super! class %s doesn't have a <super> to initialize!", prototypeClass.readableName());
-    return superObject.prototypeClass.callWith(parameters,(newSuperObj) -> () -> {
+      throw new Exceptionf("'super! class %s doesn't have a <super> to initialize!", superClass.readableName());
+    return superObject.superClass.callWith(parameters,(newSuperObj) -> () -> {
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // @NOTE: This is ONLY thread safe if the user ONLY uses <super!> as the 
@@ -109,7 +109,7 @@ public class EscmObject extends MetaObject implements Callable {
   public boolean instanceOf(EscmInterface i) {
     EscmObject obj = this;
     while(obj != null) {
-      ArrayList<EscmInterface> interfaces = obj.prototypeClass.getEscmInterfaces();
+      ArrayList<EscmInterface> interfaces = obj.superClass.getEscmInterfaces();
       if(interfaces.contains(i)) return true;
       for(EscmInterface iface : interfaces) {
         if(interfaceImplementsInterface(iface,i)) return true;
@@ -123,7 +123,7 @@ public class EscmObject extends MetaObject implements Callable {
   public boolean instanceOf(EscmClass c) {
     EscmObject obj = this;
     while(obj != null) {
-      if(obj.prototypeClass == c) return true;
+      if(obj.superClass == c) return true;
       obj = obj.superObject;
     }
     return false;
@@ -144,7 +144,7 @@ public class EscmObject extends MetaObject implements Callable {
   }
 
   public boolean equals(Object o) {
-    if(!(o instanceof EscmObject) || ((EscmObject)o).prototypeClass != prototypeClass) return false;
+    if(!(o instanceof EscmObject) || ((EscmObject)o).superClass != superClass) return false;
     EscmObject that = (EscmObject)o;
     // Check Equality of Props
     if(this.props.size() != that.props.size()) return false;
@@ -225,8 +225,8 @@ public class EscmObject extends MetaObject implements Callable {
   ////////////////////////////////////////////////////////////////////////////
   // Copying
   // <ignore> is used to distinguish this ctor from the above public one
-  private EscmObject(int ignore, EscmClass prototypeClass, EscmObject superObject, ConcurrentHashMap<String,Datum> props) {
-    this.prototypeClass = prototypeClass;
+  private EscmObject(int ignore, EscmClass superClass, EscmObject superObject, ConcurrentHashMap<String,Datum> props) {
+    this.superClass = superClass;
     if(superObject == null) {
       this.superObject = null;
     } else {
@@ -243,9 +243,8 @@ public class EscmObject extends MetaObject implements Callable {
   }
 
 
-  // PRECONDITION: <this> IS THE RESULT OF A CALL TO <loadWithState()>
   public EscmObject copy() {
     // NOTE: EscmClass.copy() reflects <this>, so the ".class" member is unnaffected!
-    return new EscmObject(0,prototypeClass,superObject,MetaObject.copyProps(props));
+    return new EscmObject(0,superClass,superObject,MetaObject.copyProps(props));
   }
 }

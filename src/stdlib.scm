@@ -40,6 +40,7 @@
 ;   - call/cc [alias]
 ;
 ;   - pprint [alias]
+;   - pprint-to-string [alias]
 ;
 ;   - thread-define
 ;   - thread-set!
@@ -829,8 +830,10 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Aliasing <pretty-print>
+;; Aliasing <pretty-print> & <pretty-print-to-string>
 (define pprint pretty-print)
+
+(define pprint-to-string pretty-print-to-string)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

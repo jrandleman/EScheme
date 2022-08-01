@@ -1,8 +1,8 @@
 [{
-  "name": "not",
-  "aliases": null,
-  "signatures": ["(not <obj>)"],
-  "description": "Returns #t if <obj> is #f, otherwise #t.",
+  "name": "typeof",
+  "aliases": ["typename"],
+  "signatures": ["(typeof <obj>)"],
+  "description": "Returns <obj>'s type name as a symbol.",
   "example": null
 }, {
   "name": "error",

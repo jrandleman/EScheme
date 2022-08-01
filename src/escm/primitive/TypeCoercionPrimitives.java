@@ -199,4 +199,19 @@ public class TypeCoercionPrimitives {
       return new escm.type.String(parameters.get(0).display());
     }
   }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // pretty-print-to-string
+  public static class PrettyPrintToString implements Primitive {
+    public java.lang.String escmName() {
+      return "pretty-print-to-string";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1) 
+        throw new Exceptionf("'(pretty-print-to-string <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return new escm.type.String(parameters.get(0).pprint());
+    }
+  }
 }
