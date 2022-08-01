@@ -3,8 +3,48 @@
 ## MORE
 
 
-- VECTORS `(vector )` -- MUST USE ONE OF JAVA'S THREAD-SAFE DATA STRUCTS UNDER THE HOOD
+- IMMUTABLE VECTORS `(vector )`
+  * CONSIDER `[]` SYNTAX (ACCOUNT FOR IN READER & `quasiquote`)
 
+
+- IMMUTABLE HASHMAPS `(hashmap )`
+  * CONSIDER `{}` SYNTAX (ACCOUNT FOR IN READER & `quasiquote`)
+  * add to README as a Scheme extension (under the `keyword` section)
+
+
+- UPDATE THE READER & INPUT-PORT ACCORDINLY !!!
+
+
+
+- ADD PRIMTIIVES & UPDATE `primitives.md` & `help`
+
+- ALSO LOOK INTO `string` PRIMITIVES FOR INSPIRATION IN ADDITION TO THE BELOW !!!
+
+- ALSO LOOK INTO HEIST'S PRIMITIVES FOR INSPIRATION IN ADDITION TO THE BELOW !!!
+
+```scheme
+vector   vector-append          vector-length   vector-reverse     
+vector-map     vector-filter  vector-for-each
+vector-ref             subvector             vector-sort     vector-sorted?     
+vector?   vector-empty?
+
+(vector-has? <vector> <obj>)
+```
+
+
+
+
+
+
+
+
+
+  * NOTE: BUILDERS ___MUST___ BE THREAD-SAFE !!!
+
+  * MENTION THE "BUILDER" CONCEPT UNDER SECTION 5 OF THE README'S "SCHEME DEVIATIONS" SECTION. EXTEND "IMMUTABLE CORE" TYPES TO INCLUDE HASHMAPS AND VECTORS
+    - explain `[]` and `{}` reader syntax creates an immutable vector and hashmap. Mutated via `builder` equivalents.
+    - mention it as a mutable alternative to the immutable other types.
+    - note that `eq?` is used for `builder-key?` & `builder-value?`
 
 ```java
 synchronized(vector) {
@@ -12,14 +52,9 @@ synchronized(vector) {
 }
 ```
 
-  * CONSIDER `[]` SYNTAX (ACCOUNT FOR IN READER & `quasiquote`)
-
-
-  * NOTE: `[]` and `{}` reader syntax creates an immutable vector and hashmap. Manipulate these via `builder` equivalents.
-
 
 ```
-(list-builder <seed-vector>)    ; <key> is an index!
+(list-builder <seed-vector>)    ; <key> is an index! [[[ should use a vector builder under the hood, with the only things changes being the ctor & '->value procedures ]]]
 (vector-builder <seed-vector>)  ; <key> is an index!
 (string-builder <seed-string>)  ; <key> is an index! <val> is a string (<key> will refer to a single-char substring)
 (hashmap-builder <seed-string>) ; <key> is an obj!
@@ -49,33 +84,10 @@ synchronized(vector) {
 
 
 
-- ADD PRIMTIIVES & UPDATE `primitives.md` & `help`
-
-- ALSO LOOK INTO `string` PRIMITIVES FOR INSPIRATION IN ADDITION TO THE BELOW !!!
-
-- ALSO LOOK INTO HEIST'S PRIMITIVES FOR INSPIRATION IN ADDITION TO THE BELOW !!!
-
-```scheme
-vector   vector-append          vector-length   vector-reverse     
-vector-map     vector-filter  vector-for-each        vector-fold     vector-fold-right  
-vector-ref             vector-subvector             vector-sort     vector-sorted?     
-vector?   vector-empty?
-
-(vector-insert! <vector> <optional-idx> <obj>) ; dflt to push
-(vector-remove! <vector> <optional-idx> <obj>) ; dflt to pop
-(vector-has? <vector> <obj>)
-
-(vector-grow! <vector> <number-elts-to-grow-by>)
-```
 
 
 
 
-
-
-
-
-- HASH MAPS `(hashmap )` -- MUST USE ONE OF JAVA'S THREAD-SAFE DATA STRUCTS UNDER THE HOOD
 
 - ADD JSON SUPPORT PRIMITIVES
   => `json->scm`, `scm->json`, `object->json`, `json-datum?`, `json-string?`
@@ -86,15 +98,14 @@ vector?   vector-empty?
 - STRING FORMATTING PROCEDURES `displayf`, `writef`, `stringf`, `pprintf` (`pretty-printf`), `(stringf )`
   => ACCOUNT FOR THIS IN THE `error` PROCEDURE
 
-- A CHARACTER TYPE ???
 
 
 
 
 
 
-
-- GENERATE DOCUMENTATION AUTOMATICALLY VIA THE `help` ENTRIES !!!
+- GENERATE DETAILED DOCUMENTION FOR `README.md` AUTOMATICALLY VIA THE `help` ENTRIES !!!
+  * should also generate internal links correctly !!!
 
 
 
