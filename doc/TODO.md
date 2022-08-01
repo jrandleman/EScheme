@@ -6,6 +6,17 @@
 
 - VECTORS `(vector )` -- MUST USE ONE OF JAVA'S THREAD-SAFE DATA STRUCTS UNDER THE HOOD
 
+<!-- 
+  => CONSIDER IMPACT OF HAVING BOTH IMMUTABLE `vector` WITH READER `[]` SUPPORT, AND A MUTABLE `mutable-vector` W/O READER SUPPORT  
+     * `(vector->mutable-vector <vector>)` `(mutable-vector->vector <vector>)`
+
+       * OR HAVE THE ONLY WAY TO GET A MUTABLE VECTOR BE `(vector->mutable <vector>)` `(mutable->vector <mutable-vector>)`
+
+     => THEN COULD ALSO HAVE `hashmap`, `{}` AND `mutmap`
+
+       * OR HAVE THE ONLY WAY TO GET A MUTABLE MAP BE `(hashmap->mutable <hashmap>)` `(mutable->hashmap <mutable-hashmap>)`
+ -->
+
 ```java
 synchronized(vector) {
   if(vector.size() > 0) return vector.get(0); // wrap in <sync> to avoid race condition of .size() and .get() !!!
@@ -14,11 +25,15 @@ synchronized(vector) {
 
   * CONSIDER `[]` SYNTAX (ACCOUNT FOR IN READER & `quasiquote`)
 
+
+
 - ADD PRIMTIIVES & UPDATE `primitives.md` & `help`
 
-- ___CONSIDER GENERIC ALGORITHMS ???___
+- ALSO LOOK INTO `string` PRIMITIVES FOR INSPIRATION IN ADDITION TO THE BELOW !!!
 
-```
+- ALSO LOOK INTO HEIST'S PRIMITIVES FOR INSPIRATION IN ADDITION TO THE BELOW !!!
+
+```scheme
 vector   vector-append          vector-length   vector-reverse     
 vector-map     vector-filter  vector-for-each        vector-fold     vector-fold-right  
 vector-ref             vector-subvector             vector-sort     vector-sorted?     
@@ -27,6 +42,8 @@ vector?   vector-empty?
 (vector-insert! <vector> <optional-idx> <obj>) ; dflt to push
 (vector-remove! <vector> <optional-idx> <obj>) ; dflt to pop
 (vector-has? <vector> <obj>)
+
+(vector-grow! <vector> <number-elts-to-grow-by>)
 ```
 
 
