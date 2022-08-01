@@ -81,25 +81,26 @@
 
 
 ------------------------------------------------------------------------------
-## EScheme-Specific Concepts (Scheme Extension/Deviations)
+## EScheme-Specific Concepts (Scheme Extensions/Deviations)
 
-1. Support for `bytecode`, `compile`, `eval-bytecode`
+1. Stackless function calls (no stack overflow from recursion)
+2. Support for `bytecode`, `compile`, `eval-bytecode`
    - `bytecode`: special form to have the compiler reflect the given bytecode
    - `compile`: convert a quoted escm expression into a quoted bytecode list
    - `eval-bytecode`: evaluate the given quoted bytecode list in the global environment
      * Hence `eval` is equivalent to `(compose eval-bytecode compile)`!
-2. `#eof`, `#void`, `#nil` reader literals for their respective values
-3. Keyword primitive types
+3. `#eof`, `#void`, `#nil` reader literals for their respective values
+4. Keyword primitive types
    - Like symbols, but prefixed with `:`, & they always evaluate to themselves
-4. Immutable core strings & pairs:
+5. Immutable core strings & pairs:
    - Mutable `<pair>` alternative may be implemented by users via escm's object system
-5. `\` reader lambda literal support:
+6. `\` reader lambda literal support:
    - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
    - `\%1` => `(lambda (%1) %1)`, `\(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
-6. `(. <obj>)` is equivalent to `<obj>` for the reader
-7. Compile-time procedural macro system:
+7. `(. <obj>)` is equivalent to `<obj>` for the reader
+8. Compile-time procedural macro system:
    - No run-time bindings, all global in scope, deletable for localization!
-8. Object System (classes, interfaces, and objects!)
-9. Multithreading Support (threads and reentrant locks!)
-10. Multi-arity and optional-parameter support via `fn`
-11. No `eqv?`, `memv`, or `assv`: only `eq?` and `equal?` are present.
+9. Object System (classes, interfaces, and objects!)
+10. Multithreading Support (threads and reentrant locks!)
+11. Multi-arity and optional-parameter support via `fn`
+12. No `eqv?`, `memv`, or `assv`: only `eq?` and `equal?` are present.
