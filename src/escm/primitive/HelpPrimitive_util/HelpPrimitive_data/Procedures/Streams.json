@@ -191,6 +191,12 @@
   "description": "Equivalent to: (scdr (scdr (scdr (scdr <stream-pair>))))",
   "example": null
 }, {
+  "name": "stream-ref",
+  "aliases": null,
+  "signatures": ["(stream-ref <stream> <index>)"],
+  "description": "Return the <index>th item in <stream>.",
+  "example": null
+}, {
   "name": "stream->list",
   "aliases": null,
   "signatures": ["(stream->list <stream> <list-length>)"],
@@ -199,8 +205,8 @@
 }, {
   "name": "stream-map",
   "aliases": null,
-  "signatures": ["(stream-map <callable> <stream>)"],
-  "description": "Generate a new stream by applying <callable> to each of the items in\n<stream>. Executes lazily.",
+  "signatures": ["(stream-map <callable> <stream> ...)"],
+  "description": "Generate a new stream by applying <callable> to each of the items in\n\"<stream> ...\". Executes lazily.",
   "example": null
 }, {
   "name": "stream-filter",
@@ -209,15 +215,33 @@
   "description": "Generate a new stream by filtering out items in <stream> that don't\nsatisfy <predicate?>. Executes lazily.",
   "example": null
 }, {
-  "name": "stream-ref",
+  "name": "stream-iterate",
   "aliases": null,
-  "signatures": ["(stream-ref <stream> <index>)"],
-  "description": "Return the <index>th item in <stream>.",
+  "signatures": ["(stream-iterate <update-callable> <seed>)"],
+  "description": "Generate a new stream by starting with <seed> and updating it with\n<update-callable>. Executes lazily.",
+  "example": null
+}, {
+  "name": "stream-constant",
+  "aliases": null,
+  "signatures": ["(stream-constant <obj> ...)"],
+  "description": "Return an infinite stream of \"<obj> ...\" repeating in a cycle. Executes lazily.",
+  "example": null
+}, {
+  "name": "stream-append",
+  "aliases": null,
+  "signatures": ["(stream-append <stream> ...)"],
+  "description": "Returns a new stream of \"<stream> ...\" appended to one another.",
+  "example": null
+}, {
+  "name": "stream-interleave",
+  "aliases": null,
+  "signatures": ["(stream-interleave <stream1> <stream2>)"],
+  "description": "Return a stream with the interleaved values of <stream1> and <stream2>.\nExecutes lazily.",
   "example": null
 }, {
   "name": "stream->generator",
   "aliases": null,
   "signatures": ["(stream->generator <stream>)"],
-  "description": "Return a thunk (nullary procedure) that, upon invocation, returns the\nnext item in the stream.",
+  "description": "Return a thunk (nullary procedure) that, upon invocation, returns the\nnext item in the stream.\nReturns <*generator-complete*> once at the end of the stream.",
   "example": null
 }]

@@ -49,10 +49,14 @@
 ;   - stream-pair?
 ;   - stream?
 ;   - sc**r ... sc****r
+;   - stream-ref
 ;   - stream->list
 ;   - stream-map
 ;   - stream-filter
-;   - stream-ref
+;   - stream-iterate
+;   - stream-constant
+;   - stream-append
+;   - stream-interleave
 ;   - stream->generator
 ;
 ;   - *generator-complete*
@@ -896,27 +900,59 @@
       (cons (scar s) (stream->list (scdr s) (- list-length 1)))
       (quote ())))
 
-(define (stream-map f s)
-  (if (null? s)
-      (quote ())
-      (scons (f (scar s))
-             (stream-map f (scdr s)))))
+(define (stream-ref s index)
+  (if (= 0 index)
+      (scar s)
+      (stream-ref (scdr s) (- index 1))))
+
+(define (stream-map callable . streams)
+    (define (stream-map streams)
+      (if (null? (car streams))
+          '()
+          (scons
+            (apply callable (map scar streams))
+            (stream-map (map scdr streams)))))
+    (stream-map streams))
 
 (define (stream-filter ? s)
   (cond ((null? s) (quote ()))
         ((? (scar s)) (scons (scar s) (stream-filter ? (scdr s))))
         (else (stream-filter ? (scdr s)))))
 
-(define (stream-ref s index)
-  (if (= 0 index)
-      (scar s)
-      (stream-ref (scdr s) (- index 1))))
+(define (stream-iterate update-callable seed)
+    (scons seed (stream-iterate update-callable (update-callable seed))))
+
+(define (stream-constant . objs)
+  (define (stream-constant obj-list)
+    (if (null? obj-list)
+        (stream-constant objs)
+        (scons (car obj-list) (stream-constant (cdr obj-list)))))
+  (if (null? objs)
+      '()
+      (stream-constant objs)))
+
+(define (stream-append s . streams)
+  (define (stream-append s streams)
+    (if (null? s)
+        (if (null? streams)
+            '()
+            (stream-append (car streams) (cdr streams)))
+        (scons (scar s) (stream-append (scdr s) streams))))
+  (if (null? streams) s (stream-append s streams)))
+
+(define (stream-interleave stream1 stream2)
+    (if (null? stream1)
+        stream2
+        (scons (scar stream1) (stream-interleave stream2 (scdr stream1)))))
 
 (define (stream->generator stream-obj)
   (define s (scons #f stream-obj))
   (lambda ()
-    (set! s (scdr s))
-    (scar s)))
+    (if (null? s)
+        *generator-complete*
+        (begin 
+          (set! s (scdr s))
+          (scar s)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

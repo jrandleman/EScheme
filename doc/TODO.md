@@ -2,7 +2,40 @@
 
 ## MORE
 
+
+
 - VECTORS `(vector )` -- MUST USE ONE OF JAVA'S THREAD-SAFE DATA STRUCTS UNDER THE HOOD
+
+```java
+synchronized(vector) {
+  if(vector.size() > 0) return vector.get(0); // wrap in <sync> to avoid race condition of .size() and .get() !!!
+}
+```
+
+  * CONSIDER `[]` SYNTAX (ACCOUNT FOR IN READER & `quasiquote`)
+
+- ADD PRIMTIIVES & UPDATE `primitives.md` & `help`
+
+- ___CONSIDER GENERIC ALGORITHMS ???___
+
+```
+vector   vector-append          vector-length   vector-reverse     
+vector-map     vector-filter  vector-for-each        vector-fold     vector-fold-right  
+vector-ref             vector-subvector             vector-sort     vector-sorted?     
+vector?   vector-empty?
+
+(vector-insert! <vector> <optional-idx> <obj>) ; dflt to push
+(vector-remove! <vector> <optional-idx> <obj>) ; dflt to pop
+(vector-has? <vector> <obj>)
+```
+
+
+
+
+
+
+
+
 - HASH MAPS `(hashmap )` -- MUST USE ONE OF JAVA'S THREAD-SAFE DATA STRUCTS UNDER THE HOOD
 
 - ADD JSON SUPPORT PRIMITIVES
@@ -16,8 +49,16 @@
 
 - A CHARACTER TYPE ???
 
-- MORE STREAM PRIMITIVES
-  => EXTEND PROCS LIKE `stream-map` TO ACCEPT MULTIPLE STREAMS !!!
+
+
+
+
+
+
+- GENERATE DOCUMENTATION AUTOMATICALLY VIA THE `help` ENTRIES !!!
+
+
+
 
 
 

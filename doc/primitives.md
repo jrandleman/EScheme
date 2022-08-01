@@ -433,14 +433,20 @@
 ------------------------
 ## Streams:
 ```scheme
-(scons <obj> <obj>)
 (stream-pair? <obj>)
 (stream? <obj>)
+
 (scar <stream-pair>) ... (scddddr <stream-pair>)
-(stream->list <stream> <list-length>)
-(stream-map <callable> <stream>)
-(stream-filter <predicate?> <stream>)
 (stream-ref <stream> <index>)
+
+(stream->list <stream> <list-length>)
+
+(stream-map <callable> <stream> ...)
+(stream-filter <predicate?> <stream>)
+(stream-iterate <update-callable> <seed>)
+(stream-constant <obj> ...)
+(stream-append <stream> ...)
+(stream-interleave <stream1> <stream2>)
 (stream->generator <stream>)
 ```
 
