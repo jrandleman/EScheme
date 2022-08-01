@@ -103,4 +103,4 @@
 9. Object System (classes, interfaces, and objects!)
 10. Multithreading Support (threads and reentrant locks!)
 11. Multi-arity and optional-parameter support via `fn`
-12. No `eqv?`, `memv`, or `assv`: only `eq?` and `equal?` are present.
+12. No `eqv?`: only `eq?` and `equal?` are present.
