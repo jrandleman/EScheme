@@ -93,7 +93,7 @@
 4. Keyword primitive types
    - Like symbols, but prefixed with `:`, & they always evaluate to themselves
 5. Vector literals have been reworked:
-   - Syntax uses `[<obj> ...]` instead of `#(<obj> ...)`
+   - Uses `[<obj> ...]` instead of `#(<obj> ...)`
    - Quotes aren't always required: 
      * `[a b c]` compiles to vector of `a`, `b`, & `c` evaluated as variables
    - Quotes can be used though to get expected results: 
