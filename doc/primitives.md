@@ -307,6 +307,8 @@
 (vector-pop-front! <vector>) ; returns the popped item
 
 (vector-append <vector> ...)
+(vector-append! <vector> <appended-vector> ...)
+
 (vector-reverse <vector>)
 (subvector <vector> <index> <optional-length>) ; defaults to the end fo the vector
 

@@ -284,6 +284,32 @@ public class VectorPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // vector-append!
+  public static class VectorAppendBang implements Primitive {
+    public java.lang.String escmName() {
+      return "vector-append!";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1)
+        throw new Exceptionf("'(vector-append! <vector> ...) expects at least 1 vector: %s", Exceptionf.profileArgs(parameters));
+      ArrayList<escm.type.Vector> appends = new ArrayList<escm.type.Vector>();
+      Datum appendedTo = parameters.get(0);
+      if(!(appendedTo instanceof escm.type.Vector))
+        throw new Exceptionf("'(vector-append! <vector> ...) invalid non-vector %s given: %s", appendedTo.profile(), Exceptionf.profileArgs(parameters));
+      for(int i = 1, n = parameters.size(); i < n; ++i) {
+        Datum d = parameters.get(i);
+        if(!(d instanceof escm.type.Vector))
+          throw new Exceptionf("'(vector-append! <vector> ...) invalid non-vector %s given: %s", d.profile(), Exceptionf.profileArgs(parameters));
+        appends.add((escm.type.Vector)d);
+      }
+      ((escm.type.Vector)appendedTo).pushAll(appends);
+      return Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // vector-reverse
   public static class VectorReverse implements Primitive {
     public java.lang.String escmName() {

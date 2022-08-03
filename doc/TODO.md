@@ -7,16 +7,40 @@
 
 
 
+___HASHMAP PRIMITIVES___
+```clj
+(hashmap <key> <value> ...)
+
+(hashmap-keys <hashmap>)
+(hashmap-values <hashmap>)
+
+(hashmap-key? <hashmap> <obj>)
+
+(hashmap-ref <hashmap> <key>) ; Equivalent to: (<hashmap> <key>)
+(hashmap-set! <hashmap> <key> <value>)
+(hashmap-delete! <hashmap> <key>)
+
+(hashmap-length <hashmap>)
+(hashmap-empty? <hashmap>)
+
+(hashmap-merge <hashmap> ...)
+(hashmap-merge! <hashmap> ...)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(hashmap->list <hashmap>)
+(list->hashmap <list>)
+
+(hashmap->vector <hashmap>)
+(vector->hashmap <vector>)
+```
 
 
 
 
 
 
-
-
-
-- IMMUTABLE HASHMAPS `(hashmap )`
+- HASHMAPS `(hashmap )`
   * CONSIDER `{}` SYNTAX (ACCOUNT FOR IN READER & `quasiquote`)
   * add to README as a Scheme extension (under the `keyword` section)
 

@@ -24,6 +24,7 @@
 //
 //      - void push(Datum d)
 //      - void pushFront(Datum d)
+//      - void pushAll(ArrayList<Vector> vects)
 //      - Datum pop()
 //      - Datum popFront()
 //
@@ -167,6 +168,12 @@ public class Vector extends Datum implements Callable {
 
   public void pushFront(Datum d) {
     value.insertElementAt(d,0);
+  }
+
+  public void pushAll(ArrayList<Vector> vects) {
+    synchronized(value) {
+      for(Vector v : vects) value.addAll(v.value);
+    }
   }
 
   public Datum pop() throws Exception {

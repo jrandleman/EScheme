@@ -83,6 +83,12 @@
   "description": "Create a new vector by appending \"<vector> ...\" to one another.",
   "example": null
 }, {
+  "name": "vector-append!",
+  "aliases": null,
+  "signatures": ["(vector-append! <vector> <appended-vector> ...)"],
+  "description": "Append \"<appended-vector> ...\" to <vector> (thereby mutating it).",
+  "example": null
+}, {
   "name": "vector-reverse",
   "aliases": null,
   "signatures": ["(vector-reverse <vector>)"],
