@@ -1,56 +1,62 @@
 
 
+(def (printf . d)
+    (for-each display d)
+    (newline))
 
 
 
+
+(newline)
+(newline)
 
 
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; ;; TESTING THREADS + CALL/CC
 
 
-(define *end* 26)
+; (define *end* 26)
 
 
-(define (fwrap)
+; (define (fwrap)
 
-  (define-generator (f1)
-    (let loop1 ((n 0))
-      (if (< n *end*)
-          (begin 
-            (dosync 
-              (display n) 
-              (newline))
-            (yield)
-            (loop1 (+ n 1))))))
+;   (define-generator (f1)
+;     (let loop1 ((n 0))
+;       (if (< n *end*)
+;           (begin 
+;             (dosync 
+;               (display n) 
+;               (newline))
+;             (yield)
+;             (loop1 (+ n 1))))))
 
-  (define-generator (f2)
-    (let loop2 ((n 0))
-      (if (< n *end*)
-          (begin 
-            (dosync 
-              (display (+ n 1000)) 
-              (newline))
-            (yield)
-            (loop2 (+ n 1))))))
+;   (define-generator (f2)
+;     (let loop2 ((n 0))
+;       (if (< n *end*)
+;           (begin 
+;             (dosync 
+;               (display (+ n 1000)) 
+;               (newline))
+;             (yield)
+;             (loop2 (+ n 1))))))
 
-  (define-generator (f3)
-    (let loop3 ((n 0))
-      (if (< n *end*)
-          (begin 
-            (dosync 
-              (write (number->string n)) 
-              (newline))
-            (yield)
-            (loop3 (+ n 1))))))
-
-
-  (complete-all-generators! (f1) (f2) (f3))
-
-)
+;   (define-generator (f3)
+;     (let loop3 ((n 0))
+;       (if (< n *end*)
+;           (begin 
+;             (dosync 
+;               (write (number->string n)) 
+;               (newline))
+;             (yield)
+;             (loop3 (+ n 1))))))
 
 
-(parallel fwrap fwrap fwrap)
+;   (complete-all-generators! (f1) (f2) (f3))
+
+; )
+
+
+; (parallel fwrap fwrap fwrap)
 
 
 

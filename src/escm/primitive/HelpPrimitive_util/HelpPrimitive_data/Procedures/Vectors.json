@@ -1,0 +1,139 @@
+[{
+  "name": "vector",
+  "aliases": null,
+  "signatures": ["(vector <obj> ...)"],
+  "description": "Construct a vector containing \"<obj> ...\".\nCreate vector literals via the [<item> ...] syntax.\nVectors are applicable to an index to get an entry: (<vector> <index>)",
+  "example": null
+}, {
+  "name": "make-vector",
+  "aliases": null,
+  "signatures": ["(make-vector <length> <fill-value>)"],
+  "description": "Construct a vector of <length> instances of <fill-value>.",
+  "example": null
+}, {
+  "name": "vector-length",
+  "aliases": null,
+  "signatures": ["(vector-length <vector>)"],
+  "description": "Returns the length of <vector>. Quite thrilling.",
+  "example": null
+}, {
+  "name": "vector-ref",
+  "aliases": null,
+  "signatures": ["(vector-ref <vector> <index>)"],
+  "description": "Returns the item in <vector> at <index>.\nCan also be achieved by applying <vector> to the <index>: (<vector> <index>)",
+  "example": null
+}, {
+  "name": "vector-set!",
+  "aliases": null,
+  "signatures": ["(vector-set! <vector> <index> <obj>)"],
+  "description": "Sets the entry at <index> in <vector> to be <obj>.",
+  "example": null
+}, {
+  "name": "vector-fill!",
+  "aliases": null,
+  "signatures": ["(vector-fill! <vector> <fill-value>)"],
+  "description": "Fill all of <vector> with <fill-value>.",
+  "example": null
+}, {
+  "name": "vector-grow!",
+  "aliases": null,
+  "signatures": ["(vector-grow! <vector> <length> <fill-value>)"],
+  "description": "Grow <vector> by <length> items set to <fill-value>.",
+  "example": null
+}, {
+  "name": "vector-insert!",
+  "aliases": null,
+  "signatures": ["(vector-insert! <vector> <index> <obj>)"],
+  "description": "Insert <obj> at <index> in <vector>, shifting back following items as needed.",
+  "example": null
+}, {
+  "name": "vector-delete!",
+  "aliases": null,
+  "signatures": ["(vector-delete! <vector> <index>)"],
+  "description": "Deletes the entry at <index> in <vector>. Returns the deleted item.",
+  "example": null
+}, {
+  "name": "vector-push!",
+  "aliases": null,
+  "signatures": ["(vector-push! <vector> <obj>)"],
+  "description": "Pushes <obj> to the back of <vector>.",
+  "example": null
+}, {
+  "name": "vector-push-front!",
+  "aliases": null,
+  "signatures": ["(vector-push-front! <vector> <obj>)"],
+  "description": "Pushes <obj> to the front of <vector>.",
+  "example": null
+}, {
+  "name": "vector-pop!",
+  "aliases": null,
+  "signatures": ["(vector-pop! <vector> <obj>)"],
+  "description": "Pops <obj> from the back of <vector>. Returns the popped item.",
+  "example": null
+}, {
+  "name": "vector-pop-front!",
+  "aliases": null,
+  "signatures": ["(vector-pop-front! <vector> <obj>)"],
+  "description": "Pops <obj> from the front of <vector>. Returns the popped item.",
+  "example": null
+}, {
+  "name": "vector-append",
+  "aliases": null,
+  "signatures": ["(vector-append <vector> ...)"],
+  "description": "Create a new vector by appending \"<vector> ...\" to one another.",
+  "example": null
+}, {
+  "name": "vector-reverse",
+  "aliases": null,
+  "signatures": ["(vector-reverse <vector>)"],
+  "description": "Get a reversed version of <vector>.",
+  "example": null
+}, {
+  "name": "subvector",
+  "aliases": null,
+  "signatures": ["(subvector <vector> <index> <optional-length>)"],
+  "description": "Returns a vector of the items in <vector> starting at <index> spanning <length>\nitems. Note that <length> will default to the end of <vector>.",
+  "example": null
+}, {
+  "name": "vector-memq",
+  "aliases": null,
+  "signatures": ["(vector-memq <vector> <obj>)"],
+  "description": "Returns the index of <obj> in <vector>, or #f if its missing.\nUses <eq?> for comparisons.",
+  "example": null
+}, {
+  "name": "vector-memv",
+  "aliases": null,
+  "signatures": ["(vector-memv <vector> <obj>)"],
+  "description": "Returns the index of <obj> in <vector>, or #f if its missing.\nUses <eqv?> for comparisons.",
+  "example": null
+}, {
+  "name": "vector-member",
+  "aliases": null,
+  "signatures": ["(vector-member <vector> <obj>)"],
+  "description": "Returns the index of <obj> in <vector>, or #f if its missing.\nUses <equal?> for comparisons.",
+  "example": null
+}, {
+  "name": "vector-sort",
+  "aliases": null,
+  "signatures": ["(vector-sort <binary-predicate?> <vector>)"],
+  "description": "Create a vector by sorting <vector> according to <predicate?>.",
+  "example": null
+}, {
+  "name": "vector-sorted?",
+  "aliases": null,
+  "signatures": ["(vector-sorted? <binary-predicate?> <vector>)"],
+  "description": "Verify <vector> is sorted according to <predicate?>.",
+  "example": null
+}, {
+  "name": "vector?",
+  "aliases": null,
+  "signatures": ["(vector? <obj>)"],
+  "description": "Returns whether <obj> is a vector.",
+  "example": null
+}, {
+  "name": "vector-empty?",
+  "aliases": null,
+  "signatures": ["(vector-empty? <vector>)"],
+  "description": "Returns whether <vector> is empty.",
+  "example": null
+}]

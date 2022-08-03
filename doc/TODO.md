@@ -3,41 +3,53 @@
 ## MORE
 
 
-- IMMUTABLE VECTORS `(vector )`
-  * CONSIDER `[]` SYNTAX (ACCOUNT FOR IN READER & `quasiquote`)
+
+
+
+
+
+
+
+
+
+
+
 
 
 - IMMUTABLE HASHMAPS `(hashmap )`
   * CONSIDER `{}` SYNTAX (ACCOUNT FOR IN READER & `quasiquote`)
   * add to README as a Scheme extension (under the `keyword` section)
 
+  * add a `help` type entry about hashmaps (INLCUDE INFO ABOUT IT BEING A CALLABLE)
 
-- UPDATE THE READER & INPUT-PORT ACCORDINLY !!!
-
-
-
-- ADD PRIMTIIVES & UPDATE `primitives.md` & `help`
-
-- ALSO LOOK INTO `string` PRIMITIVES FOR INSPIRATION IN ADDITION TO THE BELOW !!!
-
-- ALSO LOOK INTO HEIST'S PRIMITIVES FOR INSPIRATION IN ADDITION TO THE BELOW !!!
-
-```scheme
-vector   vector-append          vector-length   vector-reverse     
-vector-map     vector-filter  vector-for-each
-vector-ref             subvector             vector-sort     vector-sorted?     
-vector?   vector-empty?
-
-(vector-has? <vector> <obj>)
-```
+  1. DO TYPE & PRIMITIVES
+     -> ___TYPE SHOULD BE AN UNARY CALLABLE ACCEPTING A KEY AS ITS ARGUMENT !!!___
+  2. UPDATE `primitives.md` and `help`
+  3. UPDATE THE READER & INPUT-PORT !!!!
+     * update `quasiquote` as well !!!
+     * then update `help` again as needed in terms of the new syntax
+  4. UPDATE `README.md`
+  5. MAKE SURE TO AVOID DATA RACES BY USING `sync` AS NEEDED
+      ```java
+      synchronized(vector) {
+        if(vector.size() > 0) return vector.get(0); // wrap in <sync> to avoid race condition of .size() and .get() !!!
+      }
+      ```
 
 
+`hashmap->alist`
+`alist->hashmap`
+
+`hashmap->list`
+`list->hashmap`
+
+`hashmap->vector`
+`vector->hashmap`
 
 
 
 
-
-
+<!-- 
 
   * NOTE: BUILDERS ___MUST___ BE THREAD-SAFE !!!
 
@@ -78,7 +90,7 @@ synchronized(vector) {
 (vector-builder? <obj>)
 (string-builder? <obj>)
 (hashmap-builder? <obj>)
-```
+``` -->
 
 
 
@@ -88,6 +100,17 @@ synchronized(vector) {
 
 
 
+
+- AFTER VECTORS AND HASHMAPS: UPGRADE VERSION TO ___7.0___
+
+
+
+
+
+
+
+- STRING FORMATTING PROCEDURES `displayf`, `writef`, `stringf`, `pprintf` (`pretty-printf`), `(stringf )`
+  => ACCOUNT FOR THIS IN THE `error` PROCEDURE
 
 - ADD JSON SUPPORT PRIMITIVES
   => `json->scm`, `scm->json`, `object->json`, `json-datum?`, `json-string?`
@@ -95,8 +118,7 @@ synchronized(vector) {
 
 - ADD CSV SUPPORT PRIMITIVES
 
-- STRING FORMATTING PROCEDURES `displayf`, `writef`, `stringf`, `pprintf` (`pretty-printf`), `(stringf )`
-  => ACCOUNT FOR THIS IN THE `error` PROCEDURE
+
 
 
 
@@ -113,7 +135,7 @@ synchronized(vector) {
 
 
 
-- RUNTIME TYPING ___!!! THIS WOULD WARRANT A VERSION UPGRADE TO `7.0` !!!___
+- RUNTIME TYPING ___!!! THIS WOULD WARRANT A VERSION UPGRADE TO `8.0` !!!___
   
   * NOTE: THE BELOW SHOULD ALSO BE AVAILABLE FOR INTERFACE DEFINITIONS !!!
 

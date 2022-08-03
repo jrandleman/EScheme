@@ -74,6 +74,10 @@ public class Pair extends Datum {
     return o instanceof Pair && ((Pair)o).car.eq(car) && ((Pair)o).cdr.eq(cdr);
   }
 
+  public boolean eqv(Object o) {
+    return eq(o);
+  }
+
   public boolean equals(Object o) {
     return o instanceof Pair && ((Pair)o).car.equals(car) && ((Pair)o).cdr.equals(cdr);
   }

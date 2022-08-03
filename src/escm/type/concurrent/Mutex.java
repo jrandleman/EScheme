@@ -119,6 +119,10 @@ public class Mutex extends Datum {
     return o instanceof Mutex && ((Mutex)o).state.lock == this.state.lock;
   }
 
+  public boolean eqv(Object o) {
+    return eq(o);
+  }
+
   public boolean equals(Object o) {
     return eq(o);
   }

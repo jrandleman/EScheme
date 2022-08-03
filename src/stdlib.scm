@@ -580,6 +580,9 @@
     (define hd (if (not (atom? lst)) (car lst)))
           ; finished parsing expression (proper list)
     (cond ((null? lst) (quote ()))
+          ; quasiquote vector
+          ((vector? lst)
+            (list (list (quote list->vector) (escm-quasiquote->quote (vector->list lst) level))))
           ; finished parsing expression (dotted list)
           ((atom? lst)
             (list (list (quote quote) lst)))
@@ -588,6 +591,10 @@
             (if (= level 0)
                 (list (cadr lst))
                 (list (list (quote list) (quote (quote unquote)) (escm-quasiquote->quote (cadr lst) (- level 1)))))) ; *there*: recursively parse, in nested quasiquote
+          ; quasiquote vector
+          ((vector? hd)
+            (cons (list (quote list) (list (quote list->vector) (escm-quasiquote->quote (vector->list hd) level)))
+                  (iter (cdr lst))))
           ; quote atom
           ((atom? hd)
             (cons (list (quote list) (list (quote quote) hd))

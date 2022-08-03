@@ -47,6 +47,18 @@
   "description": "Convert a keyword to a string.",
   "example": null
 }, {
+  "name": "vector->list",
+  "aliases": null,
+  "signatures": ["(vector->list <vector>)"],
+  "description": "Convert a vector to a list.",
+  "example": null
+}, {
+  "name": "list->vector",
+  "aliases": null,
+  "signatures": ["(list->vector <list>)"],
+  "description": "Convert a list to a vector.",
+  "example": null
+}, {
   "name": "write-to-string",
   "aliases": null,
   "signatures": ["(write-to-string <obj>)"],

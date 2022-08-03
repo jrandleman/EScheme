@@ -22,6 +22,7 @@ public abstract class Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Equality
   public abstract boolean eq(Object o);
+  public abstract boolean eqv(Object o);
   public abstract boolean equals(Object o);
 
 

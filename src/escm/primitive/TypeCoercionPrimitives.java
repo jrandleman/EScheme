@@ -5,6 +5,7 @@
 package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
+import escm.type.Nil;
 import escm.type.number.Number;
 import escm.type.number.Real;
 import escm.util.Exceptionf;
@@ -212,6 +213,59 @@ public class TypeCoercionPrimitives {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(pretty-print-to-string <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
       return new escm.type.String(parameters.get(0).pprint());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // vector->list
+  public static class VectorToList implements Primitive {
+    public java.lang.String escmName() {
+      return "vector->list";
+    }
+
+    public static Datum logic(escm.type.Vector v) {
+      synchronized(v) {
+        try {
+          Datum lis = Nil.VALUE;
+          for(int i = v.size()-1; i >= 0; --i)
+            lis = new escm.type.Pair(v.get(i),lis);
+          return lis;  
+        } catch(Exception e) {
+          return Nil.VALUE; // never triggered since we know <v.get(i)> won't throw.
+        }
+      }
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector)) 
+        throw new Exceptionf("'(vector->list <vector>) expects exactly 1 vector arg: %s", Exceptionf.profileArgs(parameters));
+      return logic((escm.type.Vector)parameters.get(0));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // list->vector
+  public static class ListToVector implements Primitive {
+    public java.lang.String escmName() {
+      return "list->vector";
+    }
+
+    public static escm.type.Vector logic(Datum l) {
+      ArrayList<Datum> v = new ArrayList<Datum>();
+      while(l instanceof escm.type.Pair) {
+        escm.type.Pair p = (escm.type.Pair)l;
+        v.add(p.car());
+        l = p.cdr();
+      }
+      return new escm.type.Vector(v);
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || (!(parameters.get(0) instanceof escm.type.Pair) && !(parameters.get(0) instanceof Nil))) 
+        throw new Exceptionf("'(list->vector <list>) expects exactly 1 list arg: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters.get(0));
     }
   }
 }

@@ -37,6 +37,10 @@ public class Nil extends Datum {
     return o instanceof Nil;
   }
 
+  public boolean eqv(Object o) {
+    return eq(o);
+  }
+
   public boolean equals(Object o) {
     return eq(o);
   }

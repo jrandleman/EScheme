@@ -261,16 +261,15 @@ public class FilePrimitives {
       return "file-delete!";
     }
 
-    public static boolean logic(Path p, String signature, ArrayList<Datum> parameters) throws Exception {
-      if(!IsFileP.logic(p))
-        throw new Exceptionf("'%s path \"%s\" isn't a file!", signature, p.toString(), Exceptionf.profileArgs(parameters));
+    public static boolean logic(Path p) throws Exception {
+      if(!IsFileP.logic(p)) return false;
       return Files.deleteIfExists(p);
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(file-delete! <file-path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(logic(Path.of(((escm.type.String)parameters.get(0)).value()),"(file-delete! <file-path-string>)",parameters));
+      return Boolean.valueOf(logic(Path.of(((escm.type.String)parameters.get(0)).value())));
     }
   }
 
@@ -282,16 +281,15 @@ public class FilePrimitives {
       return "directory-delete!";
     }
 
-    public static boolean logic(Path p, String signature, ArrayList<Datum> parameters) throws Exception {
-      if(!IsDirectoryP.logic(p))
-        throw new Exceptionf("'%s path \"%s\" isn't a directory!", signature, p.toString(), Exceptionf.profileArgs(parameters));
+    public static boolean logic(Path p) throws Exception {
+      if(!IsDirectoryP.logic(p)) return false;
       return Files.deleteIfExists(p);
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(directory-delete! <directory-path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(logic(Path.of(((escm.type.String)parameters.get(0)).value()),"(directory-delete! <directory-path-string>)",parameters));
+      return Boolean.valueOf(logic(Path.of(((escm.type.String)parameters.get(0)).value())));
     }
   }
 
@@ -315,16 +313,15 @@ public class FilePrimitives {
       return succeeded;
     }
 
-    public static boolean logic(Path p, String signature, ArrayList<Datum> parameters) throws Exception {
-      if(!IsDirectoryP.logic(p))
-        throw new Exceptionf("'%s path \"%s\" isn't a directory!", signature, p.toString(), Exceptionf.profileArgs(parameters));
+    public static boolean logic(Path p) throws Exception {
+      if(!IsDirectoryP.logic(p)) return false;
       return deleteDirectoryContents(p) && Files.deleteIfExists(p);
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(directory-recursive-delete! <directory-path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(logic(Path.of(((escm.type.String)parameters.get(0)).value()),"(directory-recursive-delete! <directory-path-string>)",parameters));
+      return Boolean.valueOf(logic(Path.of(((escm.type.String)parameters.get(0)).value())));
     }
   }
 
@@ -336,17 +333,15 @@ public class FilePrimitives {
       return "path-delete!";
     }
 
-    public static boolean logic(Path p, String signature, ArrayList<Datum> parameters) throws Exception {
-      if(Files.exists(p)) {
-        return Files.deleteIfExists(p);
-      }
-      throw new Exceptionf("'%s path \"%s\" isn't a path!", signature, p.toString(), Exceptionf.profileArgs(parameters));       
+    public static boolean logic(Path p) throws Exception {
+      if(Files.exists(p)) return Files.deleteIfExists(p);
+      return false;
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(path-delete! <path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(logic(Path.of(((escm.type.String)parameters.get(0)).value()),"(path-delete! <path-string>)",parameters));
+      return Boolean.valueOf(logic(Path.of(((escm.type.String)parameters.get(0)).value())));
     }
   }
 
@@ -358,19 +353,19 @@ public class FilePrimitives {
       return "path-recursive-delete!";
     }
 
-    public static boolean logic(Path p, String signature, ArrayList<Datum> parameters) throws Exception {
+    public static boolean logic(Path p) throws Exception {
       if(IsDirectoryP.logic(p)) {
-        return DirectoryRecursiveDeleteBang.logic(p,signature,parameters);
+        return DirectoryRecursiveDeleteBang.logic(p);
       } else if(IsFileP.logic(p)) {
         return Files.deleteIfExists(p);
       }
-      throw new Exceptionf("'%s path \"%s\" isn't a path!", signature, p.toString(), Exceptionf.profileArgs(parameters));       
+      return false;
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(path-recursive-delete! <path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(logic(Path.of(((escm.type.String)parameters.get(0)).value()),"(path-recursive-delete! <path-string>)",parameters));
+      return Boolean.valueOf(logic(Path.of(((escm.type.String)parameters.get(0)).value())));
     }
   }
 
@@ -382,7 +377,7 @@ public class FilePrimitives {
       return "directory-entries";
     }
 
-    public static Datum logic(Path p, String signature, ArrayList<Datum> parameters) throws Exception {
+    public static Datum logic(Path p) throws Exception {
       if(IsDirectoryP.logic(p) == false) return Boolean.FALSE;
       Datum lis = escm.type.Nil.VALUE;
       for(File entry : (new File(p.toString())).listFiles()) {
@@ -394,7 +389,7 @@ public class FilePrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(directory-entries <directory-path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return logic(Path.of(((escm.type.String)parameters.get(0)).value()),"(directory-entries <directory-path-string>)",parameters);
+      return logic(Path.of(((escm.type.String)parameters.get(0)).value()));
     }
   }
 
@@ -406,7 +401,7 @@ public class FilePrimitives {
       return "directory-entries*";
     }
 
-    public static Datum logic(Path p, String signature, ArrayList<Datum> parameters) throws Exception {
+    public static Datum logic(Path p) throws Exception {
       if(IsDirectoryP.logic(p) == false) return Boolean.FALSE;
       Datum lis = escm.type.Nil.VALUE;
       for(File entry : (new File(p.toString())).listFiles()) {
@@ -421,7 +416,7 @@ public class FilePrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(directory-entries* <directory-path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return logic(Path.of(((escm.type.String)parameters.get(0)).value()),"(directory-entries* <directory-path-string>)",parameters);
+      return logic(Path.of(((escm.type.String)parameters.get(0)).value()));
     }
   }
 

@@ -273,6 +273,31 @@ public class ListPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // memv
+  public static class Memv implements Primitive {
+    public java.lang.String escmName() {
+      return "memv";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2)
+        throw new Exceptionf("'(memv <obj> <list>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      if(!Pair.isList(parameters.get(1))) 
+        throw new Exceptionf("'(memv <obj> <list>) 2nd arg %s isn't a list!", parameters.get(1).profile());
+      Datum obj = parameters.get(0);
+      Datum iterator = parameters.get(1);
+      while(iterator instanceof Pair) {
+        Pair iteratorPair = (Pair)iterator;
+        if(iteratorPair.car().eqv(obj))
+          return iteratorPair;
+        iterator = iteratorPair.cdr();
+      }
+      return Boolean.FALSE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // member
   public static class Member implements Primitive {
     public java.lang.String escmName() {
@@ -317,6 +342,34 @@ public class ListPrimitives {
           throw new Exceptionf("'(assq <key> <alist>) 2nd arg %s isn't an alist (list of key-value pair lists)!", parameters.get(1).profile());
         Pair innerList = (Pair)iteratorPair.car();
         if(innerList.car().eq(key))
+          return innerList;
+        iterator = iteratorPair.cdr();
+      }
+      return Boolean.FALSE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // assv
+  public static class Assv implements Primitive {
+    public java.lang.String escmName() {
+      return "assv";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2)
+        throw new Exceptionf("'(assv <key> <alist>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      if(!Pair.isList(parameters.get(1))) 
+        throw new Exceptionf("'(assv <key> <alist>) 2nd arg %s isn't an alist (list of key-value pair lists)!", parameters.get(1).profile());
+      Datum key = parameters.get(0);
+      Datum iterator = parameters.get(1);
+      while(iterator instanceof Pair) {
+        Pair iteratorPair = (Pair)iterator;
+        if(!(iteratorPair.car() instanceof Pair))
+          throw new Exceptionf("'(assv <key> <alist>) 2nd arg %s isn't an alist (list of key-value pair lists)!", parameters.get(1).profile());
+        Pair innerList = (Pair)iteratorPair.car();
+        if(innerList.car().eqv(key))
           return innerList;
         iterator = iteratorPair.cdr();
       }
@@ -657,13 +710,13 @@ public class ListPrimitives {
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2)
-        throw new Exceptionf("'(sort <comparator> <list>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(sort <predicate?> <list>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum procedure = parameters.get(0);
       if(!(procedure instanceof Callable))
-        throw new Exceptionf("'(sort <comparator> <list>) 1st arg %s isn't a callable: %s", procedure.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(sort <predicate?> <list>) 1st arg %s isn't a callable: %s", procedure.profile(), Exceptionf.profileArgs(parameters));
       Datum target = parameters.get(1);
       if(!(target instanceof Pair) && !(target instanceof Nil))
-        throw new Exceptionf("'(sort <comparator> <list>) 2nd arg %s isn't a list: %s", target.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(sort <predicate?> <list>) 2nd arg %s isn't a list: %s", target.profile(), Exceptionf.profileArgs(parameters));
       return logic((Callable)procedure,target,continuation);
     }
   }
@@ -694,14 +747,14 @@ public class ListPrimitives {
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2)
-        throw new Exceptionf("'(sorted? <comparator>) expects exactly 2 args (callable & list): %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(sorted? <predicate?> <list>) expects exactly 2 args (callable & list): %s", Exceptionf.profileArgs(parameters));
       Datum procedure = parameters.get(0);
       if(!(procedure instanceof Callable))
-        throw new Exceptionf("'(sorted? <comparator>) 1st arg %s isn't a callable: %s", procedure.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(sorted? <predicate?> <list>) 1st arg %s isn't a callable: %s", procedure.profile(), Exceptionf.profileArgs(parameters));
       Datum target = parameters.get(1);
       if(target instanceof Nil) return continuation.run(Boolean.TRUE);
       if(!(target instanceof Pair))
-        throw new Exceptionf("'(sorted? <comparator>) 2nd arg %s isn't a list: %s", target.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(sorted? <predicate?> <list>) 2nd arg %s isn't a list: %s", target.profile(), Exceptionf.profileArgs(parameters));
       return logic((Callable)procedure,target,continuation);
     }
   }

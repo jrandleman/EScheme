@@ -103,6 +103,10 @@ public class ObjectAccessChain extends Datum {
     return o instanceof ObjectAccessChain && ((Symbol)o).value().equals(value);
   }
 
+  public boolean eqv(Object o) {
+    return eq(o);
+  }
+
   public boolean equals(Object o) {
     return eq(o);
   }

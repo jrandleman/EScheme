@@ -14,7 +14,7 @@
   "name": "string",
   "aliases": ["str"],
   "signatures": null,
-  "description": "Represents a Java <string> under the hood (hence immutable).\nDenoted via double-quotes.",
+  "description": "Represents a Java <string> under the hood (hence immutable).\nLiterals are denoted via double-quotes.",
   "example": null
 }, {
   "name": "void",
@@ -50,8 +50,20 @@
   "name": "pair",
   "aliases": null,
   "signatures": null,
-  "description": "A pair of objects. <car> and <cdr> respectively get the 1st and 2nd items.\nNest them and end with #nil as the last <cdr> to create a list.",
+  "description": "An immutable pair of objects. <car> and <cdr> respectively get the 1st and 2nd\nitems. Right-nest them and end with #nil as the last <cdr> to create a list.\nCreate pair literals via the (<car> . <cdr>) syntax.",
   "example": "; The following are equivalent:\n\n(list 1 2 3)\n(cons 1 (cons 2 (cons 3 #nil)))"
+}, {
+  "name": "list",
+  "aliases": null,
+  "signatures": ["(list <obj> ...)", "(list)"],
+  "description": "Return a list containing \"<obj> ...\". Given no args, returns (quote ()).\nCreate list literals via the (<item> ...) syntax.",
+  "example": null
+}, {
+  "name": "vector",
+  "aliases": null,
+  "signatures": ["(vector <obj> ...)"],
+  "description": "Construct a vector containing \"<obj> ...\".\nCreate vector literals via the [<item> ...] syntax.\nVectors are applicable to an index to get an entry: (<vector> <index>)",
+  "example": null
 }, {
   "name": "stream",
   "aliases": null,

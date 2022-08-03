@@ -143,6 +143,28 @@ public class EscmObject extends MetaObject implements Callable {
     return o instanceof EscmObject && ((EscmObject)o).props == this.props;
   }
 
+  public boolean eqv(Object o) {
+    if(!(o instanceof EscmObject) || ((EscmObject)o).superClass != superClass) return false;
+    EscmObject that = (EscmObject)o;
+    // Check Equality of Props
+    if(this.props.size() != that.props.size()) return false;
+    for(ConcurrentHashMap.Entry<String,Datum> e : this.props.entrySet()) {
+      Datum thisProp = e.getValue();
+      Datum thatProp = that.props.get(e.getKey());
+      if(thatProp == null) {
+        return false;
+      }
+      if(thisProp instanceof CompoundProcedure && thatProp instanceof CompoundProcedure) {
+        if(!((CompoundProcedure)thisProp).name().equals(((CompoundProcedure)thatProp).name()))
+          return false;
+      } else if(!thisProp.eq(thatProp)) {
+        return false;
+      }
+    }
+    // Check Equality of Super (as needed)
+    return this.superObject == null || this.superObject.eqv(that.superObject);
+  }
+
   public boolean equals(Object o) {
     if(!(o instanceof EscmObject) || ((EscmObject)o).superClass != superClass) return false;
     EscmObject that = (EscmObject)o;
@@ -154,11 +176,10 @@ public class EscmObject extends MetaObject implements Callable {
       if(thatProp == null) {
         return false;
       }
-      if(thisProp instanceof CompoundProcedure && thatProp instanceof CompoundProcedure && 
-         !((CompoundProcedure)thisProp).name().equals(((CompoundProcedure)thatProp).name())) {
-        return false;
-      }
-      if(!thisProp.equals(thatProp)) {
+      if(thisProp instanceof CompoundProcedure && thatProp instanceof CompoundProcedure) {
+        if(!((CompoundProcedure)thisProp).name().equals(((CompoundProcedure)thatProp).name()))
+          return false;
+      } else if(!thisProp.equals(thatProp)) {
         return false;
       }
     }

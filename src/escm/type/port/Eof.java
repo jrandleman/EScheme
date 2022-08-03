@@ -39,6 +39,11 @@ public class Eof extends Datum {
   }
 
 
+  public boolean eqv(Object o) {
+    return eq(o);
+  }
+
+
   public boolean equals(Object o) {
     return eq(o);
   }

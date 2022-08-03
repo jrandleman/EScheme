@@ -92,15 +92,20 @@
 3. `#eof`, `#void`, `#nil` reader literals for their respective values
 4. Keyword primitive types
    - Like symbols, but prefixed with `:`, & they always evaluate to themselves
-5. Immutable core strings & pairs:
-   - Mutable `<pair>` alternative may be implemented by users via escm's object system
-6. `\` reader lambda literal support:
+5. Vector literals have been reworked:
+   - Syntax uses `[<obj> ...]` instead of `#(<obj> ...)`
+   - Quotes aren't always required: 
+     * `[a b c]` compiles to vector of `a`, `b`, & `c` evaluated as variables
+   - Quotes can be used though to get expected results: 
+     * `(quote [a b c])` => `[(quote a) (quote b) (quote c)]`
+6. Immutable core strings & pairs
+   - Mutable pairs may be implemented by users via the object system!
+7. `\` reader lambda literal support:
    - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
    - `\%1` => `(lambda (%1) %1)`, `\(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
-7. `(. <obj>)` is equivalent to `<obj>` for the reader
-8. Compile-time procedural macro system:
+8. `(. <obj>)` is equivalent to `<obj>` for the reader
+9. Compile-time procedural macro system:
    - No run-time bindings, all global in scope, deletable for localization!
-9. Object System (classes, interfaces, and objects!)
-10. Multithreading Support (threads and reentrant locks!)
-11. Multi-arity and optional-parameter support via `fn`
-12. No `eqv?`: only `eq?` and `equal?` are present.
+10. Object System (classes, interfaces, and objects!)
+11. Multithreading Support (threads and reentrant locks!)
+12. Multi-arity and optional-parameter support via `fn`

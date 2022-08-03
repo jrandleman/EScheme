@@ -23,6 +23,7 @@
 
 package escm.type.port;
 import java.util.Objects;
+import java.util.Stack;
 import java.io.PushbackReader;
 import java.io.InputStreamReader;
 import java.io.FileReader;
@@ -200,33 +201,56 @@ public class InputPort extends Port {
     StringBuilder sb = new StringBuilder();
     while(true) {
       try {
-        int parenCount = 0;
+        Stack<Character> containerStack = new Stack<Character>();
         boolean foundLoneAtom = false;
         while(true) {
           int input = pr.read();
           // check for atom
-          if(foundLoneAtom && parenCount == 0 && (input == -1 || Reader.isDelimiter((char)input))) {
+          if(foundLoneAtom && containerStack.empty() && (input == -1 || Reader.isDelimiter((char)input))) {
             if(input != -1) pr.unread(input);
             break;
           }
           if(input == -1) {
-            if(parenCount > 0) {
-              throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a ')' prior an associated '('!", write());
+            if(containerStack.empty() == false) {
+              char c = containerStack.pop();
+              if(c == '(') {
+                throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a ')' prior an associated '('!", write());
+              } else {
+                throw new Exceptionf("READ ERROR (for %s): Invalid bracket: found a ']' prior an associated '['!", write());
+              }
             }
             return null;
           }
           // register open paren
           if(input == '(') {
             sb.append((char)input);
-            ++parenCount;
+            containerStack.push('(');
+          // register open bracket
+          } else if(input == '[') {
+            sb.append((char)input);
+            containerStack.push('[');
           // register close paren
           } else if(input == ')') {
             sb.append((char)input);
-            --parenCount;
-            if(parenCount < 0) {
+            if(containerStack.empty()) {
               throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a ')' prior an associated '('!", write());
             }
-            if(parenCount == 0) break;
+            char opener = containerStack.pop();
+            if(opener != '(') {
+              throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a closing ')' prior to closing '%c'!", write(), opener);
+            }
+            if(containerStack.empty()) break;
+          // register close bracket
+          } else if(input == ']') {
+            sb.append((char)input);
+            if(containerStack.empty()) {
+              throw new Exceptionf("READ ERROR (for %s): Invalid bracket: found a ']' prior an associated '['!", write());
+            }
+            char opener = containerStack.pop();
+            if(opener != '[') {
+              throw new Exceptionf("READ ERROR (for %s): Invalid bracket: found a closing ']' prior to closing '%c'!", write(), opener);
+            }
+            if(containerStack.empty()) break;
           // account for whitespace
           } else if(Character.isWhitespace((char)input)) {
             sb.append((char)input);
@@ -259,7 +283,7 @@ public class InputPort extends Port {
             if(input == -1) {
               throw new Exceptionf("READ ERROR (for %s): Unterminating string literal detected!", write());
             }
-            if(parenCount == 0) break;
+            if(containerStack.empty()) break;
           // account for reader shorthands
           } else if(Reader.isReaderShorthand((char)input) || input == '\\') {
             sb.append((char)input);

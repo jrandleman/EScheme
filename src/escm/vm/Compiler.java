@@ -9,19 +9,24 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.type.Datum;
 import escm.type.Pair;
+import escm.type.Vector;
 import escm.type.Symbol;
+import escm.type.Nil;
 import escm.type.number.Exact;
 import escm.util.Trampoline;
 import escm.primitive.ListPrimitives;
+import escm.primitive.TypeCoercionPrimitives;
 import escm.primitive.MetaPrimitives;
 import escm.vm.type.Callable;
 
 public class Compiler {
   ////////////////////////////////////////////////////////////////////////////
-  // Static Instruction Symbol Constants
+  // Static Symbolic Constants
   private static final Symbol LOAD = new Symbol("load");
   private static final Symbol CALL = new Symbol("call");
   private static final Symbol PUSH = new Symbol("push");
+
+  private static final Symbol VECTOR = new Symbol("vector");
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -51,16 +56,43 @@ public class Compiler {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Compiling Vector Literals (must evaluate their contents)
+  private static Trampoline.Bounce generateVectorCallInstructions(Datum v, int count, Trampoline.Continuation continuation) throws Exception {
+    if(v instanceof Nil) return continuation.run(Pair.List(Pair.List(PUSH,VECTOR),Pair.List(CALL,new Exact(-count))));
+    Pair vPair = (Pair)v;
+    Datum hd = vPair.car();
+    if(!(hd instanceof Pair) && !(hd instanceof Vector)) {
+      return () -> generateVectorCallInstructions(vPair.cdr(),count+1,(applicationInstructions) -> {
+        return continuation.run(new Pair(Pair.List(PUSH,hd),applicationInstructions));
+      });
+    } else {
+      return () -> run(hd,(valueInstructions) -> () -> {
+        Datum instructions = ListPrimitives.Append.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
+        return generateVectorCallInstructions(vPair.cdr(),count+1,(applicationInstructions) -> {
+          return continuation.run(ListPrimitives.Append.binaryAppend(instructions,applicationInstructions));
+        });
+      });
+    }
+  }
+
+
+  private static Trampoline.Bounce compileVectorLiteral(Vector v, Trampoline.Continuation continuation) throws Exception {
+    return generateVectorCallInstructions(ListPrimitives.Reverse.logic(TypeCoercionPrimitives.VectorToList.logic(v)),1,continuation);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Compiling Applications
   private static Trampoline.Bounce compileProcedureApplication(Datum app, int count, Trampoline.Continuation continuation) throws Exception {
     if(!(app instanceof Pair)) return continuation.run(Pair.List(Pair.List(CALL,new Exact(-count))));
     Pair appPair = (Pair)app;
-    if(!(appPair.car() instanceof Pair)) {
+    Datum hd = appPair.car();
+    if(!(hd instanceof Pair) && !(hd instanceof Vector)) {
       return () -> compileProcedureApplication(appPair.cdr(),count+1,(applicationInstructions) -> {
-        return continuation.run(new Pair(Pair.List(PUSH,appPair.car()),applicationInstructions));
+        return continuation.run(new Pair(Pair.List(PUSH,hd),applicationInstructions));
       });
     } else {
-      return () -> run(appPair.car(),(valueInstructions) -> () -> {
+      return () -> run(hd,(valueInstructions) -> () -> {
         Datum instructions = ListPrimitives.Append.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
         return compileProcedureApplication(appPair.cdr(),count+1,(applicationInstructions) -> {
           return continuation.run(ListPrimitives.Append.binaryAppend(instructions,applicationInstructions));
@@ -86,6 +118,8 @@ public class Compiler {
   ////////////////////////////////////////////////////////////////////////////
   // Core compilation dispatch
   public static Trampoline.Bounce run(Datum d, Trampoline.Continuation continuation) throws Exception {
+    if(d instanceof Vector) 
+      return compileVectorLiteral((Vector)d,continuation);
     if(!(d instanceof Pair)) 
       return compileAtomicLiteral(d,continuation);
     Pair expr = (Pair)d;

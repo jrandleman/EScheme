@@ -46,6 +46,10 @@ public abstract class Port extends Datum {
   // Equality
   public abstract boolean eq(Object o);
 
+  public boolean eqv(Object o) {
+    return eq(o);
+  }
+
   public boolean equals(Object o) {
     return eq(o);
   }

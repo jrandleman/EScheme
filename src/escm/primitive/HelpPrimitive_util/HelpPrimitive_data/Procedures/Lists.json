@@ -2,7 +2,7 @@
   "name": "list",
   "aliases": null,
   "signatures": ["(list <obj> ...)", "(list)"],
-  "description": "Return a list containing \"<obj> ...\". Given no args, returns (quote ()).",
+  "description": "Return a list containing \"<obj> ...\". Given no args, returns (quote ()).\nCreate list literals via the (<item> ...) syntax.",
   "example": null
 }, {
   "name": "list*",
@@ -89,6 +89,12 @@
   "description": "Returns the sublist in <list> starting with <obj> based on <eq?> item\nequality. Returns #f if <obj> isn't in <list>.",
   "example": null
 }, {
+  "name": "memv",
+  "aliases": null,
+  "signatures": ["(memv <obj> <list>)"],
+  "description": "Returns the sublist in <list> starting with <obj> based on <eqv?> item\nequality. Returns #f if <obj> isn't in <list>.",
+  "example": null
+}, {
   "name": "member",
   "aliases": null,
   "signatures": ["(member <obj> <list>)"],
@@ -99,6 +105,12 @@
   "aliases": null,
   "signatures": ["(assq <key-obj> <alist>)"],
   "description": "Returns the pair in associative-lsit <alist> starting with <key-obj> based\non <eq?> item equality. Returns #f if <obj> isn't a key in in <alist>.",
+  "example": null
+}, {
+  "name": "assv",
+  "aliases": null,
+  "signatures": ["(assv <key-obj> <alist>)"],
+  "description": "Returns the pair in associative-lsit <alist> starting with <key-obj> based\non <eqv?> item equality. Returns #f if <obj> isn't a key in in <alist>.",
   "example": null
 }, {
   "name": "assoc",
