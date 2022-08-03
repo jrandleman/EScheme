@@ -98,7 +98,7 @@
      * `[a b c]` compiles to vector of `a`, `b`, & `c` evaluated as variables
    - Quotes can be used though to get expected results: 
      * `(quote [a b c])` => `[(quote a) (quote b) (quote c)]`
-6. Immutable core strings & pairs
+6. Immutable core pairs & strings
    - Mutable pairs may be implemented by users via the object system!
 7. `\` reader lambda literal support:
    - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
