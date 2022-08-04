@@ -67,8 +67,8 @@
 }, {
   "name": "thread-start!",
   "aliases": null,
-  "signatures": ["(thread-start! <thread>)"],
-  "description": "Starts <thread> and invokes its callable thunk runnable.",
+  "signatures": ["(thread-start! <thread> ...)"],
+  "description": "Starts \"<thread> ...\" and invokes their callable thunk runnables.",
   "example": null
 }, {
   "name": "thread-join!",

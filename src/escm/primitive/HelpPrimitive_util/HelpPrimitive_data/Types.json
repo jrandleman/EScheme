@@ -65,6 +65,12 @@
   "description": "Construct a vector containing \"<obj> ...\".\nCreate vector literals via the [<item> ...] syntax.\nVectors are applicable to an index to get an entry: (<vector> <index>)",
   "example": null
 }, {
+  "name": "hashmap",
+  "aliases": null,
+  "signatures": ["(hashmap <key> <value> ...)"],
+  "description": "Construct a hashmap containing key-value associations of \"<key> <value> ...\".\nCreate hashmap literals via the {<key> <value> ...} syntax.\nHashmaps are applicable to a key to get their entry: (<hashmap> <key>)",
+  "example": null
+}, {
   "name": "stream",
   "aliases": null,
   "signatures": null,

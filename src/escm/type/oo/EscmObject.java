@@ -143,7 +143,7 @@ public class EscmObject extends MetaObject implements Callable {
     return o instanceof EscmObject && ((EscmObject)o).props == this.props;
   }
 
-  public boolean eqv(Object o) {
+  public boolean equal(Object o) {
     if(!(o instanceof EscmObject) || ((EscmObject)o).superClass != superClass) return false;
     EscmObject that = (EscmObject)o;
     // Check Equality of Props
@@ -157,67 +157,21 @@ public class EscmObject extends MetaObject implements Callable {
       if(thisProp instanceof CompoundProcedure && thatProp instanceof CompoundProcedure) {
         if(!((CompoundProcedure)thisProp).name().equals(((CompoundProcedure)thatProp).name()))
           return false;
-      } else if(!thisProp.eq(thatProp)) {
+      } else if(!thisProp.equal(thatProp)) {
         return false;
       }
     }
     // Check Equality of Super (as needed)
-    return this.superObject == null || this.superObject.eqv(that.superObject);
-  }
-
-  public boolean equals(Object o) {
-    if(!(o instanceof EscmObject) || ((EscmObject)o).superClass != superClass) return false;
-    EscmObject that = (EscmObject)o;
-    // Check Equality of Props
-    if(this.props.size() != that.props.size()) return false;
-    for(ConcurrentHashMap.Entry<String,Datum> e : this.props.entrySet()) {
-      Datum thisProp = e.getValue();
-      Datum thatProp = that.props.get(e.getKey());
-      if(thatProp == null) {
-        return false;
-      }
-      if(thisProp instanceof CompoundProcedure && thatProp instanceof CompoundProcedure) {
-        if(!((CompoundProcedure)thisProp).name().equals(((CompoundProcedure)thatProp).name()))
-          return false;
-      } else if(!thisProp.equals(thatProp)) {
-        return false;
-      }
-    }
-    // Check Equality of Super (as needed)
-    return this.superObject == null || this.superObject.equals(that.superObject);
+    return this.superObject == null || this.superObject.equal(that.superObject);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
-  private String getPropertiesAsString() {
-    HashSet<String> propNames = new HashSet<String>();
-    EscmObject obj = this;
-    while(obj != null) {
-      propNames.addAll(obj.props());
-      obj = obj.getSuper();
-    }
-    StringBuilder sb = new StringBuilder("{");
-    for(String propName : propNames) {
-      sb.append(propName);
-      sb.append("=");
-      try {
-        sb.append(get(propName).write());
-      } catch(Exception e) {
-        // We know this won't trigger since we're only querying 
-        // for properties that we know the object already has.
-      }
-      sb.append(", ");
-    }
-    int sbLength = sb.length();
-    sb.delete(sbLength-2,sbLength);
-    sb.append("}");
-    return sb.toString();
-  }
-
-
   public String display() {
-    return "#<object " + getPropertiesAsString() + '>';
+    String className = superClass.name();
+    if(className.length() == 0) return "#<object>";
+    return "#<object [class " + className + "]>";
   }
 
   public String write() {
@@ -265,7 +219,6 @@ public class EscmObject extends MetaObject implements Callable {
 
 
   public EscmObject copy() {
-    // NOTE: EscmClass.copy() reflects <this>, so the ".class" member is unnaffected!
-    return new EscmObject(0,superClass,superObject,MetaObject.copyProps(props));
+    return new EscmObject(0,superClass,superObject,new ConcurrentHashMap<String,Datum>(props));
   }
 }

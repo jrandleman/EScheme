@@ -107,12 +107,6 @@
   "description": "Returns the index of <obj> in <vector>, or #f if its missing.\nUses <eq?> for comparisons.",
   "example": null
 }, {
-  "name": "vector-memv",
-  "aliases": null,
-  "signatures": ["(vector-memv <vector> <obj>)"],
-  "description": "Returns the index of <obj> in <vector>, or #f if its missing.\nUses <eqv?> for comparisons.",
-  "example": null
-}, {
   "name": "vector-member",
   "aliases": null,
   "signatures": ["(vector-member <vector> <obj>)"],

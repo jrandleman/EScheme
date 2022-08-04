@@ -14,37 +14,37 @@
   "name": "file-write",
   "aliases": null,
   "signatures": ["(file-write <file-path-str> <obj>)"],
-  "description": "Write <obj> to <file-path-str> using machine-readable syntax.",
+  "description": "Write <obj> to <file-path-str> using machine-readable syntax.\nNote that this will infinitely loop for cyclical structures!",
   "example": null
 }, {
   "name": "file-display",
   "aliases": null,
   "signatures": ["(file-display <file-path-str> <obj>)"],
-  "description": "Write <obj> to <file-path-str> using human-readable syntax.",
+  "description": "Write <obj> to <file-path-str> using human-readable syntax.\nNote that this will infinitely loop for cyclical structures!",
   "example": null
 }, {
   "name": "file-pretty-print",
   "aliases": null,
   "signatures": ["(file-pretty-print <file-path-str> <obj>)"],
-  "description": "Write <obj> to <file-path-str> using indented machine-readable syntax.",
+  "description": "Write <obj> to <file-path-str> using indented machine-readable syntax.\nNote that this will infinitely loop for cyclical structures!",
   "example": null
 }, {
   "name": "file-write+",
   "aliases": null,
   "signatures": ["(file-write+ <file-path-str> <obj>)"],
-  "description": "Append <obj> to <file-path-str> using machine-readable syntax.",
+  "description": "Append <obj> to <file-path-str> using machine-readable syntax.\nNote that this will infinitely loop for cyclical structures!",
   "example": null
 }, {
   "name": "file-display+",
   "aliases": null,
   "signatures": ["(file-display+ <file-path-str> <obj>)"],
-  "description": "Append <obj> to <file-path-str> using human-readable syntax.",
+  "description": "Append <obj> to <file-path-str> using human-readable syntax.\nNote that this will infinitely loop for cyclical structures!",
   "example": null
 }, {
   "name": "file-pretty-print+",
   "aliases": null,
   "signatures": ["(file-pretty-print+ <file-path-str> <obj>)"],
-  "description": "Append <obj> to <file-path-str> using indented machine-readable syntax.",
+  "description": "Append <obj> to <file-path-str> using indented machine-readable syntax.\nNote that this will infinitely loop for cyclical structures!",
   "example": null
 }, {
   "name": "path?",

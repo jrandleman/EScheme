@@ -10,12 +10,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Vector;
+import escm.type.Hashmap;
 import escm.type.Symbol;
 import escm.type.Nil;
 import escm.type.number.Exact;
 import escm.util.Trampoline;
 import escm.primitive.ListPrimitives;
-import escm.primitive.TypeCoercionPrimitives;
 import escm.primitive.MetaPrimitives;
 import escm.vm.type.Callable;
 
@@ -27,6 +27,7 @@ public class Compiler {
   private static final Symbol PUSH = new Symbol("push");
 
   private static final Symbol VECTOR = new Symbol("vector");
+  private static final Symbol HASHMAP = new Symbol("hashmap");
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -61,7 +62,7 @@ public class Compiler {
     if(v instanceof Nil) return continuation.run(Pair.List(Pair.List(PUSH,VECTOR),Pair.List(CALL,new Exact(-count))));
     Pair vPair = (Pair)v;
     Datum hd = vPair.car();
-    if(!(hd instanceof Pair) && !(hd instanceof Vector)) {
+    if(!(hd instanceof Pair) && !(hd instanceof Vector) && !(hd instanceof Hashmap)) {
       return () -> generateVectorCallInstructions(vPair.cdr(),count+1,(applicationInstructions) -> {
         return continuation.run(new Pair(Pair.List(PUSH,hd),applicationInstructions));
       });
@@ -77,7 +78,33 @@ public class Compiler {
 
 
   private static Trampoline.Bounce compileVectorLiteral(Vector v, Trampoline.Continuation continuation) throws Exception {
-    return generateVectorCallInstructions(ListPrimitives.Reverse.logic(TypeCoercionPrimitives.VectorToList.logic(v)),1,continuation);
+    return generateVectorCallInstructions(ListPrimitives.Reverse.logic(v.toList()),1,continuation);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Compiling Hashmap Literals (must evaluate their contents)
+  private static Trampoline.Bounce generateHashmapCallInstructions(Datum h, int count, Trampoline.Continuation continuation) throws Exception {
+    if(h instanceof Nil) return continuation.run(Pair.List(Pair.List(PUSH,HASHMAP),Pair.List(CALL,new Exact(-count))));
+    Pair vPair = (Pair)h;
+    Datum hd = vPair.car();
+    if(!(hd instanceof Pair) && !(hd instanceof Vector) && !(hd instanceof Hashmap)) {
+      return () -> generateHashmapCallInstructions(vPair.cdr(),count+1,(applicationInstructions) -> {
+        return continuation.run(new Pair(Pair.List(PUSH,hd),applicationInstructions));
+      });
+    } else {
+      return () -> run(hd,(valueInstructions) -> () -> {
+        Datum instructions = ListPrimitives.Append.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
+        return generateHashmapCallInstructions(vPair.cdr(),count+1,(applicationInstructions) -> {
+          return continuation.run(ListPrimitives.Append.binaryAppend(instructions,applicationInstructions));
+        });
+      });
+    }
+  }
+
+
+  private static Trampoline.Bounce compileHashmapLiteral(Hashmap h, Trampoline.Continuation continuation) throws Exception {
+    return generateHashmapCallInstructions(ListPrimitives.Reverse.logic(h.toList()),1,continuation);
   }
 
 
@@ -87,7 +114,7 @@ public class Compiler {
     if(!(app instanceof Pair)) return continuation.run(Pair.List(Pair.List(CALL,new Exact(-count))));
     Pair appPair = (Pair)app;
     Datum hd = appPair.car();
-    if(!(hd instanceof Pair) && !(hd instanceof Vector)) {
+    if(!(hd instanceof Pair) && !(hd instanceof Vector) && !(hd instanceof Hashmap)) {
       return () -> compileProcedureApplication(appPair.cdr(),count+1,(applicationInstructions) -> {
         return continuation.run(new Pair(Pair.List(PUSH,hd),applicationInstructions));
       });
@@ -120,6 +147,8 @@ public class Compiler {
   public static Trampoline.Bounce run(Datum d, Trampoline.Continuation continuation) throws Exception {
     if(d instanceof Vector) 
       return compileVectorLiteral((Vector)d,continuation);
+    if(d instanceof Hashmap) 
+      return compileHashmapLiteral((Hashmap)d,continuation);
     if(!(d instanceof Pair)) 
       return compileAtomicLiteral(d,continuation);
     Pair expr = (Pair)d;

@@ -273,31 +273,6 @@ public class ListPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // memv
-  public static class Memv implements Primitive {
-    public java.lang.String escmName() {
-      return "memv";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 2)
-        throw new Exceptionf("'(memv <obj> <list>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
-      if(!Pair.isList(parameters.get(1))) 
-        throw new Exceptionf("'(memv <obj> <list>) 2nd arg %s isn't a list!", parameters.get(1).profile());
-      Datum obj = parameters.get(0);
-      Datum iterator = parameters.get(1);
-      while(iterator instanceof Pair) {
-        Pair iteratorPair = (Pair)iterator;
-        if(iteratorPair.car().eqv(obj))
-          return iteratorPair;
-        iterator = iteratorPair.cdr();
-      }
-      return Boolean.FALSE;
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // member
   public static class Member implements Primitive {
     public java.lang.String escmName() {
@@ -313,7 +288,7 @@ public class ListPrimitives {
       Datum iterator = parameters.get(1);
       while(iterator instanceof Pair) {
         Pair iteratorPair = (Pair)iterator;
-        if(iteratorPair.car().equals(obj))
+        if(iteratorPair.car().equal(obj))
           return iteratorPair;
         iterator = iteratorPair.cdr();
       }
@@ -351,34 +326,6 @@ public class ListPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // assv
-  public static class Assv implements Primitive {
-    public java.lang.String escmName() {
-      return "assv";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 2)
-        throw new Exceptionf("'(assv <key> <alist>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
-      if(!Pair.isList(parameters.get(1))) 
-        throw new Exceptionf("'(assv <key> <alist>) 2nd arg %s isn't an alist (list of key-value pair lists)!", parameters.get(1).profile());
-      Datum key = parameters.get(0);
-      Datum iterator = parameters.get(1);
-      while(iterator instanceof Pair) {
-        Pair iteratorPair = (Pair)iterator;
-        if(!(iteratorPair.car() instanceof Pair))
-          throw new Exceptionf("'(assv <key> <alist>) 2nd arg %s isn't an alist (list of key-value pair lists)!", parameters.get(1).profile());
-        Pair innerList = (Pair)iteratorPair.car();
-        if(innerList.car().eqv(key))
-          return innerList;
-        iterator = iteratorPair.cdr();
-      }
-      return Boolean.FALSE;
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // assoc
   public static class Assoc implements Primitive {
     public java.lang.String escmName() {
@@ -397,7 +344,7 @@ public class ListPrimitives {
         if(!(iteratorPair.car() instanceof Pair))
           throw new Exceptionf("'(assoc <key> <alist>) 2nd arg %s isn't an alist (list of key-value pair lists)!", parameters.get(0).profile());
         Pair innerList = (Pair)iteratorPair.car();
-        if(innerList.car().equals(key))
+        if(innerList.car().equal(key))
           return innerList;
         iterator = iteratorPair.cdr();
       }
@@ -434,32 +381,6 @@ public class ListPrimitives {
       if(!(iterator instanceof Pair)) return Boolean.FALSE;
       while(iterator instanceof Pair) iterator = ((Pair)iterator).cdr();
       return Boolean.valueOf(!(iterator instanceof Nil));
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // circular-list?
-  // => NOTE: Since we have immutable lists (for now..?) this is always false.
-  public static class IsCircularList implements Primitive {
-    public java.lang.String escmName() {
-      return "circular-list?";
-    }
-
-    // Floyd's loop detection algorithm
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1) throw new Exceptionf("'(circular-list? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      Datum slow = parameters.get(0);
-      if(!(slow instanceof Pair)) return Boolean.FALSE;
-      Datum fast = ((Pair)slow).cdr();
-      while(fast instanceof Pair && fast != slow) {
-        Pair fastPair = (Pair)fast;
-        if(!(fastPair.cdr() instanceof Pair) || !(((Pair)fastPair.cdr()).cdr() instanceof Pair))
-          return Boolean.FALSE;
-        fast = ((Pair)fastPair.cdr()).cdr();
-        slow = ((Pair)slow).cdr();
-      }
-      return Boolean.valueOf(fast == slow);
     }
   }
 

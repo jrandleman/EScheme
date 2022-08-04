@@ -149,11 +149,7 @@ public class EscmClass extends MetaObject implements Callable {
     return o instanceof EscmClass && ((EscmClass)o).props == this.props;
   }
 
-  public boolean eqv(Object o) {
-    return eq(o);
-  }
-
-  public boolean equals(Object o) {
+  public boolean equal(Object o) {
     return eq(o);
   }
 

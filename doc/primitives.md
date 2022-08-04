@@ -267,11 +267,9 @@
 (sublist <list> <index-num> <optional-length-num>) ; length defaults to end of list
 
 (memq <obj> <list>)
-(memv <obj> <list>)
 (member <obj> <list>)
 
 (assq <key-obj> <alist>)
-(assv <key-obj> <alist>)
 (assoc <key-obj> <alist>)
 
 (sort <binary-predicate?> <list>)
@@ -279,7 +277,6 @@
 
 (list? <obj>)
 (list*? <obj>)
-(circular-list? <obj>)
 (alist? <obj>) ; associative list predicate
 (null? <obj>)
 ```
@@ -299,7 +296,7 @@
 (vector-fill! <vector> <fill-value>)
 (vector-grow! <vector> <length> <fill-value>)
 (vector-insert! <vector> <index> <obj>) ; insert <obj> at <index> & shift back items as needed
-(vector-delete! <vector> <index>) ; returns the deleted object
+(vector-delete! <vector> <index>)       ; returns the deleted object
 
 (vector-push! <vector> <obj>)
 (vector-push-front! <vector> <obj>)
@@ -312,8 +309,7 @@
 (vector-reverse <vector>)
 (subvector <vector> <index> <optional-length>) ; defaults to the end fo the vector
 
-(vector-memq <vector> <obj>) ; returns index of position, or #f if DNE. Uses <eq?> for comparisons.
-(vector-memv <vector> <obj>) ; returns index of position, or #f if DNE. Uses <eq?> for comparisons.
+(vector-memq <vector> <obj>)   ; returns index of position, or #f if DNE. Uses <eq?> for comparisons.
 (vector-member <vector> <obj>) ; returns index of position, or #f if DNE. Uses <equal?> for comparisons.
 
 (vector-sort <binary-predicate?> <vector>)
@@ -321,6 +317,32 @@
 
 (vector? <obj>)
 (vector-empty? <vector>)
+```
+
+
+------------------------
+## Hashmaps:
+```scheme
+(hashmap <key> <value> ...)
+
+(hashmap-keys <hashmap>)
+(hashmap-values <hashmap>)
+
+(hashmap-key? <hashmap> <obj>)
+
+(hashmap-ref <hashmap> <key>)          ; equivalent to: (<hashmap> <key>)
+(hashmap-set! <hashmap> <key> <value>) ; returns whether replaced another entry
+(hashmap-delete! <hashmap> <key>)      ; returns success status
+
+(hashmap-length <hashmap>)
+(hashmap-empty? <hashmap>)
+
+(hashmap-merge <hashmap> ...)
+(hashmap-merge! <hashmap> <merged-hashmap> ...)
+
+(hashmap? <obj>)
+
+(hashcode <obj> ...)
 ```
 
 
@@ -349,6 +371,12 @@
 
 (vector->list <vector>)
 (list->vector <list>)
+
+(hashmap->list <hashmap>)
+(list->hashmap <list>)
+
+(hashmap->vector <hashmap>)
+(vector->hashmap <vector>)
 
 (write-to-string <obj>)
 (display-to-string <obj>)
@@ -534,7 +562,7 @@
 (thread-priority <thread>)
 (thread-set-priority! <thread> <int-priority>)
 
-(thread-start! <thread>)
+(thread-start! <thread> ...)
 (thread-join! <thread> <optional-max-millis-to-wait>)
 
 (thread-interrupted? <thread>)

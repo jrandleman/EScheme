@@ -36,7 +36,7 @@ public class OOPrimitives {
     // Returns <null> if <super> DNE
     private static EscmClass parseSuper(ArrayList<Datum> parameters) throws Exception {
       Datum supr = parameters.get(0);
-      if(supr.equals(Boolean.FALSE)) return null;
+      if(supr.eq(Boolean.FALSE)) return null;
       if(!(supr instanceof EscmClass))
         throw new Exceptionf("'class <super> parameter isn't a class (given %s): %s", supr.profile(), Exceptionf.profileArgs(parameters));
       return (EscmClass)supr;
@@ -59,7 +59,7 @@ public class OOPrimitives {
     // Returns <null> if constructor DNE
     private static CompoundProcedure parseConstructor(ArrayList<Datum> parameters) throws Exception {
       Datum ctor = parameters.get(2);
-      if(ctor.equals(Boolean.FALSE)) return null;
+      if(ctor.eq(Boolean.FALSE)) return null;
       if(!(ctor instanceof CompoundProcedure))
         throw new Exceptionf("'class <new> constructor must be a procedure (given %s): %s", ctor.profile(), Exceptionf.profileArgs(parameters));
       return (CompoundProcedure)ctor;

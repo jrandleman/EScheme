@@ -89,12 +89,6 @@
   "description": "Returns the sublist in <list> starting with <obj> based on <eq?> item\nequality. Returns #f if <obj> isn't in <list>.",
   "example": null
 }, {
-  "name": "memv",
-  "aliases": null,
-  "signatures": ["(memv <obj> <list>)"],
-  "description": "Returns the sublist in <list> starting with <obj> based on <eqv?> item\nequality. Returns #f if <obj> isn't in <list>.",
-  "example": null
-}, {
   "name": "member",
   "aliases": null,
   "signatures": ["(member <obj> <list>)"],
@@ -105,12 +99,6 @@
   "aliases": null,
   "signatures": ["(assq <key-obj> <alist>)"],
   "description": "Returns the pair in associative-lsit <alist> starting with <key-obj> based\non <eq?> item equality. Returns #f if <obj> isn't a key in in <alist>.",
-  "example": null
-}, {
-  "name": "assv",
-  "aliases": null,
-  "signatures": ["(assv <key-obj> <alist>)"],
-  "description": "Returns the pair in associative-lsit <alist> starting with <key-obj> based\non <eqv?> item equality. Returns #f if <obj> isn't a key in in <alist>.",
   "example": null
 }, {
   "name": "assoc",
@@ -141,12 +129,6 @@
   "aliases": null,
   "signatures": ["(list*? <obj>)"],
   "description": "Returns whether <obj> is a dotted-list.",
-  "example": null
-}, {
-  "name": "circular-list?",
-  "aliases": null,
-  "signatures": ["(circular-list? <obj>)"],
-  "description": "Returns whether <obj> is a circular-list. Note that with immutability\nthis ought to be impossible, but it is provided nonetheless.",
   "example": null
 }, {
   "name": "alist?",

@@ -5,15 +5,9 @@
   "description": "Determines shallow (pointer) equality for objects that maintain state.",
   "example": null
 }, {
-  "name": "eqv?",
-  "aliases": null,
-  "signatures": ["(eqv? <obj> <obj> ...)"],
-  "description": "Determines structural equality for objects that maintain state.\nEffectively performs <eq?> on each of the contents in \"<obj> ...\".",
-  "example": null
-}, {
   "name": "equal?",
   "aliases": null,
   "signatures": ["(equal? <obj> <obj> ...)"],
-  "description": "Determines deep (value) equality for objects.",
+  "description": "Determines deep (value) equality for objects.\nNote that this will infinitely loop for cyclical structures!",
   "example": null
 }]

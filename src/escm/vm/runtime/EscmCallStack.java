@@ -39,7 +39,7 @@ public class EscmCallStack {
   }
 
 
-  public static synchronized void print() {
+  public static void print() {
     Stack<String> callStack = ((EscmThread)Thread.currentThread()).callStack;
     int n = callStack.size();
     if(n == 0) return;

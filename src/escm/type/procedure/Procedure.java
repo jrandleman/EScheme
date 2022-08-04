@@ -52,11 +52,7 @@ public abstract class Procedure extends Datum implements Callable {
   // Equality
   public abstract boolean eq(Object o);
 
-  public boolean eqv(Object o) {
-    return eq(o);
-  }
-
-  public boolean equals(Object o) {
+  public boolean equal(Object o) {
     return eq(o);
   }
 
@@ -72,13 +68,6 @@ public abstract class Procedure extends Datum implements Callable {
   // Truthiness
   public boolean isTruthy() {
     return true;
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Hash code
-  public int hashCode() {
-    return Objects.hash(type(),this);
   }
 
 

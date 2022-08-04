@@ -46,11 +46,7 @@ public class Keyword extends Datum {
     return o instanceof Keyword && ((Keyword)o).value.equals(value);
   }
 
-  public boolean eqv(Object o) {
-    return eq(o);
-  }
-
-  public boolean equals(Object o) {
+  public boolean equal(Object o) {
     return eq(o);
   }
 
@@ -93,7 +89,7 @@ public class Keyword extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Datum copy() {
+  public Keyword copy() {
     return this;
   }
 }

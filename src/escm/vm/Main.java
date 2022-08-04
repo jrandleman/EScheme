@@ -50,19 +50,37 @@ public class Main {
   }
 
 
-  private static void printJavaStackTraceWithoutMessage(Exception e) {
+  private static int getLastUniqueStackFrameIndex(StackTraceElement[] stackTrace) {
+    int i = stackTrace.length-1;
+    while(i > 0 && stackTrace[i].equals(stackTrace[i-1])) --i;
+    return i;
+  }
+
+
+  private static void printJavaStackTraceWithoutMessage(Throwable e) {
     StackTraceElement[] stackTrace = e.getStackTrace();
     if(stackTrace.length == 0) return;
+    int n = getLastUniqueStackFrameIndex(stackTrace);
     System.err.printf(">> Java Call Stack: %s", stackTrace[0]);
-    for(int i = 1; i < stackTrace.length; ++i) {
+    for(int i = 1; i <= n; ++i) {
       System.err.printf("\n                    %s", stackTrace[i]);
+    }
+    if(n < stackTrace.length-1) {
+      System.err.print("\n                    ^");
+      System.err.printf("\n                    %d more calls to \"%s\"", stackTrace.length-1-n, stackTrace[n]);
     }
   }
 
 
-  public static void reportTopLevelException(Exception e) {
+  public static void reportTopLevelError(Throwable e) {
     resetCurrentPorts();
-    System.err.printf("\nESCM ERROR: %s\n", e);
+    if(e instanceof Exception) {
+      System.err.printf("\nESCM ERROR: %s\n", e);
+    } else if(e instanceof StackOverflowError) {
+      System.err.println("\nESCM: JAVA STACK-OVERFLOW ERROR: Did you try printing/equating cyclical data?");
+    } else {
+      System.err.printf("\nESCM: JAVA ERROR: %s\n", e);
+    }
     EscmCallStack.print();
     printJavaStackTraceWithoutMessage(e);
     System.err.println("");
@@ -137,8 +155,8 @@ public class Main {
       try {
         eval(GlobalState.globalEnvironment,readFullExpression(),printContinuation);
         EscmCallStack.clear(); // residue frames may reside after continuation nonsense
-      } catch(Exception e) {
-        reportTopLevelException(e);
+      } catch(Throwable e) {
+        reportTopLevelError(e);
       }
     }
   }
@@ -240,10 +258,8 @@ public class Main {
           } else {
             launchScript(parsedCmdLine);
           }
-        } catch(Exception e) {
-          System.err.printf("Driver Loop Caught Error %s\n", e);
-          EscmCallStack.print();
-          printJavaStackTraceWithoutMessage(e);
+        } catch(Throwable e) {
+          reportTopLevelError(e);
         }
         return cont.run(escm.type.Void.VALUE);
       }

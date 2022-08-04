@@ -83,7 +83,7 @@
 ------------------------------------------------------------------------------
 ## EScheme-Specific Concepts (Scheme Extensions/Deviations)
 
-1. Stackless function calls (no stack overflow from recursion)
+1. Stackless function calls (no stack overflow from finite recursion)
 2. Support for `bytecode`, `compile`, `eval-bytecode`
    - `bytecode`: special form to have the compiler reflect the given bytecode
    - `compile`: convert a quoted escm expression into a quoted bytecode list
@@ -98,14 +98,25 @@
      * `[a b c]` compiles to vector of `a`, `b`, & `c` evaluated as variables
    - Quotes can be used though to get expected results: 
      * `(quote [a b c])` => `[(quote a) (quote b) (quote c)]`
-6. Immutable core pairs & strings
+6. Hashmap literals have been added in:
+   - Use `{<key> <value> ...}`
+   - A note on hashing:
+     * Immutable values hash based on contents (think numbers, symbols, and pairs)
+     * Mutable values hash based on identity (e.g. ___not___ their contents)
+       - This includes vectors, hashmaps, objects, classes, interfaces, etc.
+   - Quotes aren't always required: 
+     * `{a 42}` compiles to a hashmap with key `a` evaluated as variable
+   - Quotes can be used though to get expected results: 
+     * `(quote {a 42})` => `{(quote a) (quote 42)}`
+7. Immutable core pairs & strings
    - Mutable pairs may be implemented by users via the object system!
-7. `\` reader lambda literal support:
+8. `\` reader lambda literal support:
    - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
    - `\%1` => `(lambda (%1) %1)`, `\(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
-8. `(. <obj>)` is equivalent to `<obj>` for the reader
-9. Compile-time procedural macro system:
-   - No run-time bindings, all global in scope, deletable for localization!
-10. Object System (classes, interfaces, and objects!)
-11. Multithreading Support (threads and reentrant locks!)
-12. Multi-arity and optional-parameter support via `fn`
+9. `(. <obj>)` is equivalent to `<obj>` for the reader
+10. Compile-time procedural macro system:
+    - No run-time bindings, all global in scope, deletable for localization!
+11. Object System (classes, interfaces, and objects!)
+12. Multithreading Support (threads and reentrant locks!)
+13. Multi-arity and optional-parameter support via `fn`
+14. No `eqv?`: only `eq?` and `equal?`

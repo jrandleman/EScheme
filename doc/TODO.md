@@ -4,134 +4,29 @@
 
 
 
+- UPGRADE VERSION TO ___7.0___ (mention doing so b/c of vector + hashmap literals + hashCode java fixes)
 
 
+- UPDATE ON GITHUB !!!
 
-___HASHMAP PRIMITIVES___
-```clj
-(hashmap <key> <value> ...)
 
-(hashmap-keys <hashmap>)
-(hashmap-values <hashmap>)
-
-(hashmap-key? <hashmap> <obj>)
-
-(hashmap-ref <hashmap> <key>) ; Equivalent to: (<hashmap> <key>)
-(hashmap-set! <hashmap> <key> <value>)
-(hashmap-delete! <hashmap> <key>)
-
-(hashmap-length <hashmap>)
-(hashmap-empty? <hashmap>)
-
-(hashmap-merge <hashmap> ...)
-(hashmap-merge! <hashmap> ...)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(hashmap->list <hashmap>)
-(list->hashmap <list>)
-
-(hashmap->vector <hashmap>)
-(vector->hashmap <vector>)
-```
+- RESTART COMPUTER TO CLEAN UP AFTER MEMORY ISSUES
 
 
 
 
 
 
-- HASHMAPS `(hashmap )`
-  * CONSIDER `{}` SYNTAX (ACCOUNT FOR IN READER & `quasiquote`)
-  * add to README as a Scheme extension (under the `keyword` section)
+- TRY CHANGING MUTATOR/UNIQE IDENTIIES `eq?` TO TEST AGAINST `this` INSTEAD OF CONTENTS!
 
-  * add a `help` type entry about hashmaps (INLCUDE INFO ABOUT IT BEING A CALLABLE)
+- CHANGE READER TO GIVE BETTER ERRORS
+  * INSTEAD OF DUMPING OUT THE ENTIRE STRING, DO THE `JSON` PARSER THING OF HAVING AN ARROW THAT POINTS TO THE RIGHT POSITION OF THE ERROR
+    AFTER PRINTING OUT A SUBSTRING OF THE ERRORFUL CODE
+      => CONSIDER EVEN PRINTING OUT THE LINE/COLUMN NUMBER THAT THE ERROR OCCURED ON !!!
 
-  1. DO TYPE & PRIMITIVES
-     -> ___TYPE SHOULD BE AN UNARY CALLABLE ACCEPTING A KEY AS ITS ARGUMENT !!!___
-  2. UPDATE `primitives.md` and `help`
-  3. UPDATE THE READER & INPUT-PORT !!!!
-     * update `quasiquote` as well !!!
-     * then update `help` again as needed in terms of the new syntax
-  4. UPDATE `README.md`
-  5. MAKE SURE TO AVOID DATA RACES BY USING `sync` AS NEEDED
-      ```java
-      synchronized(vector) {
-        if(vector.size() > 0) return vector.get(0); // wrap in <sync> to avoid race condition of .size() and .get() !!!
-      }
-      ```
+- CONSIDER A BREAKPOINT-SETTING FCN/SPECIAL FORM/INSTRUCTION TO HELP WITH DEBUGGING?
 
-
-`hashmap->alist`
-`alist->hashmap`
-
-`hashmap->list`
-`list->hashmap`
-
-`hashmap->vector`
-`vector->hashmap`
-
-
-
-
-<!-- 
-
-  * NOTE: BUILDERS ___MUST___ BE THREAD-SAFE !!!
-
-  * MENTION THE "BUILDER" CONCEPT UNDER SECTION 5 OF THE README'S "SCHEME DEVIATIONS" SECTION. EXTEND "IMMUTABLE CORE" TYPES TO INCLUDE HASHMAPS AND VECTORS
-    - explain `[]` and `{}` reader syntax creates an immutable vector and hashmap. Mutated via `builder` equivalents.
-    - mention it as a mutable alternative to the immutable other types.
-    - note that `eq?` is used for `builder-key?` & `builder-value?`
-
-```java
-synchronized(vector) {
-  if(vector.size() > 0) return vector.get(0); // wrap in <sync> to avoid race condition of .size() and .get() !!!
-}
-```
-
-
-```
-(list-builder <seed-vector>)    ; <key> is an index! [[[ should use a vector builder under the hood, with the only things changes being the ctor & '->value procedures ]]]
-(vector-builder <seed-vector>)  ; <key> is an index!
-(string-builder <seed-string>)  ; <key> is an index! <val> is a string (<key> will refer to a single-char substring)
-(hashmap-builder <seed-string>) ; <key> is an obj!
-
-(builder-append! <builder> <appended-builder> ...)
-(builder-insert! <builder> <key> <elt>)
-(builder-delete! <builder> <key>) ; returns success status
-
-(builder-key <builder> <elt> <optional-default-value>) ; returns index if <elt> in <builder>, else reutrns <optional-default-value> (or triggers error if none given)
-(builder-value <builder> <key>) ; value of the key
-
-(builder-key? <builder> <key>)
-(builder-value? <builder> <value>)
-
-(builder-length <builder>)
-
-(builder->value <builder>) ; convert internal builder to a value (actual list/vector/string/hashmap)
-
-(builder? <obj>)
-(list-builder? <obj>)
-(vector-builder? <obj>)
-(string-builder? <obj>)
-(hashmap-builder? <obj>)
-``` -->
-
-
-
-
-
-
-
-
-
-
-- AFTER VECTORS AND HASHMAPS: UPGRADE VERSION TO ___7.0___
-
-
-
-
-
-
+- CHANGE `eq?` `equal?` IN NUMBERS TO ACCOUNT FOR EXACTNESS EQUALITY TOO (ONLY `=` TRIES TO COERCE ONE TO THE OTHER TO DETERMIEND EQUIVALENCY)
 
 - STRING FORMATTING PROCEDURES `displayf`, `writef`, `stringf`, `pprintf` (`pretty-printf`), `(stringf )`
   => ACCOUNT FOR THIS IN THE `error` PROCEDURE

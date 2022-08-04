@@ -47,11 +47,7 @@ public class Symbol extends Datum {
     return o instanceof Symbol && ((Symbol)o).value.equals(value);
   }
 
-  public boolean eqv(Object o) {
-    return eq(o);
-  }
-
-  public boolean equals(Object o) {
+  public boolean equal(Object o) {
     return eq(o);
   }
 
@@ -94,7 +90,7 @@ public class Symbol extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Datum copy() {
+  public Symbol copy() {
     return this;
   }
 }

@@ -223,24 +223,11 @@ public class TypeCoercionPrimitives {
     public java.lang.String escmName() {
       return "vector->list";
     }
-
-    public static Datum logic(escm.type.Vector v) {
-      synchronized(v) {
-        try {
-          Datum lis = Nil.VALUE;
-          for(int i = v.size()-1; i >= 0; --i)
-            lis = new escm.type.Pair(v.get(i),lis);
-          return lis;  
-        } catch(Exception e) {
-          return Nil.VALUE; // never triggered since we know <v.get(i)> won't throw.
-        }
-      }
-    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector)) 
         throw new Exceptionf("'(vector->list <vector>) expects exactly 1 vector arg: %s", Exceptionf.profileArgs(parameters));
-      return logic((escm.type.Vector)parameters.get(0));
+      return ((escm.type.Vector)parameters.get(0)).toList();
     }
   }
 
@@ -253,19 +240,95 @@ public class TypeCoercionPrimitives {
     }
 
     public static escm.type.Vector logic(Datum l) {
-      ArrayList<Datum> v = new ArrayList<Datum>();
+      escm.type.Vector v = new escm.type.Vector();
       while(l instanceof escm.type.Pair) {
         escm.type.Pair p = (escm.type.Pair)l;
-        v.add(p.car());
+        v.push(p.car());
         l = p.cdr();
       }
-      return new escm.type.Vector(v);
+      return v;
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || (!(parameters.get(0) instanceof escm.type.Pair) && !(parameters.get(0) instanceof Nil))) 
         throw new Exceptionf("'(list->vector <list>) expects exactly 1 list arg: %s", Exceptionf.profileArgs(parameters));
       return logic(parameters.get(0));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // hashmap->list
+  public static class HashmapToList implements Primitive {
+    public java.lang.String escmName() {
+      return "hashmap->list";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Hashmap)) 
+        throw new Exceptionf("'(hashmap->list <hashmap>) expects exactly 1 hashmap arg: %s", Exceptionf.profileArgs(parameters));
+      return ((escm.type.Hashmap)parameters.get(0)).toList();
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // hashmap->vector
+  public static class HashmapToVector implements Primitive {
+    public java.lang.String escmName() {
+      return "hashmap->vector";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Hashmap)) 
+        throw new Exceptionf("'(hashmap->vector <hashmap>) expects exactly 1 hashmap arg: %s", Exceptionf.profileArgs(parameters));
+      return ((escm.type.Hashmap)parameters.get(0)).toVector();
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // list->hashmap
+  public static class ListToHashmap implements Primitive {
+    public java.lang.String escmName() {
+      return "list->hashmap";
+    }
+
+    private static escm.type.Hashmap logic(Datum lst, ArrayList<Datum> parameters) throws Exception {
+      escm.type.Hashmap h = new escm.type.Hashmap();
+      while(lst instanceof escm.type.Pair) {
+        escm.type.Pair p = (escm.type.Pair)lst;
+        if(!(p.cdr() instanceof escm.type.Pair))
+          throw new Exceptionf("'(list->hashmap <list>) <list> doesn't have an even number of items: %s", Exceptionf.profileArgs(parameters));
+        escm.type.Pair cdr = (escm.type.Pair)p.cdr();
+        h.set(p.car(),cdr.car());
+        lst = cdr.cdr();
+      }
+      return h;
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || (!(parameters.get(0) instanceof escm.type.Pair) && !(parameters.get(0) instanceof Nil))) 
+        throw new Exceptionf("'(list->hashmap <list>) expects exactly 1 list arg: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters.get(0),parameters);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // vector->hashmap
+  public static class VectorToHashmap implements Primitive {
+    public java.lang.String escmName() {
+      return "vector->hashmap";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector)) 
+        throw new Exceptionf("'(vector->hashmap <vector>) expects exactly 1 vector arg: %s", Exceptionf.profileArgs(parameters));
+      escm.type.Vector v = (escm.type.Vector)parameters.get(0);
+      if(v.size() % 2 != 0)
+        throw new Exceptionf("'(vector->hashmap <vector>) <vector> doesn't have an even number of items: %s", Exceptionf.profileArgs(parameters));
+      return v.toHashmap();
     }
   }
 }

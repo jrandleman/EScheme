@@ -214,21 +214,19 @@ public class InputPort extends Port {
             if(containerStack.empty() == false) {
               char c = containerStack.pop();
               if(c == '(') {
-                throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a ')' prior an associated '('!", write());
-              } else {
-                throw new Exceptionf("READ ERROR (for %s): Invalid bracket: found a ']' prior an associated '['!", write());
+                throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: missing a closing ')' for opening '('!", write());
+              } else if(c == '[') {
+                throw new Exceptionf("READ ERROR (for %s): Invalid bracket: missing a closing ']' for opening '['!", write());
+              } else { // if(c == '{')
+                throw new Exceptionf("READ ERROR (for %s): Invalid curly-brace: missing a closing '}' for opening '{'!", write());
               }
             }
             return null;
           }
-          // register open paren
-          if(input == '(') {
+          // register open paren/bracket/curly-brace
+          if(input == '(' || input == '[' || input == '{') {
             sb.append((char)input);
-            containerStack.push('(');
-          // register open bracket
-          } else if(input == '[') {
-            sb.append((char)input);
-            containerStack.push('[');
+            containerStack.push((char)input);
           // register close paren
           } else if(input == ')') {
             sb.append((char)input);
@@ -249,6 +247,17 @@ public class InputPort extends Port {
             char opener = containerStack.pop();
             if(opener != '[') {
               throw new Exceptionf("READ ERROR (for %s): Invalid bracket: found a closing ']' prior to closing '%c'!", write(), opener);
+            }
+            if(containerStack.empty()) break;
+          // register close curly-brace
+          } else if(input == '}') {
+            sb.append((char)input);
+            if(containerStack.empty()) {
+              throw new Exceptionf("READ ERROR (for %s): Invalid curly-brace: found a '}' prior an associated '{'!", write());
+            }
+            char opener = containerStack.pop();
+            if(opener != '{') {
+              throw new Exceptionf("READ ERROR (for %s): Invalid curly-brace: found a closing '}' prior to closing '%c'!", write(), opener);
             }
             if(containerStack.empty()) break;
           // account for whitespace
@@ -359,13 +368,6 @@ public class InputPort extends Port {
   // Equality
   public boolean eq(Object o) {
     return o instanceof InputPort && ((InputPort)o).pr.equals(pr);
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Hash code
-  public int hashCode() {
-    return Objects.hash(type(),name,pr);
   }
 
 

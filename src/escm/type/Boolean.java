@@ -47,11 +47,7 @@ public class Boolean extends Datum {
     return o instanceof Boolean && ((Boolean)o) == this;
   }
 
-  public boolean eqv(Object o) {
-    return eq(o);
-  }
-
-  public boolean equals(Object o) {
+  public boolean equal(Object o) {
     return eq(o);
   }
 
@@ -95,7 +91,7 @@ public class Boolean extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Datum copy() {
+  public Boolean copy() {
     return this;
   }
 }

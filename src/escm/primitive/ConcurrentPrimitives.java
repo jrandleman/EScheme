@@ -211,9 +211,17 @@ public class ConcurrentPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
-        throw new Exceptionf("'(thread-start! <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      ((escm.type.concurrent.Thread)parameters.get(0)).start();
+      if(parameters.size() < 1)
+        throw new Exceptionf("'(thread-start! <thread> ...) expects at least 1 thread: %s", Exceptionf.profileArgs(parameters));
+      ArrayList<escm.type.concurrent.Thread> threads = new ArrayList<escm.type.concurrent.Thread>();
+      for(Datum d : parameters) {
+        if(!(d instanceof escm.type.concurrent.Thread))
+          throw new Exceptionf("'(thread-start! <thread> ...) invalid non-thread %s given: %s", d.profile(), Exceptionf.profileArgs(parameters));
+        threads.add((escm.type.concurrent.Thread)d);
+      }
+      for(escm.type.concurrent.Thread thread : threads) {
+        thread.start();
+      }
       return Void.VALUE;
     }
   }

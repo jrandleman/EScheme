@@ -14,7 +14,7 @@
   "name": "copy",
   "aliases": null,
   "signatures": ["(copy <obj>)"],
-  "description": "Return a copy of <obj>.",
+  "description": "Returns a shallow (structural) copy of <obj>.",
   "example": null
 }, {
   "name": "force",

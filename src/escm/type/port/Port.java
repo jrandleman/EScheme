@@ -46,18 +46,9 @@ public abstract class Port extends Datum {
   // Equality
   public abstract boolean eq(Object o);
 
-  public boolean eqv(Object o) {
+  public boolean equal(Object o) {
     return eq(o);
   }
-
-  public boolean equals(Object o) {
-    return eq(o);
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Hash code
-  public abstract int hashCode();
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -75,21 +66,21 @@ public abstract class Port extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Datum loadWithState(ExecutionState state) throws Exception {
+  public Port loadWithState(ExecutionState state) throws Exception {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Datum loadWithName(String name) throws Exception {
+  public Port loadWithName(String name) throws Exception {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Datum copy() {
+  public Port copy() {
     return this;
   }
 }

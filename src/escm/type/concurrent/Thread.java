@@ -140,8 +140,8 @@ public class Thread extends Datum {
       public void run() {
         try {
           Trampoline.resolve(((Callable)thunk).callWith(new ArrayList<Datum>(),terminalContinuation));
-        } catch(Exception e) {
-          Main.reportTopLevelException(e);
+        } catch(Throwable e) {
+          Main.reportTopLevelError(e);
         }
       }
     };
@@ -155,8 +155,8 @@ public class Thread extends Datum {
       public void run() {
         try {
           Trampoline.resolve(((Callable)thunk).callWith(new ArrayList<Datum>(),terminalContinuation));
-        } catch(Exception e) {
-          Main.reportTopLevelException(e);
+        } catch(Throwable e) {
+          Main.reportTopLevelError(e);
         }
       }
     };
@@ -256,11 +256,7 @@ public class Thread extends Datum {
     return o instanceof Thread && ((Thread)o) == this;
   }
 
-  public boolean eqv(Object o) {
-    return eq(o);
-  }
-
-  public boolean equals(Object o) {
+  public boolean equal(Object o) {
     return eq(o);
   }
 
@@ -303,7 +299,7 @@ public class Thread extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Datum copy() {
+  public Thread copy() {
     return this;
   }
 }

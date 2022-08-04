@@ -47,11 +47,7 @@ public class String extends Datum {
     return o instanceof String && ((String)o).value.equals(value);
   }
 
-  public boolean eqv(Object o) {
-    return eq(o);
-  }
-
-  public boolean equals(Object o) {
+  public boolean equal(Object o) {
     return eq(o);
   }
 
@@ -94,7 +90,7 @@ public class String extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying semantics
-  public Datum copy() {
+  public String copy() {
     return this;
   }
 }

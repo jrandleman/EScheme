@@ -59,6 +59,30 @@
   "description": "Convert a list to a vector.",
   "example": null
 }, {
+  "name": "vector->hashmap",
+  "aliases": null,
+  "signatures": ["(vector->hashmap <vector>)"],
+  "description": "Convert a vector of keys & values to a hashmap.",
+  "example": null
+}, {
+  "name": "hashmap->vector",
+  "aliases": null,
+  "signatures": ["(hashmap->vector <hashmap>)"],
+  "description": "Convert a hashmap to a vector of keys & values.",
+  "example": null
+}, {
+  "name": "hashmap->list",
+  "aliases": null,
+  "signatures": ["(hashmap->list <hashmap>)"],
+  "description": "Convert a hashmap to a list of keys & values.",
+  "example": null
+}, {
+  "name": "list->hashmap",
+  "aliases": null,
+  "signatures": ["(list->hashmap <list>)"],
+  "description": "Convert a list of keys & values to a hashmap.",
+  "example": null
+}, {
   "name": "write-to-string",
   "aliases": null,
   "signatures": ["(write-to-string <obj>)"],

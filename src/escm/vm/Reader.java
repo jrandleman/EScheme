@@ -33,7 +33,7 @@ public class Reader {
 
 
   public static boolean isDelimiter(char c) {
-    return Character.isWhitespace(c) || c=='(' || c==')' || c=='[' || c==']' || c=='"' || c==';';
+    return Character.isWhitespace(c) || c=='(' || c==')' || c=='[' || c==']' || c=='{' || c=='}' || c=='"' || c==';';
   }
 
 
@@ -182,9 +182,8 @@ public class Reader {
     if(sourceCode.charAt(i) == ')') return new Pair<Datum,Integer>(Nil.VALUE,i+1);
     // parse PAIR
     ArrayList<Datum> listItems = new ArrayList<Datum>();
-    Pair<Datum,Integer> parsedItem;
     while(i < n && sourceCode.charAt(i) != ')') {
-      parsedItem = readLoop(sourceCode,i,containerStack);
+      Pair<Datum,Integer> parsedItem = readLoop(sourceCode,i,containerStack);
       if(parsedItem.first != null) // if actually parsed something more than just whitespace & comments
         listItems.add(parsedItem.first);
       i = parsedItem.second;
@@ -203,9 +202,8 @@ public class Reader {
     if(i == n)
       throw new IncompleteException("READ ERROR: Incomplete vector literal!");
     escm.type.Vector vect = new escm.type.Vector();
-    Pair<Datum,Integer> parsedItem;
     while(i < n && sourceCode.charAt(i) != ']') {
-      parsedItem = readLoop(sourceCode,i,containerStack);
+      Pair<Datum,Integer> parsedItem = readLoop(sourceCode,i,containerStack);
       if(parsedItem.first != null) // if actually parsed something more than just whitespace & comments
         vect.push(parsedItem.first);
       i = parsedItem.second;
@@ -213,6 +211,35 @@ public class Reader {
     if(i >= n)
       throw new IncompleteException(String.format("READ ERROR: Invalid input \"%s\", incomplete vector literal!", writeString(sourceCode)));
     return new Pair<Datum,Integer>(vect,i+1);
+  }
+
+  
+  ////////////////////////////////////////////////////////////////////////////
+  // Hashmap Literal Parsing Helper(s)
+  // @param: <i> is where to start parsing
+  // @return: pair of parsed hashmap & position in <sourceCode> after the closing <]>
+  private static Pair<Datum,Integer> parseHashmapLiteral(String sourceCode, int i, int n, Stack<Character> containerStack) throws Exception {
+    if(i == n)
+      throw new IncompleteException("READ ERROR: Incomplete hashmap literal!");
+    escm.type.Hashmap hmap = new escm.type.Hashmap();
+    Datum key = null;
+    while(i < n && sourceCode.charAt(i) != '}') {
+      Pair<Datum,Integer> parsedItem = readLoop(sourceCode,i,containerStack);
+      if(parsedItem.first != null) { // if actually parsed something more than just whitespace & comments
+        if(key == null) {
+          key = parsedItem.first;
+        } else {
+          hmap.set(key,parsedItem.first);
+          key = null;
+        }
+      }
+      i = parsedItem.second;
+    }
+    if(i >= n)
+      throw new IncompleteException(String.format("READ ERROR: Invalid input \"%s\", incomplete hashmap literal!", writeString(sourceCode)));
+    if(key != null)
+      throw new Exceptionf("READ ERROR: Invalid hashmap literal \"%s\" key %s doesn't have a value!", hmap.write(), key.profile());
+    return new Pair<Datum,Integer>(hmap,i+1);
   }
 
 
@@ -401,6 +428,17 @@ public class Reader {
           throw new Exceptionf("READ ERROR: Invalid bracket: found a closing ']' prior to closing '%c'!", opener);
       }
 
+      // Account for curly-brace scoping
+      if(sourceCode.charAt(i) == '{') {
+        containerStack.push('{');
+      } else if(sourceCode.charAt(i) == '}') {
+        if(containerStack.empty())
+          throw new Exception("READ ERROR: Invalid curly-brace: found a '}' prior an associated '{'!");
+        char opener = containerStack.pop();
+        if(opener != '{')
+          throw new Exceptionf("READ ERROR: Invalid curly-brace: found a closing '}' prior to closing '%c'!", opener);
+      }
+
       // Ignore whitespace
       if(Character.isWhitespace(sourceCode.charAt(i))) continue;
 
@@ -426,6 +464,10 @@ public class Reader {
       // Parse Vector
       if(sourceCode.charAt(i) == '[') 
         return parseVectorLiteral(sourceCode,i+1,n,containerStack);
+
+      // Parse Hashmap
+      if(sourceCode.charAt(i) == '{') 
+        return parseHashmapLiteral(sourceCode,i+1,n,containerStack);
 
       // Check for atomic-value literals
       if(sourceCode.charAt(i) == '#') {

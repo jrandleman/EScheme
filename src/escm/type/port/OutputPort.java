@@ -204,13 +204,6 @@ public class OutputPort extends Port {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Hash code
-  public int hashCode() {
-    return Objects.hash(type(),name,bw);
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public String display() {
     return "#<output-port ["+name+"]>";

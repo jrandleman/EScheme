@@ -583,6 +583,9 @@
           ; quasiquote vector
           ((vector? lst)
             (list (list (quote list->vector) (escm-quasiquote->quote (vector->list lst) level))))
+          ; quasiquote hashmap
+          ((hashmap? lst)
+            (list (list (quote list->hashmap) (escm-quasiquote->quote (hashmap->list lst) level))))
           ; finished parsing expression (dotted list)
           ((atom? lst)
             (list (list (quote quote) lst)))
@@ -594,6 +597,10 @@
           ; quasiquote vector
           ((vector? hd)
             (cons (list (quote list) (list (quote list->vector) (escm-quasiquote->quote (vector->list hd) level)))
+                  (iter (cdr lst))))
+          ; quasiquote hashmap
+          ((hashmap? hd)
+            (cons (list (quote list) (list (quote list->hashmap) (escm-quasiquote->quote (hashmap->list hd) level)))
                   (iter (cdr lst))))
           ; quote atom
           ((atom? hd)

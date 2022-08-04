@@ -37,11 +37,7 @@ public class Void extends Datum {
     return o instanceof Void;
   }
 
-  public boolean eqv(Object o) {
-    return eq(o);
-  }
-
-  public boolean equals(Object o) {
+  public boolean equal(Object o) {
     return eq(o);
   }
 
@@ -84,7 +80,7 @@ public class Void extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Datum copy() {
+  public Void copy() {
     return this;
   }
 }

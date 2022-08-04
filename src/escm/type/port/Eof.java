@@ -38,13 +38,7 @@ public class Eof extends Datum {
     return o instanceof Eof;
   }
 
-
-  public boolean eqv(Object o) {
-    return eq(o);
-  }
-
-
-  public boolean equals(Object o) {
+  public boolean equal(Object o) {
     return eq(o);
   }
 
@@ -62,11 +56,9 @@ public class Eof extends Datum {
     return "#eof";
   }
 
-
   public String write() {
     return display();
   }
-
 
   public String pprint() {
     return write();
@@ -75,21 +67,21 @@ public class Eof extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Datum loadWithState(ExecutionState state) throws Exception {
+  public Eof loadWithState(ExecutionState state) throws Exception {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Datum loadWithName(String name) throws Exception {
+  public Eof loadWithName(String name) throws Exception {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Datum copy() {
+  public Eof copy() {
     return this;
   }
 }

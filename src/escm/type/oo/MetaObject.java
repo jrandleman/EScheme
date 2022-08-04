@@ -149,16 +149,7 @@ public abstract class MetaObject extends Datum {
   // Equality
   public abstract boolean eq(Object o);
 
-  public abstract boolean eqv(Object o);
-
-  public abstract boolean equals(Object o);
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Hash code
-  public int hashCode() {
-    return Objects.hash(type(),props);
-  }
+  public abstract boolean equal(Object o);
 
 
   ////////////////////////////////////////////////////////////////////////////

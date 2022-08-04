@@ -2,19 +2,19 @@
   "name": "pretty-print",
   "aliases": ["pprint"],
   "signatures": ["(pretty-print <obj>)", "(pretty-print <output-port> <obj>)"],
-  "description": "Pretty-print <obj> to <output-port> in indented, machine-readable form.\n<output-port> defaults to (current-output-port).\nAliased by \"pprint\".",
+  "description": "Pretty-print <obj> to <output-port> in indented, machine-readable form.\n<output-port> defaults to (current-output-port).\nAliased by \"pprint\".\nNote that this will infinitely loop for cyclical structures!",
   "example": null
 }, {
   "name": "write",
   "aliases": null,
   "signatures": ["(write <obj>)", "(write <output-port> <obj>)"],
-  "description": "Print <obj> to <output-port> in machine-readable form.\n<output-port> defaults to (current-output-port).",
+  "description": "Print <obj> to <output-port> in machine-readable form.\n<output-port> defaults to (current-output-port).\nNote that this will infinitely loop for cyclical structures!",
   "example": null
 }, {
   "name": "display",
   "aliases": null,
   "signatures": ["(display <obj>)", "(display <output-port> <obj>)"],
-  "description": "Print <obj> to <output-port> in human-readable form.\n<output-port> defaults to (current-output-port).",
+  "description": "Print <obj> to <output-port> in human-readable form.\n<output-port> defaults to (current-output-port).\nNote that this will infinitely loop for cyclical structures!",
   "example": null
 }, {
   "name": "newline",

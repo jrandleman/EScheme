@@ -1,14 +1,15 @@
 
 
-(def (printf . d)
-    (for-each display d)
-    (newline))
 
 
+(define-class C)
 
-
+(def o (C))
+(write o)
 (newline)
-(newline)
+
+
+
 
 
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

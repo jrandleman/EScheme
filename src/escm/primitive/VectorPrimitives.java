@@ -1,6 +1,6 @@
 // Author: Jordan Randleman - escm.primitive.VectorPrimitives
 // Purpose:
-//    Java primitives for list procedures.
+//    Java primitives for vector procedures.
 
 package escm.primitive;
 import java.util.ArrayList;
@@ -374,25 +374,6 @@ public class VectorPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // vector-memv
-  public static class VectorMemv implements Primitive {
-    public java.lang.String escmName() {
-      return "vector-memv";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 2)
-        throw new Exceptionf("'(vector-memv <vector> <obj>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum v = parameters.get(0);
-      Datum o = parameters.get(1);
-      if(!(v instanceof escm.type.Vector))
-        throw new Exceptionf("'(vector-memv <vector> <obj>) 1st arg isn't a vector: %s", Exceptionf.profileArgs(parameters));
-      return ((escm.type.Vector)v).memv(o);
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // vector-member
   public static class VectorMember implements Primitive {
     public java.lang.String escmName() {
@@ -427,7 +408,7 @@ public class VectorPrimitives {
       Datum target = parameters.get(1);
       if(!(target instanceof escm.type.Vector))
         throw new Exceptionf("'(vector-sort <predicate?> <vector>) 2nd arg %s isn't a vector: %s", target.profile(), Exceptionf.profileArgs(parameters));
-      return ListPrimitives.Sort.logic((Callable)procedure,TypeCoercionPrimitives.VectorToList.logic((escm.type.Vector)target),(sorted) -> () -> {
+      return ListPrimitives.Sort.logic((Callable)procedure,((escm.type.Vector)target).toList(),(sorted) -> () -> {
         return continuation.run(TypeCoercionPrimitives.ListToVector.logic(sorted));
       });
     }
@@ -450,7 +431,7 @@ public class VectorPrimitives {
       Datum target = parameters.get(1);
       if(!(target instanceof escm.type.Vector))
         throw new Exceptionf("'(vector-sorted? <predicate?> <vector>) 2nd arg %s isn't a vector: %s", target.profile(), Exceptionf.profileArgs(parameters));
-      return ListPrimitives.IsSorted.logic((Callable)procedure,TypeCoercionPrimitives.VectorToList.logic((escm.type.Vector)target),continuation);
+      return ListPrimitives.IsSorted.logic((Callable)procedure,((escm.type.Vector)target).toList(),continuation);
     }
   }
 

@@ -22,13 +22,18 @@ public abstract class Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Equality
   public abstract boolean eq(Object o);
-  public abstract boolean eqv(Object o);
-  public abstract boolean equals(Object o);
+  public abstract boolean equal(Object o);
+
+  public final boolean equals(Object o) {
+    return eq(o);
+  }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Hash code
-  public abstract int hashCode();
+  // HashCode => MUST BE OVERRIDEN FOR VALUE TYPES TO HASH PROPERLY
+  public int hashCode() {
+    return super.hashCode();
+  }
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -38,12 +43,12 @@ public abstract class Datum {
   public abstract java.lang.String pprint();
 
   // Define <toString> as an alias of <write>
-  public java.lang.String toString() {
+  public final java.lang.String toString() {
     return write();
   }
 
   // Profiler to help print datum details in error messages
-  public java.lang.String profile() {
+  public final java.lang.String profile() {
     return java.lang.String.format("%s of type \"%s\"", write(), type());
   }
 
