@@ -101,7 +101,7 @@
 6. Hashmap literals have been added in:
    - Use `{<key> <value> ...}`
    - A note on hashing:
-     * Immutable values hash based on contents (think numbers, symbols, and pairs)
+     * Immutable values hash based on contents (think numbers, symbols, pairs, etc.)
      * Mutable values hash based on identity (e.g. ___not___ their contents)
        - This includes vectors, hashmaps, objects, classes, interfaces, etc.
    - Quotes aren't always required: 
