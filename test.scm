@@ -2,13 +2,6 @@
 
 
 
-(define-class C)
-
-(def o (C))
-(write o)
-(newline)
-
-
 
 
 

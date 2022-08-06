@@ -47,12 +47,36 @@ public class UtilityPrimitives {
     
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 0) 
-        throw new Exceptionf("'(error <reason> . <args>) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(error <reason> <arg> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
       StringBuffer sb = new StringBuffer();
       sb.append(parameters.get(0).display());
       for(int i = 1, n = parameters.size(); i < n; ++i)
         sb.append(" " + parameters.get(i).write());
       throw new Exception("'error: " + sb.toString());
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      return logic(parameters);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // errorf
+  public static class Errorf implements Primitive {
+    public java.lang.String escmName() {
+      return "errorf";
+    }
+    
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() == 0) 
+        throw new Exceptionf("'(errorf <format-string> <args> ...) expects at least 1 string: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(0) instanceof escm.type.String))
+        throw new Exceptionf("'(errorf <format-string> <args> ...) 1st arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+      String formatString = ((escm.type.String)parameters.get(0)).value();
+      ArrayList<Datum> args = IOPrimitives.PrettyPrintf.getStringfArgs(parameters,1);
+      String formatted = FormatPrimitives.Stringf.logic(formatString,args,"(errorf <format-string> <args> ...)");
+      throw new Exception("'error: " + formatted);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

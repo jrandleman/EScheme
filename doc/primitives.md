@@ -130,6 +130,10 @@
 (display <optional-output-port> <obj>)
 (newline <optional-output-port>)
 
+(pretty-printf <optional-output-port> <format-string> <arg> ...) ; aliased by <pprintf>
+(writef <optional-output-port> <format-string> <arg> ...)
+(displayf <optional-output-port> <format-string> <arg> ...)
+
 (read <optional-input-port>)
 (read-string <str>) ; returns a pair: (cons <read-datum> <str-without-serialized-read-datum>)
 (read-line <optional-input-port>)
@@ -425,6 +429,8 @@
 (string-ci>=? <str> <str> ...)
 
 (string? <obj>)
+
+(stringf <format-string> <arg> ...)
 ```
 
 
@@ -465,6 +471,7 @@
 (typeof <obj>) ; returns a symbol of obj's typename
 
 (error <reason> <arg> ...)
+(errorf <format-string> <arg> ...)
 
 (copy <obj>)
 

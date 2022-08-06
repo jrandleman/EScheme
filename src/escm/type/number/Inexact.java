@@ -405,11 +405,14 @@ public class Inexact extends Real {
   ////////////////////////////////////////////////////////////////////////////
   // Equality
   public boolean eq(Object o) {
-    if(o instanceof Real) {
-      if(Double.isNaN(value)) return Double.isNaN(((Real)o).doubleValue());
-      return value == ((Real)o).doubleValue();
+    if(o instanceof Inexact) {
+      Inexact i = (Inexact)o;
+      if(Double.isNaN(value)) return Double.isNaN(i.value);
+      return value == i.value;
     } else if(o instanceof Complex) {
-      return (new Complex(value)).eq(o);
+      Complex c = (Complex)o;
+      Real r = c.realPart();
+      return r instanceof Inexact && c.imagPart().isZero() && eq(r);
     }
     return false;
   }

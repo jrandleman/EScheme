@@ -23,7 +23,7 @@
 
 package escm.type.port;
 import java.util.Objects;
-import java.io.BufferedWriter;
+import java.io.Writer;
 import java.io.OutputStreamWriter;
 import java.io.FileWriter;
 import escm.util.Exceptionf;
@@ -34,7 +34,7 @@ import escm.vm.runtime.EscmThread;
 public class OutputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Internal reader value
-  private BufferedWriter bw = null;
+  private Writer bw = null;
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ public class OutputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Static STDIN field
   private OutputPort() {
-    bw = new BufferedWriter(new OutputStreamWriter(System.out));
+    bw = new OutputStreamWriter(System.out);
     name = "System.out";
   }
 
@@ -73,7 +73,7 @@ public class OutputPort extends Port {
   // Factory Functions
   public OutputPort(String filename, boolean append) throws Exception {
     try {
-      bw = new BufferedWriter(new FileWriter(filename,append));
+      bw = new FileWriter(filename,append);
       name = filename;
     } catch(Exception e) {
       throw new Exceptionf("Can't open port \"%s\" for output: %s", filename, e);
@@ -92,7 +92,7 @@ public class OutputPort extends Port {
   // String Printing Functionality
   public void newline() throws Exception {
     try {
-      bw.newLine();
+      bw.write('\n');
       bw.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't print newline to port \"%s\": %s", name, e);
@@ -103,7 +103,7 @@ public class OutputPort extends Port {
   public void print(Object o) throws Exception {
     String s = o.toString();
     try {
-      bw.write(s,0,s.length());
+      bw.write(s);
       bw.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't print string \"%s\" to port \"%s\": %s", StringParser.escape(s), name, e);
@@ -112,9 +112,9 @@ public class OutputPort extends Port {
 
 
   public void println(Object o) throws Exception {
-    String s = o.toString()+"\n";
+    String s = o.toString();
     try {
-      bw.write(s,0,s.length());
+      bw.write(s+"\n");
       bw.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't println string \"%s\" to port \"%s\": %s", StringParser.escape(s), name, e);
@@ -125,7 +125,7 @@ public class OutputPort extends Port {
   public void printf(String fmt, Object... args) throws Exception {
     String s = String.format(fmt,args);
     try {
-      bw.write(s,0,s.length());
+      bw.write(s);
       bw.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't printf string \"%s\" to port \"%s\": %s", StringParser.escape(s), name, e);
@@ -137,8 +137,7 @@ public class OutputPort extends Port {
   // Datum Printing Functionality
   public void write(Datum d) throws Exception {
     try {
-      String s = d.write();
-      bw.write(s,0,s.length());
+      bw.write(d.write());
       bw.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't write datum %s to port \"%s\": %s", d.profile(), name, e);
@@ -148,8 +147,7 @@ public class OutputPort extends Port {
 
   public void display(Datum d) throws Exception {
     try {
-      String s = d.display();
-      bw.write(s,0,s.length());
+      bw.write(d.display());
       bw.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't display datum %s to port \"%s\": %s", d.profile(), name, e);
@@ -159,8 +157,7 @@ public class OutputPort extends Port {
 
   public void pprint(Datum d) throws Exception {
     try {
-      String s = d.pprint();
-      bw.write(s,0,s.length());
+      bw.write(d.pprint());
       bw.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't pretty-print datum %s to port \"%s\": %s", d.profile(), name, e);

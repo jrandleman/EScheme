@@ -580,10 +580,10 @@ public class Exact extends Real {
     if(o instanceof Exact) {
       Exact e = (Exact)o;
       return num.multiply(e.den).equals(e.num.multiply(den));
-    } else if(o instanceof Inexact) {
-      return doubleValue() == ((Inexact)o).doubleValue();
     } else if(o instanceof Complex) {
-      return (new Complex(this)).eq(o);
+      Complex c = (Complex)o;
+      Real r = c.realPart();
+      return r instanceof Exact && c.imagPart().isZero() && eq(r);
     }
     return false;
   }

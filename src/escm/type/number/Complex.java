@@ -150,11 +150,11 @@ public class Complex extends Number {
   public boolean eqs(Number n) {
     if(n instanceof Complex) {
       Complex c = (Complex)n;
-      return real.eq(c.real) && imag.eq(c.imag);
+      return real.eqs(c.real) && imag.eqs(c.imag);
     } else if(n instanceof Inexact) {
-      return real.eq((Inexact)n) && imag.isZero();
+      return real.eqs((Inexact)n) && imag.isZero();
     } else { //  if(n instanceof Exact)
-      return real.eq((Exact)n) && imag.isZero();
+      return real.eqs((Exact)n) && imag.isZero();
     }
   }
 

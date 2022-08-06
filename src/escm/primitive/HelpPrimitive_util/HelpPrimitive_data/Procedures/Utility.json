@@ -11,6 +11,12 @@
   "description": "Triggers a fatal error, with <reason> displayed and \"<arg> ...\" written.",
   "example": null
 }, {
+  "name": "errorf",
+  "aliases": null,
+  "signatures": ["(errorf <format-string> <arg> ...)"],
+  "description": "Triggers a fatal error, with <format-string> displayed & formatted with \"<arg> ...\".",
+  "example": null
+}, {
   "name": "copy",
   "aliases": null,
   "signatures": ["(copy <obj>)"],

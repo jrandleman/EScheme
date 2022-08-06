@@ -104,7 +104,11 @@ public class IOPrimitives {
           GlobalState.setLastPrintedANewline(false);
         } else {
           String str = ((escm.type.String)printed).value();
-          GlobalState.setLastPrintedANewline(str.charAt(str.length()-1) == '\n');
+          if(str.length() == 0) {
+            GlobalState.setLastPrintedANewline(false);
+          } else {
+            GlobalState.setLastPrintedANewline(str.charAt(str.length()-1) == '\n');
+          }
         }
       }
       return escm.type.Void.VALUE;
@@ -133,6 +137,127 @@ public class IOPrimitives {
       }
       port.newline();
       if(GlobalState.inREPL && port.isStdout()) GlobalState.setLastPrintedANewline(true);
+      return escm.type.Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // pretty-printf
+  public static class PrettyPrintf implements Primitive {
+    public java.lang.String escmName() {
+      return "pretty-printf";
+    }
+
+    public static ArrayList<Datum> getStringfArgs(ArrayList<Datum> parameters, int argStartIndex) {
+      ArrayList<Datum> args = new ArrayList<Datum>();
+      for(int n = parameters.size(); argStartIndex < n; ++argStartIndex)
+        args.add(parameters.get(argStartIndex));
+      return args;
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(pretty-printf <optional-output-port> <format-string> <arg> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      String printed = null;
+      OutputPort port = null;
+      if(parameters.get(0) instanceof OutputPort) {
+        if(parameters.size() == 1)
+          throw new Exceptionf("'(pretty-printf <optional-output-port> <format-string> <arg> ...) missing <format-string>: %s", Exceptionf.profileArgs(parameters));
+        if(!(parameters.get(1) instanceof escm.type.String))
+          throw new Exceptionf("'(pretty-printf <optional-output-port> <format-string> <arg> ...) 2nd arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+        port = (OutputPort)parameters.get(0);
+        String formatString = ((escm.type.String)parameters.get(1)).value();
+        ArrayList<Datum> args = getStringfArgs(parameters,2);
+        printed = FormatPrimitives.Stringf.logic(formatString,args,"(pretty-printf <optional-output-port> <format-string> <arg> ...)");
+      } else {
+        if(!(parameters.get(0) instanceof escm.type.String))
+          throw new Exceptionf("'(pretty-printf <optional-output-port> <format-string> <arg> ...) 1st arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+        port = OutputPort.getCurrent();
+        String formatString = ((escm.type.String)parameters.get(0)).value();
+        ArrayList<Datum> args = getStringfArgs(parameters,1);
+        printed = FormatPrimitives.Stringf.logic(formatString,args,"(pretty-printf <optional-output-port> <format-string> <arg> ...)");
+      }
+      port.print((new escm.type.String(printed)).pprint());
+      if(GlobalState.inREPL && port.isStdout()) GlobalState.setLastPrintedANewline(false);
+      return escm.type.Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // writef
+  public static class Writef implements Primitive {
+    public java.lang.String escmName() {
+      return "writef";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(writef <optional-output-port> <format-string> <arg> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      String printed = null;
+      OutputPort port = null;
+      if(parameters.get(0) instanceof OutputPort) {
+        if(parameters.size() == 1)
+          throw new Exceptionf("'(writef <optional-output-port> <format-string> <arg> ...) missing <format-string>: %s", Exceptionf.profileArgs(parameters));
+        if(!(parameters.get(1) instanceof escm.type.String))
+          throw new Exceptionf("'(writef <optional-output-port> <format-string> <arg> ...) 2nd arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+        port = (OutputPort)parameters.get(0);
+        String formatString = ((escm.type.String)parameters.get(1)).value();
+        ArrayList<Datum> args = PrettyPrintf.getStringfArgs(parameters,2);
+        printed = FormatPrimitives.Stringf.logic(formatString,args,"(writef <optional-output-port> <format-string> <arg> ...)");
+      } else {
+        if(!(parameters.get(0) instanceof escm.type.String))
+          throw new Exceptionf("'(writef <optional-output-port> <format-string> <arg> ...) 1st arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+        port = OutputPort.getCurrent();
+        String formatString = ((escm.type.String)parameters.get(0)).value();
+        ArrayList<Datum> args = PrettyPrintf.getStringfArgs(parameters,1);
+        printed = FormatPrimitives.Stringf.logic(formatString,args,"(writef <optional-output-port> <format-string> <arg> ...)");
+      }
+      port.print((new escm.type.String(printed)).write());
+      if(GlobalState.inREPL && port.isStdout()) GlobalState.setLastPrintedANewline(false);
+      return escm.type.Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // displayf
+  public static class Displayf implements Primitive {
+    public java.lang.String escmName() {
+      return "displayf";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(displayf <optional-output-port> <format-string> <arg> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      String printed = null;
+      OutputPort port = null;
+      if(parameters.get(0) instanceof OutputPort) {
+        if(parameters.size() == 1)
+          throw new Exceptionf("'(displayf <optional-output-port> <format-string> <arg> ...) missing <format-string>: %s", Exceptionf.profileArgs(parameters));
+        if(!(parameters.get(1) instanceof escm.type.String))
+          throw new Exceptionf("'(displayf <optional-output-port> <format-string> <arg> ...) 2nd arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+        port = (OutputPort)parameters.get(0);
+        String formatString = ((escm.type.String)parameters.get(1)).value();
+        ArrayList<Datum> args = PrettyPrintf.getStringfArgs(parameters,2);
+        printed = FormatPrimitives.Stringf.logic(formatString,args,"(displayf <optional-output-port> <format-string> <arg> ...)");
+      } else {
+        if(!(parameters.get(0) instanceof escm.type.String))
+          throw new Exceptionf("'(displayf <optional-output-port> <format-string> <arg> ...) 1st arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+        port = OutputPort.getCurrent();
+        String formatString = ((escm.type.String)parameters.get(0)).value();
+        ArrayList<Datum> args = PrettyPrintf.getStringfArgs(parameters,1);
+        printed = FormatPrimitives.Stringf.logic(formatString,args,"(displayf <optional-output-port> <format-string> <arg> ...)");
+      }
+      port.print((new escm.type.String(printed)).display());
+      if(GlobalState.inREPL && port.isStdout()) {
+        if(printed.length() == 0) {
+          GlobalState.setLastPrintedANewline(false);
+        } else {
+          GlobalState.setLastPrintedANewline(printed.charAt(printed.length()-1) == '\n');
+        }
+      }
       return escm.type.Void.VALUE;
     }
   }
