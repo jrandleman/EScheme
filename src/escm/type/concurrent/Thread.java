@@ -9,6 +9,7 @@ import escm.util.Trampoline;
 import escm.util.Exceptionf;
 import escm.type.Datum;
 import escm.type.Symbol;
+import escm.type.Boolean;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.vm.Main;
 import escm.vm.type.Callable;
@@ -227,6 +228,16 @@ public class Thread extends Datum {
     } else {
       return thread.dynamicEnvironment.get(name);
     }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Checking for a Variable in the Dynamic Environment
+  //   => NOTE: due to caching from the meta thread giving us access to any
+  //      value therein, we simply need to check if the value exists there
+  //      (and hence can ignore <thread.dynamicEnvironment>).
+  public Datum has(Symbol name) {
+    return Boolean.valueOf(GlobalState.metaThreadDynamicEnvironment.has(name));
   }
 
 

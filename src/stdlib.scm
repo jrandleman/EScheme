@@ -46,6 +46,7 @@
 ;   - thread-define
 ;   - thread-set!
 ;   - thread-get
+;   - thread-defined?
 ;
 ;   - scons
 ;   - stream-pair?
@@ -868,6 +869,11 @@
 (define-syntax thread-get
   (fn ((var) `(thread-get' ',var))
       ((thread var) `(thread-get' ,thread ',var))))
+
+
+(define-syntax thread-defined?
+  (fn ((var) `(thread-defined?' ',var))
+      ((thread var) `(thread-defined?' ,thread ',var))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

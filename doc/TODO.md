@@ -56,30 +56,6 @@ SHOW "LAST CALLED" PROCEDURE LOCATION
 
 
 
-- ADD IN `thread-defined?` SPECIAL FORM !!!!
-
-
-
-
-
-
-- CONSIDER CHANGING THE REPL TO SHOW INTERMEDIATE LINE NUMBERS AFTER A RETURN:
-  * IF LINE NUMBER AMOUNT JUMPS FROM ONE WIDTH TO ANOTHER, OMIT THE LAST SPACE: 
-    prompt: `"[8]> "`
-    indent: `"[9]  `
-    indent: `"[10] ` (NOTE THERE'S ONE SPACE FEWER HERE!)
-    indent: ...
-    indent: `"[100]"` (NOTE THERE'S NO SPACES HERE (AND NONE MORE FROM HERE ON OUT))
-
-```
-[8]> (define (fact n
-[9]     (if (< n 2)
-[10]        1
-[11]        (* n (fact (- n 1))))))
-[12]> 
-```
-
-
 
 
 - BETTER ERRORS BY HAVING THE MESSAGE PRINT, THEN PRINT THE EXCEPTION/ERROR NAME IN PARENS UNDER THE MESSAGE?

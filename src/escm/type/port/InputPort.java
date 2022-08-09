@@ -158,11 +158,27 @@ public class InputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Various Readers
+  private long getNumberOfDigits(long num) {
+    return (long)(Math.log10(num)+1);
+  }
+
+
   private void printReplPrompt() {
     if(!GlobalState.getLastPrintedANewline()) System.out.println("");
     System.out.printf("[%d]> ", lineNumber);
     System.out.flush();
     if(GlobalState.inREPL) GlobalState.setLastPrintedANewline(false); // from the newline input by the user's <enter>/<return> key stroke
+  }
+
+
+  private void printIncompleteReplPrompt() {
+    long width = getNumberOfDigits(lineNumber);
+    if(width > getNumberOfDigits(lineNumber-1)) {
+      for(long i = 0, n = width+3; i < n; ++i) System.out.print(' ');
+    } else {
+      for(long i = 0, n = width+4; i < n; ++i) System.out.print(' ');
+    }
+    System.out.flush();
   }
 
 
@@ -237,6 +253,7 @@ public class InputPort extends Port {
         if(result.first instanceof Eof) return null; // only reading #eof is equivalent to typing ^D
         return result.first;
       } catch(Reader.IncompleteException e) {
+        printIncompleteReplPrompt();
         continue;
       }
     }

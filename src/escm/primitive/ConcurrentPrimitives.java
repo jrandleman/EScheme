@@ -458,6 +458,36 @@ public class ConcurrentPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // thread-defined?'
+  public static class ThreadIsDefinedApostrophe implements Primitive {
+    public java.lang.String escmName() {
+      return "thread-defined?'";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      int totalParams = parameters.size();
+      if(totalParams != 1 && totalParams != 2)
+        throw new Exceptionf("'(thread-defined?' <optional-thread> <var-name>) didn't receive 1 or 2 args (optional thread, variable symbol): %s", 
+          Exceptionf.profileArgs(parameters));
+      if(totalParams == 1) {
+        if(!(parameters.get(0) instanceof Symbol))
+          throw new Exceptionf("'(thread-defined?' <optional-thread> <var-name>) 1st arg %s isn't a symbolic variable name: %s", 
+            parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
+        return Boolean.valueOf(GlobalState.metaThreadDynamicEnvironment.has((Symbol)parameters.get(0)));
+      } else {
+        if(!(parameters.get(0) instanceof escm.type.concurrent.Thread))
+          throw new Exceptionf("'(thread-defined?' <optional-thread> <var-name>) 1st arg %s isn't a thread: %s", 
+            parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
+        if(!(parameters.get(1) instanceof Symbol))
+          throw new Exceptionf("'(thread-defined?' <optional-thread> <var-name>) 2nd arg %s isn't a symbolic variable name: %s", 
+            parameters.get(1).profile(), Exceptionf.profileArgs(parameters));
+        return ((escm.type.concurrent.Thread)parameters.get(0)).has((Symbol)parameters.get(1));
+      }
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // thread-dynamic-environment
   public static class ThreadDynamicEnvironment implements Primitive {
     public java.lang.String escmName() {

@@ -185,6 +185,12 @@
   "description": "Get <variable-name>'s value in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.",
   "example": null
 }, {
+  "name": "thread-defined?",
+  "aliases": null,
+  "signatures": ["(thread-defined? <variable-name>)", "(thread-defined? <thread> <variable-name>)"],
+  "description": "Return whether <variable-name> is defined in <thread>'s\n(defaults to the \"meta-thread\") dynamic environment\n(effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.",
+  "example": null
+}, {
   "name": "scons",
   "aliases": ["cons-stream", "stream-cons"],
   "signatures": ["(scons <obj> <obj>)"],

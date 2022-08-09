@@ -587,6 +587,7 @@
 (thread-define' <optional-thread> <symbolic-variable-name> <value>)
 (thread-set!' <optional-thread> <symbolic-variable-name> <value>)
 (thread-get' <optional-thread> <symbolic-variable-name>)
+(thread-defined?' <optional-thread> <symbolic-variable-name>)
 
 (thread-dynamic-environment <optional-thread>)
 ```
