@@ -2,6 +2,35 @@
 
 ## MORE
 
+
+
+- BETTER ERRORS BY HAVING THE MESSAGE PRINT, THEN PRINT THE EXCEPTION/ERROR NAME IN PARENS UNDER THE MESSAGE?
+  ```
+  ESCM ERROR: <message>
+              (<java exception name>)
+  ```
+
+
+
+
+- CHANGE READER TO GIVE BETTER ERRORS
+  * INSTEAD OF DUMPING OUT THE ENTIRE STRING, DO THE `JSON` PARSER THING OF HAVING AN ARROW THAT POINTS TO THE RIGHT POSITION OF THE ERROR
+    AFTER PRINTING OUT A SUBSTRING OF THE ERRORFUL CODE
+      => CONSIDER EVEN PRINTING OUT THE LINE/COLUMN NUMBER THAT THE ERROR OCCURED ON !!!
+
+      => ALSO IMPROVE THE ERRORS THROWN BY THE PORT-READING METHOD IN `InputPort`
+
+
+
+
+==================================================================================================================
+==================================================================================================================
+==================================================================================================================
+==================================================================================================================
+==================================================================================================================
+==================================================================================================================
+
+
 ```
 loadWithName() // SHOULD ACCEPT A SYMBOL
   => for procedures, binds the InformationSource object of the symbol
@@ -24,15 +53,12 @@ SHOW SOURCE INFORMATION OF PROCEDURES IN CALLSTACK
 
 
 SHOW "LAST CALLED" PROCEDURE LOCATION
+  - Designed to catch exact location of `+` in: `(+ "hi")`
   - (push +) ; can have `loadWithState` of `Symbol` also `cons` source information onto env result iff getting a procedure
     - then this is pushed to thread-local "last called" stack
       * must differentiate between name-binding (defining) source and call-binding (invoking) source internally
         - if no invoking source, do nothing
         - in continuation, pop it from from the thread-local stack
-
-
-
-
 ```
 
 
@@ -49,6 +75,24 @@ SHOW "LAST CALLED" PROCEDURE LOCATION
 
 
 
+
+- `#line` macro variable: special "macro-specific" variable.
+  When the compiler expands a macro, it parses the expanded value for all `#line` instances.
+  Any instances found are replaced with the line number in the `source` object of the macro name.
+    => also have `#file` `#column`
+
+    => have compiling these symbols spereately as an atomic instead compile them to become their
+       respective values by introspecting on their `source` object instead compiling that specific
+       value!
+
+    => MENTION THESE IN `help` AND `README.md` AS A SCM EXTENSION
+
+
+
+
+
+
+
 - have anonymous lambdas print some unique id for slightly easier debugging
 
 
@@ -57,27 +101,24 @@ SHOW "LAST CALLED" PROCEDURE LOCATION
 
 
 
+- ADD AN `(absolute-path? <string>)` PRIMITIVE
+    * EQUIVALENT TO: `(equal? <string> (absolute-path <string>))`
 
-- BETTER ERRORS BY HAVING THE MESSAGE PRINT, THEN PRINT THE EXCEPTION/ERROR NAME IN PARENS UNDER THE MESSAGE?
-  ```
-  ESCM ERROR: <message>
-              (<java exception name>)
-  ```
-
-
-
-
-- CHANGE READER TO GIVE BETTER ERRORS
-  * INSTEAD OF DUMPING OUT THE ENTIRE STRING, DO THE `JSON` PARSER THING OF HAVING AN ARROW THAT POINTS TO THE RIGHT POSITION OF THE ERROR
-    AFTER PRINTING OUT A SUBSTRING OF THE ERRORFUL CODE
-      => CONSIDER EVEN PRINTING OUT THE LINE/COLUMN NUMBER THAT THE ERROR OCCURED ON !!!
-
-      => ALSO IMPROVE THE ERRORS THROWN BY THE PORT-READING METHOD IN `InputPort`
+        => ISSUE: MAY NEED TO GET RID OF `..` INSTANCES IN <(absolute-path <string>)> (SEE HOW CAN DO THIS IN JAVA & IF ITS WORTH IT)
 
 
 
 
 
+
+
+- ISSUE:
+  * Suppose `t.scm` loads `s.scm`. Then suppose we execute `escm ../t.scm`. This triggers an error that `s.scm` is not found!
+    => solution: have a `CURRENT_LOADING_DIRECTORY` constant + global determined by the path preceding the given interpretable file name
+                 (or just CWD if ___ONLY___ in the REPL). Then, if ever reading/loading/slurping (etc.) any file with a non-absolute path,
+                 make it relative to the `CURRENT_LOADING_DIRECTORY` variable
+
+                  => VERIFY THIS WORKS !!!
 
 
 
@@ -86,6 +127,9 @@ SHOW "LAST CALLED" PROCEDURE LOCATION
 
 - CONSIDER HAVING INPUT PORTS CHANGE THEIR NAME TO BE AN ABSOLUTE PATH RATHER THAN THE RELATIVE PATH !!!
   * ALSO HAVE `file-read` DO THIS TO ITS FILENAME PRIOR TO CREATING THE `source` OBJECT PASSED TO THE READER !!!
+
+
+
 
 
 
