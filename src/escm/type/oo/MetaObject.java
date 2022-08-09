@@ -25,8 +25,10 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.util.Exceptionf;
 import escm.type.Datum;
+import escm.type.Symbol;
 import escm.type.procedure.CompoundProcedure;
 import escm.vm.type.ExecutionState;
+import escm.vm.util.SourceInformation;
 
 public abstract class MetaObject extends Datum {
   ////////////////////////////////////////////////////////////////////////////
@@ -67,9 +69,8 @@ public abstract class MetaObject extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Property Managing Operations
-  // NOTE: Binds <self> to methods.
-  public Datum get(String name) throws Exception {
+  // Get Operations
+  private Datum get(String name, SourceInformation source) throws Exception {
     Datum val = props.get(name);
     if(val != null) {
       if(val instanceof CompoundProcedure) {
@@ -78,11 +79,21 @@ public abstract class MetaObject extends Datum {
       return val;
     }
     MetaObject superObj = getSuper();
-    if(superObj == null) 
-      throw new Exceptionf("'MetaObject [GET] \"%s\" isn't a property of object %s", name, write());
+    if(superObj == null) {
+      if(source == null) {
+        throw new Exceptionf("'MetaObject [GET] \"%s\" isn't a property of object %s", name, write());
+      } else {
+        throw new Exceptionf("'MetaObject [GET] \"%s\" isn't a property of object %s\n>> Location: %s", name, write(), source);
+      }
+    }
     val = superObj.get_recur(name);
-    if(val == null)
-      throw new Exceptionf("'MetaObject [GET] \"%s\" isn't a property of object %s", name, write());
+    if(val == null) {
+      if(source == null) {
+        throw new Exceptionf("'MetaObject [GET] \"%s\" isn't a property of object %s", name, write());
+      } else {
+        throw new Exceptionf("'MetaObject [GET] \"%s\" isn't a property of object %s\n>> Location: %s", name, write(), source);
+      }
+    }
     if(val instanceof CompoundProcedure) {
       return ((CompoundProcedure)val).loadWithSelf(this);
     }
@@ -90,14 +101,54 @@ public abstract class MetaObject extends Datum {
   }
 
 
-  public void set(String name, Datum newValue) throws Exception {
-    if(set_recur(name,newValue) == false)
-      throw new Exceptionf("'MetaObject [SET! TO %s] \"%s\" isn't a property of object %s", newValue.write(), name, write());
+  public Datum get(String name) throws Exception {
+    return get(name,null);
   }
 
 
+  public Datum get(Symbol name) throws Exception {
+    if(name.hasSourceInformation())
+      return get(name.value(),name.source());
+    return get(name.value(),null);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Set! Operations
+  private void set(String name, Datum newValue, SourceInformation source) throws Exception {
+    if(set_recur(name,newValue) == false) {
+      if(source == null) {
+        throw new Exceptionf("'MetaObject [SET! TO %s] \"%s\" isn't a property of object %s", newValue.write(), name, write());
+      } else {
+        throw new Exceptionf("'MetaObject [SET! TO %s] \"%s\" isn't a property of object %s\n>> Location: %s", newValue.write(), name, write(), source);
+      }
+    }
+  }
+
+
+  public void set(String name, Datum newValue) throws Exception {
+    set(name,newValue,null);
+  }
+
+
+  public void set(Symbol name, Datum newValue) throws Exception {
+    if(name.hasSourceInformation()) {
+      set(name.value(),newValue,name.source());
+    } else {
+      set(name.value(),newValue,null);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Define Operations
   public void define(String name, Datum newValue) {
     props.put(name,newValue);
+  }
+
+
+  public void define(Symbol name, Datum newValue) {
+    props.put(name.value(),newValue);
   }
 
 
@@ -108,6 +159,11 @@ public abstract class MetaObject extends Datum {
     MetaObject superObj = getSuper();
     if(superObj == null) return false;
     return superObj.has(name);
+  }
+
+
+  public boolean has(Symbol name) {
+    return has(name.value());
   }
 
 

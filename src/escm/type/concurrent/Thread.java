@@ -179,7 +179,7 @@ public class Thread extends Datum {
 
   public Thread(String name, Datum thunk) throws Exceptionf {
     if(!(thunk instanceof Callable)) 
-      throw new Exceptionf("escm.type.concurrent.Thread %s can't be created with non-callable: %s", name, thunk.profile());
+      throw new Exceptionf("Thread %s can't be created with non-callable: %s", name, thunk.profile());
     initializeValues(name,thunk);
   }
 
@@ -191,7 +191,7 @@ public class Thread extends Datum {
 
   public Thread(Datum thunk) throws Exceptionf {
     if(!(thunk instanceof Callable)) 
-      throw new Exceptionf("escm.type.concurrent.Thread can't be created with non-callable: %s", thunk.profile());
+      throw new Exceptionf("Thread can't be created with non-callable: %s", thunk.profile());
     initializeValues(thunk);
   }
 

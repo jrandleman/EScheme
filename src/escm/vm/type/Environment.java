@@ -68,9 +68,9 @@ public class Environment {
     ArrayList<String> existingVariables = new ArrayList<String>();
     addCurrentVariableBindings(existingVariables);
     ArrayList<String> potentialVariables = GetClosestStringMatches.run(varName.value(),existingVariables,MAXIMUM_SUGGESTED_VARIABLE_ALTERNATIVES);
-    StringBuilder sb = new StringBuilder("\nNo matches found! Did you mean:");
+    StringBuilder sb = new StringBuilder("\n>> No matches found! Did you mean:");
     for(int i = 0, n = potentialVariables.size(); i < n; ++i) {
-      sb.append(String.format("\n  %2d) %s", i+1, potentialVariables.get(i)));
+      sb.append(String.format("\n   %2d) %s", i+1, potentialVariables.get(i)));
     }
     return sb.toString();
   }
@@ -95,9 +95,9 @@ public class Environment {
     if(result == null) {
       if(superEnv == null) {
         if(name.hasSourceInformation()) {
-          throw new Exceptionf("escm.vm.type.Environment [GET] variable \"%s\" doesn't exist!\nLocation:\n  %s%s", name.value(), name.source(), getPossibleVariableIntentions(name));
+          throw new Exceptionf("VM [GET] variable \"%s\" doesn't exist!\n>> Location: %s%s", name.value(), name.source(), getPossibleVariableIntentions(name));
         } else {
-          throw new Exceptionf("escm.vm.type.Environment [GET] variable \"%s\" doesn't exist!%s", name.value(), getPossibleVariableIntentions(name));
+          throw new Exceptionf("VM [GET] variable \"%s\" doesn't exist!%s", name.value(), getPossibleVariableIntentions(name));
         }
       }
       return superEnv.get(name);
@@ -114,9 +114,9 @@ public class Environment {
     if(result == null) {
       if(superEnv == null) {
         if(name.hasSourceInformation()) {
-          throw new Exceptionf("escm.vm.type.Environment [SET!] variable \"%s\" doesn't exist!\nLocation:\n  %s%s", nameString, name.source(), getPossibleVariableIntentions(name));
+          throw new Exceptionf("VM [SET!] variable \"%s\" doesn't exist!\n>> Location: %s%s", nameString, name.source(), getPossibleVariableIntentions(name));
         } else {
-          throw new Exceptionf("escm.vm.type.Environment [SET!] variable \"%s\" doesn't exist!%s", nameString, getPossibleVariableIntentions(name));
+          throw new Exceptionf("VM [SET!] variable \"%s\" doesn't exist!%s", nameString, getPossibleVariableIntentions(name));
         }
       }
       superEnv.set(name,newValue);

@@ -24,7 +24,8 @@
           - by instead "re-source'ing" all symbols within an expanded macro expression, we can guarentee that expansions for `#line` (etc.)
             will work properly.
               * please note: "re-source'ing" sounds like it could be expensive asf -- options?
-                => RUN TESTS TO SEE THE COST OF THIS (BOOT-TIME COST, ETC.)
+                => ___RUN TESTS TO SEE THE COST OF THIS (BOOT-TIME COST, ETC.)___
+                ====================================================================
 
 
     ```clj
@@ -170,9 +171,46 @@ SHOW "LAST CALLED" PROCEDURE LOCATION
   * ESCPECIALLY UNICODE (`\u`) SUPPORT !!!
     => SEE `StringParser.java`
        * UPDATE IN `json` AS WELL
-  
+
+
+       `Character.toString(unicodeCodePointInt)` 
+        => NOTE: CONSIDER HOW ESCM SHOULD SUPPORT THIS: want to be able to support 32 bit unicode printing.
+           BUT doing `(string-split <string> "")` splits across 16bit chars
+
+        => MAYBE HAVE escm.type.String BE MORE COMPLEX? 
+           => ARRAY OF PAIRS OF CODEPOINTS ?
+
+           => ___ISSUE: CAN'T LEVERAGE JAVA REGEX FUNCTIONS IFF USING THIS ADVANCED STRUCTURE___
+
+           => ___POSSIBLE SOLUTION: POTENTIALLY SUPPORT `\uXXXX` FOR TRUE JAVA CHARACTERS___
+              * ___ALSO SUPPORT `\Uxxxxxxxx` FOR 32-BIT CHARSEQS W/IN A STRING (MENTION THIS CORRELATES TO A CHAR SEQUENCE, NOT A CHAR!)___
+
+
   * ADD DETAILS TO `README` & `help` REGARDING WHAT ESCAPE CHARACTERS ARE / AREN'T SUPPORTED IN STRINGS !!!
 
+
+
+
+
+
+
+
+
+- CONSIDER OPTIONAL SUPPORT FOR ANSI COLORS!
+  * have a flag to disable these
+  * NOTE: ERRORS/WARNINGS MIGHT BE ABLE TO GET AWAY WITH USING EMOJIS INSTEAD
+  * `-n`, `--nansi`
+
+
+
+
+
+
+
+
+
+
+- CHECK WHETHER SHOULD ALWAYS SET LOCAL TO ENGLISH OR NOT WHEN RUNNING ESCM (DOING SO PROGRAMMATICALLY)
 
 
 
@@ -231,6 +269,8 @@ SHOW "LAST CALLED" PROCEDURE LOCATION
 
 - RUNTIME TYPING ___!!! THIS WOULD WARRANT A VERSION UPGRADE TO `8.0` !!!___
   
+  * CHECK TO MAKE SURE ALL TYPES ARE BEING ENCAPSULATED
+
   * NOTE: THE BELOW SHOULD ALSO BE AVAILABLE FOR CLASS METHODS !!!
     - GO THRU OTHER SPECIAL FORMS AND SEE WHERE ELSE COULD BE USED !!!
 

@@ -143,9 +143,9 @@ public class CompoundProcedure extends Procedure {
 
 
   protected String stringifyParameterSignatures() {
-    StringBuilder sb = new StringBuilder("\n  Available Signatures:");
+    StringBuilder sb = new StringBuilder("\n>> Available Signatures:");
     for(int i = 0, n = state.compileTime.parametersList.size(); i < n; ++i) {
-      sb.append("\n    > " + stringifyParameters(state.compileTime.parametersList.get(i),state.compileTime.variadicParameterList.get(i)));
+      sb.append(String.format("\n   %2d) ", i+1) + stringifyParameters(state.compileTime.parametersList.get(i),state.compileTime.variadicParameterList.get(i)));
     }
     return sb.toString();
   }
@@ -154,14 +154,14 @@ public class CompoundProcedure extends Procedure {
   // @RETURN: the clause (param/body) index these args can be processed with
   protected int validateEnvironmentExtension(ArrayList<Datum> arguments) throws Exception {
     if(state.definitionEnvironment == null)
-      throw new Exceptionf("escm.type.procedure.CompoundProcedure can't apply procedure %s with a null definition environment!", name);
+      throw new Exceptionf("Can't apply procedure %s with a null definition environment!", name);
     int totalArguments = arguments.size();
     for(int i = 0, n = state.compileTime.parametersList.size(); i < n; ++i) {
       int totalParameters = state.compileTime.parametersList.get(i).size();
       if(totalArguments == totalParameters) return i;
       if(totalArguments > totalParameters && state.compileTime.variadicParameterList.get(i) != null) return i;
     }
-    throw new Exceptionf("escm.type.procedure.CompoundProcedure args %s don't match any signatures in procedure \"%s\":%s", Exceptionf.profileArgs(arguments), name, stringifyParameterSignatures());
+    throw new Exceptionf("Args (%s) don't match any signatures in procedure \"%s\":%s", Exceptionf.profileArgs(arguments), name, stringifyParameterSignatures());
   }
 
 
@@ -204,7 +204,7 @@ public class CompoundProcedure extends Procedure {
 
   public CompoundProcedure loadWithSuper(MetaObject supr) throws Exception {
     if(state.definitionEnvironment == null)
-      throw new Exceptionf("escm.type.procedure.CompoundProcedure can't bind <super> %s to procedure %s with a null definition environment!", supr.profile(), name);
+      throw new Exceptionf("Can't bind <super> %s to procedure %s with a null definition environment!", supr.profile(), name);
     Environment extendedEnvironment = new Environment(state.definitionEnvironment);
     if(supr == null) { // note that <super> is <null> for interfaces!
       extendedEnvironment.define(SUPER_SYMBOL,Boolean.FALSE);
@@ -221,7 +221,7 @@ public class CompoundProcedure extends Procedure {
 
   public CompoundProcedure loadWithSelf(MetaObject self) throws Exception {
     if(state.definitionEnvironment == null)
-      throw new Exceptionf("escm.type.procedure.CompoundProcedure can't bind <self> %s to procedure %s with a null definition environment!", self.profile(), name);
+      throw new Exceptionf("Can't bind <self> %s to procedure %s with a null definition environment!", self.profile(), name);
     Environment extendedEnvironment = new Environment(state.definitionEnvironment);
     extendedEnvironment.define(SELF_SYMBOL,self);
     return new CompoundProcedure(name,new State(extendedEnvironment,state.compileTime));
