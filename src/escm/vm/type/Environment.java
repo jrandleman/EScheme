@@ -64,10 +64,10 @@ public class Environment {
   }
 
 
-  private String getPossibleVariableIntentions(String varName) {
+  private String getPossibleVariableIntentions(Symbol varName) {
     ArrayList<String> existingVariables = new ArrayList<String>();
     addCurrentVariableBindings(existingVariables);
-    ArrayList<String> potentialVariables = GetClosestStringMatches.run(varName,existingVariables,MAXIMUM_SUGGESTED_VARIABLE_ALTERNATIVES);
+    ArrayList<String> potentialVariables = GetClosestStringMatches.run(varName.value(),existingVariables,MAXIMUM_SUGGESTED_VARIABLE_ALTERNATIVES);
     StringBuilder sb = new StringBuilder("\nNo matches found! Did you mean:");
     for(int i = 0, n = potentialVariables.size(); i < n; ++i) {
       sb.append(String.format("\n  %2d) %s", i+1, potentialVariables.get(i)));
@@ -78,8 +78,8 @@ public class Environment {
 
   ////////////////////////////////////////////////////////////////////////////
   // Has value
-  public boolean has(String name) {
-    Datum result = bindings.get(name);
+  public boolean has(Symbol name) {
+    Datum result = bindings.get(name.value());
     if(result == null) {
       if(superEnv == null) return false;
       return superEnv.has(name);
@@ -90,10 +90,16 @@ public class Environment {
 
   ////////////////////////////////////////////////////////////////////////////
   // Get value
-  public Datum get(String name) throws Exception {
-    Datum result = bindings.get(name);
+  public Datum get(Symbol name) throws Exception {
+    Datum result = bindings.get(name.value());
     if(result == null) {
-      if(superEnv == null) throw new Exceptionf("escm.vm.type.Environment [GET] variable \"%s\" doesn't exist!%s", name, getPossibleVariableIntentions(name));
+      if(superEnv == null) {
+        if(name.hasSourceInformation()) {
+          throw new Exceptionf("escm.vm.type.Environment [GET] variable \"%s\" doesn't exist!\nLocation:\n  %s%s", nameString, name.source(), getPossibleVariableIntentions(name));
+        } else {
+          throw new Exceptionf("escm.vm.type.Environment [GET] variable \"%s\" doesn't exist!%s", nameString, getPossibleVariableIntentions(name));
+        }
+      }
       return superEnv.get(name);
     }
     return result;
@@ -102,40 +108,48 @@ public class Environment {
 
   ////////////////////////////////////////////////////////////////////////////
   // Set value
-  public void set(String name, Datum newValue) throws Exception {
-    Datum result = bindings.get(name);
+  public void set(Symbol name, Datum newValue) throws Exception {
+    String nameString = name.value();
+    Datum result = bindings.get(nameString);
     if(result == null) {
-      if(superEnv == null) throw new Exceptionf("escm.vm.type.Environment [SET!] variable \"%s\" doesn't exist!%s", name, getPossibleVariableIntentions(name));
+      if(superEnv == null) {
+        if(name.hasSourceInformation()) {
+          throw new Exceptionf("escm.vm.type.Environment [SET!] variable \"%s\" doesn't exist!\nLocation:\n  %s%s", nameString, name.source(), getPossibleVariableIntentions(name));
+        } else {
+          throw new Exceptionf("escm.vm.type.Environment [SET!] variable \"%s\" doesn't exist!%s", nameString, getPossibleVariableIntentions(name));
+        }
+      }
       superEnv.set(name,newValue);
     } else {
-      bindings.put(name,newValue.loadWithName(name));
+      bindings.put(nameString,newValue.loadWithName(nameString));
     }
   }
 
 
-  public void set(String name, Primitive prm) throws Exception {
-    set(name,(Datum)(new PrimitiveProcedure(name,prm)));
+  public void set(Symbol name, Primitive prm) throws Exception {
+    set(name,(Datum)(new PrimitiveProcedure(name.value(),prm)));
   }
 
 
-  public void set(String name, PrimitiveCallable prm) throws Exception {
-    set(name,(Datum)(new PrimitiveProcedure(name,prm)));
+  public void set(Symbol name, PrimitiveCallable prm) throws Exception {
+    set(name,(Datum)(new PrimitiveProcedure(name.value(),prm)));
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Define value
-  public void define(String name, Datum value) throws Exception {
-    bindings.put(name,value.loadWithName(name));
+  public void define(Symbol name, Datum value) throws Exception {
+    String nameString = name.value();
+    bindings.put(nameString,value.loadWithName(nameString));
   }
   
 
-  public void define(String name, Primitive prm) throws Exception {
-    define(name,(Datum)(new PrimitiveProcedure(name,prm)));
+  public void define(Symbol name, Primitive prm) throws Exception {
+    define(name,(Datum)(new PrimitiveProcedure(name.value(),prm)));
   }
   
 
-  public void define(String name, PrimitiveCallable prm) throws Exception {
-    define(name,(Datum)(new PrimitiveProcedure(name,prm)));
+  public void define(Symbol name, PrimitiveCallable prm) throws Exception {
+    define(name,(Datum)(new PrimitiveProcedure(name.value(),prm)));
   }
 }

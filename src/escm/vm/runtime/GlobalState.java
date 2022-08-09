@@ -6,6 +6,7 @@ package escm.vm.runtime;
 import java.util.Random;
 import java.io.File;
 import escm.type.Datum;
+import escm.type.Symbol;
 import escm.type.number.Number;
 import escm.type.number.Exact;
 import escm.vm.type.Environment;
@@ -51,16 +52,16 @@ public class GlobalState {
   ////////////////////////////////////////////////////////////////////////////
   // Initialize the global environment
   public static void initialize() throws Exception {
-    globalEnvironment.define("*argv*",getArgv());
-    globalEnvironment.define("*file-separator*",new escm.type.String(File.separator));
-    globalEnvironment.define("*path-separator*",new escm.type.String(File.pathSeparator));
-    globalEnvironment.define("*os-name*",new escm.type.String(System.getProperty("os.name")));
-    globalEnvironment.define("*os-version*",new escm.type.String(System.getProperty("os.version")));
-    globalEnvironment.define("*os-architecture*",new escm.type.String(System.getProperty("os.arch")));
-    globalEnvironment.define("*escm-path*",new escm.type.String(EscmPath.VALUE));
-    globalEnvironment.define("*escm-execution-command*",new escm.type.String(" java -classpath "+EscmPath.VALUE+File.separator+"bin Main "));
-    globalEnvironment.define("*min-radix*",new Exact(Number.MIN_RADIX));
-    globalEnvironment.define("*max-radix*",new Exact(Number.MAX_RADIX));
+    globalEnvironment.define(new Symbol("*argv*"),getArgv());
+    globalEnvironment.define(new Symbol("*file-separator*"),new escm.type.String(File.separator));
+    globalEnvironment.define(new Symbol("*path-separator*"),new escm.type.String(File.pathSeparator));
+    globalEnvironment.define(new Symbol("*os-name*"),new escm.type.String(System.getProperty("os.name")));
+    globalEnvironment.define(new Symbol("*os-version*"),new escm.type.String(System.getProperty("os.version")));
+    globalEnvironment.define(new Symbol("*os-architecture*"),new escm.type.String(System.getProperty("os.arch")));
+    globalEnvironment.define(new Symbol("*escm-path*"),new escm.type.String(EscmPath.VALUE));
+    globalEnvironment.define(new Symbol("*escm-execution-command*"),new escm.type.String(" java -classpath "+EscmPath.VALUE+File.separator+"bin Main "));
+    globalEnvironment.define(new Symbol("*min-radix*"),new Exact(Number.MIN_RADIX));
+    globalEnvironment.define(new Symbol("*max-radix*"),new Exact(Number.MAX_RADIX));
     JavaStdLibLoader.load();
     EscmStdLibLoader.load();
   }

@@ -65,7 +65,7 @@ public class Interpreter {
         // (define <symbol>)
         case Instruction.DEFINE: {
           if(instruction.argument instanceof escm.type.Symbol) {
-            state.env.define(((escm.type.Symbol)instruction.argument).value(),state.cvr);
+            state.env.define((escm.type.Symbol)instruction.argument,state.cvr);
           } else { // instruction.argument instanceof ObjectAccessChain
             ((ObjectAccessChain)instruction.argument).define(state,state.cvr);
           }
@@ -78,7 +78,7 @@ public class Interpreter {
         // (set! <symbol>)
         case Instruction.SET: {
           if(instruction.argument instanceof escm.type.Symbol) {
-            state.env.set(((escm.type.Symbol)instruction.argument).value(),state.cvr);
+            state.env.set((escm.type.Symbol)instruction.argument,state.cvr);
           } else { // instruction.argument instanceof ObjectAccessChain
             ((ObjectAccessChain)instruction.argument).set(state,state.cvr);
           }
@@ -91,7 +91,7 @@ public class Interpreter {
         // (defined? <symbol>)
         case Instruction.DEFINEDP: {
           if(instruction.argument instanceof escm.type.Symbol) {
-            state.cvr = escm.type.Boolean.valueOf(state.env.has(((escm.type.Symbol)instruction.argument).value()));
+            state.cvr = escm.type.Boolean.valueOf(state.env.has((escm.type.Symbol)instruction.argument));
           } else { // instruction.argument instanceof ObjectAccessChain
             state.cvr = escm.type.Boolean.valueOf(((ObjectAccessChain)instruction.argument).has(state));
           }

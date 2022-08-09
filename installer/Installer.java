@@ -160,6 +160,7 @@ public class Installer {
     escmStdlibLoader.append("\n");
     escmStdlibLoader.append("package escm.vm.runtime.installerGenerated;\n");
     escmStdlibLoader.append("import java.util.ArrayList;\n");
+    escmStdlibLoader.append("import java.util.Stack;\n");
     escmStdlibLoader.append("import java.nio.file.Files;\n");
     escmStdlibLoader.append("import java.nio.file.Path;\n");
     escmStdlibLoader.append("import escm.type.Datum;\n");
@@ -174,8 +175,8 @@ public class Installer {
     escmStdlibLoader.append("    // Note that we know our stdlib don't store any continuations using call/cc \n");
     escmStdlibLoader.append("    //   upon loading, so we can afford evaluating it with a dummy continuation.\n");
     escmStdlibLoader.append("    Trampoline.Continuation terminalContinuation = (ignored) -> () -> Trampoline.LAST_BOUNCE_SIGNAL;\n");
-    escmStdlibLoader.append("    ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(escmCode);\n");
-    escmStdlibLoader.append("    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,terminalContinuation));\n");
+    escmStdlibLoader.append("    ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(\""+stdlibPath+"\",escmCode);\n");
+    escmStdlibLoader.append("    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,new Stack<String>(),terminalContinuation));\n");
     escmStdlibLoader.append("  }\n");
     escmStdlibLoader.append("}\n");
     escmStdlibLoader.append("\n");
@@ -232,6 +233,7 @@ public class Installer {
     javaStdlibLoader.append("\n");
     javaStdlibLoader.append("package escm.vm.runtime.installerGenerated;\n");
     javaStdlibLoader.append("import java.lang.reflect.Constructor;\n");
+    javaStdlibLoader.append("import escm.type.Symbol;\n");
     javaStdlibLoader.append("import escm.vm.type.Primitive;\n");
     javaStdlibLoader.append("import escm.vm.type.PrimitiveCallable;\n");
     javaStdlibLoader.append("import escm.vm.runtime.GlobalState;\n");
@@ -276,9 +278,9 @@ public class Installer {
     javaStdlibLoader.append("            Object o = ctor.newInstance();\n");
     javaStdlibLoader.append("            String escmName = getPrimitiveName(o);\n");
     javaStdlibLoader.append("            if(o instanceof Primitive) {\n");
-    javaStdlibLoader.append("              GlobalState.globalEnvironment.define(escmName,(Primitive)o);\n");
+    javaStdlibLoader.append("              GlobalState.globalEnvironment.define(new Symbol(escmName),(Primitive)o);\n");
     javaStdlibLoader.append("            } else { // o instanceof PrimitiveCallable\n");
-    javaStdlibLoader.append("              GlobalState.globalEnvironment.define(escmName,(PrimitiveCallable)o);\n");
+    javaStdlibLoader.append("              GlobalState.globalEnvironment.define(new Symbol(escmName),(PrimitiveCallable)o);\n");
     javaStdlibLoader.append("            }\n");
     javaStdlibLoader.append("          } catch(Exception e) {\n");
     javaStdlibLoader.append("            System.err.printf(\"ESCM JAVA-STDLIB-LOADER ERROR: Can't invoke nullary Ctor for inner class \\\"%s\\\" in class \\\"%s\\\": %s\\n\", innerClass.getName(), className, e);\n");

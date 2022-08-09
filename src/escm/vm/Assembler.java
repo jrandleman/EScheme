@@ -29,25 +29,25 @@ public class Assembler {
   ////////////////////////////////////////////////////////////////////////////
   // Instruction identification
   private static int getInstructionIndex(Datum instruction, String s) throws Exception {
-    if(s.equals("define"))         return Instruction.DEFINE;
-    if(s.equals("set!"))           return Instruction.SET;
+    if(s.equals("define"))       return Instruction.DEFINE;
+    if(s.equals("set!"))         return Instruction.SET;
 
-    if(s.equals("defined?"))       return Instruction.DEFINEDP;
+    if(s.equals("defined?"))     return Instruction.DEFINEDP;
 
-    if(s.equals("ifn"))            return Instruction.IFN;
-    if(s.equals("jump"))           return Instruction.JUMP;
+    if(s.equals("ifn"))          return Instruction.IFN;
+    if(s.equals("jump"))         return Instruction.JUMP;
 
-    if(s.equals("load"))           return Instruction.LOAD;
-    if(s.equals("load-symbol"))    return Instruction.LOAD_SYMBOL;
+    if(s.equals("load"))         return Instruction.LOAD;
+    if(s.equals("load-symbol"))  return Instruction.LOAD_SYMBOL;
 
-    if(s.equals("call"))           return Instruction.CALL;
+    if(s.equals("call"))         return Instruction.CALL;
 
-    if(s.equals("push"))           return Instruction.PUSH;
-    if(s.equals("pop"))            return Instruction.POP;
+    if(s.equals("push"))         return Instruction.PUSH;
+    if(s.equals("pop"))          return Instruction.POP;
 
-    if(s.equals("return"))         return Instruction.RETURN;
+    if(s.equals("return"))       return Instruction.RETURN;
 
-    if(s.equals("load-closure"))   return Instruction.Pseudo.LOAD_CLOSURE;
+    if(s.equals("load-closure")) return Instruction.Pseudo.LOAD_CLOSURE;
 
     throw new Exceptionf("ASM ERROR: %s isn't a valid bytecode instruction/syntax!", instruction.profile());
   }
@@ -90,10 +90,10 @@ public class Assembler {
   ////////////////////////////////////////////////////////////////////////////
   // Syntax Pseudo-Instruction Parsing
   private static class SyntaxComponents {
-    public ArrayList<ArrayList<String>> paramsList;
-    public ArrayList<String> variadicParamList;
+    public ArrayList<ArrayList<Symbol>> paramsList;
+    public ArrayList<Symbol> variadicParamList;
     public ArrayList<ArrayList<Instruction>> instructionsList;
-    public SyntaxComponents(ArrayList<ArrayList<String>> paramsList, ArrayList<String> variadicParamList, ArrayList<ArrayList<Instruction>> instructionsList) {
+    public SyntaxComponents(ArrayList<ArrayList<Symbol>> paramsList, ArrayList<Symbol> variadicParamList, ArrayList<ArrayList<Instruction>> instructionsList) {
       this.paramsList = paramsList;
       this.variadicParamList = variadicParamList;
       this.instructionsList = instructionsList;
@@ -101,44 +101,44 @@ public class Assembler {
   }
 
 
-  private static escm.util.Pair<ArrayList<String>,String> parseSyntaxParameters(Pair instruction, Datum params) throws Exception {
+  private static escm.util.Pair<ArrayList<Symbol>,Symbol> parseSyntaxParameters(Pair instruction, Datum params) throws Exception {
     // No params
     if(params instanceof Nil) 
-      return new escm.util.Pair<ArrayList<String>,String>(new ArrayList<String>(),null);
+      return new escm.util.Pair<ArrayList<Symbol>,Symbol>(new ArrayList<Symbol>(),null);
     // Unary variadic (if the "param list" is a single symbol)
     if(params instanceof Symbol)
-      return new escm.util.Pair<ArrayList<String>,String>(new ArrayList<String>(),((Symbol)params).value());
+      return new escm.util.Pair<ArrayList<Symbol>,Symbol>(new ArrayList<Symbol>(),(Symbol)params);
     // Invalid params
     if(!(params instanceof Pair))
       throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
     Pair paramsPair = (Pair)params;
     // Unary variadic (if the "param list" is of 2 items with the first as the "." symbol)
     if(paramsPair.car() instanceof Symbol && ((Symbol)paramsPair.car()).value().equals(".")) {
-      return new escm.util.Pair<ArrayList<String>,String>(new ArrayList<String>(),((Symbol)paramsPair.car()).value());
+      return new escm.util.Pair<ArrayList<Symbol>,Symbol>(new ArrayList<Symbol>(),(Symbol)paramsPair.car());
     }
     // Parse params
-    ArrayList<String> parameters = new ArrayList<String>();
+    ArrayList<Symbol> parameters = new ArrayList<Symbol>();
     while(params instanceof Pair) {
       paramsPair = (Pair)params;
       if(!(paramsPair.car() instanceof Symbol))
         throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
-      parameters.add(((Symbol)paramsPair.car()).value());
+      parameters.add((Symbol)paramsPair.car());
       params = paramsPair.cdr();
     }
     // No variadic
-    if(params instanceof Nil) return new escm.util.Pair<ArrayList<String>,String>(parameters,null);
+    if(params instanceof Nil) return new escm.util.Pair<ArrayList<Symbol>,Symbol>(parameters,null);
     // Has variadic
     if(!(params instanceof Symbol))
       throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
-    return new escm.util.Pair<ArrayList<String>,String>(parameters,((Symbol)params).value());
+    return new escm.util.Pair<ArrayList<Symbol>,Symbol>(parameters,(Symbol)params);
   }
 
 
   private static SyntaxComponents parseSyntaxComponents(Pair instruction) throws Exception {
     if(!(instruction.cdr() instanceof Pair))
       throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
-    ArrayList<ArrayList<String>> paramsList = new ArrayList<ArrayList<String>>();
-    ArrayList<String> variadicParamList = new ArrayList<String>();
+    ArrayList<ArrayList<Symbol>> paramsList = new ArrayList<ArrayList<Symbol>>();
+    ArrayList<Symbol> variadicParamList = new ArrayList<Symbol>();
     ArrayList<ArrayList<Instruction>> instructionsList = new ArrayList<ArrayList<Instruction>>();
     Datum iterator = instruction.cdr();
     while(iterator instanceof Pair) {
@@ -146,7 +146,7 @@ public class Assembler {
       if(!(clause instanceof Pair))
         throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
       Pair clausePair = (Pair)clause;
-      escm.util.Pair<ArrayList<String>,String> params = parseSyntaxParameters(instruction,clausePair.car());
+      escm.util.Pair<ArrayList<Symbol>,Symbol> params = parseSyntaxParameters(instruction,clausePair.car());
       paramsList.add(params.first);
       variadicParamList.add(params.second);
       instructionsList.add(run(clausePair.cdr()));

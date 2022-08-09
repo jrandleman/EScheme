@@ -30,6 +30,22 @@ public class EscmCallStack {
   }
 
   ////////////////////////////////////////////////////////////////////////////
+  // Copying the callstack (done by loader to preserve pre-load state)
+  public static Stack<String> copy() {
+    Stack<String> cloned = new Stack<String>();
+    cloned.addAll(((EscmThread)Thread.currentThread()).callStack);
+    return cloned;
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Restoring the callstack (done by loader to restore pre-load state)
+  public static void restore(Stack<String> restored) {
+    Stack<String> callStack = ((EscmThread)Thread.currentThread()).callStack;
+    callStack.clear();
+    callStack.addAll(restored);
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
   // Printing (& clearing!) the current thread's callstack
   // @PRECONDITION: callStack.size() > 0
   private static String popReadableCallableName(Stack<String> callStack) {

@@ -15,6 +15,7 @@ import escm.type.port.OutputPort;
 import escm.type.port.Eof;
 import escm.util.Exceptionf;
 import escm.vm.type.Primitive;
+import escm.vm.util.SourceInformation;
 import escm.vm.runtime.GlobalState;
 
 public class IOPrimitives {
@@ -296,12 +297,20 @@ public class IOPrimitives {
       return "read-string";
     }
 
+    private static SourceInformation createPseudoSourceInformation(escm.type.String string) {
+      StringBuilder sb = new StringBuilder("#<string ");
+      sb.append(string.write());
+      sb.append('>');
+      return new SourceInformation(sb.toString(),1,1);
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(read-string <string>) expects exactly 1 string arg: %s", Exceptionf.profileArgs(parameters));
-      String readString = ((escm.type.String)parameters.get(0)).value().trim();
+      escm.type.String str = (escm.type.String)parameters.get(0);
+      String readString = str.value().trim();
       if(readString.length() == 0) return escm.type.Void.VALUE; // (read-string "") => <void>
-      escm.util.Pair<Datum,Integer> result = escm.vm.Reader.read(readString);
+      escm.util.Pair<Datum,Integer> result = escm.vm.Reader.read(readString,createPseudoSourceInformation(str));
       String restOfString = readString.substring(result.second).trim();
       return new escm.type.Pair(result.first,new escm.type.String(restOfString));
     }

@@ -4,6 +4,7 @@
 
 package escm.primitive;
 import java.util.ArrayList;
+import java.util.Stack;
 import java.util.Calendar;
 import java.io.File;
 import escm.type.Datum;
@@ -18,6 +19,7 @@ import escm.vm.type.Environment;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
 import escm.vm.runtime.GlobalState;
+import escm.vm.runtime.EscmCallStack;
 
 public class SystemPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -75,7 +77,7 @@ public class SystemPrimitives {
       return "load";
     }
 
-    public static Trampoline.Bounce evalEachExpression(Environment env, ArrayList<Datum> exprs, int i, Trampoline.Continuation continuation) throws Exception {
+    public static Trampoline.Bounce evalEachExpression(Environment env, ArrayList<Datum> exprs, int i, Stack<String> originalCallStack, Trampoline.Continuation continuation) throws Exception {
       int n = exprs.size();
       if(i >= n) return continuation.run(escm.type.Void.VALUE);
       Trampoline.Continuation nextContinuation;
@@ -83,8 +85,9 @@ public class SystemPrimitives {
         nextContinuation = continuation;
       } else {
         nextContinuation = (value) -> () -> {
+          EscmCallStack.restore(originalCallStack); // residue frames may reside after call/cc nonsense
           if(value instanceof escm.type.port.Eof) return continuation.run(escm.type.Void.VALUE);
-          return evalEachExpression(env,exprs,i+1,continuation);
+          return evalEachExpression(env,exprs,i+1,originalCallStack,continuation);
         };
       }
       return escm.vm.Compiler.run(exprs.get(i),(compiled) -> () -> {
@@ -94,8 +97,8 @@ public class SystemPrimitives {
 
     public static Trampoline.Bounce loadFileInEnvironment(Environment env, String filename, Trampoline.Continuation continuation) throws Exception {
       String buffer = FilePrimitives.FileRead.slurpFile(filename,"load");
-      ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(buffer);
-      return evalEachExpression(env,exprs,0,continuation);
+      ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(filename,buffer);
+      return evalEachExpression(env,exprs,0,EscmCallStack.copy(),continuation);
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

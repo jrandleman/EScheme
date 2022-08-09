@@ -8,6 +8,7 @@ import java.util.Objects;
 import escm.util.Trampoline;
 import escm.util.Exceptionf;
 import escm.type.Datum;
+import escm.type.Symbol;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.vm.Main;
 import escm.vm.type.Callable;
@@ -196,14 +197,14 @@ public class Thread extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Defining a Variable in the Dynamic Environment
-  public void define(String name, Datum value) throws Exception {
+  public void define(Symbol name, Datum value) throws Exception {
     thread.dynamicEnvironment.define(name,value);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Setting a Variable in the Dynamic Environment
-  public void set(String name, Datum value) throws Exception {
+  public void set(Symbol name, Datum value) throws Exception {
     if(!thread.dynamicEnvironment.has(name)) {
       if(!GlobalState.metaThreadDynamicEnvironment.has(name)) 
         throw new Exceptionf("Variable %s doesn't exist in escm.type.concurrent.Thread \"%s\"'s dynamic environment!", getName());
@@ -216,7 +217,7 @@ public class Thread extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Getting a Variable from the Dynamic Environment
-  public Datum get(String name) throws Exception {
+  public Datum get(Symbol name) throws Exception {
     if(!thread.dynamicEnvironment.has(name)) {
       if(!GlobalState.metaThreadDynamicEnvironment.has(name)) 
         throw new Exceptionf("Variable %s doesn't exist in escm.type.concurrent.Thread \"%s\"'s dynamic environment!", getName());

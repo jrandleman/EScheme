@@ -14,6 +14,7 @@ import escm.type.Datum;
 import escm.type.Boolean;
 import escm.util.Exceptionf;
 import escm.vm.type.Primitive;
+import escm.vm.util.SourceInformation;
 
 public class FilePrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -39,25 +40,26 @@ public class FilePrimitives {
       }
     }
 
-    public static ArrayList<Datum> readBufferAsArrayList(String buffer) throws Exception {
+    public static ArrayList<Datum> readBufferAsArrayList(String filename, String buffer) throws Exception {
+      SourceInformation source = new SourceInformation(filename,1,1);
       ArrayList<Datum> contents = new ArrayList<Datum>();
-      buffer = buffer.trim();
+      buffer = buffer.stripTrailing();
       if(buffer.length() == 0) return contents;
       Integer n = buffer.length();
-      escm.util.Pair<Datum,Integer> result = escm.vm.Reader.read(buffer);
-      contents.add(result.first);
-      buffer = buffer.substring(result.second).trim();
+      escm.util.Pair<Datum,Integer> result = escm.vm.Reader.nullableRead(buffer,source);
+      if(result.first != null) contents.add(result.first);
+      buffer = buffer.substring(result.second);
       while(result.second != n && buffer.length() > 0) {
         n = buffer.length();
-        result = escm.vm.Reader.read(buffer);
-        contents.add(result.first);
-        buffer = buffer.substring(result.second).trim();
+        result = escm.vm.Reader.nullableRead(buffer,source);
+        if(result.first != null) contents.add(result.first);
+        buffer = buffer.substring(result.second);
       }
       return contents;
     }
 
-    public static Datum readBuffer(String buffer) throws Exception {
-      ArrayList<Datum> contents = readBufferAsArrayList(buffer);
+    public static Datum readBuffer(String filename, String buffer) throws Exception {
+      ArrayList<Datum> contents = readBufferAsArrayList(filename,buffer);
       if(contents.size() == 0) return escm.type.Void.VALUE;
       return convertReadExpressionsToReadExpression(contents);
     }
@@ -65,7 +67,8 @@ public class FilePrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(file-read <filename-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return readBuffer(slurpFile(((escm.type.String)parameters.get(0)).value(),"file-read"));
+      String filename = ((escm.type.String)parameters.get(0)).value();
+      return readBuffer(filename,slurpFile(filename,"file-read"));
     }
   }
 

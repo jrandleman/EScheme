@@ -23,6 +23,18 @@
   "description": "Closes <port> if it hasn't been closed yet.",
   "example": null
 }, {
+  "name": "port-name",
+  "aliases": null,
+  "signatures": ["(port-name <port>)"],
+  "description": "Returns the <port>'s name as a string.",
+  "example": null
+}, {
+  "name": "port-position",
+  "aliases": null,
+  "signatures": ["(port-position <input-port>)"],
+  "description": "Returns a pair: <input-port>'s (<line-number> . <column-number>)",
+  "example": null
+}, {
   "name": "port?",
   "aliases": null,
   "signatures": ["(port? <obj>)"],

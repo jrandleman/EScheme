@@ -1,7 +1,40 @@
 
 
 
+(define start (epoch-time))
 
+
+
+
+
+
+
+
+
+
+; (define-syntax assert
+;   (lambda (condition)
+;     (def cond-result (gensym))
+;     `(let ((,cond-result ,condition))
+;       (if (not ,cond-result)
+;           (errorf "Assert Failed: %wa" ',condition)))))
+
+; ; (assert (eq? 1 1.0))
+
+; (assert (= 1 1.0))
+
+
+
+
+
+
+
+
+
+
+(define end (epoch-time))
+
+(displayf "Time elapsed: %n\n" (/ (- end start) 1000.0))
 
 
 

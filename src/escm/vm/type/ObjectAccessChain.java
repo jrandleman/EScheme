@@ -21,13 +21,16 @@ public class ObjectAccessChain extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Implementing Object Access Chain Parsing:
   //   "obj.prop1.prop2" => ["obj", "prop1", "prop2"]
-  public static ArrayList<String> parse(String accessChainString) throws Exception {
-    ArrayList<String> accessChain = new ArrayList<String>(Arrays.asList(accessChainString.split("\\.")));
+  public static ArrayList<Symbol> parse(String accessChainString) throws Exception {
+    String[] accessChainStrings = accessChainString.split("\\.");
+    ArrayList<Symbol> accessChain = new ArrayList<Symbol>(accessChainStrings.length);
+    for(int i = 0; i < accessChainStrings.length; ++i)
+      accessChain.add(new Symbol(accessChainStrings[i]));
     validateObjectAccessChain(accessChain,accessChainString);
     return accessChain;
   }
 
-  public static ArrayList<String> parse(Symbol accessChainString) throws Exception {
+  public static ArrayList<Symbol> parse(Symbol accessChainString) throws Exception {
     return parse(accessChainString.value());
   }
 
@@ -51,23 +54,23 @@ public class ObjectAccessChain extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Private Chain Field
-  private ArrayList<String> value = null;
+  private ArrayList<Symbol> value = null;
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Chain Getter
-  public ArrayList<String> value() {
+  public ArrayList<Symbol> value() {
     return value;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  private static void validateObjectAccessChain(ArrayList<String> accessChain, String originalString) throws Exception {
+  private static void validateObjectAccessChain(ArrayList<Symbol> accessChain, String originalString) throws Exception {
     if(accessChain.size() < 2)
       throw new Exceptionf("'ObjectAccessChain invalid object access (%s) can't start or end with a period!", originalString);
-    for(String access : accessChain) {
-      if(access.length() == 0)
+    for(Symbol access : accessChain) {
+      if(access.value().length() == 0)
         throw new Exceptionf("'ObjectAccessChain invalid object access (%s) can't contain sequential periods!", originalString);
     }
   }
@@ -100,7 +103,7 @@ public class ObjectAccessChain extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Equality
   public boolean eq(Object o) {
-    return o instanceof ObjectAccessChain && ((Symbol)o).value().equals(value);
+    return o instanceof ObjectAccessChain && ((ObjectAccessChain)o).value.equals(value);
   }
 
   public boolean equal(Object o) {
@@ -137,11 +140,11 @@ public class ObjectAccessChain extends Datum {
     if(!(result instanceof MetaObject))
       throw new Exceptionf("'ObjectAccessChain 'define foremost item %s (%s) isn't a meta-object: %s", value.get(0), result.profile(), value);
     for(int i = 1, n = value.size()-1; i < n; ++i) {
-      result = ((MetaObject)result).get(value.get(i));
+      result = ((MetaObject)result).get(value.get(i).value());
       if(!(result instanceof MetaObject))
         throw new Exceptionf("'ObjectAccessChain 'define property %s (%s) isn't a meta-object: %s", value.get(i), result.profile(), value);
     }
-    ((MetaObject)result).define(value.get(value.size()-1),newPropValue);
+    ((MetaObject)result).define(value.get(value.size()-1).value(),newPropValue);
   }
 
 
@@ -152,11 +155,11 @@ public class ObjectAccessChain extends Datum {
     if(!(result instanceof MetaObject))
       throw new Exceptionf("'ObjectAccessChain 'set! foremost item %s (%s) isn't a meta-object: %s", value.get(0), result.profile(), value);
     for(int i = 1, n = value.size()-1; i < n; ++i) {
-      result = ((MetaObject)result).get(value.get(i));
+      result = ((MetaObject)result).get(value.get(i).value());
       if(!(result instanceof MetaObject))
         throw new Exceptionf("'ObjectAccessChain 'set! property %s (%s) isn't a meta-object: %s", value.get(i), result.profile(), value);
     }
-    ((MetaObject)result).set(value.get(value.size()-1),newPropValue);
+    ((MetaObject)result).set(value.get(value.size()-1).value(),newPropValue);
   }
 
 
@@ -167,11 +170,11 @@ public class ObjectAccessChain extends Datum {
     if(!(result instanceof MetaObject))
       throw new Exceptionf("'ObjectAccessChain 'has? foremost item %s (%s) isn't a meta-object: %s", value.get(0), result.profile(), value);
     for(int i = 1, n = value.size()-1; i < n; ++i) {
-      result = ((MetaObject)result).get(value.get(i));
+      result = ((MetaObject)result).get(value.get(i).value());
       if(!(result instanceof MetaObject))
         throw new Exceptionf("'ObjectAccessChain 'has? property %s (%s) isn't a meta-object: %s", value.get(i), result.profile(), value);
     }
-    return ((MetaObject)result).has(value.get(value.size()-1));
+    return ((MetaObject)result).has(value.get(value.size()-1).value());
   }
 
 
@@ -182,7 +185,7 @@ public class ObjectAccessChain extends Datum {
     if(!(result instanceof MetaObject))
       throw new Exceptionf("'ObjectAccessChain 'load foremost item %s (%s) isn't a meta-object: %s", value.get(0), result.profile(), value);
     for(int i = 1, n = value.size(); i < n; ++i) {
-      result = ((MetaObject)result).get(value.get(i));
+      result = ((MetaObject)result).get(value.get(i).value());
       if(i+1 < n && !(result instanceof MetaObject))
         throw new Exceptionf("'ObjectAccessChain 'load property %s (%s) isn't a meta-object: %s", value.get(i), result.profile(), value);
     }

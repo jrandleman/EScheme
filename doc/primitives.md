@@ -213,6 +213,9 @@
 
 (close-port! <port>)
 
+(port-name <port>)
+(port-position <input-port>) ; returns a pair: (<line-number> . <column-number>)
+
 (port? <obj>)
 (input-port? <obj>)
 (output-port? <obj>)

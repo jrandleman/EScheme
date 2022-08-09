@@ -4,6 +4,7 @@
 
 package escm.vm;
 import java.util.ArrayList;
+import java.util.Stack;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import escm.type.Datum;
@@ -91,13 +92,13 @@ public class Main {
     StringBuilder sb = new StringBuilder();
     sb.append("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
     sb.append("J          @@@@@@@@@@@@@@@@       _            _.._                 T\n");
-    sb.append("E          @      __      @      / *         .'@@'`` *              U\n");
-    sb.append("@          @     /@@\\     @      \\_/        /@@/   *****            @ EEEEEEEEEEEEEE   SSSSSSSSSSSSS      CCCCCCCMMMM             MMMM\n");
-    sb.append("T     |    @     \\@@/     @       |         @@(     * *       |     E E::::::::::::E SS:::::::::::::S  CCC::::::CM:::M           M:::M\n");
+    sb.append("E          @      __      @      / *    |    .'@@'`` *     |        U\n");
+    sb.append("@          @     /@@\\     @      \\_/   -O-  /@@/   *****  -O-       @ EEEEEEEEEEEEEE   SSSSSSSSSSSSS      CCCCCCCMMMM             MMMM\n");
+    sb.append("T     |    @     \\@@/     @       |     |   @@(     * *    |  |     E E::::::::::::E SS:::::::::::::S  CCC::::::CM:::M           M:::M\n");
     sb.append("'    /#\\   @              @      /#\\        \\@@'.___.;       /#\\    S E::::::::::::ES::::SSSSSS:::::S C:::::::::CM::::M         M::::M\n");
-    sb.append("A   (###)  @@@@@@@@@@@@@@@@    /#####\\       '.@@@@.'       (###)   @ EE:::EEEEEE::ES::::S     SSSSSSC::::CCCC::CM:::::M       M:::::M\n");
-    sb.append("I    | |    |                /#########\\        ``      |    | |    L   E::E    EEEES::::S          C:::C   CCCCCM::::::M     M::::::M\n");
-    sb.append("M    |@|   /#\\|     /\\     /#############\\     /\\     |/#\\   |@|    '   E::E        S::::S          C:::C        M:::::::M   M:::::::M\n");
+    sb.append("A   (###)  @@@@@@@@@@@@@@@@    /#####\\     | '.@@@@.'       (###)   @ EE:::EEEEEE::ES::::S     SSSSSSC::::CCCC::CM:::::M       M:::::M\n");
+    sb.append("I    | |    |                /#########\\  -O-   ``      |    | |    L   E::E    EEEES::::S          C:::C   CCCCCM::::::M     M::::::M\n");
+    sb.append("M    |@|   /#\\|     /\\     /#############\\ |   /\\     |/#\\   |@|    '   E::E        S::::S          C:::C        M:::::::M   M:::::::M\n");
     sb.append("E    | |  (##/#\\   /##\\   (###############)   /##\\   /#\\##)  | |    A   E::E         S:::SSSS       C:::C        M:::M::::M M::: M:::M\n");
     sb.append("@    |@|   |(###) (####)  _\\#############/_  (####) (###)|   |@|    M   E:::EEEEEE    SS:::::SSSS   C:::C        M:::MM::::M::::MM:::M\n");
     sb.append("M    | |   |#| |___|/\\|__|_________________|__|/\\|___| |#|   | |    O   E::::::::E      SS:::::::SS C:::C        M:::M M:::::::M M:::M\n");
@@ -154,7 +155,7 @@ public class Main {
     while(true) {
       try {
         eval(GlobalState.globalEnvironment,readFullExpression(),printContinuation);
-        EscmCallStack.clear(); // residue frames may reside after continuation nonsense
+        EscmCallStack.clear(); // residue frames may reside after call/cc nonsense
       } catch(Throwable e) {
         reportTopLevelError(e);
       }
@@ -181,8 +182,8 @@ public class Main {
     } catch(Exception e) {
       throw new Exceptionf("%s\n  %s", e, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
     }
-    ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(buffer);
-    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,replIfReplingContinuation));
+    ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(parsedCmdLine.scriptName,buffer);
+    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,new Stack<String>(),replIfReplingContinuation));
   }
 
 

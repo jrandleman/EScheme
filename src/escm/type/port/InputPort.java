@@ -3,14 +3,15 @@
 //    Input port primitive type, to read from a file/stdin.
 //
 //    Provides:
-//      - static STDIN [System.in]
+//      - static InputPort STDIN [System.in]
 //
 //      - static InputPort getCurrent()
 //      - static void setCurrent(InputPort o)
 //
-//      - boolean isStdin()
+//      - long lineNumber()
+//      - long columnNumber()
 //
-//      - long skip(long n)
+//      - boolean isStdin()
 //
 //      - boolean ready()
 //
@@ -18,8 +19,8 @@
 //      - String readCharacter()       // returns <null> if reached EOF
 //      - String readCharacters(int n) // returns <null> if reached EOF
 //      - String readLine()            // returns <null> if reached EOF
-//      - Datum readDatum()            // returns <null> if reached EOF
 //      - Datum readReplDatum()        // returns <null> if reached EOF
+//      - Datum readDatum()            // returns <null> if reached EOF
 
 package escm.type.port;
 import java.util.Objects;
@@ -30,6 +31,7 @@ import java.io.FileReader;
 import escm.util.Exceptionf;
 import escm.type.Datum;
 import escm.vm.Reader;
+import escm.vm.util.SourceInformation;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.EscmThread;
 
@@ -45,6 +47,46 @@ public class InputPort extends Port {
 
   public String sourceName() {
     return name;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Port Position
+  private long lineNumber = 1;
+
+  private long columnNumber = 1;
+
+  private void updatePortPosition(int c) {
+    if(c <= 0) return;
+    if(c == '\n') {
+      ++lineNumber;
+       columnNumber = 1; 
+    } else {
+      ++columnNumber;
+    }
+  }
+
+  private void updatePortPosition(CharSequence s) {
+    if(s == null) return;
+    for(int i = 0, n = s.length(); i < n; ++i) {
+      updatePortPosition(s.charAt(i));
+    }
+  }
+
+  private void updatePortPosition(char[] cs) {
+    if(cs == null) return;
+    for(int i = 0; i < cs.length && cs[i] != 0; ++i) {
+      updatePortPosition(cs[i]);
+    }
+  }
+
+
+  public synchronized long lineNumber() {
+    return lineNumber;
+  }
+
+  public synchronized long columnNumber() {
+    return columnNumber;
   }
 
 
@@ -102,7 +144,7 @@ public class InputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Peek Logic
-  public String peek() throws Exception {
+  public synchronized String peek() throws Exception {
     try {
       int c = pr.read();
       pr.unread(c);
@@ -116,16 +158,18 @@ public class InputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Various Readers
-  private static void printReplPrompt() {
+  private void printReplPrompt() {
     if(!GlobalState.getLastPrintedANewline()) System.out.println("");
-    System.out.print("> ");
+    System.out.printf("[%d]> ", lineNumber);
+    System.out.flush();
     if(GlobalState.inREPL) GlobalState.setLastPrintedANewline(false); // from the newline input by the user's <enter>/<return> key stroke
   }
 
 
-  public String readCharacter() throws Exception {
+  public synchronized String readCharacter() throws Exception {
     try {
       int c = pr.read();
+      updatePortPosition(c);
       if(c == -1) return null;
       return String.valueOf((char)c);
     } catch(Exception e) {
@@ -134,7 +178,7 @@ public class InputPort extends Port {
   }
 
 
-  public String readCharacters(int n) throws Exception {
+  public synchronized String readCharacters(int n) throws Exception {
     if(n == 0) return "";
     if(n < 0) {
       throw new Exceptionf("Can't read chars from port \"%s\" with negative char-count %d!", name, n);
@@ -142,6 +186,7 @@ public class InputPort extends Port {
     try {
       char[] chars = new char[n];
       int readCount = pr.read(chars,0,n);
+      updatePortPosition(chars);
       if(readCount == -1) return null;
       return new String(chars);
     } catch(Exception e) {
@@ -150,7 +195,7 @@ public class InputPort extends Port {
   }
 
 
-  public String readLine() throws Exception {
+  public synchronized String readLine() throws Exception {
     try {
       StringBuilder sb = new StringBuilder();
       int c = pr.read();
@@ -158,18 +203,21 @@ public class InputPort extends Port {
         sb.append((char)c);
         c = pr.read();
       }
+      if(c != -1) sb.append((char)c);
+      String s = sb.toString();
+      updatePortPosition(s);
       if(c == -1) return null;
-      sb.append((char)c);
-      return sb.toString();
+      return s;
     } catch(Exception e) {
       throw new Exceptionf("Can't read line from port \"%s\": %s", name, e);
     }
   }
 
 
-  public Datum readReplDatum() throws Exception {
+  public synchronized Datum readReplDatum() throws Exception {
     printReplPrompt();
     StringBuilder sb = new StringBuilder();
+    SourceInformation replDatumSourceStart = new SourceInformation(sourceName(),lineNumber,columnNumber);
     while(true) {
       try {
         String input = readLine();
@@ -184,7 +232,7 @@ public class InputPort extends Port {
         }
         if(input.length() == 0) continue;
         sb.append(input);
-        escm.util.Pair<Datum,Integer> result = Reader.read(sb.toString());
+        escm.util.Pair<Datum,Integer> result = Reader.read(sb.toString(),replDatumSourceStart.clone());
         GlobalState.setLastPrintedANewline(true); // from the newline input by the user's <enter>/<return> key stroke
         if(result.first instanceof Eof) return null; // only reading #eof is equivalent to typing ^D
         return result.first;
@@ -197,8 +245,9 @@ public class InputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Datum Reader
-  public Datum readDatum() throws Exception {
+  public synchronized Datum readDatum() throws Exception {
     StringBuilder sb = new StringBuilder();
+    SourceInformation datumSourceStart = new SourceInformation(sourceName(),lineNumber,columnNumber);
     while(true) {
       try {
         Stack<Character> containerStack = new Stack<Character>();
@@ -225,10 +274,12 @@ public class InputPort extends Port {
           }
           // register open paren/bracket/curly-brace
           if(input == '(' || input == '[' || input == '{') {
+            updatePortPosition(input);
             sb.append((char)input);
             containerStack.push((char)input);
           // register close paren
           } else if(input == ')') {
+            updatePortPosition(input);
             sb.append((char)input);
             if(containerStack.empty()) {
               throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a ')' prior an associated '('!", write());
@@ -240,6 +291,7 @@ public class InputPort extends Port {
             if(containerStack.empty()) break;
           // register close bracket
           } else if(input == ']') {
+            updatePortPosition(input);
             sb.append((char)input);
             if(containerStack.empty()) {
               throw new Exceptionf("READ ERROR (for %s): Invalid bracket: found a ']' prior an associated '['!", write());
@@ -251,6 +303,7 @@ public class InputPort extends Port {
             if(containerStack.empty()) break;
           // register close curly-brace
           } else if(input == '}') {
+            updatePortPosition(input);
             sb.append((char)input);
             if(containerStack.empty()) {
               throw new Exceptionf("READ ERROR (for %s): Invalid curly-brace: found a '}' prior an associated '{'!", write());
@@ -262,15 +315,22 @@ public class InputPort extends Port {
             if(containerStack.empty()) break;
           // account for whitespace
           } else if(Character.isWhitespace((char)input)) {
+            updatePortPosition(input);
             sb.append((char)input);
           // skip comment
           } else if(input == ';') {
+            updatePortPosition(input);
             input = pr.read();
-            while(input != '\n' && input != -1) input = pr.read();
+            while(input != '\n' && input != -1) {
+              updatePortPosition(input);
+              input = pr.read();
+            }
             if(input == -1) return null;
+            updatePortPosition('\n');
             sb.append('\n');
           // get string
           } else if(input == '"') {
+            updatePortPosition(input);
             sb.append((char)input);
             int start = sb.length()-1;
             input = pr.read();
@@ -282,9 +342,11 @@ public class InputPort extends Port {
                   ++escapeCount;
                   --j;
                 }
+                updatePortPosition(input);
                 sb.append((char)input);
                 if(escapeCount % 2 == 0) break; // non-escaped <">
               } else {
+                updatePortPosition(input);
                 sb.append((char)input);
               }
               input = pr.read();
@@ -295,6 +357,7 @@ public class InputPort extends Port {
             if(containerStack.empty()) break;
           // account for reader shorthands
           } else if(Reader.isReaderShorthand((char)input) || input == '\\') {
+            updatePortPosition(input);
             sb.append((char)input);
             if(input == ',') {
               input = pr.read();
@@ -302,6 +365,7 @@ public class InputPort extends Port {
                 throw new Exceptionf("READ ERROR (for %s): Incomplete \"unquote\" reader shorthand literal!", write());
               }
               if(input == '@') {
+                updatePortPosition(input);
                 sb.append((char)input);
               } else {
                 pr.unread(input);
@@ -309,6 +373,7 @@ public class InputPort extends Port {
             }
           // account for regular token
           } else {
+            updatePortPosition(input);
             sb.append((char)input);
             foundLoneAtom = true;
           }
@@ -316,9 +381,13 @@ public class InputPort extends Port {
         // eat the rest of the line if reading from STDIN
         if(isStdin()) {
           int c = pr.read();
-          while(c != '\n' && c != -1) c = pr.read();
+          while(c != '\n' && c != -1) {
+            updatePortPosition(c);
+            c = pr.read();
+          }
+          if(c != -1) updatePortPosition(c);
         }
-        escm.util.Pair<Datum,Integer> result = Reader.read(sb.toString());
+        escm.util.Pair<Datum,Integer> result = Reader.read(sb.toString(),datumSourceStart.clone());
         if(isStdin()) GlobalState.setLastPrintedANewline(true); // from the newline input by the user's <enter>/<return> key stroke
         if(result.first instanceof Eof) return null; // only reading #eof is equivalent to typing ^D
         return result.first;
@@ -330,15 +399,8 @@ public class InputPort extends Port {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Skip past N Characters
-  public long skip(long n) throws Exception {
-    return pr.skip(n);
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // Port Closing Semantics
-  public void close() throws Exception {
+  public synchronized void close() throws Exception {
     try {
       if(isClosed() == false) pr.close();
     } catch(Exception e) {

@@ -310,11 +310,11 @@ public class OOPrimitives {
       Datum mo = parameters.get(0);
       if(!(mo instanceof MetaObject))
         throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<String> accessChain = new ArrayList<String>();
+      ArrayList<Symbol> accessChain = new ArrayList<Symbol>();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         if(!(parameters.get(i) instanceof Symbol))
           throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) arg #%d isn't a symbol: %s", i+1, Exceptionf.profileArgs(parameters));
-        String prop = ((Symbol)parameters.get(i)).value();
+        Symbol prop = (Symbol)parameters.get(i);
         if(ObjectAccessChain.is(prop)) {
           accessChain.addAll(ObjectAccessChain.parse(prop));
         } else {
@@ -324,7 +324,7 @@ public class OOPrimitives {
       // "has?" Logic
       MetaObject obj = (MetaObject)mo;
       for(int i = 0, n = accessChain.size(); i < n; ++i) {
-        String prop = accessChain.get(i);
+        String prop = accessChain.get(i).value();
         if(!obj.has(prop)) return Boolean.FALSE;
         Datum val = obj.get(prop);
         if(i+1 < n) {
@@ -351,11 +351,11 @@ public class OOPrimitives {
       Datum mo = parameters.get(0);
       if(!(mo instanceof MetaObject))
         throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<String> accessChain = new ArrayList<String>();
+      ArrayList<Symbol> accessChain = new ArrayList<Symbol>();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         if(!(parameters.get(i) instanceof Symbol))
           throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) arg #%d isn't a symbol: %s", i+1, Exceptionf.profileArgs(parameters));
-        String prop = ((Symbol)parameters.get(i)).value();
+        Symbol prop = (Symbol)parameters.get(i);
         if(ObjectAccessChain.is(prop)) {
           accessChain.addAll(ObjectAccessChain.parse(prop));
         } else {
@@ -365,7 +365,7 @@ public class OOPrimitives {
       // "get" Logic
       for(int i = 0, n = accessChain.size(); i < n; ++i) {
         MetaObject obj = (MetaObject)mo;
-        String prop = accessChain.get(i);
+        String prop = accessChain.get(i).value();
         if(!obj.has(prop))
           throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) object property '%s doesn't exist: %s", prop, Exceptionf.profileArgs(parameters));
         mo = obj.get(prop);
@@ -391,11 +391,11 @@ public class OOPrimitives {
       Datum mo = parameters.get(0);
       if(!(mo instanceof MetaObject))
         throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<String> accessChain = new ArrayList<String>();
+      ArrayList<Symbol> accessChain = new ArrayList<Symbol>();
       for(int i = 1, n = parameters.size(); i < n-1; ++i) {
         if(!(parameters.get(i) instanceof Symbol))
           throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) arg #%d isn't a symbol: %s", i+1, Exceptionf.profileArgs(parameters));
-        String prop = ((Symbol)parameters.get(i)).value();
+        Symbol prop = (Symbol)parameters.get(i);
         if(ObjectAccessChain.is(prop)) {
           accessChain.addAll(ObjectAccessChain.parse(prop));
         } else {
@@ -406,14 +406,14 @@ public class OOPrimitives {
       // "set!" Logic
       for(int i = 0, n = accessChain.size(); i < n-1; ++i) {
         MetaObject obj = (MetaObject)mo;
-        String prop = accessChain.get(i);
+        String prop = accessChain.get(i).value();
         if(!obj.has(prop))
           throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", prop, Exceptionf.profileArgs(parameters));
         mo = obj.get(prop);
         if(!(mo instanceof MetaObject))
           throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) object property '%s isn't a meta-object: %s", prop, Exceptionf.profileArgs(parameters));
       }
-      String lastProp = accessChain.get(accessChain.size()-1);
+      String lastProp = accessChain.get(accessChain.size()-1).value();
       MetaObject obj = (MetaObject)mo;
       if(!obj.has(lastProp))
         throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", lastProp, Exceptionf.profileArgs(parameters));
@@ -437,11 +437,11 @@ public class OOPrimitives {
       Datum mo = parameters.get(0);
       if(!(mo instanceof MetaObject))
         throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<String> accessChain = new ArrayList<String>();
+      ArrayList<Symbol> accessChain = new ArrayList<Symbol>();
       for(int i = 1, n = parameters.size(); i < n-1; ++i) {
         if(!(parameters.get(i) instanceof Symbol))
           throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) arg #%d isn't a symbol: %s", i+1, Exceptionf.profileArgs(parameters));
-        String prop = ((Symbol)parameters.get(i)).value();
+        Symbol prop = (Symbol)parameters.get(i);
         if(ObjectAccessChain.is(prop)) {
           accessChain.addAll(ObjectAccessChain.parse(prop));
         } else {
@@ -452,14 +452,14 @@ public class OOPrimitives {
       // "define" Logic
       for(int i = 0, n = accessChain.size(); i < n-1; ++i) {
         MetaObject obj = (MetaObject)mo;
-        String prop = accessChain.get(i);
+        String prop = accessChain.get(i).value();
         if(!obj.has(prop))
           throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", prop, Exceptionf.profileArgs(parameters));
         mo = obj.get(prop);
         if(!(mo instanceof MetaObject))
           throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) object property '%s isn't a meta-object: %s", prop, Exceptionf.profileArgs(parameters));
       }
-      String definedProp = accessChain.get(accessChain.size()-1);
+      String definedProp = accessChain.get(accessChain.size()-1).value();
       ((MetaObject)mo).define(definedProp,newValue);
       return Void.VALUE;
     }

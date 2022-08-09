@@ -4,7 +4,7 @@
 //    Note that ALL write operations also flush automatically.
 //
 //    Provides:
-//      - static STDOUT [System.out]
+//      - static OutputPort STDOUT [System.out]
 //
 //      - static OutputPort getCurrent()
 //      - static void setCurrent(OutputPort o)
@@ -34,7 +34,7 @@ import escm.vm.runtime.EscmThread;
 public class OutputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Internal reader value
-  private Writer bw = null;
+  private Writer writer = null;
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ public class OutputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Static STDIN field
   private OutputPort() {
-    bw = new OutputStreamWriter(System.out);
+    writer = new OutputStreamWriter(System.out);
     name = "System.out";
   }
 
@@ -73,7 +73,7 @@ public class OutputPort extends Port {
   // Factory Functions
   public OutputPort(String filename, boolean append) throws Exception {
     try {
-      bw = new FileWriter(filename,append);
+      writer = new FileWriter(filename,append);
       name = filename;
     } catch(Exception e) {
       throw new Exceptionf("Can't open port \"%s\" for output: %s", filename, e);
@@ -92,8 +92,8 @@ public class OutputPort extends Port {
   // String Printing Functionality
   public void newline() throws Exception {
     try {
-      bw.write('\n');
-      bw.flush();
+      writer.write('\n');
+      writer.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't print newline to port \"%s\": %s", name, e);
     }
@@ -103,8 +103,8 @@ public class OutputPort extends Port {
   public void print(Object o) throws Exception {
     String s = o.toString();
     try {
-      bw.write(s);
-      bw.flush();
+      writer.write(s);
+      writer.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't print string \"%s\" to port \"%s\": %s", StringParser.escape(s), name, e);
     }
@@ -114,8 +114,8 @@ public class OutputPort extends Port {
   public void println(Object o) throws Exception {
     String s = o.toString();
     try {
-      bw.write(s+"\n");
-      bw.flush();
+      writer.write(s+"\n");
+      writer.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't println string \"%s\" to port \"%s\": %s", StringParser.escape(s), name, e);
     }
@@ -125,8 +125,8 @@ public class OutputPort extends Port {
   public void printf(String fmt, Object... args) throws Exception {
     String s = String.format(fmt,args);
     try {
-      bw.write(s);
-      bw.flush();
+      writer.write(s);
+      writer.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't printf string \"%s\" to port \"%s\": %s", StringParser.escape(s), name, e);
     }
@@ -137,8 +137,8 @@ public class OutputPort extends Port {
   // Datum Printing Functionality
   public void write(Datum d) throws Exception {
     try {
-      bw.write(d.write());
-      bw.flush();
+      writer.write(d.write());
+      writer.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't write datum %s to port \"%s\": %s", d.profile(), name, e);
     }
@@ -147,8 +147,8 @@ public class OutputPort extends Port {
 
   public void display(Datum d) throws Exception {
     try {
-      bw.write(d.display());
-      bw.flush();
+      writer.write(d.display());
+      writer.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't display datum %s to port \"%s\": %s", d.profile(), name, e);
     }
@@ -157,8 +157,8 @@ public class OutputPort extends Port {
 
   public void pprint(Datum d) throws Exception {
     try {
-      bw.write(d.pprint());
-      bw.flush();
+      writer.write(d.pprint());
+      writer.flush();
     } catch(Exception e) {
       throw new Exceptionf("Can't pretty-print datum %s to port \"%s\": %s", d.profile(), name, e);
     }
@@ -169,7 +169,7 @@ public class OutputPort extends Port {
   // Port Closing Semantics
   public void close() throws Exception {
     try {
-      if(isClosed() == false) bw.close();
+      if(isClosed() == false) writer.close();
     } catch(Exception e) {
       throw new Exceptionf("Can't close port \"%s\": %s", name, e);
     }
@@ -178,7 +178,7 @@ public class OutputPort extends Port {
 
   public boolean isClosed() {
     try {
-      bw.flush();
+      writer.flush();
       return false;
     } catch(Exception e) {
       return true;
@@ -196,7 +196,7 @@ public class OutputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Equality
   public boolean eq(Object o) {
-    return o instanceof OutputPort && ((OutputPort)o).bw.equals(bw);
+    return o instanceof OutputPort && ((OutputPort)o).writer.equals(writer);
   }
 
 

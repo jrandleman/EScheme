@@ -30,7 +30,7 @@ public abstract class Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // HashCode => MUST BE OVERRIDEN FOR VALUE TYPES TO HASH PROPERLY
+  // HashCode => MUST BE OVERRIDEN FOR VALUE TYPES TO HASH PROPERLY!
   public int hashCode() {
     return super.hashCode();
   }

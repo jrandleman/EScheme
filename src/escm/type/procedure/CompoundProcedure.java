@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.Datum;
+import escm.type.Symbol;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Boolean;
@@ -45,10 +46,10 @@ public class CompoundProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
   // Internal compound procedure fields
   protected static class CompileTime {
-    public ArrayList<ArrayList<java.lang.String>> parametersList;
-    public ArrayList<java.lang.String> variadicParameterList; // <null> indicates non-variadic
+    public ArrayList<ArrayList<Symbol>> parametersList;
+    public ArrayList<Symbol> variadicParameterList; // <null> indicates non-variadic
     public ArrayList<ArrayList<Instruction>> bodyList;
-    public CompileTime(ArrayList<ArrayList<java.lang.String>> parametersList, ArrayList<java.lang.String> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
+    public CompileTime(ArrayList<ArrayList<Symbol>> parametersList, ArrayList<Symbol> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
       this.parametersList = parametersList;
       this.variadicParameterList = variadicParameterList;
       this.bodyList = bodyList;
@@ -73,7 +74,7 @@ public class CompoundProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  public CompoundProcedure(ArrayList<ArrayList<java.lang.String>> parametersList, ArrayList<java.lang.String> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
+  public CompoundProcedure(ArrayList<ArrayList<Symbol>> parametersList, ArrayList<Symbol> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
     this.state = new State(new CompileTime(parametersList,variadicParameterList,bodyList));
   }
   
@@ -81,7 +82,7 @@ public class CompoundProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
   // Thunk Querying
   public boolean isThunk() { // unary variadics are considered thunks!
-    for(ArrayList<java.lang.String> params : this.state.compileTime.parametersList) {
+    for(ArrayList<Symbol> params : this.state.compileTime.parametersList) {
       if(params.isEmpty()) return true;
     }
     return false;
@@ -91,7 +92,7 @@ public class CompoundProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   // => Cloning + super environment binding
-  protected CompoundProcedure(java.lang.String name, State state) {
+  protected CompoundProcedure(String name, State state) {
     this.name = name;
     this.state = state;
   }
@@ -104,14 +105,14 @@ public class CompoundProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // Name binding (used by escm.vm.type.Environment.java)
-  public CompoundProcedure loadWithName(java.lang.String name) {
+  public CompoundProcedure loadWithName(String name) {
     if(!this.name.equals(Procedure.DEFAULT_NAME)) return this;
     return new CompoundProcedure(name,state);
   }
 
 
   // (used by escm.type.oo.MetaObject)
-  public CompoundProcedure loadWithForcedName(java.lang.String name) {
+  public CompoundProcedure loadWithForcedName(String name) {
     return new CompoundProcedure(name,state);
   }
 
@@ -125,23 +126,23 @@ public class CompoundProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // Application Abstraction
-  protected java.lang.String stringifyParameters(ArrayList<java.lang.String> params, java.lang.String variadic) {
+  protected String stringifyParameters(ArrayList<Symbol> params, Symbol variadic) {
     int n = params.size();
     if(n == 0 && variadic == null) return "expected 0 args";
     StringBuilder sb = new StringBuilder("(");
     for(int i = 0; i < n; ++i) {
-      sb.append(params.get(i));
+      sb.append(params.get(i).value());
       if(i+1 < n) sb.append(" ");
     }
     if(variadic != null) {
-      sb.append(" . " + variadic);
+      sb.append(" . " + variadic.value());
     }
     sb.append(")");
     return sb.toString();
   }
 
 
-  protected java.lang.String stringifyParameterSignatures() {
+  protected String stringifyParameterSignatures() {
     StringBuilder sb = new StringBuilder("\n  Available Signatures:");
     for(int i = 0, n = state.compileTime.parametersList.size(); i < n; ++i) {
       sb.append("\n    > " + stringifyParameters(state.compileTime.parametersList.get(i),state.compileTime.variadicParameterList.get(i)));
@@ -166,8 +167,8 @@ public class CompoundProcedure extends Procedure {
 
   protected Environment getExtendedEnvironment(int clauseNumber, ArrayList<Datum> arguments) throws Exception {
     Environment extendedEnvironment = new Environment(state.definitionEnvironment);
-    ArrayList<java.lang.String> parameters = state.compileTime.parametersList.get(clauseNumber);
-    java.lang.String variadicParameter = state.compileTime.variadicParameterList.get(clauseNumber);
+    ArrayList<Symbol> parameters = state.compileTime.parametersList.get(clauseNumber);
+    Symbol variadicParameter = state.compileTime.variadicParameterList.get(clauseNumber);
     int n = parameters.size();
     // register non-variadic arguments
     for(int i = 0; i < n; ++i)
@@ -199,14 +200,16 @@ public class CompoundProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // <super> Binding (done updon object creation)
+  private static final Symbol SUPER_SYMBOL = new Symbol("super");
+
   public CompoundProcedure loadWithSuper(MetaObject supr) throws Exception {
     if(state.definitionEnvironment == null)
       throw new Exceptionf("escm.type.procedure.CompoundProcedure can't bind <super> %s to procedure %s with a null definition environment!", supr.profile(), name);
     Environment extendedEnvironment = new Environment(state.definitionEnvironment);
     if(supr == null) { // note that <super> is <null> for interfaces!
-      extendedEnvironment.define("super",Boolean.FALSE);
+      extendedEnvironment.define(SUPER_SYMBOL,Boolean.FALSE);
     } else {
-      extendedEnvironment.define("super",supr);
+      extendedEnvironment.define(SUPER_SYMBOL,supr);
     }
     return new CompoundProcedure(name,new State(extendedEnvironment,state.compileTime));
   }
@@ -214,11 +217,13 @@ public class CompoundProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // <self> Binding (done updon method invocation)
+  private static final Symbol SELF_SYMBOL = new Symbol("self");
+
   public CompoundProcedure loadWithSelf(MetaObject self) throws Exception {
     if(state.definitionEnvironment == null)
       throw new Exceptionf("escm.type.procedure.CompoundProcedure can't bind <self> %s to procedure %s with a null definition environment!", self.profile(), name);
     Environment extendedEnvironment = new Environment(state.definitionEnvironment);
-    extendedEnvironment.define("self",self);
+    extendedEnvironment.define(SELF_SYMBOL,self);
     return new CompoundProcedure(name,new State(extendedEnvironment,state.compileTime));
   }
 }

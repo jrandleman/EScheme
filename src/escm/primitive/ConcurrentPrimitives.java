@@ -5,8 +5,9 @@
 package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
-import escm.type.Void;
+import escm.type.Symbol;
 import escm.type.Boolean;
+import escm.type.Void;
 import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.util.Exceptionf;
@@ -120,7 +121,7 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-status <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.Symbol(((escm.type.concurrent.Thread)parameters.get(0)).getStatus());
+      return new Symbol(((escm.type.concurrent.Thread)parameters.get(0)).getStatus());
     }
   }
 
@@ -369,18 +370,18 @@ public class ConcurrentPrimitives {
         throw new Exceptionf("'(thread-define' <optional-thread> <var-name> <value>) didn't receive 2 or 3 args: %s", 
           Exceptionf.profileArgs(parameters));
       if(totalParams == 2) {
-        if(!(parameters.get(0) instanceof escm.type.Symbol))
+        if(!(parameters.get(0) instanceof Symbol))
           throw new Exceptionf("'(thread-define' <optional-thread> <var-name> <value>) 1st arg %s isn't a symbol: %s", 
             parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
-        GlobalState.metaThreadDynamicEnvironment.define(((escm.type.Symbol)parameters.get(0)).value(),parameters.get(1));
+        GlobalState.metaThreadDynamicEnvironment.define((Symbol)parameters.get(0),parameters.get(1));
       } else {
         if(!(parameters.get(0) instanceof escm.type.concurrent.Thread))
           throw new Exceptionf("'(thread-define' <optional-thread> <var-name> <value>) 1st arg %s isn't a thread: %s", 
             parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
-        if(!(parameters.get(1) instanceof escm.type.Symbol))
+        if(!(parameters.get(1) instanceof Symbol))
           throw new Exceptionf("'(thread-define' <optional-thread> <var-name> <value>) 2nd arg %s isn't a symbol: %s", 
             parameters.get(1).profile(), Exceptionf.profileArgs(parameters));
-        ((escm.type.concurrent.Thread)parameters.get(0)).define(((escm.type.Symbol)parameters.get(1)).value(),parameters.get(2));
+        ((escm.type.concurrent.Thread)parameters.get(0)).define((Symbol)parameters.get(1),parameters.get(2));
       }
       return Void.VALUE;
     }
@@ -400,22 +401,22 @@ public class ConcurrentPrimitives {
         throw new Exceptionf("'(thread-set!' <optional-thread> <var-name> <value>) didn't receive 2 or 3 args: %s", 
           Exceptionf.profileArgs(parameters));
       if(totalParams == 2) {
-        if(!(parameters.get(0) instanceof escm.type.Symbol))
+        if(!(parameters.get(0) instanceof Symbol))
           throw new Exceptionf("'(thread-set!' <optional-thread> <var-name> <value>) 1st arg %s isn't a symbol: %s", 
             parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
-        String varName = ((escm.type.Symbol)parameters.get(0)).value();
+        Symbol varName = (Symbol)parameters.get(0);
         if(!GlobalState.metaThreadDynamicEnvironment.has(varName))
           throw new Exceptionf("'(thread-set!' <optional-thread> <var-name> <value>) %s isn't a variable in the meta thread dynamic environment: %s", 
-            varName, Exceptionf.profileArgs(parameters));
+            varName.value(), Exceptionf.profileArgs(parameters));
         GlobalState.metaThreadDynamicEnvironment.set(varName,parameters.get(1));
       } else {
         if(!(parameters.get(0) instanceof escm.type.concurrent.Thread))
           throw new Exceptionf("'(thread-set!' <optional-thread> <var-name> <value>) 1st arg %s isn't a thread: %s", 
             parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
-        if(!(parameters.get(1) instanceof escm.type.Symbol))
+        if(!(parameters.get(1) instanceof Symbol))
           throw new Exceptionf("'(thread-set!' <optional-thread> <var-name> <value>) 2nd arg %s isn't a symbol: %s", 
             parameters.get(1).profile(), Exceptionf.profileArgs(parameters));
-        ((escm.type.concurrent.Thread)parameters.get(0)).set(((escm.type.Symbol)parameters.get(1)).value(),parameters.get(2));
+        ((escm.type.concurrent.Thread)parameters.get(0)).set((Symbol)parameters.get(1),parameters.get(2));
       }
       return Void.VALUE;
     }
@@ -435,22 +436,22 @@ public class ConcurrentPrimitives {
         throw new Exceptionf("'(thread-get' <optional-thread> <var-name>) didn't receive 1 or 2 args (optional thread, variable symbol): %s", 
           Exceptionf.profileArgs(parameters));
       if(totalParams == 1) {
-        if(!(parameters.get(0) instanceof escm.type.Symbol))
+        if(!(parameters.get(0) instanceof Symbol))
           throw new Exceptionf("'(thread-get' <optional-thread> <var-name>) 1st arg %s isn't a symbolic variable name: %s", 
             parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
-        String varName = ((escm.type.Symbol)parameters.get(0)).value();
+        Symbol varName = (Symbol)parameters.get(0);
         if(!GlobalState.metaThreadDynamicEnvironment.has(varName))
           throw new Exceptionf("'(thread-get' <optional-thread> <var-name>) %s isn't a variable in the meta thread dynamic environment: %s", 
-            varName, Exceptionf.profileArgs(parameters));
+            varName.value(), Exceptionf.profileArgs(parameters));
         return GlobalState.metaThreadDynamicEnvironment.get(varName);
       } else {
         if(!(parameters.get(0) instanceof escm.type.concurrent.Thread))
           throw new Exceptionf("'(thread-get' <optional-thread> <var-name>) 1st arg %s isn't a thread: %s", 
             parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
-        if(!(parameters.get(1) instanceof escm.type.Symbol))
+        if(!(parameters.get(1) instanceof Symbol))
           throw new Exceptionf("'(thread-get' <optional-thread> <var-name>) 2nd arg %s isn't a symbolic variable name: %s", 
             parameters.get(1).profile(), Exceptionf.profileArgs(parameters));
-        return ((escm.type.concurrent.Thread)parameters.get(0)).get(((escm.type.Symbol)parameters.get(1)).value());
+        return ((escm.type.concurrent.Thread)parameters.get(0)).get((Symbol)parameters.get(1));
       }
     }
   }

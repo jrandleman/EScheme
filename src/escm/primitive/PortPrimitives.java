@@ -8,6 +8,7 @@ import escm.type.Datum;
 import escm.type.port.Port;
 import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
+import escm.type.number.Exact;
 import escm.type.Void;
 import escm.type.Boolean;
 import escm.util.Exceptionf;
@@ -74,6 +75,37 @@ public class PortPrimitives {
         throw new Exceptionf("'(close-port! <port>) didn't receive 1 port: %s", Exceptionf.profileArgs(parameters));
       ((Port)parameters.get(0)).close();
       return Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // port-name
+  public static class PortName implements Primitive {
+    public java.lang.String escmName() {
+      return "port-name";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Port))
+        throw new Exceptionf("'(port-name <port>) didn't receive 1 port: %s", Exceptionf.profileArgs(parameters));
+      return new escm.type.String(((Port)parameters.get(0)).sourceName());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // port-position
+  public static class PortPosition implements Primitive {
+    public java.lang.String escmName() {
+      return "port-position";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof InputPort))
+        throw new Exceptionf("'(port-position <input-port>) didn't receive 1 port: %s", Exceptionf.profileArgs(parameters));
+      InputPort ip = (InputPort)parameters.get(0);
+      return new escm.type.Pair(new Exact(ip.lineNumber()),new Exact(ip.columnNumber()));
     }
   }
 
