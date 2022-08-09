@@ -3,6 +3,49 @@
 ## MORE
 
 
+- `#line` macro variable: special "macro-specific" variable.
+  When the compiler expands a macro, it parses the expanded value for all `#line` instances.
+  Any instances found are replaced with the line number in the `source` object of the macro name.
+    => also have `#file` `#column`
+
+    => have compiling these symbols spereately as an atomic instead compile them to become their
+       respective values by introspecting on their `source` object instead compiling that specific
+       value!
+
+    => MENTION THESE IN `help` AND `README.md` AS A SCM EXTENSION
+
+    => TEST THE USE OF ALL THESE IN MACROS LIKE `assert` TO VERIFY THEY WORK!
+
+    * NOTE: POTENTIAL ISSUE: MIGHT NEED TO "RE-SOURCE" (CHANGE INTERNAL `source` OBJECT) OF ALL SYMBOLS IN THE EXPANDED EXPRESSION:
+        * A MACRO EXPANDING IN ANOTHER MACRO WOULD OTHERWISE YIELD AN INCORRECT RESULT
+          - support had `assert` expanding within another macro. that `assert` macro label would only be read in at the point prior the enclosing macro's
+            expansion (ie in the macro defn itself), & hence would NOT associate to the proper ultimate expansion point (the point where the enclosing
+            macro is used by the user elsewhere) thereby leading in an improper association of `#line` (etc.) value(s).
+          - by instead "re-source'ing" all symbols within an expanded macro expression, we can guarentee that expansions for `#line` (etc.)
+            will work properly.
+              * please note: "re-source'ing" sounds like it could be expensive asf -- options?
+                => RUN TESTS TO SEE THE COST OF THIS (BOOT-TIME COST, ETC.)
+
+
+    ```clj
+    (define-syntax assert
+      (lambda (condition)
+        (def cond-result (gensym))
+        `(begin 
+          (define ,cond-result ,condition)
+          (if (not ,cond-result)
+              (errorf "Assert Failed (%ws %n %n): %wa" #file #line #column ',condition)))))
+    ```
+
+
+
+
+
+- CHECK IPHONE FOR ENVIRONMENT API POTENTIAL UPDATE NOTES
+
+
+
+
 
 - CHANGE READER TO GIVE BETTER ERRORS
   * INSTEAD OF DUMPING OUT THE ENTIRE STRING, DO THE `JSON` PARSER THING OF HAVING AN ARROW THAT POINTS TO THE RIGHT POSITION OF THE ERROR
@@ -62,21 +105,6 @@ SHOW "LAST CALLED" PROCEDURE LOCATION
 ==================================================================================================================
 ==================================================================================================================
 ==================================================================================================================
-
-
-
-
-
-- `#line` macro variable: special "macro-specific" variable.
-  When the compiler expands a macro, it parses the expanded value for all `#line` instances.
-  Any instances found are replaced with the line number in the `source` object of the macro name.
-    => also have `#file` `#column`
-
-    => have compiling these symbols spereately as an atomic instead compile them to become their
-       respective values by introspecting on their `source` object instead compiling that specific
-       value!
-
-    => MENTION THESE IN `help` AND `README.md` AS A SCM EXTENSION
 
 
 
