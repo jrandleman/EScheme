@@ -39,106 +39,12 @@ SHOW "LAST CALLED" PROCEDURE LOCATION
 
 
 
-
-
-
-
-
-
-
-
-
-
-```
-(push 2) 
-(push 1) 
-(push +) ; gets pushed => instruction 
-(call -3)
-
-
-
-
-CHANGE `Symbol` TO HOLD A `SourceInformation` OBJECT INTERNALLY
-
-
-
-can get reader file location to the bytecode instruction set nested in lambdas. 
-PROBLEM: lifting the data from that bytecode to the toplevel exception
-         => STORE IN THREAD-LOCAL VARIABLE ??
-
-
-
-
-
-TEST EFFICIENCY OF:
-  * having CVR and STACK store a PAIR of value, sourceInformation
-  * adding CSR (current source register) AND SOURCE-STACK (stack of same size as values holding associated source information)
-    => INSTRUCTIONS ALLOCATE 
-
-
-
-
-```
-
-
-
-
-
-
-  > reader accepts a starting line number/column/source-name 
-    * -------------------- MAKE SURE TO RESET SOURCE INFO ONCE GLOBAL SCOPE IS HIT/RETURNED-TO AGAIN --------------------
-
-
-    * ALSO IMPROVE THE ERRORS THROWN BY THE PORT-READING METHOD IN `InputPort`
-
-
-    * MAKE SURE THE ASSEMBLER IS PASSING ALONG VALUES CORRECTLY FOR SOURCE DATA
-
-
-
-
-  * LINE NUMBERS FOR ERRORS ????
-    => ASSOCIATED BY READER?
-       THEN SINCE THE COMPILER SIMPLY PLICES READ ITEMS INTO BYTECODE, WILL HAVE READ ITEMS ALREADY IN THE BYTECODE ITSELF WITH THE READER METADATA
-         => WOULD LIKELY HAVE TO MAKE THE ASSEMBLER MAINTAIN THESE ASSOCIATIONS !!!
-
-
-    => change reader to accept an input-port "source" argument
-       => input ports track the line/column they're currently reading at
-
-
-
-
-
-
-
-
-
 ==================================================================================================================
 ==================================================================================================================
 ==================================================================================================================
 ==================================================================================================================
 ==================================================================================================================
 ==================================================================================================================
-
-
-
-- VERIFY THAT CHANGING `load` TO RESTORE THE ORIGINAL CALLSTACK @ EACH GLOBAL SCOPE IS ACTUALLY CORRECT:
-      * COULD RESTORING THE ORIGINAL CALLSTACK LEAD TO WERIDNESS IN AN ERROR INVOKED BY A STORED CONTINUATION?
-        IN A LOADED SCRIPT (LOADED FROM WITHIN A FUNCTION): 
-          ```clj
-          (def k #f)
-          (def (f)
-            (call/cc (lambda (cc) (set! k cc)))
-            (error "Error in function loaded f!"))
-          (set! k (f))
-
-
-          // THEN CALL <k> IN THE LOADING SCHEME SCRIPT -- WILL THE FCN IN THE LOADING SCRIPT THAT CALLED <k> BE SHOWN OR NOT? SHOULD IT EVEN THOUGH?
-
-
-          ```
-
 
 
 
@@ -203,6 +109,7 @@ TEST EFFICIENCY OF:
 
 
 - CONSIDER HAVING INPUT PORTS CHANGE THEIR NAME TO BE AN ABSOLUTE PATH RATHER THAN THE RELATIVE PATH !!!
+  * ALSO HAVE `file-read` DO THIS TO ITS FILENAME PRIOR TO CREATING THE `source` OBJECT PASSED TO THE READER !!!
 
 
 

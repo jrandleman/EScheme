@@ -95,9 +95,9 @@ public class Environment {
     if(result == null) {
       if(superEnv == null) {
         if(name.hasSourceInformation()) {
-          throw new Exceptionf("escm.vm.type.Environment [GET] variable \"%s\" doesn't exist!\nLocation:\n  %s%s", nameString, name.source(), getPossibleVariableIntentions(name));
+          throw new Exceptionf("escm.vm.type.Environment [GET] variable \"%s\" doesn't exist!\nLocation:\n  %s%s", name.value(), name.source(), getPossibleVariableIntentions(name));
         } else {
-          throw new Exceptionf("escm.vm.type.Environment [GET] variable \"%s\" doesn't exist!%s", nameString, getPossibleVariableIntentions(name));
+          throw new Exceptionf("escm.vm.type.Environment [GET] variable \"%s\" doesn't exist!%s", name.value(), getPossibleVariableIntentions(name));
         }
       }
       return superEnv.get(name);

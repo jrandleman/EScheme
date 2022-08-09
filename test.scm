@@ -7,11 +7,6 @@
 
 
 
-
-
-
-
-
 ; (define-syntax assert
 ;   (lambda (condition)
 ;     (def cond-result (gensym))
