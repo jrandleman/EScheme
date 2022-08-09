@@ -73,17 +73,18 @@ public class Main {
   }
 
 
-  public static void reportTopLevelError(Throwable e) {
+  public static void reportTopLevelError(Throwable t) {
     resetCurrentPorts();
-    if(e instanceof Exception) {
-      System.err.printf("\nESCM ERROR: %s\n", e);
-    } else if(e instanceof StackOverflowError) {
+    if(t instanceof Exception) {
+      System.err.printf("\nESCM ERROR: %s\n", t.getMessage());
+    } else if(t instanceof StackOverflowError) {
       System.err.println("\nESCM: JAVA STACK-OVERFLOW ERROR: Did you try printing/equating cyclical data?");
     } else {
-      System.err.printf("\nESCM: JAVA ERROR: %s\n", e);
+      System.err.printf("\nESCM: JAVA ERROR: %s\n", t.getMessage());
     }
     EscmCallStack.print();
-    printJavaStackTraceWithoutMessage(e);
+    System.err.printf(">> Java Throwable: %s\n", t.getClass().getName());
+    printJavaStackTraceWithoutMessage(t);
     System.err.println("");
   }
 
@@ -156,8 +157,8 @@ public class Main {
       try {
         eval(GlobalState.globalEnvironment,readFullExpression(),printContinuation);
         EscmCallStack.clear(); // residue frames may reside after call/cc nonsense
-      } catch(Throwable e) {
-        reportTopLevelError(e);
+      } catch(Throwable t) {
+        reportTopLevelError(t);
       }
     }
   }
@@ -259,8 +260,8 @@ public class Main {
           } else {
             launchScript(parsedCmdLine);
           }
-        } catch(Throwable e) {
-          reportTopLevelError(e);
+        } catch(Throwable t) {
+          reportTopLevelError(t);
         }
         return cont.run(escm.type.Void.VALUE);
       }
