@@ -68,7 +68,7 @@ public class Environment {
     ArrayList<String> existingVariables = new ArrayList<String>();
     addCurrentVariableBindings(existingVariables);
     ArrayList<String> potentialVariables = GetClosestStringMatches.run(varName.value(),existingVariables,MAXIMUM_SUGGESTED_VARIABLE_ALTERNATIVES);
-    StringBuilder sb = new StringBuilder("\n>> No matches found! Did you mean:");
+    StringBuilder sb = new StringBuilder("\n>> Did you mean:");
     for(int i = 0, n = potentialVariables.size(); i < n; ++i) {
       sb.append(String.format("\n   %2d) %s", i+1, potentialVariables.get(i)));
     }
