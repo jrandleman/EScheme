@@ -90,6 +90,11 @@ public class InputPort extends Port {
   }
 
 
+  public synchronized String getPositionString() {
+    return String.format("file=\"%s\", line=%d, column=%d", name, lineNumber, columnNumber);
+  }
+
+
   ////////////////////////////////////////////////////////////////////////////
   // Static STDIN field
   private InputPort() {
@@ -280,11 +285,11 @@ public class InputPort extends Port {
             if(containerStack.empty() == false) {
               char c = containerStack.pop();
               if(c == '(') {
-                throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: missing a closing ')' for opening '('!", write());
+                throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: missing a closing ')' for opening '('!\n>> Location: %s", write(), getPositionString());
               } else if(c == '[') {
-                throw new Exceptionf("READ ERROR (for %s): Invalid bracket: missing a closing ']' for opening '['!", write());
+                throw new Exceptionf("READ ERROR (for %s): Invalid bracket: missing a closing ']' for opening '['!\n>> Location: %s", write(), getPositionString());
               } else { // if(c == '{')
-                throw new Exceptionf("READ ERROR (for %s): Invalid curly-brace: missing a closing '}' for opening '{'!", write());
+                throw new Exceptionf("READ ERROR (for %s): Invalid curly-brace: missing a closing '}' for opening '{'!\n>> Location: %s", write(), getPositionString());
               }
             }
             return null;
@@ -299,11 +304,11 @@ public class InputPort extends Port {
             updatePortPosition(input);
             sb.append((char)input);
             if(containerStack.empty()) {
-              throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a ')' prior an associated '('!", write());
+              throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a ')' prior an associated '('!\n>> Location: %s", write(), getPositionString());
             }
             char opener = containerStack.pop();
             if(opener != '(') {
-              throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a closing ')' prior to closing '%c'!", write(), opener);
+              throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a closing ')' prior to closing '%c'!\n>> Location: %s", write(), opener, getPositionString());
             }
             if(containerStack.empty()) break;
           // register close bracket
@@ -311,11 +316,11 @@ public class InputPort extends Port {
             updatePortPosition(input);
             sb.append((char)input);
             if(containerStack.empty()) {
-              throw new Exceptionf("READ ERROR (for %s): Invalid bracket: found a ']' prior an associated '['!", write());
+              throw new Exceptionf("READ ERROR (for %s): Invalid bracket: found a ']' prior an associated '['!\n>> Location: %s", write(), getPositionString());
             }
             char opener = containerStack.pop();
             if(opener != '[') {
-              throw new Exceptionf("READ ERROR (for %s): Invalid bracket: found a closing ']' prior to closing '%c'!", write(), opener);
+              throw new Exceptionf("READ ERROR (for %s): Invalid bracket: found a closing ']' prior to closing '%c'!\n>> Location: %s", write(), opener, getPositionString());
             }
             if(containerStack.empty()) break;
           // register close curly-brace
@@ -323,11 +328,11 @@ public class InputPort extends Port {
             updatePortPosition(input);
             sb.append((char)input);
             if(containerStack.empty()) {
-              throw new Exceptionf("READ ERROR (for %s): Invalid curly-brace: found a '}' prior an associated '{'!", write());
+              throw new Exceptionf("READ ERROR (for %s): Invalid curly-brace: found a '}' prior an associated '{'!\n>> Location: %s", write(), getPositionString());
             }
             char opener = containerStack.pop();
             if(opener != '{') {
-              throw new Exceptionf("READ ERROR (for %s): Invalid curly-brace: found a closing '}' prior to closing '%c'!", write(), opener);
+              throw new Exceptionf("READ ERROR (for %s): Invalid curly-brace: found a closing '}' prior to closing '%c'!\n>> Location: %s", write(), opener, getPositionString());
             }
             if(containerStack.empty()) break;
           // account for whitespace
@@ -349,6 +354,8 @@ public class InputPort extends Port {
           } else if(input == '"') {
             updatePortPosition(input);
             sb.append((char)input);
+            long stringStartLine = lineNumber;
+            long stringStartColumn = columnNumber;
             int start = sb.length()-1;
             input = pr.read();
             while(input != -1) {
@@ -369,7 +376,7 @@ public class InputPort extends Port {
               input = pr.read();
             }
             if(input == -1) {
-              throw new Exceptionf("READ ERROR (for %s): Unterminating string literal detected!", write());
+              throw new Exceptionf("READ ERROR (for %s): Unterminating string literal detected!\n>> Location: %s", write(), name, stringStartLine, stringStartColumn);
             }
             if(containerStack.empty()) break;
           // account for reader shorthands
@@ -379,7 +386,7 @@ public class InputPort extends Port {
             if(input == ',') {
               input = pr.read();
               if(input == -1) {
-                throw new Exceptionf("READ ERROR (for %s): Incomplete \"unquote\" reader shorthand literal!", write());
+                throw new Exceptionf("READ ERROR (for %s): Incomplete \"unquote\" reader shorthand literal!\n>> Location: %s", write(), getPositionString());
               }
               if(input == '@') {
                 updatePortPosition(input);
