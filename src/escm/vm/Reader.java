@@ -49,31 +49,32 @@ public class Reader {
 
 
   // @return: pair of parsed reader shorthand literal expansion & position in <sourceCode> after the parsed literal
-  private static Pair<Datum,Integer> parseReaderShorthandLiteralLogic(String sourceCode, String longhandName, int shorthandEndIdx, Stack<Character> containerStack, SourceInformation source) throws Exception {
+  private static Pair<Datum,Integer> parseReaderShorthandLiteralLogic(String sourceCode, String longhandName, int shorthandEndIdx, Stack<Character> containerStack, SourceInformation source, SourceInformation shorthandSource) throws Exception {
     Pair<Datum,Integer> parsedItem = readLoop(sourceCode,shorthandEndIdx,containerStack,source);
     if(parsedItem.first == null)
       throw new IncompleteException("READ ERROR: Incomplete "+longhandName+" reader shorthand literal!");
-    return new Pair<Datum,Integer>(escm.type.Pair.List(new Symbol(longhandName),parsedItem.first), parsedItem.second);
+    return new Pair<Datum,Integer>(escm.type.Pair.List(new Symbol(longhandName,shorthandSource),parsedItem.first), parsedItem.second);
   }
 
 
   // @return: pair of parsed reader shorthand literal expansion & position in <sourceCode> after the parsed literal
   private static Pair<Datum,Integer> parseReaderShorthandLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws Exception {
+    SourceInformation shorthandSource = source.clone();
     if(sourceCode.charAt(i) == '\'') {
       source.updatePosition('\'');
-      return parseReaderShorthandLiteralLogic(sourceCode,"quote",i+1,containerStack,source);
+      return parseReaderShorthandLiteralLogic(sourceCode,"quote",i+1,containerStack,source,shorthandSource);
     }
     if(sourceCode.charAt(i) == '`') {
       source.updatePosition('`');
-      return parseReaderShorthandLiteralLogic(sourceCode,"quasiquote",i+1,containerStack,source);
+      return parseReaderShorthandLiteralLogic(sourceCode,"quasiquote",i+1,containerStack,source,shorthandSource);
     }
     if(sourceCode.charAt(i) == ',') {
       source.updatePosition(',');
       if(i+1 < n && sourceCode.charAt(i+1) == '@') {
         source.updatePosition('@');
-        return parseReaderShorthandLiteralLogic(sourceCode,"unquote-splicing",i+2,containerStack,source);
+        return parseReaderShorthandLiteralLogic(sourceCode,"unquote-splicing",i+2,containerStack,source,shorthandSource);
       }
-      return parseReaderShorthandLiteralLogic(sourceCode,"unquote",i+1,containerStack,source);
+      return parseReaderShorthandLiteralLogic(sourceCode,"unquote",i+1,containerStack,source,shorthandSource);
     }
     // Should be unreachable but just in case ...
     throw new Exception("READ ERROR: Unknown Reader Shorthand Literal at index "+i+" in "+writeString(sourceCode)+"!");
