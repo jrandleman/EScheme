@@ -3,6 +3,9 @@
 ## MORE
 
 
+
+
+
 - INSTEAD OF SHOWING SOURCE INFORMATION IN CALLSTACK, SHOW ___WHERE___ PROCEDURES WERE CALLED ?
   - HAVE SYMBOL'S "LOAD WITH STATE" BIND ITS OWN "SOURCE" OBJECT TO A PROCEDURE IF EVALUATING TO A PROCEDURE ???
     - SUPPORT THIS WITH ALL PROCS, NOT JUST COMPOUNDS !!!
@@ -59,8 +62,45 @@
 
 
 
-
 - IMPROVE BOOT TIME VIA SERIALIZATION ???
+
+    => START BY TIMING DIFFERENCE WITH REDUCING `.substring` USE IN `FileRead.readBufferAsArrayList()` !!!
+
+    => ___THIS MAY NOT BE WORTH IT, BUT WORTH KEEPING HERE IN CASE___
+
+    => PERHAPS SOME WAY TO PRE-COMPILE ENTIRE STDLIB INTO A SINGLE GIANT `bytecode` EXPRESSION (`SGBE`):
+       => THAT `SGBE` IS THEN COMPILED DOWN TO AN "INSTRUCTION SET" (`ArrayList<Instruction>`) 
+          => THAT `ArrayList<Instruction>` IS THEN SERIALIZED AND SAVED IN A `compiled-stdlib` FILE IN `/src`
+             => THEN, UPON INTERPRETER BOOT-TIME, `compiled-stdlib` IS READ AND EXECUTED DIRECTLY
+
+             * MUST TEST THE PERF DIFFERENCE OF THIS VS OUR CURRENT APPROACH
+
+               => IF WE END UP KEEPING THIS SOLUTION:
+
+                  * WE MUST MENTION IN `stdlib.scm` THAT A FULL, FRESH `EScheme` REINSTALL IS REQUIRED FOR 
+                    THE `stdlib.scm` FILE'S CONTENTS TO EFFECT THE ESCM RUNTIME
+
+                  * CONSIDER EXPOSING THIS ABILITY SOMEWHAT TO TO THE ESCM RUNTIME? 
+                    - `(write-java-object <obj>)`
+                    - `(read-java-object <string-or-input-port>)`
+                    - `(run-and-serialize <file-name>)` ; COULD EVEN EXECUTE THIS IN A SANDBOXED ENVIRONMENT ???
+
+
+
+
+
+
+
+
+- CONSIDER HAVING `eval` & `bytecode-eval` & `load` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
+  
+  - CONSIDER A `process` TYPE? `fork`?
+    => copy-on-write semantics for `fork`, similar to how the "meta-thread" works ??
+
+
+
+
+
 
 
 

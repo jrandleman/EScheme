@@ -238,7 +238,7 @@ public class InputPort extends Port {
   public synchronized Datum readReplDatum() throws Exception {
     printReplPrompt();
     StringBuilder sb = new StringBuilder();
-    SourceInformation replDatumSourceStart = new SourceInformation(sourceName(),lineNumber,columnNumber);
+    SourceInformation replDatumSourceStart = new SourceInformation(name,lineNumber,columnNumber);
     while(true) {
       try {
         String input = readLine();
@@ -269,7 +269,7 @@ public class InputPort extends Port {
   // Datum Reader
   public synchronized Datum readDatum() throws Exception {
     StringBuilder sb = new StringBuilder();
-    SourceInformation datumSourceStart = new SourceInformation(sourceName(),lineNumber,columnNumber);
+    SourceInformation datumSourceStart = new SourceInformation(name,lineNumber,columnNumber);
     while(true) {
       try {
         Stack<Character> containerStack = new Stack<Character>();

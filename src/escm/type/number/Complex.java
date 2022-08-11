@@ -184,10 +184,10 @@ public class Complex extends Number {
     if(n instanceof Complex) {
       Complex c = (Complex)n;
       Real resultReal = (Real)real.mul(c.real).sub(imag.mul(c.imag));
-      Real resultImag = (Real)real.mul(c.imag).sub(imag.mul(c.real));
+      Real resultImag = (Real)real.mul(c.imag).add(imag.mul(c.real));
       return (new Complex(resultReal,resultImag)).unifyComponentExactness();
     } else {
-      return (new Complex((Real)real.mul(n),((Real)imag.mul(n)).negate())).unifyComponentExactness();
+      return (new Complex((Real)real.mul(n),(Real)imag.mul(n))).unifyComponentExactness();
     }
   }
 

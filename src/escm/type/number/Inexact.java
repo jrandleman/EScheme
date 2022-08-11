@@ -147,7 +147,7 @@ public class Inexact extends Real {
 
   public Number sqrt() {
     if(value < 0.0)
-      return new Complex(new Inexact(),new Inexact(-Math.sqrt(-value)));
+      return new Complex(new Inexact(),new Inexact(Math.sqrt(-value)));
     return new Inexact(Math.sqrt(value));
   }
 
