@@ -16,23 +16,45 @@ import escm.util.Pair;
 import escm.util.StringParser;
 import escm.util.Exceptionf;
 import escm.vm.util.SourceInformation;
+import escm.util.json.util.SubstringIndexError;
 
 public class Reader {
   ////////////////////////////////////////////////////////////////////////////
-  // Exception Type Specialization
-  public static class IncompleteException extends Exception {
-    public IncompleteException() {}
-    public IncompleteException(String msg) {super(msg);}
+  // Length of the Reader's Error Substring
+  private static final int READER_ERROR_SUBSTRING_LENGTH = 80;
+
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Exception Type(s) Specialization
+  public static class ReaderException extends Exception {
+    private static String generateMessage(int errorIndex, String sourceCode, SourceInformation source, String fmt, Object ... args) {
+      StringBuilder sb = new StringBuilder();
+      sb.append(String.format(fmt,args));
+      if(sourceCode.length() > 0) {
+        String[] errorSubstring = SubstringIndexError.run(errorIndex,sourceCode,READER_ERROR_SUBSTRING_LENGTH);
+        sb.append("\n>> Found Here: " + errorSubstring[0] + 
+                  "\n               " + errorSubstring[1]);
+      }
+      sb.append("\n>> Location: " + source.toString());
+      return sb.toString();
+    }
+
+    public ReaderException(int errorIndex, String sourceCode, SourceInformation source, String fmt, Object ... args) {
+      super(generateMessage(errorIndex,sourceCode,source,fmt,args));
+    }
+  }
+
+
+  public static class IncompleteException extends ReaderException {
+    public IncompleteException(int errorIndex, String sourceCode, SourceInformation source, String fmt, Object ... args) {
+      super(errorIndex,sourceCode,source,fmt,args);
+    }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // General Helpers
-  private static String writeString(String str) {
-    return (new escm.type.String(str)).write();
-  }
-
-
   public static boolean isDelimiter(char c) {
     return Character.isWhitespace(c) || c=='(' || c==')' || c=='[' || c==']' || c=='{' || c=='}' || c=='"' || c==';';
   }
@@ -49,35 +71,35 @@ public class Reader {
 
 
   // @return: pair of parsed reader shorthand literal expansion & position in <sourceCode> after the parsed literal
-  private static Pair<Datum,Integer> parseReaderShorthandLiteralLogic(String sourceCode, String longhandName, int shorthandEndIdx, Stack<Character> containerStack, SourceInformation source, SourceInformation shorthandSource) throws Exception {
+  private static Pair<Datum,Integer> parseReaderShorthandLiteralLogic(String sourceCode, String longhandName, int shorthandStartIdx, int shorthandEndIdx, Stack<Character> containerStack, SourceInformation source, SourceInformation shorthandSource) throws ReaderException {
     Pair<Datum,Integer> parsedItem = readLoop(sourceCode,shorthandEndIdx,containerStack,source);
     if(parsedItem.first == null)
-      throw new IncompleteException("READ ERROR: Incomplete "+longhandName+" reader shorthand literal!");
+      throw new IncompleteException(shorthandStartIdx, sourceCode, shorthandSource, "READ ERROR: Incomplete \"%s\" reader shorthand literal!", longhandName);
     return new Pair<Datum,Integer>(escm.type.Pair.List(new Symbol(longhandName,shorthandSource),parsedItem.first), parsedItem.second);
   }
 
 
   // @return: pair of parsed reader shorthand literal expansion & position in <sourceCode> after the parsed literal
-  private static Pair<Datum,Integer> parseReaderShorthandLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws Exception {
+  private static Pair<Datum,Integer> parseReaderShorthandLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
     SourceInformation shorthandSource = source.clone();
     if(sourceCode.charAt(i) == '\'') {
       source.updatePosition('\'');
-      return parseReaderShorthandLiteralLogic(sourceCode,"quote",i+1,containerStack,source,shorthandSource);
+      return parseReaderShorthandLiteralLogic(sourceCode,"quote",i,i+1,containerStack,source,shorthandSource);
     }
     if(sourceCode.charAt(i) == '`') {
       source.updatePosition('`');
-      return parseReaderShorthandLiteralLogic(sourceCode,"quasiquote",i+1,containerStack,source,shorthandSource);
+      return parseReaderShorthandLiteralLogic(sourceCode,"quasiquote",i,i+1,containerStack,source,shorthandSource);
     }
     if(sourceCode.charAt(i) == ',') {
       source.updatePosition(',');
       if(i+1 < n && sourceCode.charAt(i+1) == '@') {
         source.updatePosition('@');
-        return parseReaderShorthandLiteralLogic(sourceCode,"unquote-splicing",i+2,containerStack,source,shorthandSource);
+        return parseReaderShorthandLiteralLogic(sourceCode,"unquote-splicing",i,i+2,containerStack,source,shorthandSource);
       }
-      return parseReaderShorthandLiteralLogic(sourceCode,"unquote",i+1,containerStack,source,shorthandSource);
+      return parseReaderShorthandLiteralLogic(sourceCode,"unquote",i,i+1,containerStack,source,shorthandSource);
     }
     // Should be unreachable but just in case ...
-    throw new Exception("READ ERROR: Unknown Reader Shorthand Literal at index "+i+" in "+writeString(sourceCode)+"!");
+    throw new ReaderException(i, sourceCode, shorthandSource, "READ ERROR: Unknown reader shorthand literal!");
   }
 
 
@@ -141,27 +163,29 @@ public class Reader {
 
 
   // @return: pair of parsed lambda literal expansion & position in <sourceCode> after the parsed literal
-  private static Pair<Datum,Integer> parseReaderLambdaLiteralLogic(String sourceCode, int i, Stack<Character> containerStack, SourceInformation source) throws Exception {
+  private static Pair<Datum,Integer> parseReaderLambdaLiteralLogic(String sourceCode, int i, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
+    SourceInformation lambdaSource = source.clone();
+    source.updatePosition('\\');
     Pair<Datum,Integer> parsedItem = readLoop(sourceCode,i,containerStack,source);
     if(parsedItem.first == null)
-      throw new IncompleteException("READ ERROR: Incomplete lambda reader shorthand literal!");
+      throw new IncompleteException(i-1, sourceCode, lambdaSource, "READ ERROR: Incomplete lambda reader shorthand literal!");
     return new Pair<Datum,Integer>(generateExpandedLambda(parsedItem.first),parsedItem.second);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // List Literal Parsing Helpers
-  private static boolean isPeriodSymbol(Datum d) throws Exception {
+  private static boolean isPeriodSymbol(Datum d) throws ReaderException {
     return d instanceof Symbol && ((Symbol)d).value().equals(".");
   }
 
 
   // Returns whether the list is dotted
-  private static boolean validatePeriodSymbolPosition(ArrayList<Datum> arr) throws Exception {
+  private static boolean validatePeriodSymbolPosition(int listIndex, String sourceCode, SourceInformation listSource, ArrayList<Datum> arr) throws ReaderException {
     boolean isDotted = false;
     for(int i = 0, n = arr.size(); i < n; ++i) {
       if(isPeriodSymbol(arr.get(i))) {
-        if(i+2 != n) throw new Exception("READ ERROR: Invalid list literal: \".\" MUST be the penultimate symbol!");
+        if(i+2 != n) throw new ReaderException(listIndex, sourceCode, listSource, "READ ERROR: Invalid list literal: \".\" MUST be the penultimate symbol!");
         isDotted = true; // "(. <obj>)" is equivalent to "<obj>" for the reader
       }
     }
@@ -170,8 +194,8 @@ public class Reader {
 
 
   // Returns <arr> as a <Datum> scheme pair data structure
-  private static Datum convertArrayListToSchemeList(ArrayList<Datum> arr) throws Exception {
-    boolean isDotted = validatePeriodSymbolPosition(arr);
+  private static Datum convertArrayListToSchemeList(int listIndex, String sourceCode, SourceInformation listSource, ArrayList<Datum> arr) throws ReaderException {
+    boolean isDotted = validatePeriodSymbolPosition(listIndex,sourceCode,listSource,arr);
     if(isDotted) {
       arr.remove(arr.size()-2); // remove the dot
       if(arr.size() == 1) return arr.get(0); // "(. <obj>)" is equivalent to "<obj>" for the reader
@@ -187,9 +211,12 @@ public class Reader {
 
   // @param: <i> is where to start parsing
   // @return: pair of parsed list & position in <sourceCode> after the closing <)>
-  private static Pair<Datum,Integer> parseListLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws Exception {
+  private static Pair<Datum,Integer> parseListLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
+    int listIndex = i-1;
+    SourceInformation listSource = source.clone();
+    source.updatePosition('(');
     if(i == n)
-      throw new IncompleteException("READ ERROR: Incomplete list literal!");
+      throw new IncompleteException(listIndex,sourceCode,listSource,"READ ERROR: Incomplete list literal!");
     // parse NIL
     if(sourceCode.charAt(i) == ')') {
       source.updatePosition(')');
@@ -204,9 +231,9 @@ public class Reader {
       i = parsedItem.second;
     }
     if(i >= n)
-      throw new IncompleteException(String.format("READ ERROR: Invalid input %s, incomplete list literal!", writeString(sourceCode)));
+      throw new IncompleteException(listIndex,sourceCode,listSource,"READ ERROR: Incomplete list literal!");
     source.updatePosition(')');
-    return new Pair<Datum,Integer>(convertArrayListToSchemeList(listItems),i+1);
+    return new Pair<Datum,Integer>(convertArrayListToSchemeList(listIndex,sourceCode,listSource,listItems),i+1);
   }
 
   
@@ -214,9 +241,12 @@ public class Reader {
   // Vector Literal Parsing Helper(s)
   // @param: <i> is where to start parsing
   // @return: pair of parsed vector & position in <sourceCode> after the closing <]>
-  private static Pair<Datum,Integer> parseVectorLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws Exception {
+  private static Pair<Datum,Integer> parseVectorLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
+    int vectorIndex = i-1;
+    SourceInformation vectorSource = source.clone();
+    source.updatePosition('[');
     if(i == n)
-      throw new IncompleteException("READ ERROR: Incomplete vector literal!");
+      throw new IncompleteException(vectorIndex,sourceCode,vectorSource,"READ ERROR: Incomplete vector literal!");
     escm.type.Vector vect = new escm.type.Vector();
     while(i < n && sourceCode.charAt(i) != ']') {
       Pair<Datum,Integer> parsedItem = readLoop(sourceCode,i,containerStack,source);
@@ -225,7 +255,7 @@ public class Reader {
       i = parsedItem.second;
     }
     if(i >= n)
-      throw new IncompleteException(String.format("READ ERROR: Invalid input %s, incomplete vector literal!", writeString(sourceCode)));
+      throw new IncompleteException(vectorIndex,sourceCode,vectorSource,"READ ERROR: Incomplete vector literal!");
     source.updatePosition(']');
     return new Pair<Datum,Integer>(vect,i+1);
   }
@@ -235,9 +265,12 @@ public class Reader {
   // Hashmap Literal Parsing Helper(s)
   // @param: <i> is where to start parsing
   // @return: pair of parsed hashmap & position in <sourceCode> after the closing <]>
-  private static Pair<Datum,Integer> parseHashmapLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws Exception {
+  private static Pair<Datum,Integer> parseHashmapLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
+    int hashmapIndex = i-1;
+    SourceInformation hashmapSource = source.clone();
+    source.updatePosition('{');
     if(i == n)
-      throw new IncompleteException("READ ERROR: Incomplete hashmap literal!");
+      throw new IncompleteException(hashmapIndex,sourceCode,hashmapSource,"READ ERROR: Incomplete hashmap literal!");
     escm.type.Hashmap hmap = new escm.type.Hashmap();
     Datum key = null;
     while(i < n && sourceCode.charAt(i) != '}') {
@@ -253,9 +286,9 @@ public class Reader {
       i = parsedItem.second;
     }
     if(i >= n)
-      throw new IncompleteException(String.format("READ ERROR: Invalid input %s, incomplete hashmap literal!", writeString(sourceCode)));
+      throw new IncompleteException(hashmapIndex,sourceCode,hashmapSource,"READ ERROR: Incomplete hashmap literal!");
     if(key != null)
-      throw new Exceptionf("READ ERROR: Invalid hashmap literal %s key %s doesn't have a value!", hmap.write(), key.profile());
+      throw new ReaderException(hashmapIndex,sourceCode,hashmapSource,"READ ERROR: Hashmap literal %s key %s doesn't have a value!", hmap.write(), key.profile());
     source.updatePosition('}');
     return new Pair<Datum,Integer>(hmap,i+1);
   }
@@ -349,8 +382,10 @@ public class Reader {
   // @param: <i> is where to start parsing
   // @return: pair of parsed string & position in <sourceCode> after the closing <">
   private static Pair<Datum,Integer> parseStringLiteral(String sourceCode, int i, int n, SourceInformation source) throws IncompleteException {
-    int start = i; 
+    int start = i-1; 
+    SourceInformation stringSource = source.clone();
     StringBuilder sb = new StringBuilder();
+    source.updatePosition('"');
     while(i < n) {
       source.updatePosition(sourceCode.charAt(i));
       if(sourceCode.charAt(i) == '"') {
@@ -370,7 +405,7 @@ public class Reader {
       }
       ++i;
     }
-    throw new IncompleteException("READ ERROR: Unterminating string literal detected!");
+    throw new IncompleteException(start,sourceCode,stringSource,"READ ERROR: Unterminating string literal detected!");
   }
 
 
@@ -438,7 +473,7 @@ public class Reader {
   ////////////////////////////////////////////////////////////////////////////
   // Main Reader Loop
   // => <.first> is <null> if only read whitespace/comments
-  private static Pair<Datum,Integer> readLoop(String sourceCode, int startIndex, Stack<Character> containerStack, SourceInformation source) throws Exception {
+  private static Pair<Datum,Integer> readLoop(String sourceCode, int startIndex, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
 
     for(int i = startIndex, n = sourceCode.length(); i < n; ++i) {
 
@@ -447,10 +482,10 @@ public class Reader {
         containerStack.push('(');
       } else if(sourceCode.charAt(i) == ')') {
         if(containerStack.empty())
-          throw new Exception("READ ERROR: Invalid parenthesis: found a ')' prior an associated '('!");
+          throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid parenthesis: found a ')' prior an associated '('!");
         char opener = containerStack.pop();
         if(opener != '(')
-          throw new Exceptionf("READ ERROR: Invalid parenthesis: found a closing ')' prior to closing '%c'!", opener);
+          throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid parenthesis: found a closing ')' prior to closing '%c'!", opener);
       }
 
       // Account for bracket scoping
@@ -458,10 +493,10 @@ public class Reader {
         containerStack.push('[');
       } else if(sourceCode.charAt(i) == ']') {
         if(containerStack.empty())
-          throw new Exception("READ ERROR: Invalid bracket: found a ']' prior an associated '['!");
+          throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid bracket: found a ']' prior an associated '['!");
         char opener = containerStack.pop();
         if(opener != '[')
-          throw new Exceptionf("READ ERROR: Invalid bracket: found a closing ']' prior to closing '%c'!", opener);
+          throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid bracket: found a closing ']' prior to closing '%c'!", opener);
       }
 
       // Account for curly-brace scoping
@@ -469,10 +504,10 @@ public class Reader {
         containerStack.push('{');
       } else if(sourceCode.charAt(i) == '}') {
         if(containerStack.empty())
-          throw new Exception("READ ERROR: Invalid curly-brace: found a '}' prior an associated '{'!");
+          throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid curly-brace: found a '}' prior an associated '{'!");
         char opener = containerStack.pop();
         if(opener != '{')
-          throw new Exceptionf("READ ERROR: Invalid curly-brace: found a closing '}' prior to closing '%c'!", opener);
+          throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid curly-brace: found a closing '}' prior to closing '%c'!", opener);
       }
 
       // Ignore whitespace
@@ -494,7 +529,6 @@ public class Reader {
 
       // Expand reader lambda literals
       if(sourceCode.charAt(i) == '\\') {
-        source.updatePosition('\\');
         return parseReaderLambdaLiteralLogic(sourceCode,i+1,containerStack,source);
       }
 
@@ -504,19 +538,16 @@ public class Reader {
 
       // Parse List/Pair
       if(sourceCode.charAt(i) == '(') {
-        source.updatePosition('(');
         return parseListLiteral(sourceCode,i+1,n,containerStack,source);
       }
 
       // Parse Vector
       if(sourceCode.charAt(i) == '[') {
-        source.updatePosition('[');
         return parseVectorLiteral(sourceCode,i+1,n,containerStack,source);
       }
 
       // Parse Hashmap
       if(sourceCode.charAt(i) == '{') {
-        source.updatePosition('{');
         return parseHashmapLiteral(sourceCode,i+1,n,containerStack,source);
       }
 
@@ -541,7 +572,6 @@ public class Reader {
 
       // Parse String Literals
       if(sourceCode.charAt(i) == '"') {
-        source.updatePosition('"');
         return parseStringLiteral(sourceCode,i+1,n,source);
       }
 
@@ -559,7 +589,7 @@ public class Reader {
       // Parse Symbol Literals
       return parseSymbolLiteral(sourceCode,i,n,source);
     }
-    throw new IncompleteException(String.format("READ ERROR: Invalid input %s terminated prior to being able to parse a datum!", writeString(sourceCode)));
+    throw new IncompleteException(sourceCode.length()-1,sourceCode,source,"READ ERROR: Terminated prior to being able to parse a datum!");
   }
 
 
@@ -569,13 +599,13 @@ public class Reader {
   //                      2. the length of characters read from <sourceCode> to produce the read datum
 
   // @return: <.first> is <null> if only read in whitespace/comments!
-  public static Pair<Datum,Integer> nullableRead(String sourceCode, SourceInformation source) throws Exception {
+  public static Pair<Datum,Integer> nullableRead(String sourceCode, SourceInformation source) throws ReaderException {
     return readLoop(sourceCode,0,new Stack<Character>(),source);
   }
 
 
   // @return: <.first> is <#void> if only read in whitespace/comments!
-  public static Pair<Datum,Integer> read(String sourceCode, SourceInformation source) throws Exception {
+  public static Pair<Datum,Integer> read(String sourceCode, SourceInformation source) throws ReaderException {
     Pair<Datum,Integer> result = nullableRead(sourceCode,source);
     if(result.first != null) return result;
     return new Pair<Datum,Integer>(escm.type.Void.VALUE,result.second);

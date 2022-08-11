@@ -5,6 +5,15 @@
 
 
 
+
+
+
+
+
+
+
+
+
 (do ((i 0 (+ i 1)))
     ((>= i 200))
     (displayf "Here: %n\n" (sqrt -1))
@@ -122,4 +131,3 @@
 ; ; (newline)
 ; ; (write (s.perimeter))
 ; ; (newline)
-

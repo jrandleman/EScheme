@@ -127,13 +127,14 @@ public class StringParser {
 
 
   public static Pair<Integer,String> escape(int indexToUpdate, String str) {
+    int originalIndexToUpdate = indexToUpdate;
     StringBuilder escaped = new StringBuilder();
     for(int i = 0, n = str.length(); i < n; ++i) {
       if(str.charAt(i) != '"' && str.charAt(i) != '\\' && !Character.isISOControl(str.charAt(i))) {
         escaped.append(str.charAt(i));
       } else {
         String escapedChar = escapedChar(str.charAt(i));
-        if(indexToUpdate >= i) indexToUpdate += escapedChar.length()-1;
+        if(i < originalIndexToUpdate) indexToUpdate += escapedChar.length()-1;
         escaped.append(escapedChar);
       }
     }

@@ -5,28 +5,14 @@
 package escm.util.json.util;
 
 public class JsonException extends Exception {
-  private static String getArrowString(int arrowIndex, int strlength) {
-    StringBuilder sb = new StringBuilder();
-    for(int i = 0; i < strlength+1; ++i) { // "+1" accounts for '"'
-      if(i == arrowIndex) {
-        sb.append('^');
-      } else {
-        sb.append(' ');
-      }
-    }
-    return sb.toString();
-  }
+  // Length of the substring to show for Json parsing errors
+  private static final int ERROR_SUBSTRING_LENGTH = 80;
 
 
   private static String getJsonErrorSubstring(int index, String jsonStr) {
-    int substringSpan = 40;
-    String indent = "\n    ";
-    int n = jsonStr.length();
-    int startIndex = index-substringSpan < 0 ? 0 : index-substringSpan;
-    int endPosition = index+substringSpan+1 > n ? n : index+substringSpan+1;
-    Pair<Integer,String> result = StringParser.escape(index-startIndex,jsonStr.substring(startIndex,endPosition));
-    return "\n\n    Error Substring: " + '"' + result.second +  '"' +
-             "\n                     " + getArrowString(result.first,result.second.length());
+    String [] errorMessage = SubstringIndexError.run(index,jsonStr,ERROR_SUBSTRING_LENGTH);
+    return "\n\n    Error Substring: " + errorMessage[0] +
+             "\n                     " + errorMessage[1];
   }
 
 

@@ -242,10 +242,10 @@ public abstract class JsonDatum {
       } else if(isNull(s,i,n)) {
         return parseNull(s,i,n);
       } else {
-        throw new JsonException(i,s,"Invalid JSON string at index %d: \"%s\"");
+        throw new JsonException(i,s,"Invalid JSON string!");
       }
     }
-    throw new JsonException(start,s,"Invalid JSON string at index %d: \"%s\"");
+    throw new JsonException(start,s,"Invalid JSON string!");
   }
 
 
