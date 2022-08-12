@@ -15,6 +15,7 @@ import java.util.Arrays;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.oo.MetaObject;
+import escm.type.procedure.Procedure;
 import escm.util.Exceptionf;
 import escm.vm.util.SourceInformation;
 
@@ -242,13 +243,16 @@ public class ObjectAccessChain extends Datum {
       }
     }
     for(int i = 1, n = value.size(); i < n; ++i) {
-      result = ((MetaObject)result).get(value.get(i));
+      Symbol prop = value.get(i);
+      result = ((MetaObject)result).get(prop);
       if(i+1 < n && !(result instanceof MetaObject)) {
-        if(value.get(i).hasSourceInformation()) {
-          throw new Exceptionf("ObjectAccessChain: <get> property \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(i), result.profile(), value, value.get(i).source());
+        if(prop.hasSourceInformation()) {
+          throw new Exceptionf("ObjectAccessChain: <get> property \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", prop, result.profile(), value, prop.source());
         } else {
-          throw new Exceptionf("ObjectAccessChain: <get> property \"%s\" (%s) isn't a meta-object: %s", value.get(i), result.profile(), value);
+          throw new Exceptionf("ObjectAccessChain: <get> property \"%s\" (%s) isn't a meta-object: %s", prop, result.profile(), value);
         }
+      } else if(i+1 == n && result instanceof Procedure && prop.hasSourceInformation()) {
+        result = ((Procedure)result).loadWithInvocationSource(prop.source());
       }
     }
     return result;

@@ -10,6 +10,7 @@ import escm.util.Trampoline;
 import escm.type.Datum;
 import escm.type.procedure.Procedure;
 import escm.vm.type.ExecutionState;
+import escm.vm.util.SourceInformation;
 
 public class ContinuationProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
@@ -32,16 +33,24 @@ public class ContinuationProcedure extends Procedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Name binding (used by escm.vm.type.Environment.java)
-  private ContinuationProcedure(String name, Trampoline.Continuation continuation) {
+  // Name binding (used by escm.vm.type.Environment)
+  private ContinuationProcedure(String name, SourceInformation invocationSource, Trampoline.Continuation continuation) {
     this.name = name;
+    this.invocationSource = invocationSource;
     this.continuation = continuation;
   }
 
 
   public ContinuationProcedure loadWithName(String name) throws Exception {
     if(!this.name.equals(Procedure.DEFAULT_NAME)) return this;
-    return new ContinuationProcedure(name,continuation);
+    return new ContinuationProcedure(name,invocationSource,continuation);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Invocation source binding (used by escm.type.Symbol)
+  public ContinuationProcedure loadWithInvocationSource(SourceInformation invocationSource) {
+    return new ContinuationProcedure(name,invocationSource,continuation);
   }
 
 

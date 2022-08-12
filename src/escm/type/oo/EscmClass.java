@@ -66,8 +66,8 @@ public class EscmClass extends MetaObject implements Callable {
   // Constructor
   private void bindImmediateMethodsWithName() {
     String currentName = name();
-    MetaObject.bindMethodsWithName("[class::static] "+currentName+".",props);
-    MetaObject.bindMethodsWithName("[class::instance] "+currentName+".",objectProps);
+    MetaObject.bindMethodsWithName(currentName+"."," [class::static]",props);
+    MetaObject.bindMethodsWithName(currentName+"."," [class::instance]",objectProps);
     // NOTE: We don't need to bind the super class's method names, since 
     //       they've already been bound when creating them prior to being 
     //       passed to this class's ctor.

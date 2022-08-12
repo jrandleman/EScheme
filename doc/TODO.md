@@ -6,34 +6,6 @@
 
 
 
-- INSTEAD OF SHOWING SOURCE INFORMATION IN CALLSTACK, SHOW ___WHERE___ PROCEDURES WERE CALLED ?
-  - HAVE SYMBOL'S "LOAD WITH STATE" BIND ITS OWN "SOURCE" OBJECT TO A PROCEDURE IF EVALUATING TO A PROCEDURE ???
-    - SUPPORT THIS WITH ALL PROCS, NOT JUST COMPOUNDS !!!
-
-    ```java
-    public CompoundProcedure loadWithSource(InformationSource source) { // called by <Symbol :: loadWithState()>
-      return new CompoundProcedure(name,source,state); // passing the same <state> here ensures that `eq?` `equal?` still work properly!
-    }
-    ```
-
-    - THEN NO NEED FOR A "LAST CALLED" VARIABLE, ___AND___ THE CALLSTACK IS MUCH MORE INFORMATIVE (SAYS _WHERE_ EVERY CALL HAPPENED!)
-
-
-    - NOTE: THIS WILL RESULT IN ___MANY MORE___ JAVA ALLOCATIONS. DETERMINE IF WORTH THE RUNTIME BENEFIT. 
-
-      * ___TEST, TEST, TEST WITH MANY DIFFERENT FUNCTIONS BOTH W/ & W/O THIS FEATURE TO MAKE SURE NOT HURTING THE RUNTIME PERF___
-
-
-
-
-
-
-
-
-
-
-
-
 - MAKE OBJECT CONSTRUCTION / METHOD-INVOCATION AS EFFICIENT AS POSSIBLE:
   - TEST THE COST IN RAW JAVA
   - TEST COST OF JUST LOOPING FOR N ITERATIONS IN ESCM
@@ -92,66 +64,16 @@
 
 
 
+
+
+
+
 - CONSIDER HAVING `eval` & `bytecode-eval` & `load` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
   
   - CONSIDER A `process` TYPE? `fork`?
     => copy-on-write semantics for `fork`, similar to how the "meta-thread" works ??
 
 
-
-
-
-
-
-
-==================================================================================================================
-==================================================================================================================
-==================================================================================================================
-==================================================================================================================
-==================================================================================================================
-==================================================================================================================
-
-
-```
-loadWithName() // SHOULD ACCEPT A SYMBOL
-  => for procedures, binds the InformationSource object of the symbol
-
-```
-
-
-
-```
-loadWithSource(SourceInformation source)
-
-
-
-
-SHOW SOURCE INFORMATION OF PROCEDURES IN CALLSTACK
-  * CURRENT APPROACH OF MODIFIYING NAME-BINDING (`loadWithName`) TO ALSO "CONS" SOURCE INFO ONTO PROCEDURES THAT MAY BE REGISTERED IN THE CALLSTACK ALONG WITH A NAME
-
-
-
-
-
-SHOW "LAST CALLED" PROCEDURE LOCATION
-  - Designed to catch exact location of `+` in: `(+ "hi")`
-  - (push +) ; can have `loadWithState` of `Symbol` also `cons` source information onto env result iff getting a procedure
-    - then this is pushed to thread-local "last called" stack
-      * must differentiate between name-binding (defining) source and call-binding (invoking) source internally
-        - if no invoking source, do nothing
-        - in continuation, pop it from from the thread-local stack
-```
-
-
-
-
-
-==================================================================================================================
-==================================================================================================================
-==================================================================================================================
-==================================================================================================================
-==================================================================================================================
-==================================================================================================================
 
 
 

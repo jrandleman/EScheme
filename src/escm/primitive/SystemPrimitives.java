@@ -10,6 +10,7 @@ import java.io.File;
 import escm.type.Datum;
 import escm.type.number.Real;
 import escm.type.number.Exact;
+import escm.util.Pair;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.ExecuteSystemCommand;
@@ -18,6 +19,7 @@ import escm.vm.type.ExecutionState;
 import escm.vm.type.Environment;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
+import escm.vm.util.SourceInformation;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.EscmCallStack;
 
@@ -77,7 +79,7 @@ public class SystemPrimitives {
       return "load";
     }
 
-    public static Trampoline.Bounce evalEachExpression(Environment env, ArrayList<Datum> exprs, int i, Stack<String> originalCallStack, Trampoline.Continuation continuation) throws Exception {
+    public static Trampoline.Bounce evalEachExpression(Environment env, ArrayList<Datum> exprs, int i, Stack<Pair<String,SourceInformation>> originalCallStack, Trampoline.Continuation continuation) throws Exception {
       int n = exprs.size();
       if(i >= n) return continuation.run(escm.type.Void.VALUE);
       Trampoline.Continuation nextContinuation;

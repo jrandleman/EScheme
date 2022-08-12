@@ -8,14 +8,15 @@ package escm.vm.runtime;
 import java.util.ArrayList;
 import java.util.Stack;
 import java.math.BigInteger;
+import escm.util.Pair;
 import escm.type.Datum;
-import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.primitive.UtilityPrimitives;
 import escm.vm.type.Environment;
+import escm.vm.util.SourceInformation;
 
 public abstract class EscmThread extends Thread {
   // <escm.type.concurrent.Thread> thread-local object
@@ -23,7 +24,7 @@ public abstract class EscmThread extends Thread {
 
 
   // <CallStack> thread-local call stack
-  public Stack<String> callStack = new Stack<String>();
+  public Stack<Pair<String,SourceInformation>> callStack = new Stack<Pair<String,SourceInformation>>();
 
 
   // <escm.primitive.UtilityPrimitives.DynamicWind> thread-local set of winds
@@ -31,7 +32,7 @@ public abstract class EscmThread extends Thread {
 
 
   // <escm.primitive.UtilityPrimitives.WithExceptionHandler> thread-local set of winds
-  public Datum currentExceptionHandlers = Pair.List(
+  public Datum currentExceptionHandlers = escm.type.Pair.List(
     new PrimitiveProcedure(
       "unhandled-exception-handler",
       (params, cont) -> {

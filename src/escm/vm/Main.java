@@ -10,10 +10,12 @@ import java.io.InputStreamReader;
 import escm.type.Datum;
 import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
+import escm.util.Pair;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.ExecutionState;
 import escm.vm.type.Environment;
+import escm.vm.util.SourceInformation;
 import escm.vm.runtime.EscmCallStack;
 import escm.vm.runtime.EscmThread;
 import escm.vm.runtime.GlobalState;
@@ -184,7 +186,7 @@ public class Main {
       throw new Exceptionf("%s\n  %s", e, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
     }
     ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(parsedCmdLine.scriptName,buffer);
-    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,new Stack<String>(),replIfReplingContinuation));
+    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,new Stack<Pair<String,SourceInformation>>(),replIfReplingContinuation));
   }
 
 

@@ -164,9 +164,11 @@ public class Installer {
     escmStdlibLoader.append("import java.nio.file.Files;\n");
     escmStdlibLoader.append("import java.nio.file.Path;\n");
     escmStdlibLoader.append("import escm.type.Datum;\n");
+    escmStdlibLoader.append("import escm.util.Pair;\n");
     escmStdlibLoader.append("import escm.util.Trampoline;\n");
     escmStdlibLoader.append("import escm.primitive.FilePrimitives;\n");
     escmStdlibLoader.append("import escm.primitive.SystemPrimitives;\n");
+    escmStdlibLoader.append("import escm.vm.util.SourceInformation;\n");
     escmStdlibLoader.append("import escm.vm.runtime.GlobalState;\n");
     escmStdlibLoader.append("\n");
     escmStdlibLoader.append("public class EscmStdLibLoader {\n");
@@ -176,7 +178,7 @@ public class Installer {
     escmStdlibLoader.append("    //   upon loading, so we can afford evaluating it with a dummy continuation.\n");
     escmStdlibLoader.append("    Trampoline.Continuation terminalContinuation = (ignored) -> () -> Trampoline.LAST_BOUNCE_SIGNAL;\n");
     escmStdlibLoader.append("    ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(\""+stdlibPath+"\",escmCode);\n");
-    escmStdlibLoader.append("    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,new Stack<String>(),terminalContinuation));\n");
+    escmStdlibLoader.append("    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,new Stack<Pair<String,SourceInformation>>(),terminalContinuation));\n");
     escmStdlibLoader.append("  }\n");
     escmStdlibLoader.append("}\n");
     escmStdlibLoader.append("\n");

@@ -6,21 +6,22 @@
 
 package escm.vm.runtime;
 import java.util.Stack;
+import escm.util.Pair;
+import escm.vm.util.SourceInformation;
 
 public class EscmCallStack {
   ////////////////////////////////////////////////////////////////////////////
   // Registering a call
-  public static void push(String calledFunctionName) {
-    ((EscmThread)Thread.currentThread()).callStack.push(calledFunctionName);
+  public static void push(String calledFunctionName, SourceInformation invocationSource) {
+    ((EscmThread)Thread.currentThread()).callStack.push(new Pair<String,SourceInformation>(calledFunctionName,invocationSource));
   }
 
   ////////////////////////////////////////////////////////////////////////////
   // Deregistering a specific call (prevents double-pops when using call/cc)
   //   => NOTE: <nameToPop> uses SHALLOW EQUALITY (not string contents) !!!
-  public static String pop(String nameToPop) {
-    Stack<String> callStack = ((EscmThread)Thread.currentThread()).callStack;
-    if(!callStack.empty() && callStack.peek() == nameToPop) return callStack.pop();
-    return null;
+  public static void pop(String nameToPop) {
+    Stack<Pair<String,SourceInformation>> callStack = ((EscmThread)Thread.currentThread()).callStack;
+    if(!callStack.empty() && callStack.peek().first == nameToPop) callStack.pop();
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -31,16 +32,16 @@ public class EscmCallStack {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying the callstack (done by loader to preserve pre-load state)
-  public static Stack<String> copy() {
-    Stack<String> cloned = new Stack<String>();
+  public static Stack<Pair<String,SourceInformation>> copy() {
+    Stack<Pair<String,SourceInformation>> cloned = new Stack<Pair<String,SourceInformation>>();
     cloned.addAll(((EscmThread)Thread.currentThread()).callStack);
     return cloned;
   }
 
   ////////////////////////////////////////////////////////////////////////////
   // Restoring the callstack (done by loader to restore pre-load state)
-  public static void restore(Stack<String> restored) {
-    Stack<String> callStack = ((EscmThread)Thread.currentThread()).callStack;
+  public static void restore(Stack<Pair<String,SourceInformation>> restored) {
+    Stack<Pair<String,SourceInformation>> callStack = ((EscmThread)Thread.currentThread()).callStack;
     callStack.clear();
     callStack.addAll(restored);
   }
@@ -48,15 +49,21 @@ public class EscmCallStack {
   ////////////////////////////////////////////////////////////////////////////
   // Printing (& clearing!) the current thread's callstack
   // @PRECONDITION: callStack.size() > 0
-  private static String popReadableCallableName(Stack<String> callStack) {
-    String name = callStack.pop();
-    if(name.length()==0) return "#<ANONYMOUS-CALLABLE>";
-    return name;
+  private static String popReadableCallableName(Stack<Pair<String,SourceInformation>> callStack) {
+    Pair<String,SourceInformation> nameSourcePair = callStack.pop();
+    String name = null;
+    if(nameSourcePair.first.length() == 0) { 
+      name = "#<ANONYMOUS-CALLABLE>";
+    } else {
+      name = nameSourcePair.first;
+    }
+    if(nameSourcePair.second == null) return name;
+    return name + " (" + nameSourcePair.second.toString() + ")";
   }
 
 
   public static void print() {
-    Stack<String> callStack = ((EscmThread)Thread.currentThread()).callStack;
+    Stack<Pair<String,SourceInformation>> callStack = ((EscmThread)Thread.currentThread()).callStack;
     int n = callStack.size();
     if(n == 0) return;
     StringBuilder sb = new StringBuilder(">> Escm Call Stack: " + popReadableCallableName(callStack));

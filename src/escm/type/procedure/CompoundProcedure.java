@@ -40,6 +40,7 @@ import escm.vm.Interpreter;
 import escm.vm.type.Instruction;
 import escm.vm.type.ExecutionState;
 import escm.vm.type.Environment;
+import escm.vm.util.SourceInformation;
 import escm.vm.runtime.EscmCallStack;
 
 public class CompoundProcedure extends Procedure {
@@ -92,28 +93,36 @@ public class CompoundProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   // => Cloning + super environment binding
-  protected CompoundProcedure(String name, State state) {
+  protected CompoundProcedure(String name, SourceInformation invocationSource, State state) {
     this.name = name;
+    this.invocationSource = invocationSource;
     this.state = state;
   }
 
 
   public CompoundProcedure loadWithState(ExecutionState exeState) {
-    return new CompoundProcedure(name,new State(exeState.env,state.compileTime));
+    return new CompoundProcedure(name,invocationSource,new State(exeState.env,state.compileTime));
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Name binding (used by escm.vm.type.Environment.java)
+  // Name binding (used by escm.vm.type.Environment)
   public CompoundProcedure loadWithName(String name) {
     if(!this.name.equals(Procedure.DEFAULT_NAME)) return this;
-    return new CompoundProcedure(name,state);
+    return new CompoundProcedure(name,invocationSource,state);
   }
 
 
   // (used by escm.type.oo.MetaObject)
   public CompoundProcedure loadWithForcedName(String name) {
-    return new CompoundProcedure(name,state);
+    return new CompoundProcedure(name,invocationSource,state);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Invocation source binding (used by escm.type.Symbol)
+  public CompoundProcedure loadWithInvocationSource(SourceInformation invocationSource) {
+    return new CompoundProcedure(name,invocationSource,state);
   }
 
 
@@ -188,7 +197,7 @@ public class CompoundProcedure extends Procedure {
     return () -> {
       int clauseNumber = validateEnvironmentExtension(arguments);
       Environment extendedEnvironment = getExtendedEnvironment(clauseNumber,arguments);
-      EscmCallStack.push(name);
+      EscmCallStack.push(name,invocationSource);
       Trampoline.Continuation popContinuation = (value) -> () -> {
         EscmCallStack.pop(name);
         return continuation.run(value);
@@ -211,7 +220,7 @@ public class CompoundProcedure extends Procedure {
     } else {
       extendedEnvironment.define(SUPER_SYMBOL,supr);
     }
-    return new CompoundProcedure(name,new State(extendedEnvironment,state.compileTime));
+    return new CompoundProcedure(name,invocationSource,new State(extendedEnvironment,state.compileTime));
   }
 
 
@@ -224,6 +233,6 @@ public class CompoundProcedure extends Procedure {
       throw new Exceptionf("Can't bind <self> %s to procedure %s with a null definition environment!", self.profile(), name);
     Environment extendedEnvironment = new Environment(state.definitionEnvironment);
     extendedEnvironment.define(SELF_SYMBOL,self);
-    return new CompoundProcedure(name,new State(extendedEnvironment,state.compileTime));
+    return new CompoundProcedure(name,invocationSource,new State(extendedEnvironment,state.compileTime));
   }
 }

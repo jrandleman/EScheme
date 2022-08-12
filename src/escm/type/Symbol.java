@@ -6,6 +6,7 @@ package escm.type;
 import java.util.Objects;
 import java.util.ArrayList;
 import escm.util.Exceptionf;
+import escm.type.procedure.Procedure;
 import escm.vm.type.ExecutionState;
 import escm.vm.util.SourceInformation;
 
@@ -100,7 +101,10 @@ public class Symbol extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public Datum loadWithState(ExecutionState state) throws Exception {
-    return state.env.get(this);
+    Datum value = state.env.get(this);
+    if(value instanceof Procedure && source != null) 
+      return ((Procedure)value).loadWithInvocationSource(source);
+    return value;
   }
 
 

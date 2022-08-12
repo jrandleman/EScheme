@@ -60,7 +60,7 @@ public class EscmInterface extends MetaObject {
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
   private void bindImmediateMethodsWithName() {
-    MetaObject.bindMethodsWithName("[interface::static] "+name()+".",props);
+    MetaObject.bindMethodsWithName(name()+"."," [interface::static]",props);
     // NOTE: We don't need to bind the super interface method names, since 
     //       they've already been bound when creating them prior to being 
     //       passed to this interface's ctor.

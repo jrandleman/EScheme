@@ -17,6 +17,7 @@ import escm.util.Trampoline;
 import escm.type.Datum;
 import escm.vm.type.ExecutionState;
 import escm.vm.type.Callable;
+import escm.vm.util.SourceInformation;
 
 public abstract class Procedure extends Datum implements Callable {
   ////////////////////////////////////////////////////////////////////////////
@@ -34,6 +35,11 @@ public abstract class Procedure extends Datum implements Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Invocation Source (to be printed by escm.vm.runtime.EscmCallStack)
+  protected SourceInformation invocationSource = null;
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Application Abstraction
   public abstract Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception;
 
@@ -44,8 +50,13 @@ public abstract class Procedure extends Datum implements Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Name binding (used by escm.vm.type.Environment.java)
+  // Name binding (used by escm.vm.type.Environment)
   public abstract Procedure loadWithName(java.lang.String name) throws Exception;
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Invocation source binding (used by escm.type.Symbol)
+  public abstract Procedure loadWithInvocationSource(SourceInformation invocationSource);
 
 
   ////////////////////////////////////////////////////////////////////////////

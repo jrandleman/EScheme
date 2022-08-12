@@ -238,12 +238,12 @@ public abstract class MetaObject extends Datum {
 
   // [ONLY FOR USE UPON INITIAL CONSTRUCTION] Support function to bind names to methods.
   //   => NOTE: MUTATES THE GIVEN <props> ARGUMENT !!!
-  public static void bindMethodsWithName(String namePrefix, ConcurrentHashMap<String,Datum> props) {
+  public static void bindMethodsWithName(String namePrefix, String nameSuffix, ConcurrentHashMap<String,Datum> props) {
     for(ConcurrentHashMap.Entry<String,Datum> e : props.entrySet()) {
       Datum propValue = e.getValue();
       if(propValue instanceof CompoundProcedure) {
         String propName = e.getKey();
-        props.put(propName,((CompoundProcedure)propValue).loadWithForcedName(namePrefix+propName));
+        props.put(propName,((CompoundProcedure)propValue).loadWithForcedName(namePrefix+propName+nameSuffix));
       }
     }
   }

@@ -11,6 +11,7 @@ import escm.type.Datum;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
 import escm.vm.type.ExecutionState;
+import escm.vm.util.SourceInformation;
 import escm.vm.runtime.EscmCallStack;
 
 public class PrimitiveProcedure extends Procedure {
@@ -44,10 +45,24 @@ public class PrimitiveProcedure extends Procedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Name binding (used by escm.vm.type.Environment.java)
+  // Name binding (used by escm.vm.type.Environment)
+  private PrimitiveProcedure(java.lang.String name, SourceInformation invocationSource, Callable prm) {
+    this.name = name;
+    this.invocationSource = invocationSource;
+    this.prm = prm;
+  }
+
+
   public PrimitiveProcedure loadWithName(java.lang.String name) throws Exception {
     if(!this.name.equals(Procedure.DEFAULT_NAME)) return this;
-    return new PrimitiveProcedure(name,prm);
+    return new PrimitiveProcedure(name,invocationSource,prm);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Invocation source binding (used by escm.type.Symbol)
+  public PrimitiveProcedure loadWithInvocationSource(SourceInformation invocationSource) {
+    return new PrimitiveProcedure(name,invocationSource,prm);
   }
 
 
@@ -62,7 +77,7 @@ public class PrimitiveProcedure extends Procedure {
   // Application Abstraction
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
     return () -> {
-      EscmCallStack.push(name);
+      EscmCallStack.push(name,invocationSource);
       Trampoline.Continuation popContinuation = (value) -> () -> {
         EscmCallStack.pop(name);
         return continuation.run(value);
