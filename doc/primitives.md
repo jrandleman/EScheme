@@ -189,6 +189,7 @@
 (make-directory! <path-str>) ; creates directories as needed to make this directory exist
 
 (absolute-path <path-str>)
+(absolute-path? <path-str>)
 
 (file-extension <path-str>)
 (has-file-extension? <path-str> <extension-str>)

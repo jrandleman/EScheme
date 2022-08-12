@@ -110,7 +110,7 @@
   "name": "current-directory",
   "aliases": null,
   "signatures": ["(current-directory)"],
-  "description": "Get the current working directory as a string.",
+  "description": "Get the current working directory's absolute path as a string.",
   "example": null
 }, {
   "name": "path-parent",
@@ -141,6 +141,12 @@
   "aliases": null,
   "signatures": ["(absolute-path <path-str>)"],
   "description": "Returns the absolute path of <path-str>.",
+  "example": null
+}, {
+  "name": "absolute-path?",
+  "aliases": null,
+  "signatures": ["(absolute-path? <path-str>)"],
+  "description": "Returns whether <path-str> is an absolute path.\nEffectively: (equal? <path-str> (absolute-path <path-str>))",
   "example": null
 }, {
   "name": "file-extension",

@@ -30,6 +30,7 @@ import escm.util.Exceptionf;
 import escm.util.StringParser;
 import escm.type.Datum;
 import escm.vm.runtime.EscmThread;
+import escm.primitive.FilePrimitives;
 
 public class OutputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
@@ -74,7 +75,7 @@ public class OutputPort extends Port {
   public OutputPort(String filename, boolean append) throws Exception {
     try {
       writer = new FileWriter(filename,append);
-      name = filename;
+      name = FilePrimitives.AbsolutePath.logic(filename);
     } catch(Exception e) {
       throw new Exceptionf("Can't open port \"%s\" for output: %s", filename, e);
     }

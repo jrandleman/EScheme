@@ -89,17 +89,6 @@
 
 
 
-- ADD AN `(absolute-path? <string>)` PRIMITIVE
-    * EQUIVALENT TO: `(equal? <string> (absolute-path <string>))`
-
-        => ISSUE: MAY NEED TO GET RID OF `..` INSTANCES IN <(absolute-path <string>)> (SEE HOW CAN DO THIS IN JAVA & IF ITS WORTH IT)
-
-
-
-
-
-
-
 - ISSUE:
   * Suppose `t.scm` loads `s.scm`. Then suppose we execute `escm ../t.scm`. This triggers an error that `s.scm` is not found!
     => solution: have a `CURRENT_LOADING_DIRECTORY` constant + global determined by the path preceding the given interpretable file name
@@ -113,8 +102,7 @@
 
 
 
-- CONSIDER HAVING INPUT PORTS CHANGE THEIR NAME TO BE AN ABSOLUTE PATH RATHER THAN THE RELATIVE PATH !!!
-  * ALSO HAVE `file-read` DO THIS TO ITS FILENAME PRIOR TO CREATING THE `source` OBJECT PASSED TO THE READER !!!
+
 
 
 

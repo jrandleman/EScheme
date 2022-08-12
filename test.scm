@@ -40,6 +40,21 @@
 
 
 
+
+; (define n (if (null? *argv*) 20 (string->number (car *argv*))))
+; (print-pascal-triangle n) ; Prints "n" layers of Pascal's triangle
+
+
+
+
+
+
+
+
+
+
+
+
 (define-class C
   ((g) (error "in g!"))
   ((f) (self.g)))
@@ -51,16 +66,21 @@
 
 (def o (C))
 (displayf "%a\n" o.f)
-(o.f)
+; (o.f)
+
+
+
+; (define (func) (error "In func!"))
+
+; (define (geostation) (func))
+
+; (define (harries) (geostation))
+
+; (harries)
 
 
 
 
-
-
-
-; (define n (if (null? *argv*) 20 (string->number (car *argv*))))
-; (print-pascal-triangle n) ; Prints "n" layers of Pascal's triangle
 
 
 
@@ -83,16 +103,16 @@
 
 
 
-; ; (define-syntax assert
-; ;   (lambda (condition)
-; ;     (def cond-result (gensym))
-; ;     `(let ((,cond-result ,condition))
-; ;       (if (not ,cond-result)
-; ;           (errorf "Assert Failed: %wa" ',condition)))))
+; (define-syntax assert
+;   (lambda (condition)
+;     (def cond-result (gensym))
+;     `(let ((,cond-result ,condition))
+;       (if (not ,cond-result)
+;           (errorf "Assert Failed: %wa" ',condition)))))
 
-; ; ; (assert (eq? 1 1.0))
+; ; (assert (eq? 1 1.0))
 
-; ; (assert (= 1 1.0))
+; (assert (= 1 1.0))
 
 
 

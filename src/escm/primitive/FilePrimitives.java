@@ -41,7 +41,7 @@ public class FilePrimitives {
     }
 
     public static ArrayList<Datum> readBufferAsArrayList(String filename, String buffer) throws Exception {
-      SourceInformation source = new SourceInformation(filename,1,1);
+      SourceInformation source = new SourceInformation(AbsolutePath.logic(filename),1,1);
       ArrayList<Datum> contents = new ArrayList<Datum>();
       buffer = buffer.stripTrailing();
       if(buffer.length() == 0) return contents;
@@ -434,7 +434,7 @@ public class FilePrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) 
         throw new Exceptionf("'(current-directory) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.String(Paths.get("").toAbsolutePath().toString());
+      return new escm.type.String(Paths.get("").toFile().getCanonicalPath().toString());
     }
   }
 
@@ -510,10 +510,38 @@ public class FilePrimitives {
       return "absolute-path";
     }
 
+    public static String logic(String pathStr) {
+      try {
+        return Path.of(pathStr).toFile().getCanonicalPath().toString();
+      } catch(Exception e1) {
+        try {
+          return Path.of(pathStr).toFile().getAbsolutePath();
+        } catch(Exception e2) {
+          return pathStr;
+        }
+      }
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(absolute-path <path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.String(Path.of(((escm.type.String)parameters.get(0)).value()).toAbsolutePath().toString());
+      return new escm.type.String(logic(((escm.type.String)parameters.get(0)).value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // absolute-path?
+  public static class IsAbsolutePath implements Primitive {
+    public java.lang.String escmName() {
+      return "absolute-path?";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
+        throw new Exceptionf("'(absolute-path? <path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
+      String pathStr = ((escm.type.String)parameters.get(0)).value();
+      return Boolean.valueOf(pathStr.equals(AbsolutePath.logic(pathStr)));
     }
   }
 

@@ -34,6 +34,7 @@ import escm.vm.Reader;
 import escm.vm.util.SourceInformation;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.EscmThread;
+import escm.primitive.FilePrimitives;
 
 public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
@@ -122,7 +123,7 @@ public class InputPort extends Port {
   public InputPort(String filename) throws Exception {
     try {
       pr = new PushbackReader(new FileReader(filename));
-      name = filename;
+      name = FilePrimitives.AbsolutePath.logic(filename);
     } catch(Exception e) {
       throw new Exceptionf("Can't open port \"%s\" for input: %s", filename, e);
     }
