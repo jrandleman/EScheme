@@ -155,9 +155,9 @@
   "description": "Get the file extension of <path-str>. Returns #f if non-existant.",
   "example": null
 }, {
-  "name": "has-file-extension?",
+  "name": "file-has-extension?",
   "aliases": null,
-  "signatures": ["(has-file-extension? <path-str> <extension-str>)"],
+  "signatures": ["(file-has-extension? <path-str> <extension-str>)"],
   "description": "Returns whether <path-str> has <extension-str> as its file extension.",
   "example": null
 }, {

@@ -196,7 +196,7 @@
 (absolute-path? <path-str>)
 
 (file-extension <path-str>)
-(has-file-extension? <path-str> <extension-str>)
+(file-has-extension? <path-str> <extension-str>)
 (swap-file-extension <path-str> <new-extension-str>)
 
 (file-size <file-path-str>)

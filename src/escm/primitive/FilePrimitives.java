@@ -603,21 +603,21 @@ public class FilePrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // has-file-extension?
-  public static class HasFileExtensionP implements Primitive {
+  // file-has-extension?
+  public static class FileHasExtensionP implements Primitive {
     public java.lang.String escmName() {
-      return "has-file-extension?";
+      return "file-has-extension?";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
-        throw new Exceptionf("'(has-file-extension? <path-string> <extension-string>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(file-has-extension? <path-string> <extension-string>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum pathStrDatum = parameters.get(0);
       if(!(pathStrDatum instanceof escm.type.String))
-        throw new Exceptionf("'(has-file-extension? <path-string> <extension-string>) path isn't a string: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(file-has-extension? <path-string> <extension-string>) path isn't a string: %s", Exceptionf.profileArgs(parameters));
       Datum extStrDatum = parameters.get(1);
       if(!(extStrDatum instanceof escm.type.String))
-        throw new Exceptionf("'(has-file-extension? <path-string> <extension-string>) extension isn't a string: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(file-has-extension? <path-string> <extension-string>) extension isn't a string: %s", Exceptionf.profileArgs(parameters));
       String ext = FileExtension.logic(((escm.type.String)pathStrDatum).value());
       if(ext == null) return Boolean.FALSE;
       return Boolean.valueOf(((escm.type.String)extStrDatum).value().equals(ext));
