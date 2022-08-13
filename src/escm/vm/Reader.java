@@ -17,12 +17,12 @@ import escm.util.StringParser;
 import escm.util.Exceptionf;
 import escm.vm.util.SourceInformation;
 import escm.util.json.util.SubstringIndexError;
+import escm.primitive.FilePrimitives;
 
 public class Reader {
   ////////////////////////////////////////////////////////////////////////////
   // Length of the Reader's Error Substring
   private static final int READER_ERROR_SUBSTRING_LENGTH = 80;
-
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -456,9 +456,24 @@ public class Reader {
   // @param: <i> is where to start parsing
   // @return: pair of parsed symbol & position in <sourceCode> after the parsed symbol
   //          => NOTE: returns <null> if at an "empty symbol" (IE if the reader was only given whitespace & comments)
-  private static Pair<Datum,Integer> parseSymbolLiteral(String sourceCode, int i, int n, SourceInformation source) {
+  private static final String CURRENT_PARENT_PATH_READER_LITERAL = "#path";
+
+
+  private static String getCurrentPathParent(int symbolStart, String sourceCode, SourceInformation symbolSource) throws ReaderException {
+    try {
+      String fileName = symbolSource.fileName();
+      String parent = FilePrimitives.PathParent.logic(fileName);
+      if(parent == null) return FilePrimitives.CurrentDirectory.logic();
+      return parent;  
+    } catch(Exception e) {
+      throw new ReaderException(symbolStart,sourceCode,symbolSource,"READ ERROR: Can't generate \"#path\": %s", e.getMessage());
+    }
+  }
+
+  private static Pair<Datum,Integer> parseSymbolLiteral(String sourceCode, int i, int n, SourceInformation source) throws ReaderException {
     StringBuilder sb = new StringBuilder();
     SourceInformation symbolSource = source.clone();
+    int symbolStart = i;
     while(i < n && !isDelimiter(sourceCode.charAt(i))) {
       char c = sourceCode.charAt(i);
       source.updatePosition(c);
@@ -466,7 +481,12 @@ public class Reader {
       ++i;
     }
     if(sb.length() == 0) return new Pair<Datum,Integer>(null,i);
-    return new Pair<Datum,Integer>(new Symbol(sb.toString(),symbolSource),i);
+    String symbolString = sb.toString();
+    if(symbolString.equals(CURRENT_PARENT_PATH_READER_LITERAL)) {
+      return new Pair<Datum,Integer>(new escm.type.String(getCurrentPathParent(symbolStart,sourceCode,symbolSource)),i);
+    } else {
+      return new Pair<Datum,Integer>(new Symbol(symbolString,symbolSource),i);
+    }
   }
 
 

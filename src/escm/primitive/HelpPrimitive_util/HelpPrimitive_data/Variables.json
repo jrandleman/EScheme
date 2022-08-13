@@ -1,4 +1,10 @@
 [{
+  "name": "#path",
+  "aliases": null,
+  "signatures": null,
+  "description": "Reader literal expanding to the current file's parent path as a string.",
+  "example": null
+}, {
   "name": "*argv*",
   "aliases": ["argv"],
   "signatures": null,
@@ -38,7 +44,7 @@
   "name": "*escm-path*",
   "aliases": ["escm-path", "escheme-path", "*escheme-path*"],
   "signatures": null,
-  "description": "Path string to the hosting EScheme implementation's location.",
+  "description": "Path string to the hosting EScheme implementation's directory.",
   "example": null
 }, {
   "name": "*escm-execution-command*",

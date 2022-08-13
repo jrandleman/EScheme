@@ -14,6 +14,8 @@
 ------------------------
 ## Variables:
 ```scheme
+#path ; reader literal, not a true variable
+
 *argv*
 
 *file-separator*
@@ -148,6 +150,8 @@
 (exit <optional-integer-exit-code>)
 
 (load <filename-str>)
+
+(load-from <directory-str> <filename-str>) ; preferred for portability, esp. where <directory-str> is <#path>
 
 (system <command-str> <optional-env-var-str-list> <optional-directory-str>)
 ```

@@ -6,7 +6,6 @@ package escm.primitive;
 import java.util.ArrayList;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.StandardCopyOption;
 import java.io.File;
@@ -431,10 +430,14 @@ public class FilePrimitives {
       return "current-directory";
     }
 
+    public static String logic() throws Exception {
+      return Path.of("").toAbsolutePath().toString();
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) 
         throw new Exceptionf("'(current-directory) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.String(Paths.get("").toFile().getCanonicalPath().toString());
+      return new escm.type.String(logic());
     }
   }
 
@@ -446,12 +449,23 @@ public class FilePrimitives {
       return "path-parent";
     }
 
+    // Returns <null> on failure
+    public static String logic(String pathString) {
+      try {
+        Path p = Path.of(pathString).getParent();
+        if(p == null) return null;
+        return p.toString();
+      } catch(Exception e) {
+        return null;
+      }
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(path-parent <path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      Path p = Path.of(((escm.type.String)parameters.get(0)).value()).getParent();
-      if(p == null) return Boolean.FALSE;
-      return new escm.type.String(p.toString());
+      String parent = logic(((escm.type.String)parameters.get(0)).value());
+      if(parent == null) return Boolean.FALSE;
+      return new escm.type.String(parent);
     }
   }
 
@@ -537,11 +551,27 @@ public class FilePrimitives {
       return "absolute-path?";
     }
 
+    public static boolean logic(String path) {
+      try {
+        File fp = Path.of(path).toFile();
+        try {
+          return path.equals(fp.getCanonicalPath().toString()) || path.equals(fp.getAbsolutePath());
+        } catch(Exception e1) {
+          try {
+            return path.equals(fp.getAbsolutePath());
+          } catch(Exception e2) {
+            return false;
+          }
+        }
+      } catch(Exception e3) {
+        return false;
+      }
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(absolute-path? <path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      String pathStr = ((escm.type.String)parameters.get(0)).value();
-      return Boolean.valueOf(pathStr.equals(AbsolutePath.logic(pathStr)));
+      return Boolean.valueOf(logic(((escm.type.String)parameters.get(0)).value()));
     }
   }
 

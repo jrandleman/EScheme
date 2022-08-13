@@ -201,8 +201,9 @@ public class Main {
 
   private static void setArgv(int argvStart, String[] args) {
     Datum argvIterator = escm.type.Nil.VALUE;
-    for(int i = args.length-1; i >= argvStart; --i)
+    for(int i = args.length-1; i > argvStart; --i)
       argvIterator = new escm.type.Pair(new escm.type.String(args[i]),argvIterator);
+    argvIterator = new escm.type.Pair(new escm.type.String(FilePrimitives.AbsolutePath.logic(args[argvStart])),argvIterator);
     GlobalState.setArgv(argvIterator);
   }
 
@@ -233,12 +234,12 @@ public class Main {
             System.exit(1);
           }
           parsed.scriptName = args[i+1];
-          setArgv(i+2,args);
+          setArgv(i+1,args);
           return parsed;
         }
         default: {
           parsed.scriptName = args[i];
-          setArgv(i+1,args);
+          setArgv(i,args);
           return parsed;
         }
       }

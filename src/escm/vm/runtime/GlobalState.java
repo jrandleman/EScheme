@@ -13,6 +13,7 @@ import escm.vm.type.Environment;
 import escm.vm.runtime.installerGenerated.EscmPath;
 import escm.vm.runtime.installerGenerated.JavaStdLibLoader;
 import escm.vm.runtime.installerGenerated.EscmStdLibLoader;
+import escm.primitive.FilePrimitives;
 
 public class GlobalState {
   ////////////////////////////////////////////////////////////////////////////

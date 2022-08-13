@@ -97,8 +97,8 @@ public class SystemPrimitives {
       });
     }
 
-    public static Trampoline.Bounce loadFileInEnvironment(Environment env, String filename, Trampoline.Continuation continuation) throws Exception {
-      String buffer = FilePrimitives.FileRead.slurpFile(filename,"load");
+    public static Trampoline.Bounce loadFileInEnvironment(String primitiveName, Environment env, String filename, Trampoline.Continuation continuation) throws Exception {
+      String buffer = FilePrimitives.FileRead.slurpFile(filename,primitiveName);
       ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(filename,buffer);
       return evalEachExpression(env,exprs,0,EscmCallStack.copy(),continuation);
     }
@@ -106,7 +106,36 @@ public class SystemPrimitives {
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(load <filename>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return loadFileInEnvironment(GlobalState.globalEnvironment,((escm.type.String)parameters.get(0)).value(),continuation);
+      return loadFileInEnvironment("load",GlobalState.globalEnvironment,((escm.type.String)parameters.get(0)).value(),continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // load-from
+  public static class LoadFrom implements PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "load-from";
+    }
+
+    public static String getPath(String dir, String file) {
+      int n = dir.length();
+      if(FilePrimitives.IsAbsolutePath.logic(file) || n == 0) return file;
+      if(dir.charAt(n-1) == File.separatorChar) return dir + file;
+      return dir + File.separator + file;
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 2) 
+        throw new Exceptionf("'(load-from <directory> <filename>) didn't receive exactly 2 strings: %s", Exceptionf.profileArgs(parameters));
+      Datum directory = parameters.get(0);
+      Datum file = parameters.get(1);
+      if(!(directory instanceof escm.type.String))
+        throw new Exceptionf("'(load-from <directory> <filename>) 1st arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+      if(!(file instanceof escm.type.String))
+        throw new Exceptionf("'(load-from <directory> <filename>) 2nd arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+      String path = getPath(((escm.type.String)directory).value(),((escm.type.String)file).value());
+      return Load.loadFileInEnvironment("load-from",GlobalState.globalEnvironment,path,continuation);
     }
   }
 

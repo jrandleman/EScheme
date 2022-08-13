@@ -6,6 +6,16 @@
 
 
 
+- CHANGE `has-file-extension?` TO BE `file-has-extension?`
+
+
+
+
+
+
+
+
+
 - MAKE OBJECT CONSTRUCTION / METHOD-INVOCATION AS EFFICIENT AS POSSIBLE:
   - TEST THE COST IN RAW JAVA
   - TEST COST OF JUST LOOPING FOR N ITERATIONS IN ESCM
@@ -82,20 +92,6 @@
 
 
 - have anonymous lambdas print some unique id for slightly easier debugging
-
-
-
-
-
-
-
-- ISSUE:
-  * Suppose `t.scm` loads `s.scm`. Then suppose we execute `escm ../t.scm`. This triggers an error that `s.scm` is not found!
-    => solution: have a `CURRENT_LOADING_DIRECTORY` constant + global determined by the path preceding the given interpretable file name
-                 (or just CWD if ___ONLY___ in the REPL). Then, if ever reading/loading/slurping (etc.) any file with a non-absolute path,
-                 make it relative to the `CURRENT_LOADING_DIRECTORY` variable
-
-                  => VERIFY THIS WORKS !!!
 
 
 

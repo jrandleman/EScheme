@@ -1,10 +1,30 @@
 
 
 
+
+; (define import
+;   (let ((import-parent-path 
+;           (if (null? *argv*) 
+;               "" 
+;               (string-append (path-parent (car *argv*)) *file-separator*))))
+;     (lambda (libname)
+;       (if (absolute-path? libname)
+;           (load libname)
+;           (load (string-append import-parent-path libname))))))
+
+
+
+
+
+
+
+
+
+
+
+
+
 (define start (epoch-time))
-
-
-
 
 
 
@@ -49,34 +69,6 @@
 
 
 
-
-
-
-
-
-
-(define-class C
-  ((g) (error "in g!"))
-  ((f) (self.g)))
-
-(def (f) 99)
-
-
-(f)
-
-(def o (C))
-(displayf "%a\n" o.f)
-; (o.f)
-
-
-
-; (define (func) (error "In func!"))
-
-; (define (geostation) (func))
-
-; (define (harries) (geostation))
-
-; (harries)
 
 
 

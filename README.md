@@ -89,16 +89,18 @@
    - `compile`: convert a quoted escm expression into a quoted bytecode list
    - `eval-bytecode`: evaluate the given quoted bytecode list in the global environment
      * Hence `eval` is equivalent to `(compose eval-bytecode compile)`!
-3. `#eof`, `#void`, `#nil` reader literals for their respective values
-4. Keyword primitive types
+3. `(. <obj>)` is equivalent to `<obj>` for the reader
+4. `#eof`, `#void`, `#nil` reader literals for their respective values
+5. `#path` reader literal expanding to the current file's parent path string
+6. Keyword primitive types
    - Like symbols, but prefixed with `:`, & they always evaluate to themselves
-5. Vector literals have been reworked:
+7. Vector literals have been reworked:
    - Uses `[<obj> ...]` instead of `#(<obj> ...)`
    - Quotes aren't always required: 
      * `[a b c]` compiles to vector of `a`, `b`, & `c` evaluated as variables
    - Quotes can be used though to get expected results: 
      * `(quote [a b c])` => `[(quote a) (quote b) (quote c)]`
-6. Hashmap literals have been added in:
+8. Hashmap literals have been added in:
    - Use `{<key> <value> ...}`
    - A note on hashing:
      * Immutable values hash based on contents (think numbers, symbols, pairs, etc.)
@@ -108,15 +110,14 @@
      * `{a 42}` compiles to a hashmap with key `a` evaluated as variable
    - Quotes can be used though to get expected results: 
      * `(quote {a 42})` => `{(quote a) (quote 42)}`
-7. Immutable core pairs & strings
+9. Immutable core pairs & strings
    - Mutable pairs may be implemented by users via the object system!
-8. `\` reader lambda literal support:
-   - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
-   - `\%1` => `(lambda (%1) %1)`, `\(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
-9. `(. <obj>)` is equivalent to `<obj>` for the reader
-10. Compile-time procedural macro system:
+10. `\` reader lambda literal support:
+    - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
+    - `\%1` => `(lambda (%1) %1)`, `\(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
+11. Compile-time procedural macro system:
     - No run-time bindings, all global in scope, deletable for localization!
-11. Object System (classes, interfaces, and objects!)
-12. Multithreading Support (threads and reentrant locks!)
-13. Multi-arity and optional-parameter support via `fn`
-14. No `eqv?`: only `eq?` and `equal?`
+12. Object System (classes, interfaces, and objects!)
+13. Multithreading Support (threads and reentrant locks!)
+14. Multi-arity and optional-parameter support via `fn`
+15. No `eqv?`: only `eq?` and `equal?`

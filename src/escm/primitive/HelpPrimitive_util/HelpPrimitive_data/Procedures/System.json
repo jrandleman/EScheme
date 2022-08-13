@@ -8,7 +8,13 @@
   "name": "load",
   "aliases": null,
   "signatures": ["(load <filename-str>)"],
-  "description": "Reads and evaluates <filename-str>'s EScheme contents in the global environment.",
+  "description": "Reads and evaluates <filename-str>'s EScheme contents in the global environment.\nNote that <load-from> should be used if <filename-str> is a relative path.",
+  "example": null
+}, {
+  "name": "load-from",
+  "aliases": null,
+  "signatures": ["(load-from <directory-str> <filename-str>)"],
+  "description": "Loads the <filename-str> in <directory-str> as EScheme code in the global\nenvironment. Use:\n\n(load-from #path <filename-str>)\n\nas a portable alternative to (load <filename-str>) if <filename-str> is a\nrelative path, since <load> only operates relative to (current-directory).",
   "example": null
 }, {
   "name": "system",
