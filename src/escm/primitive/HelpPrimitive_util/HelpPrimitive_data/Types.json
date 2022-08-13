@@ -18,13 +18,13 @@
   "example": null
 }, {
   "name": "void",
-  "aliases": null,
+  "aliases": ["#void"],
   "signatures": null,
   "description": "The \"nothing\" type, typically returned by non-pure actions that end in '!'.\nDenoted via #void",
   "example": null
 }, {
   "name": "nil",
-  "aliases": ["null"],
+  "aliases": ["null", "#nil"],
   "signatures": null,
   "description": "The \"null\" type terminating lists. Denoted via (quote ()) and #nil",
   "example": null
@@ -84,7 +84,7 @@
   "example": "(define (sieve ints)\n  (def current-int (scar ints))\n  (scons \n    current-int\n    (stream-filter \n      (lambda (n) (positive? (remainder n current-int)))\n      (sieve (scdr ints)))))\n\n(define (ints-from n)\n  (scons n (ints-from (+ n 1))))\n\n(define primes (sieve (ints-from 2))) ; infinite stream of prime numbers!\n\n(display (stream->list primes 13))\n(newline)"
 }, {
   "name": "eof",
-  "aliases": null,
+  "aliases": ["#eof"],
   "signatures": null,
   "description": "The \"end-of-file\" value terminating files.\nDenoted via #eof and detected via (eof? <obj>).\nEnds file/REPL evaluation early if read in as a single expression.",
   "example": null

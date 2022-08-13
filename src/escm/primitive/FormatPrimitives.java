@@ -227,9 +227,8 @@ public class FormatPrimitives {
         }
       }
       // Display the number
-      StringBuilder numberBuffer = new StringBuilder();
       if(signs && ((fmtArg instanceof Complex && ((Complex)fmtArg).realPart().isPositive()) || (fmtArg instanceof Real && ((Real)fmtArg).isPositive()))) {
-        numberBuffer.append('+');
+        sb.append('+');
       }
       if(coerceExact && !(fmtArg instanceof Exact)) {
         if(fmtArg instanceof Inexact) {
@@ -253,15 +252,14 @@ public class FormatPrimitives {
           complexBuffer.append(serializeNumberWithRadix(imag,radix));
         }
         complexBuffer.append('i');
-        numberBuffer.append(paddZeros(complexBuffer.toString(),leftPadding));
+        sb.append(paddZeros(complexBuffer.toString(),leftPadding));
       } else {
         if(commas) {
-          numberBuffer.append(paddZeros(addRealNumberCommas(serializeNumberWithRadix((Real)fmtArg,radix)),leftPadding));
+          sb.append(paddZeros(addRealNumberCommas(serializeNumberWithRadix((Real)fmtArg,radix)),leftPadding));
         } else {
-          numberBuffer.append(paddZeros(serializeNumberWithRadix((Real)fmtArg,radix),leftPadding));
+          sb.append(paddZeros(serializeNumberWithRadix((Real)fmtArg,radix),leftPadding));
         }
       }
-      sb.append(numberBuffer);
       return i;
     }
 
@@ -296,9 +294,8 @@ public class FormatPrimitives {
         }
       }
       // Display the number
-      StringBuilder numberBuffer = new StringBuilder();
       if(signs && ((fmtArg instanceof Complex && ((Complex)fmtArg).realPart().isPositive()) || (fmtArg instanceof Real && ((Real)fmtArg).isPositive()))) {
-        numberBuffer.append('+');
+        sb.append('+');
       }
       if(coerceInxact && !(fmtArg instanceof Inexact)) {
         if(fmtArg instanceof Exact) {
@@ -322,15 +319,14 @@ public class FormatPrimitives {
           complexBuffer.append(serializeNumberWithPrecision(imag,precision));
         }
         complexBuffer.append('i');
-        numberBuffer.append(paddZeros(complexBuffer.toString(),leftPadding));
+        sb.append(paddZeros(complexBuffer.toString(),leftPadding));
       } else {
         if(commas) {
-          numberBuffer.append(paddZeros(addRealNumberCommas(serializeNumberWithPrecision((Real)fmtArg,precision)),leftPadding));
+          sb.append(paddZeros(addRealNumberCommas(serializeNumberWithPrecision((Real)fmtArg,precision)),leftPadding));
         } else {
-          numberBuffer.append(paddZeros(serializeNumberWithPrecision((Real)fmtArg,precision),leftPadding));
+          sb.append(paddZeros(serializeNumberWithPrecision((Real)fmtArg,precision),leftPadding));
         }
       }
-      sb.append(numberBuffer);
       return i;
     }
 

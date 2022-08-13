@@ -3,13 +3,7 @@
 ## MORE
 
 
-
-
-
-- MAKE OBJECT CONSTRUCTION / METHOD-INVOCATION AS EFFICIENT AS POSSIBLE:
-  - TEST THE COST IN RAW JAVA
-  - TEST COST OF JUST LOOPING FOR N ITERATIONS IN ESCM
-  - THEN FIGURE OUT HOW TO OPTIMIZE CONSTRUCTING 55K - 1 MILLION OBJECTS W/ COMPLEX/DEFAULT CTORS + INHERITED CLASSES + IMPLEMENTED INTERFACES
+- CONSIDER MOVING `ExecutionState.java` & `Instruction.java` TO BE IN `vm/util`
 
 
 
@@ -21,11 +15,21 @@
 
 
 
-- MAKE FORMATTING PROCEDURES (`stringf` ETC.) AS EFFICIENT AS POSSIBLE
-  * FOR EXAMPLE, DETERMINE IF `StringBuilder numberBuffer` IS REALLY NEEDED, OR WHETHER CAN JUST USE `sb`, ETC.
+```clj
+(load-and-serialize <filename-path>) ; load the escm contents, then serialize the resulting bytecode as a Java object, and return such as a string
+(eval-serialized <serialized-string>) ; evaluates the serialized Java code representing an instruction set
+(load-serialized <filename-path>) ; load & eval <filename-path> containing serialized Java code (representing an instruction set)
+```
 
 
 
+
+
+
+- SUPPORT THE CREATION OF TEMPORARY FILE NAMES (THREAD-INDEPENDANT) !!!
+```clj
+(temp-file-name) ; .escmtmp-SS-MM-HH-DD-MM-YY-THREAD_ID-COUNTER (registers in a container that gets auto-deleted upon end of the EScheme session)
+```
 
 
 
@@ -35,8 +39,6 @@
 
 
 - IMPROVE BOOT TIME VIA SERIALIZATION ???
-
-    => START BY TIMING DIFFERENCE WITH REDUCING `.substring` USE IN `FileRead.readBufferAsArrayList()` !!!
 
     => ___THIS MAY NOT BE WORTH IT, BUT WORTH KEEPING HERE IN CASE___
 
@@ -67,11 +69,29 @@
 
 
 
+                      
 
-- CONSIDER HAVING `eval` & `bytecode-eval` & `load` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
-  
-  - CONSIDER A `process` TYPE? `fork`?
-    => copy-on-write semantics for `fork`, similar to how the "meta-thread" works ??
+
+
+
+
+- MAKE OBJECT CONSTRUCTION / METHOD-INVOCATION AS EFFICIENT AS POSSIBLE:
+  - TEST THE COST IN RAW JAVA
+  - TEST COST OF JUST LOOPING FOR N ITERATIONS IN ESCM
+  - THEN FIGURE OUT HOW TO OPTIMIZE CONSTRUCTING 55K - 1 MILLION OBJECTS W/ COMPLEX/DEFAULT CTORS + INHERITED CLASSES + IMPLEMENTED INTERFACES
+
+
+
+
+
+
+
+
+
+
+
+
+- CONSIDER HAVING `eval` & `bytecode-eval` & `load` & `load-from` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
 
 
 
@@ -305,6 +325,8 @@
 
 - GUI PRIMITIVES
   
+  * GET TO THE POINT WHERE CAN GENERATE A FRACTAL !!!
+
   * CONSIDER A -i, --interactive FLAG TO LAUNCH THE REPL IN A GUI WINDOW THAT DETECTS KEYSTROKES, STORES HISTORY VIA ^v, ETC. 
 
 - LOOK BACK AT HEIST-SCHEME FOR ANY OTHER FEATURES TO IMPLEMENT

@@ -14,7 +14,7 @@
 ------------------------
 ## Variables:
 ```scheme
-#path ; reader literal, not a true variable
+#path ; reader literal (expands to a string, not a true variable)
 
 *argv*
 

@@ -28,11 +28,11 @@ public class Reader {
   ////////////////////////////////////////////////////////////////////////////
   // Exception Type(s) Specialization
   public static class ReaderException extends Exception {
-    private static String generateMessage(int errorIndex, String sourceCode, SourceInformation source, String fmt, Object ... args) {
+    private static String generateMessage(int errorIndex, CharSequence sourceCode, SourceInformation source, String fmt, Object ... args) {
       StringBuilder sb = new StringBuilder();
       sb.append(String.format(fmt,args));
       if(sourceCode.length() > 0) {
-        String[] errorSubstring = SubstringIndexError.run(errorIndex,sourceCode,READER_ERROR_SUBSTRING_LENGTH);
+        String[] errorSubstring = SubstringIndexError.run(errorIndex,sourceCode.toString(),READER_ERROR_SUBSTRING_LENGTH);
         sb.append("\n>> Found Here: " + errorSubstring[0] + 
                   "\n               " + errorSubstring[1]);
       }
@@ -40,14 +40,14 @@ public class Reader {
       return sb.toString();
     }
 
-    public ReaderException(int errorIndex, String sourceCode, SourceInformation source, String fmt, Object ... args) {
+    public ReaderException(int errorIndex, CharSequence sourceCode, SourceInformation source, String fmt, Object ... args) {
       super(generateMessage(errorIndex,sourceCode,source,fmt,args));
     }
   }
 
 
   public static class IncompleteException extends ReaderException {
-    public IncompleteException(int errorIndex, String sourceCode, SourceInformation source, String fmt, Object ... args) {
+    public IncompleteException(int errorIndex, CharSequence sourceCode, SourceInformation source, String fmt, Object ... args) {
       super(errorIndex,sourceCode,source,fmt,args);
     }
   }
@@ -71,7 +71,7 @@ public class Reader {
 
 
   // @return: pair of parsed reader shorthand literal expansion & position in <sourceCode> after the parsed literal
-  private static Pair<Datum,Integer> parseReaderShorthandLiteralLogic(String sourceCode, String longhandName, int shorthandStartIdx, int shorthandEndIdx, Stack<Character> containerStack, SourceInformation source, SourceInformation shorthandSource) throws ReaderException {
+  private static Pair<Datum,Integer> parseReaderShorthandLiteralLogic(CharSequence sourceCode, String longhandName, int shorthandStartIdx, int shorthandEndIdx, Stack<Character> containerStack, SourceInformation source, SourceInformation shorthandSource) throws ReaderException {
     Pair<Datum,Integer> parsedItem = readLoop(sourceCode,shorthandEndIdx,containerStack,source);
     if(parsedItem.first == null)
       throw new IncompleteException(shorthandStartIdx, sourceCode, shorthandSource, "READ ERROR: Incomplete \"%s\" reader shorthand literal!", longhandName);
@@ -80,7 +80,7 @@ public class Reader {
 
 
   // @return: pair of parsed reader shorthand literal expansion & position in <sourceCode> after the parsed literal
-  private static Pair<Datum,Integer> parseReaderShorthandLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
+  private static Pair<Datum,Integer> parseReaderShorthandLiteral(CharSequence sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
     SourceInformation shorthandSource = source.clone();
     if(sourceCode.charAt(i) == '\'') {
       source.updatePosition('\'');
@@ -163,7 +163,7 @@ public class Reader {
 
 
   // @return: pair of parsed lambda literal expansion & position in <sourceCode> after the parsed literal
-  private static Pair<Datum,Integer> parseReaderLambdaLiteralLogic(String sourceCode, int i, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
+  private static Pair<Datum,Integer> parseReaderLambdaLiteralLogic(CharSequence sourceCode, int i, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
     SourceInformation lambdaSource = source.clone();
     source.updatePosition('\\');
     Pair<Datum,Integer> parsedItem = readLoop(sourceCode,i,containerStack,source);
@@ -181,7 +181,7 @@ public class Reader {
 
 
   // Returns whether the list is dotted
-  private static boolean validatePeriodSymbolPosition(int listIndex, String sourceCode, SourceInformation listSource, ArrayList<Datum> arr) throws ReaderException {
+  private static boolean validatePeriodSymbolPosition(int listIndex, CharSequence sourceCode, SourceInformation listSource, ArrayList<Datum> arr) throws ReaderException {
     boolean isDotted = false;
     for(int i = 0, n = arr.size(); i < n; ++i) {
       if(isPeriodSymbol(arr.get(i))) {
@@ -194,7 +194,7 @@ public class Reader {
 
 
   // Returns <arr> as a <Datum> scheme pair data structure
-  private static Datum convertArrayListToSchemeList(int listIndex, String sourceCode, SourceInformation listSource, ArrayList<Datum> arr) throws ReaderException {
+  private static Datum convertArrayListToSchemeList(int listIndex, CharSequence sourceCode, SourceInformation listSource, ArrayList<Datum> arr) throws ReaderException {
     boolean isDotted = validatePeriodSymbolPosition(listIndex,sourceCode,listSource,arr);
     if(isDotted) {
       arr.remove(arr.size()-2); // remove the dot
@@ -211,7 +211,7 @@ public class Reader {
 
   // @param: <i> is where to start parsing
   // @return: pair of parsed list & position in <sourceCode> after the closing <)>
-  private static Pair<Datum,Integer> parseListLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
+  private static Pair<Datum,Integer> parseListLiteral(CharSequence sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
     int listIndex = i-1;
     SourceInformation listSource = source.clone();
     source.updatePosition('(');
@@ -241,7 +241,7 @@ public class Reader {
   // Vector Literal Parsing Helper(s)
   // @param: <i> is where to start parsing
   // @return: pair of parsed vector & position in <sourceCode> after the closing <]>
-  private static Pair<Datum,Integer> parseVectorLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
+  private static Pair<Datum,Integer> parseVectorLiteral(CharSequence sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
     int vectorIndex = i-1;
     SourceInformation vectorSource = source.clone();
     source.updatePosition('[');
@@ -265,7 +265,7 @@ public class Reader {
   // Hashmap Literal Parsing Helper(s)
   // @param: <i> is where to start parsing
   // @return: pair of parsed hashmap & position in <sourceCode> after the closing <]>
-  private static Pair<Datum,Integer> parseHashmapLiteral(String sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
+  private static Pair<Datum,Integer> parseHashmapLiteral(CharSequence sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
     int hashmapIndex = i-1;
     SourceInformation hashmapSource = source.clone();
     source.updatePosition('{');
@@ -298,15 +298,15 @@ public class Reader {
   // Boolean Literal Identification & Parsing Helpers
   // @precondition: sourceCode.charAt(i) == '#'
   // @param: <i> is where to start parsing
-  // @param: <n> is <sourceCode.size()>
-  private static boolean isBooleanLiteral(String sourceCode, int i, int n) {
+  // @param: <n> is <sourceCode.length()>
+  private static boolean isBooleanLiteral(CharSequence sourceCode, int i, int n) {
     return i+1 < n && (sourceCode.charAt(i+1) == 't' || sourceCode.charAt(i+1) == 'f') && 
                       (i+2 == n || isDelimiter(sourceCode.charAt(i+2)));
   }
 
 
   // @return: pair of parsed boolean & position in <sourceCode> after the parsed literal
-  private static Pair<Datum,Integer> parseBooleanLiteral(String sourceCode, int i, SourceInformation source) {
+  private static Pair<Datum,Integer> parseBooleanLiteral(CharSequence sourceCode, int i, SourceInformation source) {
     if(sourceCode.charAt(i+1) == 't') {
       source.updatePosition("#t");
       return new Pair<Datum,Integer>(escm.type.Boolean.TRUE,i+2);
@@ -320,8 +320,8 @@ public class Reader {
   // Nil Literal Identification & Parsing Helpers
   // @precondition: sourceCode.charAt(i) == '#'
   // @param: <i> is where to start parsing
-  // @param: <n> is <sourceCode.size()>
-  private static boolean isNilLiteral(String sourceCode, int i, int n) {
+  // @param: <n> is <sourceCode.length()>
+  private static boolean isNilLiteral(CharSequence sourceCode, int i, int n) {
     return i+3 < n && sourceCode.charAt(i+1) == 'n' && 
                       sourceCode.charAt(i+2) == 'i' && 
                       sourceCode.charAt(i+3) == 'l' &&
@@ -330,7 +330,7 @@ public class Reader {
 
 
   // @return: pair of parsed literal & position in <sourceCode> after the literal
-  private static Pair<Datum,Integer> parseNilLiteral(String sourceCode, int i, SourceInformation source) {
+  private static Pair<Datum,Integer> parseNilLiteral(CharSequence sourceCode, int i, SourceInformation source) {
     source.updatePosition("#nil");
     return new Pair<Datum,Integer>(Nil.VALUE,i+4);
   }
@@ -340,8 +340,8 @@ public class Reader {
   // Void Literal Identification & Parsing Helpers
   // @precondition: sourceCode.charAt(i) == '#'
   // @param: <i> is where to start parsing
-  // @param: <n> is <sourceCode.size()>
-  private static boolean isVoidLiteral(String sourceCode, int i, int n) {
+  // @param: <n> is <sourceCode.length()>
+  private static boolean isVoidLiteral(CharSequence sourceCode, int i, int n) {
     return i+4 < n && sourceCode.charAt(i+1) == 'v' && 
                       sourceCode.charAt(i+2) == 'o' && 
                       sourceCode.charAt(i+3) == 'i' && 
@@ -351,7 +351,7 @@ public class Reader {
 
 
   // @return: pair of parsed literal & position in <sourceCode> after the literal
-  private static Pair<Datum,Integer> parseVoidLiteral(String sourceCode, int i, SourceInformation source) {
+  private static Pair<Datum,Integer> parseVoidLiteral(CharSequence sourceCode, int i, SourceInformation source) {
     source.updatePosition("#void");
     return new Pair<Datum,Integer>(escm.type.Void.VALUE,i+5);
   }
@@ -361,8 +361,8 @@ public class Reader {
   // EOF Literal Identification & Parsing Helpers
   // @precondition: sourceCode.charAt(i) == '#'
   // @param: <i> is where to start parsing
-  // @param: <n> is <sourceCode.size()>
-  private static boolean isEofLiteral(String sourceCode, int i, int n) {
+  // @param: <n> is <sourceCode.length()>
+  private static boolean isEofLiteral(CharSequence sourceCode, int i, int n) {
     return i+3 < n && sourceCode.charAt(i+1) == 'e' && 
                       sourceCode.charAt(i+2) == 'o' && 
                       sourceCode.charAt(i+3) == 'f' && 
@@ -371,7 +371,7 @@ public class Reader {
 
 
   // @return: pair of parsed literal & position in <sourceCode> after the literal
-  private static Pair<Datum,Integer> parseEofLiteral(String sourceCode, int i, SourceInformation source) {
+  private static Pair<Datum,Integer> parseEofLiteral(CharSequence sourceCode, int i, SourceInformation source) {
     source.updatePosition("#eof");
     return new Pair<Datum,Integer>(escm.type.port.Eof.VALUE,i+4);
   }
@@ -381,7 +381,7 @@ public class Reader {
   // String Literal Parsing Helper
   // @param: <i> is where to start parsing
   // @return: pair of parsed string & position in <sourceCode> after the closing <">
-  private static Pair<Datum,Integer> parseStringLiteral(String sourceCode, int i, int n, SourceInformation source) throws IncompleteException {
+  private static Pair<Datum,Integer> parseStringLiteral(CharSequence sourceCode, int i, int n, SourceInformation source) throws IncompleteException {
     int start = i-1; 
     SourceInformation stringSource = source.clone();
     StringBuilder sb = new StringBuilder();
@@ -414,7 +414,7 @@ public class Reader {
   // @param: <i> is where to start parsing
   // @return: pair of parsed keyword & position in <sourceCode> after the parsed keyword
   //          => NOTE: returns <null> if at an "empty keyword" (IE if the reader was only given whitespace & comments)
-  private static Pair<Datum,Integer> parseKeywordLiteral(String sourceCode, int i, int n, SourceInformation source) {
+  private static Pair<Datum,Integer> parseKeywordLiteral(CharSequence sourceCode, int i, int n, SourceInformation source) {
     StringBuilder sb = new StringBuilder();
     while(i < n && !isDelimiter(sourceCode.charAt(i))) {
       char c = sourceCode.charAt(i);
@@ -431,7 +431,7 @@ public class Reader {
   // Number Literal Parsing Helper
   // @param: <i> is where to start parsing
   // @return: pair of parsed number & position in <sourceCode> after the parsed double
-  private static Pair<Number,Integer> parseNumberLiteral(String sourceCode, int i, int n, SourceInformation source) {
+  private static Pair<Number,Integer> parseNumberLiteral(CharSequence sourceCode, int i, int n, SourceInformation source) {
     int start = i;
     StringBuilder sb = new StringBuilder();
     while(i < n && !isDelimiter(sourceCode.charAt(i))) {
@@ -459,7 +459,7 @@ public class Reader {
   private static final String CURRENT_PARENT_PATH_READER_LITERAL = "#path";
 
 
-  private static String getCurrentPathParent(int symbolStart, String sourceCode, SourceInformation symbolSource) throws ReaderException {
+  private static String getCurrentPathParent(int symbolStart, CharSequence sourceCode, SourceInformation symbolSource) throws ReaderException {
     try {
       String fileName = symbolSource.fileName();
       String parent = FilePrimitives.PathParent.logic(fileName);
@@ -470,7 +470,7 @@ public class Reader {
     }
   }
 
-  private static Pair<Datum,Integer> parseSymbolLiteral(String sourceCode, int i, int n, SourceInformation source) throws ReaderException {
+  private static Pair<Datum,Integer> parseSymbolLiteral(CharSequence sourceCode, int i, int n, SourceInformation source) throws ReaderException {
     StringBuilder sb = new StringBuilder();
     SourceInformation symbolSource = source.clone();
     int symbolStart = i;
@@ -493,7 +493,7 @@ public class Reader {
   ////////////////////////////////////////////////////////////////////////////
   // Main Reader Loop
   // => <.first> is <null> if only read whitespace/comments
-  private static Pair<Datum,Integer> readLoop(String sourceCode, int startIndex, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
+  private static Pair<Datum,Integer> readLoop(CharSequence sourceCode, int startIndex, Stack<Character> containerStack, SourceInformation source) throws ReaderException {
 
     for(int i = startIndex, n = sourceCode.length(); i < n; ++i) {
 
@@ -619,13 +619,13 @@ public class Reader {
   //                      2. the length of characters read from <sourceCode> to produce the read datum
 
   // @return: <.first> is <null> if only read in whitespace/comments!
-  public static Pair<Datum,Integer> nullableRead(String sourceCode, SourceInformation source) throws ReaderException {
+  public static Pair<Datum,Integer> nullableRead(CharSequence sourceCode, SourceInformation source) throws ReaderException {
     return readLoop(sourceCode,0,new Stack<Character>(),source);
   }
 
 
   // @return: <.first> is <#void> if only read in whitespace/comments!
-  public static Pair<Datum,Integer> read(String sourceCode, SourceInformation source) throws ReaderException {
+  public static Pair<Datum,Integer> read(CharSequence sourceCode, SourceInformation source) throws ReaderException {
     Pair<Datum,Integer> result = nullableRead(sourceCode,source);
     if(result.first != null) return result;
     return new Pair<Datum,Integer>(escm.type.Void.VALUE,result.second);
