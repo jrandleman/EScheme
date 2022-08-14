@@ -9,7 +9,7 @@ import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.Datum;
 import escm.type.procedure.Procedure;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 import escm.vm.util.SourceInformation;
 
 public class ContinuationProcedure extends Procedure {

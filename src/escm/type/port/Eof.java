@@ -5,7 +5,7 @@
 package escm.type.port;
 import java.util.Objects;
 import escm.type.Datum;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 
 public class Eof extends Datum {
   ////////////////////////////////////////////////////////////////////////////

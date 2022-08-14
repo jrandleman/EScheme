@@ -14,7 +14,7 @@ import escm.vm.Compiler;
 import escm.vm.Assembler;
 import escm.vm.Interpreter;
 import escm.vm.type.Callable;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
 import escm.vm.runtime.GlobalState;

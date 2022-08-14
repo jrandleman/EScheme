@@ -26,7 +26,7 @@ import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.procedure.CompoundProcedure;
 import escm.type.procedure.MethodProcedure;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 import escm.vm.util.SourceInformation;
 
 public abstract class MetaObject extends Datum {

@@ -17,6 +17,7 @@ import escm.type.Symbol;
 import escm.type.oo.MetaObject;
 import escm.type.procedure.Procedure;
 import escm.util.Exceptionf;
+import escm.vm.util.ExecutionState;
 import escm.vm.util.SourceInformation;
 
 public class ObjectAccessChain extends Datum {

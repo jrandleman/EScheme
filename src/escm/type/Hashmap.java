@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 import escm.vm.type.Callable;
 
 public class Hashmap extends Datum implements Callable {

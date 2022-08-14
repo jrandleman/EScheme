@@ -22,7 +22,7 @@ import escm.type.procedure.CompoundProcedure;
 import escm.type.number.Inexact;
 import escm.util.Exceptionf;
 import escm.vm.type.Instruction;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 import escm.vm.type.ObjectAccessChain;
 
 public class Assembler {

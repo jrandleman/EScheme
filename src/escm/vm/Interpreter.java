@@ -13,7 +13,7 @@ import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.Callable;
 import escm.vm.type.Instruction;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 import escm.vm.type.Environment;
 import escm.vm.type.ObjectAccessChain;
 

@@ -6,7 +6,7 @@
 //    requires the extension of this contract!
 
 package escm.type;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 
 public abstract class Datum {
   ////////////////////////////////////////////////////////////////////////////

@@ -36,7 +36,7 @@ import escm.type.Pair;
 import escm.type.Nil;
 import escm.vm.Interpreter;
 import escm.vm.type.Instruction;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 import escm.vm.type.Environment;
 import escm.vm.util.SourceInformation;
 import escm.vm.runtime.EscmCallStack;

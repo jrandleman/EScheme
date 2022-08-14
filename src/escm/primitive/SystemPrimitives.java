@@ -15,7 +15,7 @@ import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.ExecuteSystemCommand;
 import escm.vm.type.Callable;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 import escm.vm.type.Environment;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;

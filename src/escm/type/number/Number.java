@@ -50,7 +50,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import escm.util.Exceptionf;
 import escm.type.Datum;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 
 public abstract class Number extends Datum {
   ////////////////////////////////////////////////////////////////////////////

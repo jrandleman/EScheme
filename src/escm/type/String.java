@@ -5,7 +5,7 @@
 package escm.type;
 import java.util.Objects;
 import escm.util.StringParser;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 
 public class String extends Datum {
   ////////////////////////////////////////////////////////////////////////////

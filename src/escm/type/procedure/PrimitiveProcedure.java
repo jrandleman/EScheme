@@ -10,7 +10,7 @@ import escm.util.Trampoline;
 import escm.type.Datum;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 import escm.vm.util.SourceInformation;
 import escm.vm.runtime.EscmCallStack;
 

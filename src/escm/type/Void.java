@@ -4,7 +4,7 @@
 
 package escm.type;
 import java.util.Objects;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 
 public class Void extends Datum {
   ////////////////////////////////////////////////////////////////////////////

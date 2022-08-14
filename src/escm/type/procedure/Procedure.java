@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import escm.util.Trampoline;
 import escm.type.Datum;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 import escm.vm.type.Callable;
 import escm.vm.util.SourceInformation;
 

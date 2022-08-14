@@ -9,7 +9,7 @@ import java.util.Objects;
 import escm.type.Datum;
 import escm.type.Boolean;
 import escm.type.Void;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 
 public class Mutex extends Datum {
   ////////////////////////////////////////////////////////////////////////////

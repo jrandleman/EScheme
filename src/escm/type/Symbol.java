@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.ArrayList;
 import escm.util.Exceptionf;
 import escm.type.procedure.Procedure;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 import escm.vm.util.SourceInformation;
 
 public class Symbol extends Datum {

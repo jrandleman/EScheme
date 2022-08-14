@@ -1,12 +1,14 @@
-// Author: Jordan Randleman - escm.vm.type.ExecutionState
+// Author: Jordan Randleman - escm.vm.util.ExecutionState
 // Purpose:
 //    Wrapper class containing a state of the EScheme bytecode interpreter.
 
-package escm.vm.type;
+package escm.vm.util;
 import java.util.ArrayList;
 import java.util.Stack;
 import escm.type.Datum;
 import escm.type.Void;
+import escm.vm.type.Environment;
+import escm.vm.type.Instruction;
 
 public class ExecutionState {
   ////////////////////////////////////////////////////////////////////////////

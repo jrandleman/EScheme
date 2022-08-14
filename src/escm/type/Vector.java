@@ -43,7 +43,7 @@ import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.number.Exact;
 import escm.type.number.Real;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 import escm.vm.type.Callable;
 
 public class Vector extends Datum implements Callable {

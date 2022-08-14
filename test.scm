@@ -11,6 +11,27 @@
   ((get-msg) "In class C2!"))
 
 
+
+
+
+
+(def o2 (C2))
+(o2.print-msg)
+
+
+
+
+
+#eof
+
+
+
+
+
+
+
+
+
 (define-class Rectangle
   ((new w l)
     (define self.w w)

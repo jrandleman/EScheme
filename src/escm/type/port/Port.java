@@ -11,7 +11,7 @@
 
 package escm.type.port;
 import escm.type.Datum;
-import escm.vm.type.ExecutionState;
+import escm.vm.util.ExecutionState;
 
 public abstract class Port extends Datum {
   ////////////////////////////////////////////////////////////////////////////
