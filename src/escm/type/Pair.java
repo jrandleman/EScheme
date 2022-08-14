@@ -326,14 +326,14 @@ public class Pair extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Pair loadWithState(ExecutionState state) throws Exception {
+  public Pair loadWithState(ExecutionState state) {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Pair loadWithName(java.lang.String name) throws Exception {
+  public Pair loadWithName(java.lang.String name) {
     return this;
   }
 

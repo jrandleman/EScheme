@@ -46,12 +46,12 @@ public abstract class Procedure extends Datum implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter Abstraction
-  public abstract Procedure loadWithState(ExecutionState state) throws Exception;
+  public abstract Procedure loadWithState(ExecutionState state);
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Name binding (used by escm.vm.type.Environment)
-  public abstract Procedure loadWithName(java.lang.String name) throws Exception;
+  public abstract Procedure loadWithName(java.lang.String name);
 
 
   ////////////////////////////////////////////////////////////////////////////

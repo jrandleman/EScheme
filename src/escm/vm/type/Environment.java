@@ -138,18 +138,18 @@ public class Environment {
 
   ////////////////////////////////////////////////////////////////////////////
   // Define value
-  public void define(Symbol name, Datum value) throws Exception {
+  public void define(Symbol name, Datum value) {
     String nameString = name.value();
     bindings.put(nameString,value.loadWithName(nameString));
   }
   
 
-  public void define(Symbol name, Primitive prm) throws Exception {
+  public void define(Symbol name, Primitive prm) {
     define(name,(Datum)(new PrimitiveProcedure(name.value(),prm)));
   }
   
 
-  public void define(Symbol name, PrimitiveCallable prm) throws Exception {
+  public void define(Symbol name, PrimitiveCallable prm) {
     define(name,(Datum)(new PrimitiveProcedure(name.value(),prm)));
   }
 }

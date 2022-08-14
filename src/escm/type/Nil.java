@@ -66,14 +66,14 @@ public class Nil extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Nil loadWithState(ExecutionState state) throws Exception {
+  public Nil loadWithState(ExecutionState state) {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Nil loadWithName(java.lang.String name) throws Exception {
+  public Nil loadWithName(java.lang.String name) {
     return this;
   }
 

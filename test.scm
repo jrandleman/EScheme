@@ -1,22 +1,43 @@
 
 
+(define-class C1 
+  ((get-msg) "In class C1!")
+  ((print-msg)
+    (display (self.get-msg))
+    (newline)))
 
 
-; (define import
-;   (let ((import-parent-path 
-;           (if (null? *argv*) 
-;               "" 
-;               (string-append (path-parent (car *argv*)) *file-separator*))))
-;     (lambda (libname)
-;       (if (absolute-path? libname)
-;           (load libname)
-;           (load (string-append import-parent-path libname))))))
+(define-class C2 (:extends C1)
+  ((get-msg) "In class C2!"))
+
+
+(define-class Rectangle
+  ((new w l)
+    (define self.w w)
+    (define self.l l))
+  ((area)
+    (* self.w self.l))
+  ((perimeter)
+    (* 2 (+ self.w self.l))))
+
+(define-class Square (:extends Rectangle)
+  ((new l)
+    (super! l l)))
 
 
 
 
 
 
+
+
+(define-syntax do-n-times
+  (lambda (n expr)
+    (def count (gensym))
+    `(let ((,count 0))
+      (while ((< ,count ,n))
+          ,expr
+          (set! ,count (+ 1 ,count))))))
 
 
 
@@ -25,6 +46,29 @@
 
 
 (define start (epoch-time))
+
+
+
+
+
+(define-class C
+  ((new (val 10))
+    (def self.scale val))
+  ((->procedure n)
+    (* self.scale n)))
+
+
+(def o (C 88))
+
+
+(do-n-times 10
+  (o 12))
+
+
+
+
+
+
 
 
 

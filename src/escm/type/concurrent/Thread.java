@@ -297,14 +297,14 @@ public class Thread extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Thread loadWithState(ExecutionState state) throws Exception {
+  public Thread loadWithState(ExecutionState state) {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Thread loadWithName(String name) throws Exception {
+  public Thread loadWithName(String name) {
     return this;
   }
 

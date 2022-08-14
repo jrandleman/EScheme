@@ -66,14 +66,14 @@ public abstract class Port extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Port loadWithState(ExecutionState state) throws Exception {
+  public Port loadWithState(ExecutionState state) {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Port loadWithName(String name) throws Exception {
+  public Port loadWithName(String name) {
     return this;
   }
 

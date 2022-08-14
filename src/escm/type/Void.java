@@ -66,14 +66,14 @@ public class Void extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Void loadWithState(ExecutionState state) throws Exception {
+  public Void loadWithState(ExecutionState state) {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Void loadWithName(java.lang.String name) throws Exception {
+  public Void loadWithName(java.lang.String name) {
     return this;
   }
 

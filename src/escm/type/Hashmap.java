@@ -219,14 +219,14 @@ public class Hashmap extends Datum implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Hashmap loadWithState(ExecutionState state) throws Exception {
+  public Hashmap loadWithState(ExecutionState state) {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Hashmap loadWithName(java.lang.String name) throws Exception {
+  public Hashmap loadWithName(java.lang.String name) {
     return this;
   }
 

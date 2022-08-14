@@ -261,7 +261,7 @@ public class ObjectAccessChain extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public ObjectAccessChain loadWithName(String name) throws Exception {
+  public ObjectAccessChain loadWithName(String name) {
     return this;
   }
 

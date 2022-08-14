@@ -76,14 +76,14 @@ public class String extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public String loadWithState(ExecutionState state) throws Exception {
+  public String loadWithState(ExecutionState state) {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public String loadWithName(java.lang.String name) throws Exception {
+  public String loadWithName(java.lang.String name) {
     return this;
   }
 

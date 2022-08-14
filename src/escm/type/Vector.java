@@ -334,14 +334,14 @@ public class Vector extends Datum implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Vector loadWithState(ExecutionState state) throws Exception {
+  public Vector loadWithState(ExecutionState state) {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Vector loadWithName(java.lang.String name) throws Exception {
+  public Vector loadWithName(java.lang.String name) {
     return this;
   }
 

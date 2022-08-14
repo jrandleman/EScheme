@@ -75,14 +75,14 @@ public class Keyword extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Keyword loadWithState(ExecutionState state) throws Exception {
+  public Keyword loadWithState(ExecutionState state) {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Keyword loadWithName(java.lang.String name) throws Exception {
+  public Keyword loadWithName(java.lang.String name) {
     return this;
   }
 

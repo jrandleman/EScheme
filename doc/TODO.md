@@ -13,6 +13,19 @@
 
 
 
+- SUPPORT THE CREATION OF TEMPORARY FILE NAMES (THREAD-INDEPENDANT) !!!
+```clj
+(temp-file-name) ; .escmtmp-SS-MM-HH-DD-MM-YY-THREAD_ID-COUNTER (registers in a container that gets auto-deleted upon end of the EScheme session)
+                 ; => ISSUE: ^C WILL CAUSE THESE FILES TO LEAK -- HOW TO ADDRESS THIS ???
+```
+
+
+
+
+
+
+
+
 
 
 ```clj
@@ -20,23 +33,6 @@
 (eval-serialized <serialized-string>) ; evaluates the serialized Java code representing an instruction set
 (load-serialized <filename-path>) ; load & eval <filename-path> containing serialized Java code (representing an instruction set)
 ```
-
-
-
-
-
-
-- SUPPORT THE CREATION OF TEMPORARY FILE NAMES (THREAD-INDEPENDANT) !!!
-```clj
-(temp-file-name) ; .escmtmp-SS-MM-HH-DD-MM-YY-THREAD_ID-COUNTER (registers in a container that gets auto-deleted upon end of the EScheme session)
-```
-
-
-
-
-
-
-
 
 - IMPROVE BOOT TIME VIA SERIALIZATION ???
 
@@ -58,30 +54,6 @@
                     - `(write-java-object <obj>)`
                     - `(read-java-object <string-or-input-port>)`
                     - `(run-and-serialize <file-name>)` ; COULD EVEN EXECUTE THIS IN A SANDBOXED ENVIRONMENT ???
-
-
-
-
-
-
-
-
-
-
-
-                      
-
-
-
-
-
-- MAKE OBJECT CONSTRUCTION / METHOD-INVOCATION AS EFFICIENT AS POSSIBLE:
-  - TEST THE COST IN RAW JAVA
-  - TEST COST OF JUST LOOPING FOR N ITERATIONS IN ESCM
-  - THEN FIGURE OUT HOW TO OPTIMIZE CONSTRUCTING 55K - 1 MILLION OBJECTS W/ COMPLEX/DEFAULT CTORS + INHERITED CLASSES + IMPLEMENTED INTERFACES
-
-
-
 
 
 

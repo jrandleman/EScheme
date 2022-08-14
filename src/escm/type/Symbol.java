@@ -110,7 +110,7 @@ public class Symbol extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Symbol loadWithName(java.lang.String name) throws Exception {
+  public Symbol loadWithName(java.lang.String name) {
     return this;
   }
 

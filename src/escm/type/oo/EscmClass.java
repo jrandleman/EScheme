@@ -11,7 +11,6 @@
 //    - callWith(...) // overloads constructing an object instance of this class!
 
 package escm.type.oo;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.util.Exceptionf;
@@ -19,8 +18,8 @@ import escm.util.Trampoline;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.procedure.CompoundProcedure;
+import escm.type.procedure.MethodProcedure;
 import escm.vm.type.Callable;
-import escm.vm.type.ExecutionState;
 
 public class EscmClass extends MetaObject implements Callable {
   ////////////////////////////////////////////////////////////////////////////
@@ -64,13 +63,13 @@ public class EscmClass extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  private void bindImmediateMethodsWithName() {
-    String currentName = name();
-    MetaObject.bindMethodsWithName(currentName+"."," [class::static]",props);
-    MetaObject.bindMethodsWithName(currentName+"."," [class::instance]",objectProps);
-    // NOTE: We don't need to bind the super class's method names, since 
-    //       they've already been bound when creating them prior to being 
-    //       passed to this class's ctor.
+  private void convertInstanceProceduresToMethods() {
+    for(ConcurrentHashMap.Entry<String,Datum> e : this.objectProps.entrySet()) {
+      Datum val = e.getValue();
+      if(val instanceof CompoundProcedure) {
+        this.objectProps.put(e.getKey(),new MethodProcedure((CompoundProcedure)val));
+      }
+    }
   }
 
 
@@ -82,8 +81,30 @@ public class EscmClass extends MetaObject implements Callable {
     for(EscmInterface iface : interfaces) {
       iface.confirmSatisfiedBy(this);
     }
-    bindImmediateMethodsWithSuper();
-    bindImmediateMethodsWithName();
+    this.convertProceduresToMethodsAndBindSuper();
+    this.convertInstanceProceduresToMethods();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Immediate Method Name Generation
+  protected String generateMethodName(String propertyName) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(name());
+    sb.append(".");
+    sb.append(propertyName);
+    sb.append(" [class::static]");
+    return sb.toString();
+  }
+
+
+  protected String generateInstanceMethodName(String propertyName) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(name());
+    sb.append(".");
+    sb.append(propertyName);
+    sb.append(" [class::instance]");
+    return sb.toString();
   }
 
 
@@ -98,14 +119,13 @@ public class EscmClass extends MetaObject implements Callable {
   // Constructing Objects
   private Trampoline.Bounce constructSuperObject(EscmObject superObj, Trampoline.Continuation continuation) throws Exception {
     EscmObject obj = new EscmObject(this,superObj,MetaObject.copyProps(objectProps));
-    obj.bindImmediateMethodsWithSuper();
     Datum ctor = obj.props.get("new");
     // Invoke a "new" ctors in super objects (non-nullary ctors must be explicitely called by user via "(super! <arg> ...)")
-    if(ctor == null || !(ctor instanceof CompoundProcedure) || !((CompoundProcedure)ctor).isThunk()) {
+    if(ctor == null || !(ctor instanceof MethodProcedure) || !((MethodProcedure)ctor).isThunk()) {
       return continuation.run(obj);
     }
     obj.props.remove("new");
-    return ((CompoundProcedure)ctor).loadWithSelf(obj).callWith(new ArrayList<Datum>(),(ignored) -> () -> continuation.run(obj));
+    return ((MethodProcedure)ctor).loadWithSelf(obj).callWith(new ArrayList<Datum>(),(ignored) -> () -> continuation.run(obj));
   }
 
 
@@ -118,13 +138,12 @@ public class EscmClass extends MetaObject implements Callable {
 
   private Trampoline.Bounce constructObject(EscmObject superObj, ArrayList<Datum> args, Trampoline.Continuation continuation) throws Exception {
     EscmObject obj = new EscmObject(this,superObj,MetaObject.copyProps(objectProps));
-    obj.bindImmediateMethodsWithSuper();
     Datum ctor = obj.props.get("new");
-    if(ctor != null && ctor instanceof CompoundProcedure) {
+    if(ctor != null && ctor instanceof MethodProcedure) {
       obj.props.remove("new");
-      return ((CompoundProcedure)ctor).loadWithSelf(obj).callWith(args,(ignored) -> () -> continuation.run(obj));
+      return ((MethodProcedure)ctor).loadWithSelf(obj).callWith(args,(ignored) -> () -> continuation.run(obj));
     } else if(args.size() > 0) {
-      throw new Exceptionf("Class %s construction error: no custom constructor defined!", readableName());
+      throw new Exceptionf("Class %s construction error: no custom ctor defined for args: %s", readableName(), Exceptionf.profileArgs(args));
     }
     return continuation.run(obj);
   }
@@ -172,32 +191,34 @@ public class EscmClass extends MetaObject implements Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Loading-into-memory semantics for the VM's interpreter
-  public EscmClass loadWithState(ExecutionState state) throws Exception {
-    return this;
+  // Loading-into-environment semantics for the VM's interpreter
+  private void bindInstanceMethodsWithName() {
+    for(ConcurrentHashMap.Entry<String,Datum> e : this.objectProps.entrySet()) {
+      Datum val = e.getValue();
+      if(val instanceof MethodProcedure) {
+        String key = e.getKey();
+        this.objectProps.put(key,((MethodProcedure)val).loadWithForcedName(generateInstanceMethodName(key)));
+      }
+    }
   }
 
 
-  ////////////////////////////////////////////////////////////////////////////
-  // Loading-into-environment semantics for the VM's interpreter
-
-  // NOTE: <ignore> here just distinguishes this private ctor from the public one
-  private EscmClass(int ignore, EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) throws Exception {
+  private EscmClass(String name, EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) {
     this.superClass = superClass;
     this.interfaces = interfaces;
     this.props = props;
     this.objectProps = objectProps;
-    bindImmediateMethodsWithSuper();
+    this.props.put("name",new Symbol(name));
+    this.bindMethodsWithName();
+    this.bindInstanceMethodsWithName();
+    // @NOTE: No need to re-bind super, since <props> already points to <superClass> as <super>
   }
 
 
-  public EscmClass loadWithName(String name) throws Exception {
+  public EscmClass loadWithName(String name) {
     String currentName = name();
     if(currentName.length() > 0) return this;
-    EscmClass c = new EscmClass(0,this.superClass,this.interfaces,MetaObject.copyProps(this.props),this.objectProps);
-    c.props.put("name",new Symbol(name));
-    c.bindImmediateMethodsWithName();
-    return c;
+    return new EscmClass(name,this.superClass,this.interfaces,MetaObject.copyProps(this.props),MetaObject.copyProps(this.objectProps));
   }
 
 

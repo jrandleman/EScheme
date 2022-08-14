@@ -34,8 +34,6 @@ import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.Pair;
 import escm.type.Nil;
-import escm.type.Boolean;
-import escm.type.oo.MetaObject;
 import escm.vm.Interpreter;
 import escm.vm.type.Instruction;
 import escm.vm.type.ExecutionState;
@@ -78,16 +76,6 @@ public class CompoundProcedure extends Procedure {
   public CompoundProcedure(ArrayList<ArrayList<Symbol>> parametersList, ArrayList<Symbol> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
     this.state = new State(new CompileTime(parametersList,variadicParameterList,bodyList));
   }
-  
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Thunk Querying
-  public boolean isThunk() { // unary variadics are considered thunks!
-    for(ArrayList<Symbol> params : this.state.compileTime.parametersList) {
-      if(params.isEmpty()) return true;
-    }
-    return false;
-  }
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -109,12 +97,6 @@ public class CompoundProcedure extends Procedure {
   // Name binding (used by escm.vm.type.Environment)
   public CompoundProcedure loadWithName(String name) {
     if(!this.name.equals(Procedure.DEFAULT_NAME)) return this;
-    return new CompoundProcedure(name,invocationSource,state);
-  }
-
-
-  // (used by escm.type.oo.MetaObject)
-  public CompoundProcedure loadWithForcedName(String name) {
     return new CompoundProcedure(name,invocationSource,state);
   }
 
@@ -208,31 +190,6 @@ public class CompoundProcedure extends Procedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // <super> Binding (done updon object creation)
-  private static final Symbol SUPER_SYMBOL = new Symbol("super");
+  // Backdoors
 
-  public CompoundProcedure loadWithSuper(MetaObject supr) throws Exception {
-    if(state.definitionEnvironment == null)
-      throw new Exceptionf("Can't bind <super> %s to procedure %s with a null definition environment!", supr.profile(), name);
-    Environment extendedEnvironment = new Environment(state.definitionEnvironment);
-    if(supr == null) { // note that <super> is <null> for interfaces!
-      extendedEnvironment.define(SUPER_SYMBOL,Boolean.FALSE);
-    } else {
-      extendedEnvironment.define(SUPER_SYMBOL,supr);
-    }
-    return new CompoundProcedure(name,invocationSource,new State(extendedEnvironment,state.compileTime));
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // <self> Binding (done updon method invocation)
-  private static final Symbol SELF_SYMBOL = new Symbol("self");
-
-  public CompoundProcedure loadWithSelf(MetaObject self) throws Exception {
-    if(state.definitionEnvironment == null)
-      throw new Exceptionf("Can't bind <self> %s to procedure %s with a null definition environment!", self.profile(), name);
-    Environment extendedEnvironment = new Environment(state.definitionEnvironment);
-    extendedEnvironment.define(SELF_SYMBOL,self);
-    return new CompoundProcedure(name,invocationSource,new State(extendedEnvironment,state.compileTime));
-  }
 }

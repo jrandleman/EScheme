@@ -60,7 +60,7 @@ public abstract class Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public abstract Datum loadWithName(java.lang.String name) throws Exception;
+  public abstract Datum loadWithName(java.lang.String name);
 
 
   ////////////////////////////////////////////////////////////////////////////

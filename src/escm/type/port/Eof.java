@@ -67,14 +67,14 @@ public class Eof extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Eof loadWithState(ExecutionState state) throws Exception {
+  public Eof loadWithState(ExecutionState state) {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Eof loadWithName(String name) throws Exception {
+  public Eof loadWithName(String name) {
     return this;
   }
 

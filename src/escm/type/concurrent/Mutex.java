@@ -149,7 +149,7 @@ public class Mutex extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Mutex loadWithState(ExecutionState state) throws Exception {
+  public Mutex loadWithState(ExecutionState state) {
     return this;
   }
 
@@ -161,7 +161,7 @@ public class Mutex extends Datum {
     this.state = state;
   }
 
-  public Mutex loadWithName(String name) throws Exception {
+  public Mutex loadWithName(String name) {
     if(this.name != null) return this;
     return new Mutex(name,this.state);
   }

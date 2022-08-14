@@ -14,19 +14,18 @@
 //
 //    - ArrayList<String> props() // returns list of prop names
 //
-//    - static BindingsMap loadPropsWithState(BindingsMap props, ExecutionState state)
 //    - static BindingsMap copyProps(BindingsMap props)
 //      * BindingsMap ::= ConcurrentHashMap<String,Datum>
 
 
 package escm.type.oo;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.util.Exceptionf;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.procedure.CompoundProcedure;
+import escm.type.procedure.MethodProcedure;
 import escm.vm.type.ExecutionState;
 import escm.vm.util.SourceInformation;
 
@@ -73,8 +72,8 @@ public abstract class MetaObject extends Datum {
   private Datum get(String name, SourceInformation source) throws Exception {
     Datum val = props.get(name);
     if(val != null) {
-      if(val instanceof CompoundProcedure) {
-        return ((CompoundProcedure)val).loadWithSelf(this);
+      if(val instanceof MethodProcedure) {
+        return ((MethodProcedure)val).loadWithSelf(this);
       }
       return val;
     }
@@ -94,8 +93,8 @@ public abstract class MetaObject extends Datum {
         throw new Exceptionf("'MetaObject [GET] \"%s\" isn't a property of object %s\n>> Location: %s", name, write(), source);
       }
     }
-    if(val instanceof CompoundProcedure) {
-      return ((CompoundProcedure)val).loadWithSelf(this);
+    if(val instanceof MethodProcedure) {
+      return ((MethodProcedure)val).loadWithSelf(this);
     }
     return val;
   }
@@ -116,7 +115,13 @@ public abstract class MetaObject extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Set! Operations
   private void set(String name, Datum newValue, SourceInformation source) throws Exception {
-    if(set_recur(name,newValue) == false) {
+    boolean successfulSet = false;
+    if(newValue instanceof CompoundProcedure) {
+      successfulSet = set_recur(name,new MethodProcedure((CompoundProcedure)newValue,getSuper(),generateMethodName(name)));
+    } else {
+      successfulSet = set_recur(name,newValue);
+    }
+    if(successfulSet == false) {
       if(source == null) {
         throw new Exceptionf("'MetaObject [SET! TO %s] \"%s\" isn't a property of object %s", newValue.write(), name, write());
       } else {
@@ -142,13 +147,22 @@ public abstract class MetaObject extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Define Operations
-  public void define(String name, Datum newValue) {
-    props.put(name,newValue);
+  public void define(String name, Datum newValue) throws Exception {
+    if(newValue instanceof CompoundProcedure) {
+      props.put(name,new MethodProcedure((CompoundProcedure)newValue,getSuper(),generateMethodName(name)));
+    } else {
+      props.put(name,newValue);
+    }
   }
 
 
-  public void define(Symbol name, Datum newValue) {
-    props.put(name.value(),newValue);
+  public void define(Symbol name, Datum newValue) throws Exception {
+    if(newValue instanceof CompoundProcedure) {
+      String nameString = name.value();
+      props.put(nameString,new MethodProcedure((CompoundProcedure)newValue,getSuper(),generateMethodName(nameString)));
+    } else {
+      props.put(name.value(),newValue);
+    }
   }
 
 
@@ -178,12 +192,31 @@ public abstract class MetaObject extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // <super>-binding helper methods
-  protected void bindImmediateMethodsWithSuper() throws Exception {
-    for(String s : props.keySet()) {
-      Datum val = props.get(s);
+  // Immediate Method Name Generation
+  protected abstract String generateMethodName(String propertyName);
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Method Generation
+  protected void convertProceduresToMethodsAndBindSuper() throws Exception {
+    MetaObject supr = getSuper();
+    for(ConcurrentHashMap.Entry<String,Datum> e : props.entrySet()) {
+      Datum val = e.getValue();
       if(val instanceof CompoundProcedure) {
-        props.put(s,((CompoundProcedure)val).loadWithSuper(getSuper()));
+        props.put(e.getKey(),new MethodProcedure((CompoundProcedure)val,supr));
+      }
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // <super>-binding helper method
+  protected void bindMethodsWithSuper() {
+    MetaObject supr = getSuper();
+    for(ConcurrentHashMap.Entry<String,Datum> e : props.entrySet()) {
+      Datum val = e.getValue();
+      if(val instanceof MethodProcedure) {
+        props.put(e.getKey(),((MethodProcedure)val).loadWithSuper(supr));
       }
     }
   }
@@ -219,31 +252,23 @@ public abstract class MetaObject extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public abstract MetaObject loadWithState(ExecutionState state) throws Exception;
-
-
-  // Support function create new <props> loaded in the current state
-  public static ConcurrentHashMap<String,Datum> loadPropsWithState(ConcurrentHashMap<String,Datum> props, ExecutionState state) throws Exception {
-    ConcurrentHashMap<String,Datum> loaded = new ConcurrentHashMap<String,Datum>(props.size());
-    for(ConcurrentHashMap.Entry<String,Datum> e : props.entrySet())
-      loaded.put(e.getKey(),e.getValue().loadWithState(state));
-    return loaded;
+  public MetaObject loadWithState(ExecutionState state) {
+    return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public abstract MetaObject loadWithName(String name) throws Exception;
+  public abstract MetaObject loadWithName(String name);
 
 
-  // [ONLY FOR USE UPON INITIAL CONSTRUCTION] Support function to bind names to methods.
-  //   => NOTE: MUTATES THE GIVEN <props> ARGUMENT !!!
-  public static void bindMethodsWithName(String namePrefix, String nameSuffix, ConcurrentHashMap<String,Datum> props) {
+  // [ONLY FOR USE UPON INITIAL CONSTRUCTION] Support function to bind names to methods
+  protected void bindMethodsWithName() {
     for(ConcurrentHashMap.Entry<String,Datum> e : props.entrySet()) {
-      Datum propValue = e.getValue();
-      if(propValue instanceof CompoundProcedure) {
-        String propName = e.getKey();
-        props.put(propName,((CompoundProcedure)propValue).loadWithForcedName(namePrefix+propName+nameSuffix));
+      Datum val = e.getValue();
+      if(val instanceof MethodProcedure) {
+        String key = e.getKey();
+        props.put(key,((MethodProcedure)val).loadWithForcedName(generateMethodName(key)));
       }
     }
   }
@@ -256,7 +281,7 @@ public abstract class MetaObject extends Datum {
 
   // Support function to generate a copy <props>
   public static ConcurrentHashMap<String,Datum> copyProps(ConcurrentHashMap<String,Datum> props) {
-    ConcurrentHashMap<String,Datum> copied = new ConcurrentHashMap<String,Datum>(props.size());
+    ConcurrentHashMap<String,Datum> copied = new ConcurrentHashMap<String,Datum>();
     for(ConcurrentHashMap.Entry<String,Datum> e : props.entrySet())
       copied.put(e.getKey(),e.getValue().copy());
     return copied;

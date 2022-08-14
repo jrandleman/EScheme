@@ -14,10 +14,8 @@
 package escm.type.oo;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
-import escm.util.Exceptionf;
 import escm.type.Datum;
 import escm.type.Symbol;
-import escm.vm.type.ExecutionState;
 
 public class EscmInterface extends MetaObject {
   ////////////////////////////////////////////////////////////////////////////
@@ -59,20 +57,23 @@ public class EscmInterface extends MetaObject {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  private void bindImmediateMethodsWithName() {
-    MetaObject.bindMethodsWithName(name()+"."," [interface::static]",props);
-    // NOTE: We don't need to bind the super interface method names, since 
-    //       they've already been bound when creating them prior to being 
-    //       passed to this interface's ctor.
-  }
-
-
   public EscmInterface(ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) throws Exception {
     this.interfaces = interfaces;
     this.props = props;
     this.requiredProps = requiredProps;
-    bindImmediateMethodsWithSuper();
-    bindImmediateMethodsWithName();
+    this.convertProceduresToMethodsAndBindSuper();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Immediate Method Name Generation
+  protected String generateMethodName(String propertyName) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(name());
+    sb.append(".");
+    sb.append(propertyName);
+    sb.append(" [interface::static]");
+    return sb.toString();
   }
 
 
@@ -166,31 +167,21 @@ public class EscmInterface extends MetaObject {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Loading-into-memory semantics for the VM's interpreter
-  public EscmInterface loadWithState(ExecutionState state) throws Exception {
-    return this;
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-
-  // NOTE: <ignore> here just distinguishes this private ctor from the public one
-  private EscmInterface(int ignore, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) throws Exception {
+  private EscmInterface(String name, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) {
     this.interfaces = interfaces;
     this.props = props;
     this.requiredProps = requiredProps;
-    bindImmediateMethodsWithSuper();
+    this.props.put("name",new Symbol(name));
+    this.bindMethodsWithName();
+    // @NOTE: Don't need to bind <super> since it's #f for interfaces & already bound as such in <props>.
   }
 
 
-  public EscmInterface loadWithName(String name) throws Exception {
+  public EscmInterface loadWithName(String name) {
     String currentName = name();
     if(currentName.length() > 0) return this;
-    EscmInterface i = new EscmInterface(0,this.interfaces,MetaObject.copyProps(this.props),this.requiredProps);
-    i.props.put("name",new Symbol(name));
-    i.bindImmediateMethodsWithName();
-    return i;
+    return new EscmInterface(name,this.interfaces,MetaObject.copyProps(this.props),this.requiredProps);
   }
 
 

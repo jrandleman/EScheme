@@ -77,14 +77,14 @@ public class Boolean extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public Boolean loadWithState(ExecutionState state) throws Exception {
+  public Boolean loadWithState(ExecutionState state) {
     return this;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  public Boolean loadWithName(java.lang.String name) throws Exception {
+  public Boolean loadWithName(java.lang.String name) {
     return this;
   }
 

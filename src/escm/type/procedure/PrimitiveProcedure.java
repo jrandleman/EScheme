@@ -39,7 +39,7 @@ public class PrimitiveProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
-  public PrimitiveProcedure loadWithState(ExecutionState state) throws Exception {
+  public PrimitiveProcedure loadWithState(ExecutionState state) {
     return this;
   }
 
@@ -53,7 +53,7 @@ public class PrimitiveProcedure extends Procedure {
   }
 
 
-  public PrimitiveProcedure loadWithName(java.lang.String name) throws Exception {
+  public PrimitiveProcedure loadWithName(java.lang.String name) {
     if(!this.name.equals(Procedure.DEFAULT_NAME)) return this;
     return new PrimitiveProcedure(name,invocationSource,prm);
   }
