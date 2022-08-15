@@ -2,7 +2,7 @@
   "name": "#path",
   "aliases": null,
   "signatures": null,
-  "description": "Reader literal expanding to the current file's parent path as a string.",
+  "description": "Reader literal that expands to the current file's parent path as a string.",
   "example": null
 }, {
   "name": "*argv*",

@@ -91,7 +91,7 @@
      * Hence `eval` is equivalent to `(compose eval-bytecode compile)`!
 3. `(. <obj>)` is equivalent to `<obj>` for the reader
 4. `#eof`, `#void`, `#nil` reader literals for their respective values
-5. `#path` reader literal expanding to the current file's parent path string
+5. `#path` reader literal that expands to the current file's parent path string
 6. Keyword primitive types
    - Like symbols, but prefixed with `:`, & they always evaluate to themselves
 7. Vector literals have been reworked:
@@ -110,7 +110,7 @@
      * `{a 42}` compiles to a hashmap with key `a` evaluated as variable
    - Quotes can be used though to get expected results: 
      * `(quote {a 42})` => `{(quote a) (quote 42)}`
-9. Immutable core pairs & strings
+9. Immutable pairs & strings
    - Mutable pairs may be implemented by users via the object system!
 10. `\` reader lambda literal support:
     - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`

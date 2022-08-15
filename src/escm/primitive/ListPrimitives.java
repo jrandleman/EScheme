@@ -67,17 +67,8 @@ public class ListPrimitives {
       return "append";
     }
 
-    private static Datum shallowCopy(Datum lis2) {
-      if(!(lis2 instanceof Pair)) return lis2;
-      Pair lis2Pair = (Pair)lis2;
-      return new Pair(lis2Pair.car(),shallowCopy(lis2Pair.cdr()));
-    }
-
     public static Datum binaryAppend(Datum lis1, Datum lis2) throws Exception {
-      if(lis1 instanceof Nil) {
-        if(lis2 instanceof Pair) return shallowCopy(lis2);
-        return lis2;
-      }
+      if(lis1 instanceof Nil) return lis2; // immutable pairs means we don't need a shallow-copy of <lis2>!
       Pair lis1Pair = (Pair)lis1;
       return new Pair(lis1Pair.car(),binaryAppend(lis1Pair.cdr(),lis2));
     }
