@@ -107,7 +107,7 @@ public class HashmapPrimitives {
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 3)
-        throw new Exceptionf("'(hashmap-set! <hashmap> <key> <value>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(hashmap-set! <hashmap> <key> <value>) expects exactly 3 args: %s", Exceptionf.profileArgs(parameters));
       Datum h = parameters.get(0);
       if(!(h instanceof escm.type.Hashmap))
         throw new Exceptionf("'(hashmap-set! <hashmap> <key> <value>) 1st arg %s isn't a hashmap: %s", h.profile(), Exceptionf.profileArgs(parameters));

@@ -10,6 +10,24 @@
 ```
 
 
+- CONSIDER ADDING IN 
+```scheme
+
+(open-output-file! <filename-string>) ; Equivalent to: (file-delete! <filename-string>) (open-output-file <filename-string>)
+
+
+(open-temp-input-file <filename-string>) ; temp files are deleted upon exit!
+(open-temp-output-file <filename-string>) ; temp files are deleted upon exit!
+(open-temp-output-file+ <filename-string>) ; temp files are deleted upon exit!
+(open-temp-output-file! <filename-string>) ; temp files are deleted upon exit!
+
+;; ORR: CHANGE SIGS OF THE EXISTING VERIONS ABOVE TO HAVE AN OPTIONAL "BOOLEAN" ARGUMENT SETTING WHETHER THE FILE IS TEMPORARY (DEFAULT #f)
+
+(temp-port? <port>)
+
+```
+
+
 
 
 
@@ -54,6 +72,7 @@
 
 
 - CONSIDER HAVING `eval` & `bytecode-eval` & `load` & `load-from` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
+  => OPTIONAL ARG TO THE EXISTING FCNS DENOTING WHETHER TO SANDBOX THE EVALUATION (#f BY DEFAULT)
 
 
 
