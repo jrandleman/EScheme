@@ -461,6 +461,7 @@ public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public String display() {
-    return "#<input-port ["+name+"]>";
+    if(isClosed()) return "#<input-port (closed) "+name+">";
+    return "#<input-port (open) "+name+">";
   }
 }

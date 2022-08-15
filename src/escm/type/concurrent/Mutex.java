@@ -134,8 +134,19 @@ public class Mutex extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public String display() {
-    if(name == null) return "#<mutex-" + Boolean.valueOf(isLocked()).display() + ">";
-    return "#<mutex-" + Boolean.valueOf(isLocked()).display() + "-" + name + ">";
+    if(name == null) {
+      if(isLocked()) {
+        return "#<mutex (locked)>";
+      } else {
+        return "#<mutex (unlocked)>";
+      }
+    } else {
+      if(isLocked()) {
+        return "#<mutex (locked) " + name + ">";
+      } else {
+        return "#<mutex (unlocked) " + name + ">";
+      }
+    }
   }
 
   public String write() {

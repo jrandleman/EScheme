@@ -3,32 +3,39 @@
 ## MORE
 
 
-- SUPPORT THE CREATION OF TEMPORARY FILE NAMES (THREAD-INDEPENDANT) !!!
-```clj
-(temp-file-name) ; .escmtmp-SS-MM-HH-DD-MM-YY-THREAD_ID-COUNTER (registers in a container that gets auto-deleted upon end of the EScheme session)
-                 ; => ISSUE: ^C WILL CAUSE THESE FILES TO LEAK -- HOW TO ADDRESS THIS ???
-```
+- IMPROVE BOOT-TIME BY HAVING THE INSTALLER PERFORM REFLECTION PREEMPTIVELY THEN HAVING IT GENERATE JAVA CODE THAT MANUALLY REGISTERS EACH PARSED PRIMTIIVE ???
+  
+  => TIME THE DIFF HERE TO SEE IF ITS WORTH IT !!!
+
+  => IE GENERATE ALL STATEMENTS: `GlobalState.globalEnvironment.define(new Symbol(prm.escmName()),new PrimitiveDomain.PrimitiveName());`
+
+     => THEN HAVE A BACKDOOR THAT DOESN'T REQUIRE A SYMBOL WHEN DEFINING PRIMTIVE-JAVA-FCN TYPES (PASS A STRING DIRECTLY TO THE ENV API TO AVOID
+        ALLOCATING A POINTLESS SYMBOL FOR EACH PRIMTIIVE DURING BOOT-TIME)!
 
 
-- CONSIDER ADDING IN 
+
+
+
+
+
+
+
+
+- CONSIDER ADDING IN TEMP FILE SUPPORT
 ```scheme
+HAVE THE <filename-string> ARG IN:
+  
+  * open-input-file
+  * output-file
+  * output-file+
 
-(open-output-file! <filename-string>) ; Equivalent to: (file-delete! <filename-string>) (open-output-file <filename-string>)
+BECOME OPTIONAL. IF NOT GIVEN, GENERATES A "TEMPORARY PORT" THAT IS DELETED UPON EXIT BY THE VM.
 
-
-(open-temp-input-file <filename-string>) ; temp files are deleted upon exit!
-(open-temp-output-file <filename-string>) ; temp files are deleted upon exit!
-(open-temp-output-file+ <filename-string>) ; temp files are deleted upon exit!
-(open-temp-output-file! <filename-string>) ; temp files are deleted upon exit!
-
-;; ORR: CHANGE SIGS OF THE EXISTING VERIONS ABOVE TO HAVE AN OPTIONAL "BOOLEAN" ARGUMENT SETTING WHETHER THE FILE IS TEMPORARY (DEFAULT #f)
-
-(temp-port? <port>)
-
+IN DOCUMENTATION, NOTE: 
+  
+  * CAN GET THE TEMP-FILE LOCATION VIA `port-path` (TO READ FROM A WRITTEN PORT, ETC.)
+  * CAN TEST FOR WHETHER A PORT IS TEMPORARY VIA THE NEW `temp-port?` PRIMITIVE
 ```
-
-
-
 
 
 

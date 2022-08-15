@@ -3,8 +3,7 @@
 (define-class C1 
   ((get-msg) "In class C1!")
   ((print-msg)
-    (display (self.get-msg))
-    (newline)))
+    (displayf "%a\n" (self.get-msg))))
 
 
 (define-class C2 (:extends C1)
@@ -16,7 +15,11 @@
 
 
 (def o2 (C2))
-(o2.print-msg)
+(display C2)
+(newline)
+
+(display o2)
+(newline)
 
 
 

@@ -204,6 +204,7 @@ public class OutputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public String display() {
-    return "#<output-port ["+name+"]>";
+    if(isClosed()) return "#<output-port (closed) "+name+">";
+    return "#<output-port (open) "+name+">";
   }
 }

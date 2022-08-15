@@ -283,7 +283,7 @@ public class Thread extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public String display() {
-    return "#<thread " + thread.getName() + ">";
+    return "#<thread (id=" + thread.getId() + ") " + thread.getName() + ">";
   }
 
   public String write() {

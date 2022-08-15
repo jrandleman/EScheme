@@ -23,10 +23,10 @@
   "description": "Closes <port> if it hasn't been closed yet.",
   "example": null
 }, {
-  "name": "port-name",
+  "name": "port-path",
   "aliases": null,
-  "signatures": ["(port-name <port>)"],
-  "description": "Returns the <port>'s name as a string.",
+  "signatures": ["(port-path <port>)"],
+  "description": "Returns the <port>'s path as a string.",
   "example": null
 }, {
   "name": "port-position",

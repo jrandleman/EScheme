@@ -183,7 +183,7 @@ public class EscmObject extends MetaObject implements Callable {
   public String display() {
     String className = escmClass.name();
     if(className.length() == 0) return "#<object>";
-    return "#<object [class " + className + "]>";
+    return "#<object (class=" + className + ")>";
   }
 
   public String write() {

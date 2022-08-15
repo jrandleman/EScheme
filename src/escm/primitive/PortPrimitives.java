@@ -80,15 +80,15 @@ public class PortPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // port-name
-  public static class PortName implements Primitive {
+  // port-path
+  public static class PortPath implements Primitive {
     public java.lang.String escmName() {
-      return "port-name";
+      return "port-path";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Port))
-        throw new Exceptionf("'(port-name <port>) didn't receive 1 port: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(port-path <port>) didn't receive 1 port: %s", Exceptionf.profileArgs(parameters));
       return new escm.type.String(((Port)parameters.get(0)).sourceName());
     }
   }
