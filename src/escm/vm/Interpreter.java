@@ -12,10 +12,10 @@ import escm.type.number.Real;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.Callable;
-import escm.vm.type.Instruction;
+import escm.vm.util.Instruction;
 import escm.vm.util.ExecutionState;
-import escm.vm.type.Environment;
-import escm.vm.type.ObjectAccessChain;
+import escm.vm.util.Environment;
+import escm.vm.util.ObjectAccessChain;
 
 public class Interpreter {
   ////////////////////////////////////////////////////////////////////////////

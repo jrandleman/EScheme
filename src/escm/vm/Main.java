@@ -14,7 +14,7 @@ import escm.util.Pair;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.util.ExecutionState;
-import escm.vm.type.Environment;
+import escm.vm.util.Environment;
 import escm.vm.util.SourceInformation;
 import escm.vm.runtime.EscmCallStack;
 import escm.vm.runtime.EscmThread;

@@ -9,7 +9,7 @@ import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.number.Number;
 import escm.type.number.Exact;
-import escm.vm.type.Environment;
+import escm.vm.util.Environment;
 import escm.vm.runtime.installerGenerated.EscmPath;
 import escm.vm.runtime.installerGenerated.JavaStdLibLoader;
 import escm.vm.runtime.installerGenerated.EscmStdLibLoader;

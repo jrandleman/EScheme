@@ -50,7 +50,7 @@ public abstract class Procedure extends Datum implements Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Name binding (used by escm.vm.type.Environment)
+  // Name binding (used by escm.vm.util.Environment)
   public abstract Procedure loadWithName(java.lang.String name);
 
 

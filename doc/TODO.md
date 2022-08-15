@@ -3,16 +3,6 @@
 ## MORE
 
 
-- CONSIDER MOVING `ExecutionState.java` & `Instruction.java` TO BE IN `vm/util`
-
-
-
-
-
-
-
-
-
 - SUPPORT THE CREATION OF TEMPORARY FILE NAMES (THREAD-INDEPENDANT) !!!
 ```clj
 (temp-file-name) ; .escmtmp-SS-MM-HH-DD-MM-YY-THREAD_ID-COUNTER (registers in a container that gets auto-deleted upon end of the EScheme session)

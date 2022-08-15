@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import escm.type.Symbol;
 import escm.type.Boolean;
 import escm.type.oo.MetaObject;
-import escm.vm.type.Environment;
+import escm.vm.util.Environment;
 import escm.vm.util.SourceInformation;
 
 public class MethodProcedure extends CompoundProcedure {

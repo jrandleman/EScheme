@@ -1,11 +1,11 @@
-// Author: Jordan Randleman - escm.vm.type.Environment
+// Author: Jordan Randleman - escm.vm.util.Environment
 // Purpose:
 //    EScheme environment type used internally by the evaluator and EScheme procedures to
 //    represent variable bindings in a particular scope. Nested scopes are supported by 
 //    having each environment contain a pointer to its enclosing environment (the global 
 //    environment's "super" [enclosing] environment is <null>).
 
-package escm.vm.type;
+package escm.vm.util;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +17,8 @@ import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.procedure.Procedure;
 import escm.type.procedure.PrimitiveProcedure;
+import escm.vm.type.Primitive;
+import escm.vm.type.PrimitiveCallable;
 
 public class Environment {
   ////////////////////////////////////////////////////////////////////////////

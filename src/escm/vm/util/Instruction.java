@@ -1,8 +1,8 @@
-// Author: Jordan Randleman - escm.vm.type.Instruction
+// Author: Jordan Randleman - escm.vm.util.Instruction
 // Purpose:
 //    Class to denote an escm instruction.
 
-package escm.vm.type;
+package escm.vm.util;
 import escm.type.Datum;
 
 public class Instruction {

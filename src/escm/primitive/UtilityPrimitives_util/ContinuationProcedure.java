@@ -33,7 +33,7 @@ public class ContinuationProcedure extends Procedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Name binding (used by escm.vm.type.Environment)
+  // Name binding (used by escm.vm.util.Environment)
   private ContinuationProcedure(String name, SourceInformation invocationSource, Trampoline.Continuation continuation) {
     this.name = name;
     this.invocationSource = invocationSource;

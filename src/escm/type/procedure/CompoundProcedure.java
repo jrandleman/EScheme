@@ -35,9 +35,9 @@ import escm.type.Symbol;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.vm.Interpreter;
-import escm.vm.type.Instruction;
+import escm.vm.util.Instruction;
 import escm.vm.util.ExecutionState;
-import escm.vm.type.Environment;
+import escm.vm.util.Environment;
 import escm.vm.util.SourceInformation;
 import escm.vm.runtime.EscmCallStack;
 
@@ -94,7 +94,7 @@ public class CompoundProcedure extends Procedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Name binding (used by escm.vm.type.Environment)
+  // Name binding (used by escm.vm.util.Environment)
   public CompoundProcedure loadWithName(String name) {
     if(!this.name.equals(Procedure.DEFAULT_NAME)) return this;
     return new CompoundProcedure(name,invocationSource,state);

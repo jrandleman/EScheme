@@ -7,8 +7,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 import escm.type.Datum;
 import escm.type.Void;
-import escm.vm.type.Environment;
-import escm.vm.type.Instruction;
+import escm.vm.util.Environment;
 
 public class ExecutionState {
   ////////////////////////////////////////////////////////////////////////////

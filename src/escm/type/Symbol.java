@@ -13,7 +13,7 @@ import escm.vm.util.SourceInformation;
 public class Symbol extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Source Information 
-  //   * Used to print unknown variable locations by <escm.vm.type.Environment>
+  //   * Used to print unknown variable locations by <escm.vm.util.Environment>
   private SourceInformation source = null;
 
   public boolean hasSourceInformation() {

@@ -15,7 +15,7 @@ import escm.util.Trampoline;
 import escm.vm.Main;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
-import escm.vm.type.Environment;
+import escm.vm.util.Environment;
 import escm.vm.runtime.EscmThread;
 import escm.vm.runtime.GlobalState;
 

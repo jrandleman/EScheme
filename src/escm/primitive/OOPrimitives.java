@@ -23,7 +23,7 @@ import escm.util.Trampoline;
 import escm.vm.type.Primitive;
 import escm.vm.type.Callable;
 import escm.vm.type.PrimitiveCallable;
-import escm.vm.type.ObjectAccessChain;
+import escm.vm.util.ObjectAccessChain;
 
 public class OOPrimitives {
   ////////////////////////////////////////////////////////////////////////////

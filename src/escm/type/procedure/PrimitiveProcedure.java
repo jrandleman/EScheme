@@ -45,7 +45,7 @@ public class PrimitiveProcedure extends Procedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Name binding (used by escm.vm.type.Environment)
+  // Name binding (used by escm.vm.util.Environment)
   private PrimitiveProcedure(java.lang.String name, SourceInformation invocationSource, Callable prm) {
     this.name = name;
     this.invocationSource = invocationSource;

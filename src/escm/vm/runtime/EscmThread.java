@@ -15,7 +15,7 @@ import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.primitive.UtilityPrimitives;
-import escm.vm.type.Environment;
+import escm.vm.util.Environment;
 import escm.vm.util.SourceInformation;
 
 public abstract class EscmThread extends Thread {
