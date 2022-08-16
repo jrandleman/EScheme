@@ -3,6 +3,10 @@
 ## MORE
 
 
+
+
+
+
 - CONSIDER HAVING A PROTECTION AGAINST CYCLIC LOADS: A TRULY GLOBAL (NOT JUST THREAD-LOCAL) TRACKER OF ALL THE CURRENTLY "loaded" FILES 
   (ALL SUCCESSFUL ARGS FROM `load` & `load-from`)
 
@@ -40,7 +44,7 @@ IN DOCUMENTATION, NOTE:
 
 
 
-
+<!-- 
 ```clj
 (load-and-serialize <filename-path>) ; load the escm contents, then serialize the resulting bytecode as a Java object, and return such as a string
 (eval-serialized <serialized-string>) ; evaluates the serialized Java code representing an instruction set
@@ -67,7 +71,7 @@ IN DOCUMENTATION, NOTE:
                     - `(write-java-object <obj>)`
                     - `(read-java-object <string-or-input-port>)`
                     - `(run-and-serialize <file-name>)` ; COULD EVEN EXECUTE THIS IN A SANDBOXED ENVIRONMENT ???
-
+ -->
 
 
 

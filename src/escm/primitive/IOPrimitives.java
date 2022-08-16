@@ -14,6 +14,7 @@ import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
 import escm.type.port.Eof;
 import escm.util.Exceptionf;
+import escm.vm.Reader;
 import escm.vm.type.Primitive;
 import escm.vm.util.SourceInformation;
 import escm.vm.runtime.GlobalState;
@@ -310,7 +311,7 @@ public class IOPrimitives {
       escm.type.String str = (escm.type.String)parameters.get(0);
       String readString = str.value().trim();
       if(readString.length() == 0) return escm.type.Void.VALUE; // (read-string "") => <void>
-      escm.util.Pair<Datum,Integer> result = escm.vm.Reader.read(readString,createPseudoSourceInformation(str));
+      escm.util.Pair<Datum,Integer> result = Reader.read(readString,createPseudoSourceInformation(str),Reader.GIVE_DETAILED_INCOMPLETE_ERRORS);
       String restOfString = readString.substring(result.second).trim();
       return new escm.type.Pair(result.first,new escm.type.String(restOfString));
     }

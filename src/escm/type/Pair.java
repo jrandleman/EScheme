@@ -9,9 +9,16 @@ import escm.vm.util.ExecutionState;
 
 public class Pair extends Datum {
   ////////////////////////////////////////////////////////////////////////////
-  // Private Car/Cdr Fields
+  // Value returned by <length> for dotted lists
+  public static final int DOTTED_LIST_LENGTH = -1;
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Private Car/Cdr & Length Fields
   private Datum car;
   private Datum cdr;
+
+  private int length;
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -30,6 +37,14 @@ public class Pair extends Datum {
   public Pair(Datum car, Datum cdr) {
     this.car = car;
     this.cdr = cdr;
+    if(cdr instanceof Pair) {
+      this.length = ((Pair)cdr).length;
+      if(this.length != DOTTED_LIST_LENGTH) ++this.length;
+    } else if(cdr instanceof Nil) {
+      this.length = 1;
+    } else {
+      this.length = DOTTED_LIST_LENGTH;
+    }
   }
 
 
@@ -44,13 +59,20 @@ public class Pair extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Static List Predicate
+  // Static List Predicates
   public static boolean isList(Datum d) {
-    if(d instanceof Nil) return true;
-    if(!(d instanceof Pair)) return false;
-    Datum iterator = d;
-    while(iterator instanceof Pair) iterator = ((Pair)iterator).cdr;
-    return iterator instanceof Nil;
+    return d instanceof Nil || (d instanceof Pair && ((Pair)d).length != DOTTED_LIST_LENGTH);
+  }
+
+  public static boolean isDottedList(Datum d) {
+    return d instanceof Pair && ((Pair)d).length == DOTTED_LIST_LENGTH;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Length Getter (returns <Pair.DOTTED_LIST_LENGTH> for dotted-lists)
+  public int length() {
+    return length;
   }
 
 

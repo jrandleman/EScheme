@@ -254,7 +254,7 @@ public class InputPort extends Port {
         }
         if(input.length() == 0) continue;
         sb.append(input);
-        escm.util.Pair<Datum,Integer> result = Reader.read(sb.toString(),replDatumSourceStart.clone());
+        escm.util.Pair<Datum,Integer> result = Reader.read(sb.toString(),replDatumSourceStart.clone(),Reader.GIVE_EMPTY_INCOMPLETE_ERRORS);
         GlobalState.setLastPrintedANewline(true); // from the newline input by the user's <enter>/<return> key stroke
         if(result.first instanceof Eof) return null; // only reading #eof is equivalent to typing ^D
         return result.first;
@@ -377,7 +377,7 @@ public class InputPort extends Port {
               input = pr.read();
             }
             if(input == -1) {
-              throw new Exceptionf("READ ERROR (for %s): Unterminating string literal detected!\n>> Location: %s", write(), name, stringStartLine, stringStartColumn);
+              throw new Exceptionf("READ ERROR (for %s): Unterminating string literal detected!\n>> Location: %s", write(), getPositionString());
             }
             if(containerStack.empty()) break;
           // account for reader shorthands
@@ -412,7 +412,7 @@ public class InputPort extends Port {
           }
           if(c != -1) updatePortPosition(c);
         }
-        escm.util.Pair<Datum,Integer> result = Reader.read(sb.toString(),datumSourceStart.clone());
+        escm.util.Pair<Datum,Integer> result = Reader.read(sb.toString(),datumSourceStart.clone(),Reader.GIVE_EMPTY_INCOMPLETE_ERRORS);
         if(isStdin()) GlobalState.setLastPrintedANewline(true); // from the newline input by the user's <enter>/<return> key stroke
         if(result.first instanceof Eof) return null; // only reading #eof is equivalent to typing ^D
         return result.first;

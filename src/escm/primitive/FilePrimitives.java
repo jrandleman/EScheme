@@ -12,6 +12,7 @@ import java.io.File;
 import escm.type.Datum;
 import escm.type.Boolean;
 import escm.util.Exceptionf;
+import escm.vm.Reader;
 import escm.vm.type.Primitive;
 import escm.vm.util.SourceInformation;
 
@@ -45,12 +46,12 @@ public class FilePrimitives {
       buffer = buffer.stripTrailing();
       if(buffer.length() == 0) return contents;
       Integer n = buffer.length();
-      escm.util.Pair<Datum,Integer> result = escm.vm.Reader.nullableRead(buffer,source);
+      escm.util.Pair<Datum,Integer> result = Reader.nullableRead(buffer,source,Reader.GIVE_DETAILED_INCOMPLETE_ERRORS);
       if(result.first != null) contents.add(result.first);
       buffer = buffer.substring(result.second);
       while(result.second != n && buffer.length() > 0) {
         n = buffer.length();
-        result = escm.vm.Reader.nullableRead(buffer,source);
+        result = Reader.nullableRead(buffer,source,Reader.GIVE_DETAILED_INCOMPLETE_ERRORS);
         if(result.first != null) contents.add(result.first);
         buffer = buffer.substring(result.second);
       }

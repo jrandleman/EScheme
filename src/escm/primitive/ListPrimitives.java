@@ -98,13 +98,9 @@ public class ListPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !Pair.isList(parameters.get(0))) 
         throw new Exceptionf("'(length <list>) didn't receive exactly 1 list: %s", Exceptionf.profileArgs(parameters));
-      int count = 0;
-      Datum iterator = parameters.get(0);
-      while(iterator instanceof Pair) {
-        ++count;
-        iterator = ((Pair)iterator).cdr();
-      }
-      return new Exact(count);
+      Datum lis = parameters.get(0);
+      if(lis instanceof Nil) return new Exact(); // 0
+      return new Exact(((Pair)lis).length());
     }
   }
 
@@ -367,11 +363,9 @@ public class ListPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1) throw new Exceptionf("'(list*? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      Datum iterator = parameters.get(0);
-      if(!(iterator instanceof Pair)) return Boolean.FALSE;
-      while(iterator instanceof Pair) iterator = ((Pair)iterator).cdr();
-      return Boolean.valueOf(!(iterator instanceof Nil));
+      if(parameters.size() != 1) 
+        throw new Exceptionf("'(list*? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(Pair.isDottedList(parameters.get(0)));
     }
   }
 
