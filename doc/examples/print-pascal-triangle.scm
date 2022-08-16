@@ -17,6 +17,6 @@
 (define (print-pascal-triangle n)
   (for-each (lambda (r) (write r) (newline)) (get-pascal-triangle n)))
 
-(define n (if (null? *argv*) 20 (string->number (car *argv*))))
+(define n (if (= (length *argv*) 1) 20 (string->number (car *argv*))))
 
 (print-pascal-triangle n) ; Prints "n" layers of Pascal's triangle
