@@ -7,8 +7,8 @@
 }, {
   "name": "open-output-file",
   "aliases": null,
-  "signatures": ["(open-output-file <filename-string>)"],
-  "description": "Returns an output-port file handle to write to <filename-string>.\nIf <filename-string> exists, it is cleared.",
+  "signatures": ["(open-output-file)", "(open-output-file <filename-string>)"],
+  "description": "Returns an output-port file handle to write to <filename-string>.\nIf <filename-string> exists, it is cleared.\n\nIf <filename-string> isn't given, generates a temporary file.\nAccess a temporary file's path via <port-path>.\nTemporary files are automatically deleted upon exit by the VM.",
   "example": null
 }, {
   "name": "open-output-file+",
@@ -51,6 +51,12 @@
   "aliases": null,
   "signatures": ["(output-port? <obj>)"],
   "description": "Returns whether <obj> is an output-port.",
+  "example": null
+}, {
+  "name": "temp-port?",
+  "aliases": null,
+  "signatures": ["(temp-port? <obj>)"],
+  "description": "Returns whether <obj> is a port pointing to a temporary file.\nAccess a temporary file's path via <port-path>.\nTemporary files are automatically deleted upon exit by the VM.",
   "example": null
 }, {
   "name": "open-port?",

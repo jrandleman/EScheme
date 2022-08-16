@@ -97,7 +97,7 @@
 }, {
   "name": "subvector",
   "aliases": null,
-  "signatures": ["(subvector <vector> <index> <optional-length>)"],
+  "signatures": ["(subvector <vector> <index>)", "(subvector <vector> <index> <length>)"],
   "description": "Returns a vector of the items in <vector> starting at <index> spanning <length>\nitems. Note that <length> will default to the end of <vector>.",
   "example": null
 }, {

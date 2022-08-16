@@ -213,7 +213,7 @@
 ## Ports:
 ```scheme
 (open-input-file <filename-string>)
-(open-output-file <filename-string>)
+(open-output-file <optional-filename-string>) ; nullary call creates a "temporary file"!
 (open-output-file+ <filename-string>)
 
 (close-port! <port>)
@@ -224,6 +224,7 @@
 (port? <obj>)
 (input-port? <obj>)
 (output-port? <obj>)
+(temp-port? <obj>) ; check if port handles a "temporary file"!
 
 (open-port? <port>)
 (closed-port? <port>)

@@ -28,6 +28,7 @@ import java.util.Stack;
 import java.io.PushbackReader;
 import java.io.InputStreamReader;
 import java.io.FileReader;
+import java.io.File;
 import escm.util.Exceptionf;
 import escm.type.Datum;
 import escm.vm.Reader;
@@ -38,7 +39,7 @@ import escm.primitive.FilePrimitives;
 
 public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
-  // Internal reader value
+  // Internal Reader Value
   private PushbackReader pr = null;
 
 

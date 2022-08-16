@@ -8,6 +8,8 @@
 //      - void close()
 //      - boolean isClosed()
 //      - boolean isOpen()
+//
+//      - boolean isTemporary()
 
 package escm.type.port;
 import escm.type.Datum;
@@ -32,6 +34,18 @@ public abstract class Port extends Datum {
 
   public boolean isOpen() {
     return isClosed() == false;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Temporary File Predicate
+  public static final String TEMP_FILE_PREFIX = "escm-tmp-pfx-";
+
+  public static final String TEMP_FILE_SUFFIX = "-escm-tmp-sfx";
+
+  public boolean isTemporary() {
+    String path = sourceName();
+    return path.endsWith(TEMP_FILE_SUFFIX) && path.contains(TEMP_FILE_PREFIX);
   }
 
 

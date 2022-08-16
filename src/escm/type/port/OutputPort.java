@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.io.Writer;
 import java.io.OutputStreamWriter;
 import java.io.FileWriter;
+import java.io.File;
 import escm.util.Exceptionf;
 import escm.util.StringParser;
 import escm.type.Datum;
@@ -34,7 +35,7 @@ import escm.primitive.FilePrimitives;
 
 public class OutputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
-  // Internal reader value
+  // Internal Reader Value
   private Writer writer = null;
 
 
@@ -50,13 +51,13 @@ public class OutputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Static STDIN field
-  private OutputPort() {
+  private OutputPort(int ignore) {
     writer = new OutputStreamWriter(System.out);
     name = "System.out";
   }
 
 
-  public static final OutputPort STDOUT = new OutputPort();
+  public static final OutputPort STDOUT = new OutputPort(0);
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -78,6 +79,17 @@ public class OutputPort extends Port {
       name = FilePrimitives.AbsolutePath.logic(filename);
     } catch(Exception e) {
       throw new Exceptionf("Can't open port \"%s\" for output: %s", filename, e);
+    }
+  }
+
+  public OutputPort() throws Exception {
+    try {
+      File tempFile = File.createTempFile(Port.TEMP_FILE_PREFIX,Port.TEMP_FILE_SUFFIX);
+      tempFile.deleteOnExit();
+      writer = new FileWriter(tempFile);
+      name = tempFile.getAbsolutePath();
+    } catch(Exception e) {
+      throw new Exceptionf("Can't open temp-port for output: %s", e);
     }
   }
 

@@ -41,8 +41,10 @@ public class PortPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String))
-        throw new Exceptionf("'(open-output-file <filename-string>) didn't receive 1 string: %s", Exceptionf.profileArgs(parameters));
+      int n = parameters.size();
+      if(n == 0) return new OutputPort();
+      if(n != 1 || !(parameters.get(0) instanceof escm.type.String))
+        throw new Exceptionf("'(open-output-file <optional-filename-string>) didn't receive no-args or 1 string: %s", Exceptionf.profileArgs(parameters));
       return new OutputPort(((escm.type.String)parameters.get(0)).value(),false);
     }
   }
@@ -151,6 +153,21 @@ public class PortPrimitives {
       if(parameters.size() != 1)
         throw new Exceptionf("'(output-port? <obj>) didn't receive 1 arg: %s", Exceptionf.profileArgs(parameters));
       return Boolean.valueOf(parameters.get(0) instanceof OutputPort);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // temp-port?
+  public static class TempPortP implements Primitive {
+    public java.lang.String escmName() {
+      return "temp-port?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1)
+        throw new Exceptionf("'(temp-port? <obj>) didn't receive 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(parameters.get(0) instanceof Port && ((Port)parameters.get(0)).isTemporary());
     }
   }
 
