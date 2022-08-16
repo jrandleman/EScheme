@@ -18,8 +18,7 @@
 (display C2)
 (newline)
 
-(display o2)
-(newline)
+(o2.print-msg)
 
 
 

@@ -68,9 +68,11 @@ public class ListPrimitives {
     }
 
     public static Datum binaryAppend(Datum lis1, Datum lis2) throws Exception {
-      if(lis1 instanceof Nil) return lis2; // immutable pairs means we don't need a shallow-copy of <lis2>!
-      Pair lis1Pair = (Pair)lis1;
-      return new Pair(lis1Pair.car(),binaryAppend(lis1Pair.cdr(),lis2));
+      if(lis1 instanceof Pair) {
+        Pair lis1Pair = (Pair)lis1;
+        return new Pair(lis1Pair.car(),binaryAppend(lis1Pair.cdr(),lis2));
+      }
+      return lis2; // immutable pairs means we don't need a shallow-copy of <lis2>!
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -449,7 +451,7 @@ public class ListPrimitives {
     }
     
     public static ArrayList<Datum> getCars(ArrayList<Datum> ls, String callerName) throws Exception {
-      ArrayList<Datum> cars = new ArrayList<Datum>();
+      ArrayList<Datum> cars = new ArrayList<Datum>(ls.size());
       for(Datum l : ls) {
         if(!(l instanceof Pair))
           throw new Exceptionf("'%s can't get the <car> of non-pair %s", callerName, l.profile());
@@ -459,7 +461,7 @@ public class ListPrimitives {
     }
 
     public static ArrayList<Datum> getCdrs(ArrayList<Datum> ls, String callerName) throws Exception {
-      ArrayList<Datum> cdrs = new ArrayList<Datum>();
+      ArrayList<Datum> cdrs = new ArrayList<Datum>(ls.size());
       for(Datum l : ls) {
         if(!(l instanceof Pair))
           throw new Exceptionf("'%s can't get the <cdr> of non-pair %s", callerName, l.profile());
@@ -529,7 +531,7 @@ public class ListPrimitives {
     
     public static Trampoline.Bounce logic(Callable p, Datum seed, ArrayList<Datum> ls, Trampoline.Continuation continuation) throws Exception {
       if(!(ls.get(0) instanceof Pair)) return continuation.run(seed);
-      ArrayList<Datum> args = new ArrayList<Datum>();
+      ArrayList<Datum> args = new ArrayList<Datum>(ls.size()+1);
       args.add(seed);
       args.addAll(Map.getCars(ls,"fold"));
       return p.callWith(args,
