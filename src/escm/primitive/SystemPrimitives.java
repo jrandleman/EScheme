@@ -10,6 +10,7 @@ import java.io.File;
 import escm.type.Datum;
 import escm.type.number.Real;
 import escm.type.number.Exact;
+import escm.type.Void;
 import escm.util.Pair;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
@@ -22,6 +23,7 @@ import escm.vm.type.PrimitiveCallable;
 import escm.vm.util.SourceInformation;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.EscmCallStack;
+import escm.vm.runtime.EscmThread;
 
 public class SystemPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -67,7 +69,7 @@ public class SystemPrimitives {
         System.out.println(getExitMessage());
       }
       System.exit(code);
-      return escm.type.Void.VALUE; // never triggered
+      return Void.VALUE; // never triggered
     }
   }
 
@@ -81,14 +83,14 @@ public class SystemPrimitives {
 
     public static Trampoline.Bounce evalEachExpression(Environment env, ArrayList<Datum> exprs, int i, Stack<Pair<String,SourceInformation>> originalCallStack, Trampoline.Continuation continuation) throws Exception {
       int n = exprs.size();
-      if(i >= n) return continuation.run(escm.type.Void.VALUE);
+      if(i >= n) return continuation.run(Void.VALUE);
       Trampoline.Continuation nextContinuation;
       if(i+1 == n) {
         nextContinuation = continuation;
       } else {
         nextContinuation = (value) -> () -> {
           EscmCallStack.restore(originalCallStack); // residue frames may reside after call/cc nonsense
-          if(value instanceof escm.type.port.Eof) return continuation.run(escm.type.Void.VALUE);
+          if(value instanceof escm.type.port.Eof) return continuation.run(Void.VALUE);
           return evalEachExpression(env,exprs,i+1,originalCallStack,continuation);
         };
       }
@@ -134,8 +136,62 @@ public class SystemPrimitives {
         throw new Exceptionf("'(load-from <directory> <filename>) 1st arg isn't a string: %s", Exceptionf.profileArgs(parameters));
       if(!(file instanceof escm.type.String))
         throw new Exceptionf("'(load-from <directory> <filename>) 2nd arg isn't a string: %s", Exceptionf.profileArgs(parameters));
-      String path = getPath(((escm.type.String)directory).value(),((escm.type.String)file).value());
-      return Load.loadFileInEnvironment("load-from",GlobalState.globalEnvironment,path,continuation);
+      String filePath = getPath(((escm.type.String)directory).value(),((escm.type.String)file).value());
+      return Load.loadFileInEnvironment("load-from",GlobalState.globalEnvironment,filePath,continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // load-once
+  public static class LoadOnce implements PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "load-once";
+    }
+
+    public static void registerLoadedFile(String filePath) {
+      ((EscmThread)java.lang.Thread.currentThread()).loadedOnceFiles.add(filePath);
+    }
+
+    public static boolean notLoadedYet(String filePath) {
+      return ((EscmThread)java.lang.Thread.currentThread()).loadedOnceFiles.contains(filePath) == false;
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
+        throw new Exceptionf("'(load-once <filename>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
+      String filePath = FilePrimitives.AbsolutePath.logic(((escm.type.String)parameters.get(0)).value());
+      if(notLoadedYet(filePath)) {
+        registerLoadedFile(filePath);
+        return Load.loadFileInEnvironment("load-once",GlobalState.globalEnvironment,filePath,continuation);
+      }
+      return continuation.run(Void.VALUE);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // load-once-from
+  public static class LoadOnceFrom implements PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "load-once-from";
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 2) 
+        throw new Exceptionf("'(load-once-from <directory> <filename>) didn't receive exactly 2 strings: %s", Exceptionf.profileArgs(parameters));
+      Datum directory = parameters.get(0);
+      Datum file = parameters.get(1);
+      if(!(directory instanceof escm.type.String))
+        throw new Exceptionf("'(load-once-from <directory> <filename>) 1st arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+      if(!(file instanceof escm.type.String))
+        throw new Exceptionf("'(load-once-from <directory> <filename>) 2nd arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+      String filePath = LoadFrom.getPath(((escm.type.String)directory).value(),((escm.type.String)file).value());
+      if(LoadOnce.notLoadedYet(filePath)) {
+        LoadOnce.registerLoadedFile(filePath);
+        return Load.loadFileInEnvironment("load-once-from",GlobalState.globalEnvironment,filePath,continuation);
+      }
+      return continuation.run(Void.VALUE);
     }
   }
 

@@ -5,20 +5,6 @@
 
 
 
-
-- CONSIDER HAVING A PROTECTION AGAINST CYCLIC LOADS: A TRULY GLOBAL (NOT JUST THREAD-LOCAL) TRACKER OF ALL THE CURRENTLY "loaded" FILES 
-  (ALL SUCCESSFUL ARGS FROM `load` & `load-from`)
-
-  -> THEN HAVE AN EXTRA ARG TO `LOAD` (OR A NEW PRIMTIVE) THAT ACCOUNTS FOR "TRUE LOADING" (LOAD NO MATTER WHAT) ___VS.___ "SAFE LOADING" (ONLY LOADING IF NOT LOADED YET)
-
-
-
-
-
-
-
-
-
 <!-- 
 ```clj
 (load-and-serialize <filename-path>) ; load the escm contents, then serialize the resulting bytecode as a Java object, and return such as a string
