@@ -123,7 +123,7 @@ public class Main {
     sb.append("    __\\      {   '-.|.'--~'`}\"    _/` \\       N |-----------------/ /=======================\\ \\-----------------| E\n");
     sb.append("    \\    .=\"` }.-~\"'u'- '-..'  __/\\__, \\\n");
     sb.append("   _/  .\"    {  -'.~('-_,.'\\_,/ \\_ , \\_ \\               Copyright (c) Jordan Candide Randleman 2021-2022\n");
-    sb.append("  /  .\"    _/'`--; ;  `  ;        \\. ,\\_ \\                        Eerina's Scheme: Version 7.0\n");
+    sb.append(String.format("  /  .\"    _/'`--; ;  `  ;        \\. ,\\_ \\                        Eerina's Scheme: Version %.1f\n",SystemPrimitives.VERSION));
     sb.append(" /..=\"  _/'      `-..__-'           \\. ,\\ \\                   Type (help) for Help, (exit) to Exit \n");
     sb.append("|;____/'                              \\.,`\\`\n");
     sb.append("                                        \\.,\\\n");
