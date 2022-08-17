@@ -5,6 +5,19 @@
 
 
 
+
+- CHANGE MOSQUE/COPYRIGHT IN ASCII ART TO BE SHIFTED DOWN BY 1 LINE
+
+
+
+
+
+
+
+
+`SEE T.java ON DESKTOP & REMEMBER TO FIX BOOLEAN TO NOTE CHECK COMPARISON TO POINTER DIRECTLY, RATHER CHECK RELATIVE TO TYPE (VERIFY NOT DOING THIS ANYWHERE ELSE BEYOND BOOLEAN)`
+
+
 <!-- 
 ```clj
 (load-and-serialize <filename-path>) ; load the escm contents, then serialize the resulting bytecode as a Java object, and return such as a string
