@@ -6,9 +6,10 @@
 //    requires the extension of this contract!
 
 package escm.type;
+import java.io.Serializable;
 import escm.vm.util.ExecutionState;
 
-public abstract class Datum {
+public abstract class Datum implements Serializable {
   ////////////////////////////////////////////////////////////////////////////
   // Type
   public abstract java.lang.String type();

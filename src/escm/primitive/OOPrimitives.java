@@ -13,7 +13,7 @@ import escm.type.oo.EscmClass;
 import escm.type.oo.EscmObject;
 import escm.type.Symbol;
 import escm.type.Keyword;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.type.procedure.CompoundProcedure;
 import escm.type.Void;
 import escm.type.Nil;

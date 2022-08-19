@@ -171,7 +171,7 @@ public class MetaPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol))
         throw new Exceptionf("'(delete-syntax! <macro-name>) didn't receive exactly 1 symbol: %s", Exceptionf.profileArgs(parameters));
-      return escm.type.Boolean.valueOf(Compiler.MACRO_REGISTRY.remove(((Symbol)parameters.get(0)).value()) != null);
+      return escm.type.bool.Boolean.valueOf(Compiler.MACRO_REGISTRY.remove(((Symbol)parameters.get(0)).value()) != null);
     }
   }
 
@@ -186,7 +186,7 @@ public class MetaPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol))
         throw new Exceptionf("'(syntax? <macro-name>) didn't receive exactly 1 symbol: %s", Exceptionf.profileArgs(parameters));
-      return escm.type.Boolean.valueOf(Compiler.MACRO_REGISTRY.containsKey(((Symbol)parameters.get(0)).value()));
+      return escm.type.bool.Boolean.valueOf(Compiler.MACRO_REGISTRY.containsKey(((Symbol)parameters.get(0)).value()));
     }
   }
 }

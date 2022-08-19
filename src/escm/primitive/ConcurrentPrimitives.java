@@ -6,7 +6,7 @@ package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Symbol;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.type.Void;
 import escm.type.number.Real;
 import escm.type.number.Exact;
@@ -152,7 +152,7 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.concurrent.Thread) || !(parameters.get(1) instanceof Boolean))
         throw new Exceptionf("'(thread-set-daemon! <thread> <status>) didn't receive exactly 1 thread & 1 boolean: %s", Exceptionf.profileArgs(parameters));
-      ((escm.type.concurrent.Thread)parameters.get(0)).setDaemon(((Boolean)parameters.get(1)) == Boolean.TRUE);
+      ((escm.type.concurrent.Thread)parameters.get(0)).setDaemon(parameters.get(1).isTruthy());
       return Void.VALUE;
     }
   }

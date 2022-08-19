@@ -9,7 +9,7 @@ import escm.util.Trampoline;
 import escm.util.Exceptionf;
 import escm.type.Datum;
 import escm.type.Symbol;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.vm.Main;
 import escm.vm.type.Callable;
@@ -265,7 +265,7 @@ public class Thread extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Equality
   public boolean eq(Object o) {
-    return o instanceof Thread && ((Thread)o) == this;
+    return o instanceof Thread && ((Thread)o).thread == this.thread;
   }
 
   public boolean equal(Object o) {

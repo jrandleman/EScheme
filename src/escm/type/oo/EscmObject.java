@@ -112,7 +112,7 @@ public class EscmObject extends MetaObject implements Callable {
   // Instance of Interface or Class
   private boolean interfaceImplementsInterface(EscmInterface i1, EscmInterface i2) {
     for(EscmInterface iface : i1.getEscmInterfaces()) {
-      if(iface == i2 || interfaceImplementsInterface(iface,i2)) return true;
+      if(iface.eq(i2) || interfaceImplementsInterface(iface,i2)) return true;
     }
     return false;
   }

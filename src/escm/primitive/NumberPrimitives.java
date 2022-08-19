@@ -6,7 +6,7 @@ package escm.primitive;
 import java.util.ArrayList;
 import java.util.Random;
 import escm.type.Datum;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.type.number.Number;
 import escm.type.number.Real;
 import escm.type.number.Exact;

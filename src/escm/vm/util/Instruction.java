@@ -3,9 +3,10 @@
 //    Class to denote an escm instruction.
 
 package escm.vm.util;
+import java.io.Serializable;
 import escm.type.Datum;
 
-public class Instruction {
+public class Instruction implements Serializable {
   ////////////////////////////////////////////////////////////////////////////
   // Static Instruction Constants
   public static final int DEFINE      = 0;

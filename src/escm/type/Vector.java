@@ -39,6 +39,7 @@ package escm.type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
+import escm.type.bool.Boolean;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.number.Exact;

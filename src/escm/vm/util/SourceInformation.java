@@ -4,8 +4,9 @@
 //    to be held by the read escm.type.Symbol
 
 package escm.vm.util;
+import java.io.Serializable;
 
-public class SourceInformation {
+public class SourceInformation implements Serializable {
   ////////////////////////////////////////////////////////////////////////////
   // Private Fields
   private String fileName = null;

@@ -28,6 +28,7 @@
 
 package escm.type.procedure;
 import java.util.ArrayList;
+import java.io.Serializable;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.Datum;
@@ -44,7 +45,7 @@ import escm.vm.runtime.EscmCallStack;
 public class CompoundProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
   // Internal compound procedure fields
-  protected static class CompileTime {
+  protected static class CompileTime implements Serializable {
     public ArrayList<ArrayList<Symbol>> parametersList;
     public ArrayList<Symbol> variadicParameterList; // <null> indicates non-variadic
     public ArrayList<ArrayList<Instruction>> bodyList;
@@ -55,7 +56,7 @@ public class CompoundProcedure extends Procedure {
     }
   };
 
-  protected static class State {
+  protected static class State implements Serializable {
     public Environment definitionEnvironment;
     public CompileTime compileTime;
     public State(CompileTime compileTime) {

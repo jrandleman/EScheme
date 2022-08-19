@@ -8,7 +8,7 @@ import java.util.Collections;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.type.procedure.Procedure;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.type.oo.EscmObject;

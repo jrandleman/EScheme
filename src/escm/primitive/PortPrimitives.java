@@ -10,7 +10,7 @@ import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
 import escm.type.number.Exact;
 import escm.type.Void;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.Callable;

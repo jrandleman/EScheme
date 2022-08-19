@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
 import escm.type.port.Eof;

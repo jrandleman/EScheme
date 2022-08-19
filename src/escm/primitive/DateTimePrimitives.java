@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import escm.type.Datum;
 import escm.type.Pair;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.type.number.Exact;
 import escm.util.Exceptionf;
 import escm.vm.type.Primitive;

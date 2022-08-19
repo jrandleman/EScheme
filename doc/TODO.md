@@ -9,12 +9,7 @@
 `SEE T.java ON DESKTOP & REMEMBER TO FIX BOOLEAN TO NOTE CHECK COMPARISON TO POINTER DIRECTLY, RATHER CHECK RELATIVE TO TYPE (VERIFY NOT DOING THIS ANYWHERE ELSE BEYOND BOOLEAN)`
 
 
-<!-- 
-```clj
-(load-and-serialize <filename-path>) ; load the escm contents, then serialize the resulting bytecode as a Java object, and return such as a string
-(eval-serialized <serialized-string>) ; evaluates the serialized Java code representing an instruction set
-(load-serialized <filename-path>) ; load & eval <filename-path> containing serialized Java code (representing an instruction set)
-```
+<!--
 
 - IMPROVE BOOT TIME VIA SERIALIZATION ???
 
@@ -37,6 +32,87 @@
                     - `(read-java-object <string-or-input-port>)`
                     - `(run-and-serialize <file-name>)` ; COULD EVEN EXECUTE THIS IN A SANDBOXED ENVIRONMENT ???
  -->
+
+
+
+
+
+- PUT A NOTE @ TOP OF `stdlib.scm` EXPLAINING THE `stdlib.ser` SITUATION, AND THAT A FULL REINSTALL 
+  __OR__ CALLING `escm --serialize-stdlib` IS REQUIRED FOR CHANGES TO `stdlib.scm` TO TAKE EFFECT ON THE ESCHEME RUNTIME !!!
+
+
+
+
+- INSTALLER: After compiling EScheme, 
+  * DELETE `bin/stdlib.ser` IF PRESENT
+  * EXECUTE `escm --serialize-stdlib` TO HAVE AN INTERNAL FCN W/IN ESCHEME GET TRIGGERED TO WRITE THE PRE-COMPILED VERSION OF STDLIB TO `bin/stdlib.ser`
+  * EXTEND INSTALLER TO HAVE FLAG: `-i`, `--interpreted-stdlib`
+    => DISABLES PRE-SERIALIZATION OF `src/stdlib.scm` AND HAS ESCHEME JUST INTERPRET IT AS A REGULAR ESCM FILE !
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- ADDRESS BUG: (ACCESSING NON-EXISTENT `*argv*` FIELD)
+
+```
+ESCM ERROR: f != java.lang.Integer
+>> Escm Call Stack: ref (file="/Users/katiarandleman/Documents/JordanStuff/EScheme/rename.scm", line=3, column=17)
+>> Java Throwable: java.util.IllegalFormatConversionException
+>> Java Call Stack: java.base/java.util.Formatter$FormatSpecifier.failConversion(Formatter.java:4442)
+                    java.base/java.util.Formatter$FormatSpecifier.printFloat(Formatter.java:2976)
+                    java.base/java.util.Formatter$FormatSpecifier.print(Formatter.java:2924)
+                    java.base/java.util.Formatter.format(Formatter.java:2689)
+                    java.base/java.util.Formatter.format(Formatter.java:2625)
+                    java.base/java.lang.String.format(String.java:4143)
+                    escm.util.Exceptionf.<init>(Exceptionf.java:29)
+                    escm.primitive.ListPrimitives$Ref.callWith(ListPrimitives.java:196)
+                    escm.type.procedure.PrimitiveProcedure$1.callWith(PrimitiveProcedure.java:34)
+                    escm.type.procedure.PrimitiveProcedure.lambda$callWith$2(PrimitiveProcedure.java:85)
+                    escm.util.Trampoline.resolve(Trampoline.java:77)
+                    escm.vm.Main.launchScript(Main.java:198)
+                    escm.vm.Main.lambda$launchESchemeSession$6(Main.java:273)
+                    escm.type.procedure.PrimitiveProcedure.lambda$callWith$2(PrimitiveProcedure.java:85)
+                    escm.util.Trampoline.resolve(Trampoline.java:77)
+                    escm.type.concurrent.Thread$1.run(Thread.java:144)
+[Finished in 679ms]
+```
+
+
+
+
+
+
+
+- MAKE SURE ALL "Stream" INSTANCES ARE PROPERLY CLOSED IN JAVA
+  * MAKE SURE MOVE AS MANY "CLOSE" OPERATIONS AS POSSIBLE PRIOR THROWING ERRORS FOR FILES!
+
 
 
 

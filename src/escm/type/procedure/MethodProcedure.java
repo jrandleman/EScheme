@@ -5,7 +5,7 @@
 package escm.type.procedure;
 import java.util.ArrayList;
 import escm.type.Symbol;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.type.oo.MetaObject;
 import escm.vm.util.Environment;
 import escm.vm.util.SourceInformation;

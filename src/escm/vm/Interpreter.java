@@ -91,9 +91,9 @@ public class Interpreter {
         // (defined? <symbol>)
         case Instruction.DEFINEDP: {
           if(instruction.argument instanceof escm.type.Symbol) {
-            state.cvr = escm.type.Boolean.valueOf(state.env.has((escm.type.Symbol)instruction.argument));
+            state.cvr = escm.type.bool.Boolean.valueOf(state.env.has((escm.type.Symbol)instruction.argument));
           } else { // instruction.argument instanceof ObjectAccessChain
-            state.cvr = escm.type.Boolean.valueOf(((ObjectAccessChain)instruction.argument).has(state));
+            state.cvr = escm.type.bool.Boolean.valueOf(((ObjectAccessChain)instruction.argument).has(state));
           }
           ++state.cii;
           break;

@@ -321,10 +321,10 @@ public class Reader {
   private static Pair<Datum,Integer> parseBooleanLiteral(CharSequence sourceCode, int i, SourceInformation source) {
     if(sourceCode.charAt(i+1) == 't') {
       source.updatePosition("#t");
-      return new Pair<Datum,Integer>(escm.type.Boolean.TRUE,i+2);
+      return new Pair<Datum,Integer>(escm.type.bool.Boolean.TRUE,i+2);
     }
     source.updatePosition("#f");
-    return new Pair<Datum,Integer>(escm.type.Boolean.FALSE,i+2);
+    return new Pair<Datum,Integer>(escm.type.bool.Boolean.FALSE,i+2);
   }
 
 

@@ -1,22 +1,18 @@
-// Author: Jordan Randleman - escm.type.Boolean
+// Author: Jordan Randleman - escm.type.bool.Boolean
 // Purpose:
-//    Boolean primitive type.
+//    Abstract boolean primitive type.
 
-package escm.type;
+package escm.type.bool;
 import java.util.Objects;
+import escm.type.Datum;
 import escm.vm.util.ExecutionState;
 
-public class Boolean extends Datum {
+public abstract class Boolean extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Static T/F Constants
-  public static final Boolean TRUE = new Boolean();
+  public static final TrueBoolean TRUE = new TrueBoolean();
   
-  public static final Boolean FALSE = new Boolean();
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Private Constructor (use <valueOf()>)
-  private Boolean() {}
+  public static final FalseBoolean FALSE = new FalseBoolean();
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -37,14 +33,15 @@ public class Boolean extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Truthiness
   public boolean isTruthy() {
-    return this == TRUE;
+    return this instanceof TrueBoolean;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Equality
   public boolean eq(Object o) {
-    return o instanceof Boolean && ((Boolean)o) == this;
+    if(isTruthy()) return o instanceof TrueBoolean;
+    return o instanceof FalseBoolean;
   }
 
   public boolean equal(Object o) {
@@ -55,14 +52,14 @@ public class Boolean extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
-    return Objects.hash(type(),this == TRUE);
+    return Objects.hash(type(),isTruthy());
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public java.lang.String display() {
-    if(this == TRUE) return "#t";
+    if(isTruthy()) return "#t";
     return "#f";
   }
 

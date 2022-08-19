@@ -29,8 +29,8 @@
   "description": "Forces an expression delayed by the <delay> macro to be evaluated.",
   "example": null
 }, {
-  "name": "call-with-current-continuation",
-  "aliases": ["call/cc"],
+  "name": "call/cc",
+  "aliases": ["call-with-current-continuation"],
   "signatures": ["(call-with-current-continuation <unary-callable>)"],
   "description": "Calls <unary-callable> with the current continuation as its argument.\nAliased by <call/cc>.",
   "example": null
@@ -75,5 +75,17 @@
   "aliases": null,
   "signatures": ["(time <callable> <arg> ...)"],
   "description": "Returns a pair after applying <callable> to \"<arg> ...\":\n  (<execution-time-in-milliseconds> . <result>)",
+  "example": null
+}, {
+  "name": "serialize",
+  "aliases": null,
+  "signatures": ["(serialize <escm-file-path> <serialized-file-path>)"],
+  "description": "Load and serialize the contents of <escm-file-path> into <serialized-file-path>.\n\nSerialization works by storing the Java bytecode of the assembled instruction set\nobject holding <escm-file-path>'s EScheme bytecode in <serialized-file-path>. The\ncontents must first be evaluated in order to expand macros properly during\ncompilation.\n\nTotally optional to use, this facility is provided in order to squeeze the most\nperformance out of the EScheme runtime, since loading a serialized file skips both\nreading and compiling the EScheme code therein, making its overall evaluation faster.\n\nLoad serialized EScheme code with the <load-serialized> primitive.",
+  "example": null
+}, {
+  "name": "load-serialized",
+  "aliases": null,
+  "signatures": ["(load-serialized <serialized-file-path>)"],
+  "description": "Loads the serialized EScheme code in <serialized-file-path>.\nSerialize an EScheme file with the <serialize> primitive.\nSee the <serialize> primitive's entry for more details on serialization.",
   "example": null
 }]

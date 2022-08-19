@@ -10,7 +10,7 @@ import escm.type.Nil;
 import escm.type.Void;
 import escm.type.number.Real;
 import escm.type.number.Exact;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;

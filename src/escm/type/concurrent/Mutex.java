@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.TimeUnit;
 import java.util.Objects;
 import escm.type.Datum;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.type.Void;
 import escm.vm.util.ExecutionState;
 

@@ -10,7 +10,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.StandardCopyOption;
 import java.io.File;
 import escm.type.Datum;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.util.Exceptionf;
 import escm.vm.Reader;
 import escm.vm.type.Primitive;

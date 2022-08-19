@@ -41,7 +41,7 @@ public class TypeCoercionPrimitives {
           return Number.valueOf(((escm.type.String)str).value(),radix);
         }
       } catch(Exception e) {
-        return escm.type.Boolean.FALSE;
+        return escm.type.bool.Boolean.FALSE;
       }
     }
   }
@@ -76,7 +76,7 @@ public class TypeCoercionPrimitives {
           return new escm.type.String(((Number)num).toString(radix));
         }
       } catch(Exception e) {
-        return escm.type.Boolean.FALSE;
+        return escm.type.bool.Boolean.FALSE;
       }
     }
   }

@@ -1,6 +1,9 @@
 // Author: Jordan Randleman - escm.primitive.UtilityPrimitives
 // Purpose:
-//    Java primitives for utility procedures.
+//    Java primitives for utility procedures. 
+//
+//    => NOTE: The serialization procedures are implemented 
+//             seperately in <SerializationPrimitives.java>
 
 package escm.primitive;
 import java.util.ArrayList;
@@ -9,7 +12,7 @@ import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Void;
-import escm.type.Boolean;
+import escm.type.bool.Boolean;
 import escm.type.Symbol;
 import escm.type.number.Exact;
 import escm.util.Exceptionf;
