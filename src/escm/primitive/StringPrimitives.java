@@ -101,7 +101,7 @@ public class StringPrimitives {
       int indexValue = ((Real)index).intValue();
       String strValue = ((escm.type.String)str).value();
       if(indexValue >= strValue.length())
-        throw new Exceptionf("'(string-ref <string> <index>) index %f exceeds length of string %s", indexValue, str.write());
+        throw new Exceptionf("'(string-ref <string> <index>) index %d exceeds length of string %s", indexValue, str.write());
       return new escm.type.String(String.valueOf(strValue.charAt(indexValue)));
     }
   }

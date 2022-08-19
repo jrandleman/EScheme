@@ -50,6 +50,8 @@
     => DISABLES PRE-SERIALIZATION OF `src/stdlib.scm` AND HAS ESCHEME JUST INTERPRET IT AS A REGULAR ESCM FILE !
 
 
+USE THE NEWLY ADDED `serialize` AND `load-serialized` PRIMITIVE LOGICS INTERNALLY !!!!!!!
+==========================================================================================
 
 
 
@@ -74,35 +76,6 @@
 
 
 
-
-
-
-
-
-- ADDRESS BUG: (ACCESSING NON-EXISTENT `*argv*` FIELD)
-
-```
-ESCM ERROR: f != java.lang.Integer
->> Escm Call Stack: ref (file="/Users/katiarandleman/Documents/JordanStuff/EScheme/rename.scm", line=3, column=17)
->> Java Throwable: java.util.IllegalFormatConversionException
->> Java Call Stack: java.base/java.util.Formatter$FormatSpecifier.failConversion(Formatter.java:4442)
-                    java.base/java.util.Formatter$FormatSpecifier.printFloat(Formatter.java:2976)
-                    java.base/java.util.Formatter$FormatSpecifier.print(Formatter.java:2924)
-                    java.base/java.util.Formatter.format(Formatter.java:2689)
-                    java.base/java.util.Formatter.format(Formatter.java:2625)
-                    java.base/java.lang.String.format(String.java:4143)
-                    escm.util.Exceptionf.<init>(Exceptionf.java:29)
-                    escm.primitive.ListPrimitives$Ref.callWith(ListPrimitives.java:196)
-                    escm.type.procedure.PrimitiveProcedure$1.callWith(PrimitiveProcedure.java:34)
-                    escm.type.procedure.PrimitiveProcedure.lambda$callWith$2(PrimitiveProcedure.java:85)
-                    escm.util.Trampoline.resolve(Trampoline.java:77)
-                    escm.vm.Main.launchScript(Main.java:198)
-                    escm.vm.Main.lambda$launchESchemeSession$6(Main.java:273)
-                    escm.type.procedure.PrimitiveProcedure.lambda$callWith$2(PrimitiveProcedure.java:85)
-                    escm.util.Trampoline.resolve(Trampoline.java:77)
-                    escm.type.concurrent.Thread$1.run(Thread.java:144)
-[Finished in 679ms]
-```
 
 
 

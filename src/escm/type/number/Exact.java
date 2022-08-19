@@ -393,13 +393,13 @@ public class Exact extends Real {
   // Common Denominator & Multiple Computations
   private void guarenteeGivenIntegers(String opName, Real r) throws Exception {
     if(isInteger() == false) 
-      throw new Exceptionf("Can't perform (%s %f %f) with non-integer %f", opName, display(), r.display(), display());
+      throw new Exceptionf("Can't perform (%s %s %s) with non-integer %s", opName, display(), r.display(), display());
     if(r.isInteger() == false) 
-      throw new Exceptionf("Can't perform (%s %f %f) with non-integer %f", opName, display(), r.display(), r.display());
+      throw new Exceptionf("Can't perform (%s %s %s) with non-integer %s", opName, display(), r.display(), r.display());
     if(isNegative()) 
-      throw new Exceptionf("Can't perform (%s %f %f) with negative %f", opName, display(), r.display(), display());
+      throw new Exceptionf("Can't perform (%s %s %s) with negative %s", opName, display(), r.display(), display());
     if(r.isNegative()) 
-      throw new Exceptionf("Can't perform (%s %f %f) with non-integer %f", opName, display(), r.display(), r.display());
+      throw new Exceptionf("Can't perform (%s %s %s) with non-integer %s", opName, display(), r.display(), r.display());
   }
 
 

@@ -193,7 +193,7 @@ public class ListPrimitives {
       for(int count = 0; lis instanceof Pair; ++count, lis = ((Pair)lis).cdr())
         if(count == indexValue)
           return ((Pair)lis).car();
-      throw new Exceptionf("'(ref <list> <index>) index %f is out of bounds for list %s", indexValue, parameters.get(0).write());
+      throw new Exceptionf("'(ref <list> <index>) index %d is out of bounds for list %s", indexValue, parameters.get(0).write());
     }
   }
 
