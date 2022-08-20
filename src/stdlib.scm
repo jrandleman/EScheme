@@ -4,6 +4,12 @@
 ;; => IMPORTANT: MUST _NEVER_ STORE A CONTINUATION UPON INITIAL INTERPRETATION BY
 ;;               THE VM: CAN _ONLY_ DEFINE SPECIAL FORMS, PROCEDURES, & VARIABLES
 
+;; => IMPORTANT: IN ORDER FOR CHANGES IN THIS FILE TO TAKE EFFECT, 1 OF 2 ACTIONS 
+;;               MUST BE TAKEN:
+;;                 1) RUN ESCHEME WITH THE --serialize-stdlib COMMAND-LINE FLAG
+;;                    ___OR___
+;;                 2) REINSTALL ESCHEME VIA "installer/Installer.java"
+
 ; PROVIDES:
 ;   - quote
 ;   - define-syntax

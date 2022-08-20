@@ -52,7 +52,7 @@ public class GlobalState {
 
   ////////////////////////////////////////////////////////////////////////////
   // Initialize the global environment
-  public static void initialize() throws Exception {
+  public static void initializeCoreJavaState() throws Exception {
     globalEnvironment.define(new Symbol("*argv*"),getArgv());
     globalEnvironment.define(new Symbol("*file-separator*"),new escm.type.String(File.separator));
     globalEnvironment.define(new Symbol("*path-separator*"),new escm.type.String(File.pathSeparator));
@@ -64,6 +64,10 @@ public class GlobalState {
     globalEnvironment.define(new Symbol("*min-radix*"),new Exact(Number.MIN_RADIX));
     globalEnvironment.define(new Symbol("*max-radix*"),new Exact(Number.MAX_RADIX));
     JavaStdLibLoader.load();
+  }
+
+  public static void initialize() throws Exception {
+    initializeCoreJavaState();
     EscmStdLibLoader.load();
   }
 };

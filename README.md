@@ -15,6 +15,8 @@
 * Run: `javac Installer.java`
 * Run: `java Installer`
   - Use the `-v` or `--verbose` command-line flag to print extra progress messages.
+  - Use the `-i` or `--interpret-stdlib` command-line flag to skip serializing `stdlib.scm`
+    * Useful to tinker/experiment with core EScheme syntax extensions
 * ___Optional:___ if you're using `bash` or `zsh` as your shell:
   - `bash`:
     1. Copy the `alias='...'` output by the installer.

@@ -5,6 +5,7 @@
 package escm.vm;
 import java.util.ArrayList;
 import java.util.Stack;
+import java.io.File;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import escm.type.Datum;
@@ -22,6 +23,7 @@ import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.installerGenerated.EscmPath;
 import escm.primitive.SystemPrimitives;
 import escm.primitive.FilePrimitives;
+import escm.primitive.SerializationPrimitives;
 
 public class Main {
   ////////////////////////////////////////////////////////////////////////////
@@ -200,11 +202,22 @@ public class Main {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Implementing the <stdlib.scm> Serializer
+  private static void serializeStdLib() throws Exception {
+    GlobalState.initializeCoreJavaState();
+    String escmStdlibPath = EscmPath.VALUE+File.separator+"src"+File.separator+"stdlib.scm";
+    String serStdlibPath = EscmPath.VALUE+File.separator+"bin"+File.separator+"stdlib.ser";
+    Trampoline.resolve(SerializationPrimitives.Serialize.logic(escmStdlibPath,serStdlibPath,(ignore) -> () -> Trampoline.LAST_BOUNCE_SIGNAL));
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Parse the command-line
   private static class ParsedCommandLine {
-    public boolean launchingQuiet  = false; // -q --quiet
-    public boolean loadingIntoREPL = false; // -l --load
-    public String scriptName = null;        // <null> denotes no script
+    public boolean serializingStdLib = false; // --serialize-stdlib
+    public boolean launchingQuiet    = false; // -q --quiet
+    public boolean loadingIntoREPL   = false; // -l --load
+    public String scriptName         = null;  // <null> denotes no script
   }
 
 
@@ -221,6 +234,10 @@ public class Main {
     ParsedCommandLine parsed = new ParsedCommandLine();
     for(int i = 0; i < args.length; ++i) {
       switch(args[i]) {
+        case "--serialize-stdlib": {
+          parsed.serializingStdLib = true;
+          return parsed;
+        }
         case "-v": case "--version": {
           System.out.printf("Eerina's Scheme Version %s\n", SystemPrimitives.VERSION);
           System.out.printf("Target: %s %s\n", System.getProperty("os.name"),System.getProperty("os.version"));
@@ -265,7 +282,9 @@ public class Main {
       (params, cont) -> {
         ParsedCommandLine parsedCmdLine = parseCommandLine(args);
         try {
-          if(parsedCmdLine.scriptName == null) {
+          if(parsedCmdLine.serializingStdLib == true) {
+            serializeStdLib();
+          } else if(parsedCmdLine.scriptName == null) {
             GlobalState.initialize();
             GlobalState.inREPL = true; // trigger exit message to be printed
             launchRepl(parsedCmdLine);

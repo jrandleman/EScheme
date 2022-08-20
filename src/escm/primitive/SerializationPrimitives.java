@@ -127,7 +127,7 @@ public class SerializationPrimitives {
       if(!(readObject instanceof ArrayList))
         throw new Exceptionf("'(load-serialized <serialized-file-path>) file \"%s\" didn't contain a serialized instruction set!", serializePath);
       ArrayList readObjectArrayList = (ArrayList)readObject;
-      ArrayList<Instruction> instructions = new ArrayList<Instruction>();
+      ArrayList<Instruction> instructions = new ArrayList<Instruction>(readObjectArrayList.size());
       for(Object obj : readObjectArrayList) {
         if(!(obj instanceof Instruction))
           throw new Exceptionf("'(load-serialized <serialized-file-path>) file \"%s\" didn't contain a serialized instruction set!", serializePath);
