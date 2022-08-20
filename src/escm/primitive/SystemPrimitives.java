@@ -23,7 +23,6 @@ import escm.vm.type.PrimitiveCallable;
 import escm.vm.util.SourceInformation;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.EscmCallStack;
-import escm.vm.runtime.EscmThread;
 
 public class SystemPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -150,11 +149,11 @@ public class SystemPrimitives {
     }
 
     public static void registerLoadedFile(String filePath) {
-      ((EscmThread)java.lang.Thread.currentThread()).loadedOnceFiles.add(filePath);
+      GlobalState.loadedOnceFiles.put(filePath,0);
     }
 
     public static boolean notLoadedYet(String filePath) {
-      return ((EscmThread)java.lang.Thread.currentThread()).loadedOnceFiles.contains(filePath) == false;
+      return GlobalState.loadedOnceFiles.containsKey(filePath) == false;
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

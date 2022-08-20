@@ -7,7 +7,6 @@
 package escm.vm.runtime;
 import java.util.ArrayList;
 import java.util.Stack;
-import java.util.HashSet;
 import java.math.BigInteger;
 import escm.util.Pair;
 import escm.type.Datum;
@@ -28,11 +27,6 @@ public abstract class EscmThread extends Thread {
   ////////////////////////////////////////////////////////////////////////////
   // <CallStack> thread-local call stack
   public Stack<Pair<String,SourceInformation>> callStack = new Stack<Pair<String,SourceInformation>>();
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // <SystemPrimitives> thread-local set of prior "load-once" args 
-  public HashSet<String> loadedOnceFiles = new HashSet<String>();
 
 
   ////////////////////////////////////////////////////////////////////////////

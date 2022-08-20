@@ -4,6 +4,7 @@
 
 package escm.vm.runtime;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.io.File;
 import escm.type.Datum;
 import escm.type.Symbol;
@@ -40,6 +41,11 @@ public class GlobalState {
   private static Random prng = new Random();
 
   public static synchronized double getRandomDouble() { return prng.nextDouble(); }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // <SystemPrimitives> set of prior "load-once" args (sentinel ints)
+  // => Note this isn't thread-local since files are globally loaded!
+  public static ConcurrentHashMap<String,Integer> loadedOnceFiles = new ConcurrentHashMap<String,Integer>();
 
   ////////////////////////////////////////////////////////////////////////////
   // Representing the Dynamic "Meta Thread" Environment

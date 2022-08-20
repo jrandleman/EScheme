@@ -2,6 +2,65 @@
 
 ## MORE
 
+- CONSIDER PREPENDING SERILIZED FILE WITH TOP LINE: `)ESCM-SERILIZED-FILE)`
+  `(serialized? <file-path-string>)`
+
+    * IF THIS IS IMPLEMENTED CORRECTLY: 
+      1. DON'T NEED THE NEW `-s`, `-ls` COMMAND LINE FLAGS BELOW
+         - CAN INSTEAD DETERMINE EVAL STRATEGY AUTOMATICALLY WHEN LOADING/INTERPRETING A GIVEN FILENAME
+      2. DON'T NEED `load-serialized` & `load-once-serialized` !!!
+         - RM FROM `help` & `primitives`
+         - CAN INSTEAD DETERMINE EVAL STRATEGY AUTOMATICALLY VIA `load` & `load-from` & `load-once` & `load-once-from`
+           * MENTION IN THEIR HELP ENTRY THAT THEY WILL AUTOMATICALLY WORK W/ SERIALIZED FILES TOO!
+
+
+
+
+
+
+<!-- 
+- COMMAND LINE SUPPORT FOR LOADING/INTERPRETTING SERIALIZED FILES!
+  `-s`, `--serialized <script> <arg1> ...` ; interpret & terminate the serialized `<script>` file
+  `-ls`, `--load-serialized <script> <arg1> ...` ; load the serialized `<script>` file into the REPL
+
+    ADD THESE TO THE README, `--help` RESULT, & `command-line` SECTION IN `help`
+
+
+
+    ```
+    Command-line flags may be used to modify EScheme's behavior:
+      1. -v,  --version                         | Print EScheme version information
+      2. -h,  --help                            | Print this information
+      3. -q,  --quiet                           | Launch the REPL without ASCII art
+      5. -l,  --load <script> <arg1> ...        | Load <script> with <arg> ... as *argv* into the REPL
+      6. -ls, --load-serial <script> <arg1> ... | Load serialized <script> into the REPL
+      4. -s,  --serial <script> <arg1> ...      | Interpret serialized <script>
+      7. <script> <arg1> ...                    | Interpret <script>
+      8. [no arguments]                         | Launch the REPL
+
+    ```
+ -->
+
+
+
+
+
+
+
+
+- ADD A `serialization` ENTRY TO THE `Topics` HELP SECTION !!!!
+
+
+
+
+
+
+- CONSIDER HAVING `load` & `load-from` & `load-serialized` ALSO POPULATE THE `load-once` BUFFER TOO !!!
+
+
+
+
+
 
 
 - MAKE SURE ALL "Stream" INSTANCES ARE PROPERLY CLOSED IN JAVA
@@ -15,7 +74,7 @@
 
 
 
-- CONSIDER HAVING `eval` & `bytecode-eval` & `load` & `load-from` & `load-serialized` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
+- CONSIDER HAVING `eval` & `bytecode-eval` & `load` & `load-from` & `load-serialized` & `serialize` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
   => OPTIONAL ARG TO THE EXISTING FCNS DENOTING WHETHER TO SANDBOX THE EVALUATION (#f BY DEFAULT)
 
 
