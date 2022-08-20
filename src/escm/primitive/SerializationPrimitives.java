@@ -8,10 +8,12 @@ import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import escm.type.Datum;
 import escm.type.Void;
+import escm.type.bool.Boolean;
 import escm.type.port.Eof;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
@@ -20,11 +22,17 @@ import escm.vm.Assembler;
 import escm.vm.Interpreter;
 import escm.vm.util.Instruction;
 import escm.vm.util.ExecutionState;
+import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
 import escm.vm.runtime.GlobalState;
 import escm.primitive.SerializationPrimitives_util.InstructionSet;
 
 public class SerializationPrimitives {
+  ////////////////////////////////////////////////////////////////////////////
+  // Serialized File Header
+  public static final byte[] SERIALIZED_FILE_HEADER = "\10SERIALIZED\22ESCHEME\21".getBytes();
+
+
   ////////////////////////////////////////////////////////////////////////////
   // Private Linked List for CPS Serialization
   private static class InstructionsList {
@@ -57,6 +65,46 @@ public class SerializationPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // serialized?
+  public static class IsSerializedP implements Primitive {
+    public java.lang.String escmName() {
+      return "serialized?";
+    }
+
+    private static boolean hasSerializationHeader(byte[] readHeader, int charsRead) {
+      if(charsRead < SERIALIZED_FILE_HEADER.length || charsRead > readHeader.length) return false;
+      for(int i = 0; i < SERIALIZED_FILE_HEADER.length; ++i) {
+        if(readHeader[i] != SERIALIZED_FILE_HEADER[i]) return false;
+      }
+      return true;
+    }
+
+
+    public static boolean logic(String filePath) {
+      if(FilePrimitives.IsFileP.logic(Path.of(filePath)) == false) return false;
+      try {
+        FileInputStream fileIn = new FileInputStream(filePath);
+        ObjectInputStream in = new ObjectInputStream(fileIn);
+        byte[] header_buffer = new byte[SERIALIZED_FILE_HEADER.length];
+        int read_length = in.read(header_buffer,0,header_buffer.length);
+        boolean hasHeader = hasSerializationHeader(header_buffer,read_length);
+        in.close();
+        fileIn.close();
+        return hasHeader;
+      } catch(Exception e) {
+        return false;
+      }
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
+        throw new Exceptionf("'(serialized? <file-path-string>) didn't receive 1 string: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(logic(((escm.type.String)parameters.get(0)).value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // serialize
   public static class Serialize implements PrimitiveCallable {
     public java.lang.String escmName() {
@@ -81,6 +129,7 @@ public class SerializationPrimitives {
     private static void writeEscmSerializedInstructions(ArrayList<Instruction> instructions, String serializePath) throws Exception {
       FileOutputStream fileOut = new FileOutputStream(serializePath);
       ObjectOutputStream out = new ObjectOutputStream(fileOut);
+      out.write(SERIALIZED_FILE_HEADER);
       out.writeObject(instructions);
       out.close();
       fileOut.close();
@@ -117,10 +166,11 @@ public class SerializationPrimitives {
     }
 
     private static ArrayList<Instruction> getEscmInstructions(String serializePath) throws Exception {
-      if(FilePrimitives.IsFileP.logic(Path.of(serializePath)) == false)
-        throw new Exceptionf("'(load-serialized <serialized-file-path>) 1st arg \"%s\" isn't a file!", serializePath);
+      if(IsSerializedP.logic(serializePath) == false)
+        throw new Exceptionf("'(load-serialized <serialized-file-path>) 1st arg \"%s\" isn't a serialized file!", serializePath);
       FileInputStream fileIn = new FileInputStream(serializePath);
       ObjectInputStream in = new ObjectInputStream(fileIn);
+      in.skipBytes(SERIALIZED_FILE_HEADER.length);
       Object readObject = in.readObject();
       in.close();
       fileIn.close();

@@ -137,7 +137,7 @@
 (displayf <optional-output-port> <format-string> <arg> ...)
 
 (read <optional-input-port>)
-(read-string <str>) ; returns a pair: (cons <read-datum> <str-without-serialized-read-datum>)
+(read-string <str>) ; returns a pair: (cons <read-datum> <str-without-read-datum>)
 (read-line <optional-input-port>)
 
 (eof? <obj>)
@@ -500,6 +500,8 @@
 (time <callable> <arg> ...) ; (<time-taken-in-milliseconds> . <result>)
 
 (serialize <escm-file-path> <serialized-file-path>)
+(serialized? <file-path>)
+
 (load-serialized <serialized-file-path>)
 (load-once-serialized <serialized-file-path>)
 ```

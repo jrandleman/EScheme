@@ -83,6 +83,12 @@
   "description": "Load and serialize the contents of <escm-file-path> into <serialized-file-path>.\n\nSerialization works by storing the Java bytecode of the assembled instruction set\nobject holding <escm-file-path>'s EScheme bytecode in <serialized-file-path>. The\ncontents must first be evaluated in order to expand macros properly during\ncompilation.\n\nTotally optional to use, this facility is provided in order to squeeze the most\nperformance out of the EScheme runtime, since loading a serialized file skips both\nreading and compiling the EScheme code therein, making its overall evaluation faster.\n\nLoad serialized EScheme code with the <load-serialized> primitive.",
   "example": null
 }, {
+  "name": "serialized?",
+  "aliases": null,
+  "signatures": ["(serialized? <file-path>)"],
+  "description": "Returns whether <file-path> is a serialized file created by <serialize>.",
+  "example": null
+}, {
   "name": "load-serialized",
   "aliases": null,
   "signatures": ["(load-serialized <serialized-file-path>)"],

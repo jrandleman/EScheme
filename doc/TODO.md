@@ -2,8 +2,7 @@
 
 ## MORE
 
-- CONSIDER PREPENDING SERILIZED FILE WITH TOP LINE: `)ESCM-SERILIZED-FILE)`
-  `(serialized? <file-path-string>)`
+- `(serialized? <file-path-string>)`
 
     * IF THIS IS IMPLEMENTED CORRECTLY: 
       1. DON'T NEED THE NEW `-s`, `-ls` COMMAND LINE FLAGS BELOW
@@ -12,8 +11,6 @@
          - RM FROM `help` & `primitives`
          - CAN INSTEAD DETERMINE EVAL STRATEGY AUTOMATICALLY VIA `load` & `load-from` & `load-once` & `load-once-from`
            * MENTION IN THEIR HELP ENTRY THAT THEY WILL AUTOMATICALLY WORK W/ SERIALIZED FILES TOO!
-
-
 
 
 
@@ -62,8 +59,15 @@
 
 
 
+- ADD IN `(file-remove-extension <file-path-string> <extension-string>)`
 
-- MAKE SURE ALL "Stream" INSTANCES ARE PROPERLY CLOSED IN JAVA
+
+
+
+
+
+
+- MAKE SURE ALL "Stream" & "File" & "Reader" & "Writer" INSTANCES ARE PROPERLY CLOSED IN JAVA
   * MAKE SURE MOVE AS MANY "CLOSE" OPERATIONS AS POSSIBLE PRIOR THROWING ERRORS FOR FILES!
 
 
