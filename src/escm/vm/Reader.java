@@ -269,6 +269,7 @@ public class Reader {
     if(i >= n)
       throw new IncompleteException(ignoringIncomplete,vectorIndex,sourceCode,vectorSource,"READ ERROR: Incomplete vector literal!");
     source.updatePosition(']');
+    containerStack.pop(); // opening ']'
     return new Pair<Datum,Integer>(vect,i+1);
   }
 
@@ -302,6 +303,7 @@ public class Reader {
     if(key != null)
       throw new ReaderException(hashmapIndex,sourceCode,hashmapSource,"READ ERROR: Hashmap literal %s key %s doesn't have a value!", hmap.write(), key.profile());
     source.updatePosition('}');
+    containerStack.pop(); // opening '}'
     return new Pair<Datum,Integer>(hmap,i+1);
   }
 
