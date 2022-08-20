@@ -88,4 +88,10 @@
   "signatures": ["(load-serialized <serialized-file-path>)"],
   "description": "Loads the serialized EScheme code in <serialized-file-path>.\nSerialize an EScheme file with the <serialize> primitive.\nSee the <serialize> primitive's entry for more details on serialization.",
   "example": null
+}, {
+  "name": "load-once-serialized",
+  "aliases": null,
+  "signatures": ["(load-once-serialized <serialized-file-path>)"],
+  "description": "Loads the serialized EScheme code in <serialized-file-path>.\nFuture calls to <load-once-serialized> with <serialized-file-path> do nothing.\nSerialize an EScheme file with the <serialize> primitive.\nSee the <serialize> primitive's entry for more details on serialization.",
+  "example": null
 }]

@@ -150,4 +150,24 @@ public class SerializationPrimitives {
       return logic(((escm.type.String)parameters.get(0)).value(),continuation);
     }
   }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // load-once-serialized
+  public static class LoadOnceSerialized implements PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "load-once-serialized";
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
+        throw new Exceptionf("'(load-once-serialized <serialized-file-path>) didn't receive 1 string: %s", Exceptionf.profileArgs(parameters));
+      String filePath = FilePrimitives.AbsolutePath.logic(((escm.type.String)parameters.get(0)).value());
+      if(SystemPrimitives.LoadOnce.notLoadedYet(filePath)) {
+        SystemPrimitives.LoadOnce.registerLoadedFile(filePath);
+        return LoadSerialized.logic(filePath,continuation);
+      }
+      return continuation.run(Void.VALUE);
+    }
+  }
 }

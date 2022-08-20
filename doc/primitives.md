@@ -501,6 +501,7 @@
 
 (serialize <escm-file-path> <serialized-file-path>)
 (load-serialized <serialized-file-path>)
+(load-once-serialized <serialized-file-path>)
 ```
 
 
