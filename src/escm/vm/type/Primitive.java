@@ -6,9 +6,10 @@
 
 package escm.vm.type;
 import java.util.ArrayList;
+import java.io.Serializable;
 import escm.type.Datum;
 
-public interface Primitive {
+public interface Primitive extends Serializable {
   public String escmName();
   public Datum callWith(ArrayList<Datum> parameters) throws Exception;
 }

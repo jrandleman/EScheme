@@ -425,6 +425,13 @@ public class InputPort extends Port {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Java Serialization WRITE Semantics
+  private Object writeReplace() throws Exception {
+    return new SerializedInputPort(name);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Port Closing Semantics
   public synchronized void close() throws Exception {
     try {

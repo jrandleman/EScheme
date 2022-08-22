@@ -2,6 +2,7 @@
 
 ## MORE
 
+
 - `(serialized? <file-path-string>)`
 
     * IF THIS IS IMPLEMENTED CORRECTLY: 
@@ -9,8 +10,11 @@
          - CAN INSTEAD DETERMINE EVAL STRATEGY AUTOMATICALLY WHEN LOADING/INTERPRETING A GIVEN FILENAME
       2. DON'T NEED `load-serialized` & `load-once-serialized` !!!
          - RM FROM `help` & `primitives`
+         - EXECTUE `strfind load-serialized src` TO ADJUST/RM ALL INSTANCES
          - CAN INSTEAD DETERMINE EVAL STRATEGY AUTOMATICALLY VIA `load` & `load-from` & `load-once` & `load-once-from`
            * MENTION IN THEIR HELP ENTRY THAT THEY WILL AUTOMATICALLY WORK W/ SERIALIZED FILES TOO!
+
+      3. TEST THAT THE CMD-LINE & SOURCE-CODE LOADING OF SERIALIZED FILES WORKS SEAMLESSLY AS INTENDED
 
 
 
@@ -43,23 +47,15 @@
 
 
 
-
-
-- ADD A `serialization` ENTRY TO THE `Topics` HELP SECTION !!!!
-
-
-
-
-
-
-- CONSIDER HAVING `load` & `load-from` & `load-serialized` ALSO POPULATE THE `load-once` BUFFER TOO !!!
+- CONSIDER HAVING `load` & `load-from` ALSO POPULATE THE `load-once` BUFFER TOO !!!
 
 
 
 
 
 
-- ADD IN `(file-remove-extension <file-path-string> <extension-string>)`
+
+- ADD IN `(file-remove-extension <file-path-string> <extension-string>)` (ALSO REMOVES THE ".")
 
 
 

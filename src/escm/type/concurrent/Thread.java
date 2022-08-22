@@ -296,6 +296,13 @@ public class Thread extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Java Serialization WRITE Semantics
+  private Object writeReplace() throws Exception {
+    return new SerializedThread(thread.getName(),runnable);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public Thread loadWithState(ExecutionState state) {
     return this;

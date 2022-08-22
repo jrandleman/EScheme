@@ -179,6 +179,13 @@ public class OutputPort extends Port {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Java Serialization WRITE Semantics
+  private Object writeReplace() throws Exception {
+    return new SerializedOutputPort(name);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Port Closing Semantics
   public void close() throws Exception {
     try {

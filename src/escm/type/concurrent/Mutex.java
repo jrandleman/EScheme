@@ -6,6 +6,7 @@ package escm.type.concurrent;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.TimeUnit;
 import java.util.Objects;
+import java.io.Serializable;
 import escm.type.Datum;
 import escm.type.bool.Boolean;
 import escm.type.Void;
@@ -14,7 +15,7 @@ import escm.vm.util.ExecutionState;
 public class Mutex extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Private Internal Lock, Specific, & Name Field
-  private static class State {
+  private static class State implements Serializable {
     private ReentrantLock lock = new ReentrantLock();
     private Datum specific = Void.VALUE;
   };

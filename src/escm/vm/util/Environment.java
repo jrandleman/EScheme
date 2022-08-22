@@ -9,6 +9,7 @@ package escm.vm.util;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.io.Serializable;
 import escm.util.Exceptionf;
 import escm.util.GetClosestStringMatches;
 import escm.type.Datum;
@@ -20,7 +21,7 @@ import escm.type.procedure.PrimitiveProcedure;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
 
-public class Environment {
+public class Environment implements Serializable {
   ////////////////////////////////////////////////////////////////////////////
   // Constant Fields
   public static final int MAXIMUM_SUGGESTED_VARIABLE_ALTERNATIVES = 10;

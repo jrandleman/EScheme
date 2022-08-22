@@ -13,6 +13,7 @@ import escm.type.Vector;
 import escm.type.Hashmap;
 import escm.type.Symbol;
 import escm.type.Nil;
+import escm.type.procedure.Procedure;
 import escm.type.number.Exact;
 import escm.util.Trampoline;
 import escm.primitive.ListPrimitives;
@@ -132,8 +133,14 @@ public class Compiler {
   private static Trampoline.Bounce compileApplication(Pair d, Trampoline.Continuation continuation) throws Exception {
     // Expand Macro
     if(d.car() instanceof Symbol && MACRO_REGISTRY.containsKey(((Symbol)d.car()).value())) {
+      Symbol macroName = (Symbol)d.car();
+      Callable macroCallable = MACRO_REGISTRY.get(macroName.value());
       ArrayList<Datum> args = MetaPrimitives.Apply.convertListToArrayList(d.cdr());
-      return MACRO_REGISTRY.get(((Symbol)d.car()).value()).callWith(args,(expandedExpr) -> () -> run(expandedExpr,continuation));
+      if(macroCallable instanceof Procedure && macroName.hasSourceInformation()) {
+        return ((Procedure)macroCallable).loadWithInvocationSource(macroName.source()).callWith(args,(expandedExpr) -> () -> run(expandedExpr,continuation));
+      } else {
+        return macroCallable.callWith(args,(expandedExpr) -> () -> run(expandedExpr,continuation));
+      }
     // Compile procedure application
     } else {
       // Reverse the application expression to use the faster negative <call> argument @ runtime

@@ -5,10 +5,11 @@
 
 package escm.vm.type;
 import java.util.ArrayList;
+import java.io.Serializable;
 import escm.type.Datum;
 import escm.util.Trampoline;
 
-public interface PrimitiveCallable extends Callable {
+public interface PrimitiveCallable extends Callable, Serializable {
   public String escmName();
   public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception;
 }
