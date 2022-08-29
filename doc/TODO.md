@@ -96,10 +96,7 @@
 
 
 ```clj
-
 ;;;;;;;;;;;;;;;;
-;;;; IN ESCHEME:
-
 ; Predicates
 (AssociativeCollection? <object>) ; for objects (aliased by <AC?>)
 (OrderedCollection? <object>) ; aliased by <OC?>
@@ -108,6 +105,7 @@
 (ordered-collection? <obj>) ; aliased by <oc?>
 
 
+;;;;;;;;;;;;;;;;
 ; ACs
 (empty? <ac>)
 (length <ac>)
@@ -148,13 +146,9 @@
 (delete-duplicates <ac>)
 
 
+;;;;;;;;;;;;;;;;
 ; OCs
 (conj <val> <oc>) ; add <val> as efficiently as possible to <oc>. Makes no guarentee about position.
-
-(fold-right <callable> <seed> <oc> ...) ; only ordered collections have the concept of "right-to-left"
-
-(remove-first <predicate?> <oc>)
-(remove-last <predicate?> <oc>)
 
 (head <oc>)
 (tail <oc>)
@@ -164,6 +158,11 @@
 (slice <oc> <start-key> <optional-length-or-end-predicate>)
 
 (reverse <oc>)
+
+(fold-right <callable> <seed> <oc> ...) ; only ordered collections have the concept of "right-to-left"
+
+(remove-first <predicate?> <oc>)
+(remove-last <predicate?> <oc>)
 
 (skip <predicate?> <oc>)
 (skip-right <predicate?> <oc>)
