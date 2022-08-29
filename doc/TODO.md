@@ -112,11 +112,9 @@
 (length+ <list>)
 
 (fold <callable> <seed> <ac> ...)
-(fold-right <callable> <seed> <ac> ...)
 
 (map <callable> <ac> ...)
 (for-each <callable> <ac> ...)
-(for-each-right <callable> <ac> ...)
 (filter <callable> <ac>)
 
 (count <predicate?> <ac>)
@@ -151,13 +149,7 @@
 ; OCs
 (conj <val> <oc>) ; add <val> as efficiently as possible to <oc>. Makes no guarentee about position.
 
-(map-from <start-key> <optional-length-or-end-predicate> <callable> <oc> ...)
-(for-each-from <start-key> <optional-length-or-end-predicate> <callable> <oc> ...)
-(filter-from <start-key> <optional-length-or-end-predicate> <callable> <oc>)
-
-(slice <oc> <start-key> <optional-length-or-end-predicate>)
-
-(reverse <oc>)
+(fold-right <callable> <seed> <oc> ...) ; only ordered collections have the concept of "right-to-left"
 
 (remove-first <predicate?> <oc>)
 (remove-last <predicate?> <oc>)
@@ -166,6 +158,10 @@
 (tail <oc>)
 (init <oc>)
 (last <oc>)
+
+(slice <oc> <start-key> <optional-length-or-end-predicate>)
+
+(reverse <oc>)
 
 (skip <predicate?> <oc>)
 (skip-right <predicate?> <oc>)
@@ -207,7 +203,6 @@
 int length();
 
 Trampoline.Bounce forEach(Callable c, Trampoline.Continuation continuation) throws Exception; // -> Void
-Trampoline.Bounce forEachRight(Callable c, Trampoline.Continuation continuation) throws Exception; // -> Void
 
 ValueType ref(KeyType key) throws Exception;
 
