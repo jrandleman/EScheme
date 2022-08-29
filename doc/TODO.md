@@ -183,23 +183,23 @@
 //////////////////////////////////////////////////////////////////////////////
 // REQUIRED METHODS TO IMPLEMENT IN JAVA/ESCM OBJECTS SATISFYING AC:
 
-Trampoline.Bounce length(Trampoline.Continuation continuation) throws Exception; // -> int
+int length();
 
 Trampoline.Bounce forEach(Callable c, Trampoline.Continuation continuation) throws Exception; // -> Void
 Trampoline.Bounce forEachRight(Callable c, Trampoline.Continuation continuation) throws Exception; // -> Void
 
-Trampoline.Bounce ref(KeyType key, Trampoline.Continuation continuation) throws Exception; // -> ValueType
+ValueType ref(KeyType key) throws Exception;
 
-Trampoline.Bounce append(AssociativeCollection ac, Trampoline.Continuation continuation) throws Exception; // -> AssociativeCollection
+AssociativeCollection append(AssociativeCollection ac) throws Exception;
 
-Trampoline.Bounce delete(KeyType key, Trampoline.Continuation continuation) throws Exception; // -> AssociativeCollection
+AssociativeCollection delete(KeyType key) throws Exception;
 
-Trampoline.Bounce conj(KeyType key, ValueType val, Trampoline.Continuation continuation) throws Exception; // -> AssociativeCollection
+AssociativeCollection conj(KeyType key, ValueType val) throws Exception;
 
-Trampoline.Bounce toList(Trampoline.Continuation continuation) throws Exception; // -> Datum
-Trampoline.Bounce toVector(Trampoline.Continuation continuation) throws Exception; // -> Datum
-Trampoline.Bounce toString(Trampoline.Continuation continuation) throws Exception; // -> Datum
-Trampoline.Bounce toHashmap(Trampoline.Continuation continuation) throws Exception; // -> Datum
+Datum toList() throws Exception;
+Datum toVector() throws Exception;
+Datum toString() throws Exception;
+Datum toHashmap() throws Exception;
 ```
 
 
