@@ -180,6 +180,15 @@
 
 ```java
 //////////////////////////////////////////////////////////////////////////////
+// NOTE: SHOULD HAVE CERTAIN METHODS FOR INSTANCES TO SATISFY, __BUT__ CLASS 
+//       SHOULD HAVE STATIC METHODS TO PERFORM PRM OPERATIONS DERIVED BY THOSE
+//       IMPLEMENTED METHODS ON INSTANCES
+//         => example: "forEach" is a method that can be used to implement the
+//                     static `AssociativeCollection.Map(Callable c, AssociativeCollection ... acs)` method
+//////////////////////////////////////////////////////////////////////////////
+
+
+
 //////////////////////////////////////////////////////////////////////////////
 // REQUIRED METHODS TO IMPLEMENT IN JAVA/ESCM OBJECTS SATISFYING AC:
 
