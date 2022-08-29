@@ -104,6 +104,7 @@
 
 (map <callable> <ac> ...)
 (for-each <callable> <ac> ...)
+(for-each-right <callable> <ac> ...)
 (filter <callable> <ac>)
 
 (count <predicate?> <ac>)
@@ -118,7 +119,7 @@
 (any <predicate?> <ac> ...)
 (every <predicate?> <ac> ...)
 
-(conj <obj> <ac>)
+(conj <key> <val> <ac>) ; return version of <ac> with <val> associated to <key>
 
 (associative-collection->list <ac>) ; (aliased by ac->list)
 (associative-collection->string <ac>) ; (aliased by ac->string)
@@ -136,6 +137,8 @@
 
 
 ; OCs
+(conj <val> <oc>) ; add <val> as efficiently as possible to <oc>. Makes no guarentee about position.
+
 (map-from <start-key> <optional-length-or-end-predicate> <callable> <oc> ...)
 (for-each-from <start-key> <optional-length-or-end-predicate> <callable> <oc> ...)
 (filter-from <start-key> <optional-length-or-end-predicate> <callable> <oc>)
@@ -175,7 +178,29 @@
 ```
 
 
+```java
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+// REQUIRED METHODS TO IMPLEMENT IN JAVA/ESCM OBJECTS SATISFYING AC:
 
+Trampoline.Bounce length(Trampoline.Continuation continuation) throws Exception; // -> int
+
+Trampoline.Bounce forEach(Callable c, Trampoline.Continuation continuation) throws Exception; // -> Void
+Trampoline.Bounce forEachRight(Callable c, Trampoline.Continuation continuation) throws Exception; // -> Void
+
+Trampoline.Bounce ref(KeyType key, Trampoline.Continuation continuation) throws Exception; // -> ValueType
+
+Trampoline.Bounce append(AssociativeCollection ac, Trampoline.Continuation continuation) throws Exception; // -> AssociativeCollection
+
+Trampoline.Bounce delete(KeyType key, Trampoline.Continuation continuation) throws Exception; // -> AssociativeCollection
+
+Trampoline.Bounce conj(KeyType key, ValueType val, Trampoline.Continuation continuation) throws Exception; // -> AssociativeCollection
+
+Trampoline.Bounce toList(Trampoline.Continuation continuation) throws Exception; // -> Datum
+Trampoline.Bounce toVector(Trampoline.Continuation continuation) throws Exception; // -> Datum
+Trampoline.Bounce toString(Trampoline.Continuation continuation) throws Exception; // -> Datum
+Trampoline.Bounce toHashmap(Trampoline.Continuation continuation) throws Exception; // -> Datum
+```
 
 
 
