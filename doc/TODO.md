@@ -3,8 +3,60 @@
 ## MORE
 
 
+- ADD IN `(file-remove-extension <file-path-string> <extension-string>)` (ALSO REMOVES THE ".")
 
-- CONSIDER HAVING `load` & `load-from` ALSO POPULATE THE `load-once` BUFFER TOO !!!
+
+
+
+
+
+
+- MAKE SURE ALL "Stream" & "File" & "Reader" & "Writer" INSTANCES ARE PROPERLY CLOSED IN JAVA
+  * MAKE SURE MOVE AS MANY "CLOSE" OPERATIONS AS POSSIBLE PRIOR THROWING ERRORS FOR FILES!
+
+
+
+
+
+
+
+
+
+- CONSIDER HAVING `eval` & `bytecode-eval` & `load` & `load-from` & `load-serialized` & `serialize` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
+  => OPTIONAL ARG TO THE EXISTING FCNS DENOTING WHETHER TO SANDBOX THE EVALUATION (#f BY DEFAULT)
+
+
+
+
+
+
+
+
+
+
+
+- have anonymous lambdas print some unique id for slightly easier debugging
+
+
+
+
+
+
+
+
+
+
+
+
+
+- CHECK (& RECORD HERE) IPHONE NOTES ON ESCM !!!
+
+
+
+
+
+
+
 
 
 
@@ -62,66 +114,6 @@
 ====================================================================================
 ====================================================================================
 ====================================================================================
-
-
-
-
-
-
-
-- ADD IN `(file-remove-extension <file-path-string> <extension-string>)` (ALSO REMOVES THE ".")
-
-
-
-
-
-
-
-- MAKE SURE ALL "Stream" & "File" & "Reader" & "Writer" INSTANCES ARE PROPERLY CLOSED IN JAVA
-  * MAKE SURE MOVE AS MANY "CLOSE" OPERATIONS AS POSSIBLE PRIOR THROWING ERRORS FOR FILES!
-
-
-
-
-
-
-
-
-
-- CONSIDER HAVING `eval` & `bytecode-eval` & `load` & `load-from` & `load-serialized` & `serialize` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
-  => OPTIONAL ARG TO THE EXISTING FCNS DENOTING WHETHER TO SANDBOX THE EVALUATION (#f BY DEFAULT)
-
-
-
-
-
-
-
-
-
-
-
-- have anonymous lambdas print some unique id for slightly easier debugging
-
-
-
-
-
-
-
-
-
-
-
-
-
-- CHECK (& RECORD HERE) IPHONE NOTES ON ESCM !!!
-
-
-
-
-
-
 
 
 

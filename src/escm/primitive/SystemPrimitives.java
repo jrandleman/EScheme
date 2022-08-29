@@ -105,6 +105,7 @@ public class SystemPrimitives {
     }
 
     public static Trampoline.Bounce logic(String primitiveName, String filename, Trampoline.Continuation continuation) throws Exception {
+      LoadOnce.registerLoadedFile(filename);
       if(SerializationPrimitives.IsSerializedP.logic(filename) == true) {
         return SerializationPrimitives.loadSerializedFile(primitiveName,filename,continuation);
       } else {
@@ -168,10 +169,7 @@ public class SystemPrimitives {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(load-once <filename>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
       String filePath = FilePrimitives.AbsolutePath.logic(((escm.type.String)parameters.get(0)).value());
-      if(notLoadedYet(filePath)) {
-        registerLoadedFile(filePath);
-        return Load.logic("load-once",filePath,continuation);
-      }
+      if(notLoadedYet(filePath)) return Load.logic("load-once",filePath,continuation);
       return continuation.run(Void.VALUE);
     }
   }
@@ -194,10 +192,7 @@ public class SystemPrimitives {
       if(!(file instanceof escm.type.String))
         throw new Exceptionf("'(load-once-from <directory> <filename>) 2nd arg isn't a string: %s", Exceptionf.profileArgs(parameters));
       String filePath = LoadFrom.getPath(((escm.type.String)directory).value(),((escm.type.String)file).value());
-      if(LoadOnce.notLoadedYet(filePath)) {
-        LoadOnce.registerLoadedFile(filePath);
-        return Load.logic("load-once-from",filePath,continuation);
-      }
+      if(LoadOnce.notLoadedYet(filePath)) return Load.logic("load-once-from",filePath,continuation);
       return continuation.run(Void.VALUE);
     }
   }
