@@ -20,10 +20,10 @@
 
 
 
-
-
 - CONSIDER HAVING `eval` & `bytecode-eval` & `load` & `load-from` & `load-serialized` & `serialize` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
   => OPTIONAL ARG TO THE EXISTING FCNS DENOTING WHETHER TO SANDBOX THE EVALUATION (#f BY DEFAULT)
+
+
 
 
 
@@ -68,6 +68,18 @@
 ====================================================================================
 ====================================================================================
 
+
+"module" statement processed (MUST be @ top of the file) signifies we are exporting new symbols to the set of "public" symbols.
+
+When reading in (importing!) a module:
+Each symbol is given a private environment pointer that links to the private environment of the module they were defined in?
+  => when setting/defining/getting a symbol -- WITHIN THE GLOBAL SCOPE -- first check whether the symbol is public. If so, 
+     go ahead and operate on it in the global scope. Otherwise, do it in their attached "private global environment" scope.
+
+
+
+
+
 -> CHANGE THE READER MACRO `#path` TO BE `#!path`
    * USE `STRFIND` TO VERIFY INSTANCE & CHANGE AS NEEDED ACCORDINGLY
 
@@ -90,7 +102,7 @@
 
      Moreover, modules _ALSO_ tell the compiler to compile and run each of the internal expressions entirely one after another, in order to be able to 
                control exposure semantics of macros
-               - why do we give a fuck about this though? Can't this symbol obfuscation not just be reader?
+               - why do we care about this though? Can't this symbol obfuscation not just be reader?
                  * then revert to `#module` (instead of `#!module`) since a reader-op (not a compile-op)
                  * issue: don't want reader to obfuscate already "public" symbols in the process (ie don't hash "define")
                    - maybe need to scrap multiple scoped modules & instead "#module" expression must be the first thing in a file
@@ -107,7 +119,7 @@
      ```lisp
      ; <public-symbol> ::= <local-name> :as <exposed-name> ; exposed as <exposed-name> in files that load this file
      ;                   | <local-name> ; equivalent to: "<local-name> :as <local-name>"
-     (#!module (<public-symbol> ...) <expression> ...)
+     (#module (<public-symbol> ...) <expression> ...)
      ```
 
 ====================================================================================
