@@ -202,7 +202,7 @@ public class Installer {
       escmStdlibLoader.append("\n");
       escmStdlibLoader.append("public class EscmStdLibLoader {\n");
       escmStdlibLoader.append("  public static void load() throws Exception {\n");
-      escmStdlibLoader.append("    Trampoline.resolve(SerializationPrimitives.LoadSerialized.logic(\""+stdlibPath+"\",(ignored) -> () -> Trampoline.LAST_BOUNCE_SIGNAL));\n");
+      escmStdlibLoader.append("    Trampoline.resolve(SerializationPrimitives.loadSerializedFile(\"load\",\""+stdlibPath+"\",(ignored) -> () -> Trampoline.LAST_BOUNCE_SIGNAL));\n");
       escmStdlibLoader.append("  }\n");
       escmStdlibLoader.append("}\n");
       escmStdlibLoader.append("\n");

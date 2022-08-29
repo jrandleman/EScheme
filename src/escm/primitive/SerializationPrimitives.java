@@ -1,6 +1,7 @@
 // Author: Jordan Randleman - escm.primitive.SerializationPrimitives
 // Purpose:
-//    Java primitives for boolean operations.
+//    Java primitives for serialization operations.
+//    Also contains loading logic for serialized files via <loadSerializedFile()>.
 
 package escm.primitive;
 import java.util.ArrayList;
@@ -111,7 +112,7 @@ public class SerializationPrimitives {
       return "serialize";
     }
 
-    private static Trampoline.Bounce getEscmInstructions(InstructionsList list, int i, int n, ArrayList<Datum> escmExprs, Trampoline.Continuation continuation) throws Exception { 
+    private static Trampoline.Bounce getDeserializedEscmInstructions(InstructionsList list, int i, int n, ArrayList<Datum> escmExprs, Trampoline.Continuation continuation) throws Exception { 
       if(i >= n) {
         if(list == null) return continuation.run(new InstructionSet());
         return continuation.run(new InstructionSet(list.mergeInReverse()));
@@ -121,7 +122,7 @@ public class SerializationPrimitives {
         return Interpreter.run(new ExecutionState(GlobalState.globalEnvironment,compiledAsm),(evalResult) -> () -> {
           if(evalResult instanceof Eof)
             return continuation.run(new InstructionSet((new InstructionsList(compiledAsm,list)).mergeInReverse()));
-          return getEscmInstructions(new InstructionsList(compiledAsm,list),i+1,n,escmExprs,continuation);
+          return getDeserializedEscmInstructions(new InstructionsList(compiledAsm,list),i+1,n,escmExprs,continuation);
         });
       });
     }
@@ -141,7 +142,7 @@ public class SerializationPrimitives {
         throw new Exceptionf("'(serialize <escm-file-path> <serialized-file-path>) 1st arg \"%s\" isn't a file!", escmPathStr);
       String escmContents = Files.readString(escmPath);
       ArrayList<Datum> escmExprs = FilePrimitives.FileRead.readBufferAsArrayList(escmPathStr,escmContents);
-      return getEscmInstructions(null,0,escmExprs.size(),escmExprs,(instructionSet) -> () -> {
+      return getDeserializedEscmInstructions(null,0,escmExprs.size(),escmExprs,(instructionSet) -> () -> {
         if(!(instructionSet instanceof InstructionSet))
           throw new Exceptionf("'(serialize <escm-file-path> <serialized-file-path>) compiling \"%s\" didn't yield an instruction set!", escmPathStr);
         ArrayList<Instruction> instructions = ((InstructionSet)instructionSet).value();
@@ -159,65 +160,32 @@ public class SerializationPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // load-serialized
-  public static class LoadSerialized implements PrimitiveCallable {
-    public java.lang.String escmName() {
-      return "load-serialized";
+  // Logic to load a serialized file
+  private static ArrayList<Instruction> getDeserializedEscmInstructions(String primitiveName, String serializePath) throws Exception {
+    FileInputStream fileIn = new FileInputStream(serializePath);
+    ObjectInputStream in = new ObjectInputStream(fileIn);
+    in.skipBytes(SERIALIZED_FILE_HEADER.length);
+    Object readObject = in.readObject();
+    in.close();
+    fileIn.close();
+    if(!(readObject instanceof ArrayList))
+      throw new Exceptionf("'(%s <filename>) serialized file \"%s\" didn't contain a valid serialized instruction set!", primitiveName, serializePath);
+    ArrayList readObjectArrayList = (ArrayList)readObject;
+    ArrayList<Instruction> instructions = new ArrayList<Instruction>(readObjectArrayList.size());
+    for(Object obj : readObjectArrayList) {
+      if(!(obj instanceof Instruction))
+        throw new Exceptionf("'(%s <filename>) serialized file \"%s\" didn't contain a valid serialized instruction set!", primitiveName, serializePath);
+      instructions.add((Instruction)obj);
     }
-
-    private static ArrayList<Instruction> getEscmInstructions(String serializePath) throws Exception {
-      if(IsSerializedP.logic(serializePath) == false)
-        throw new Exceptionf("'(load-serialized <serialized-file-path>) 1st arg \"%s\" isn't a serialized file!", serializePath);
-      FileInputStream fileIn = new FileInputStream(serializePath);
-      ObjectInputStream in = new ObjectInputStream(fileIn);
-      in.skipBytes(SERIALIZED_FILE_HEADER.length);
-      Object readObject = in.readObject();
-      in.close();
-      fileIn.close();
-      if(!(readObject instanceof ArrayList))
-        throw new Exceptionf("'(load-serialized <serialized-file-path>) file \"%s\" didn't contain a serialized instruction set!", serializePath);
-      ArrayList readObjectArrayList = (ArrayList)readObject;
-      ArrayList<Instruction> instructions = new ArrayList<Instruction>(readObjectArrayList.size());
-      for(Object obj : readObjectArrayList) {
-        if(!(obj instanceof Instruction))
-          throw new Exceptionf("'(load-serialized <serialized-file-path>) file \"%s\" didn't contain a serialized instruction set!", serializePath);
-        instructions.add((Instruction)obj);
-      }
-      return instructions;
-    }
-
-    public static Trampoline.Bounce logic(String serializePath, Trampoline.Continuation continuation) throws Exception {
-      ArrayList<Instruction> instructions = getEscmInstructions(serializePath);
-      return Interpreter.run(new ExecutionState(GlobalState.globalEnvironment,instructions),(evalResult) -> () -> {
-        if(evalResult instanceof Eof) return continuation.run(Void.VALUE);
-        return continuation.run(evalResult);
-      });
-    }
-
-    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
-        throw new Exceptionf("'(load-serialized <serialized-file-path>) didn't receive 1 string: %s", Exceptionf.profileArgs(parameters));
-      return logic(((escm.type.String)parameters.get(0)).value(),continuation);
-    }
+    return instructions;
   }
 
-
-  ////////////////////////////////////////////////////////////////////////////
-  // load-once-serialized
-  public static class LoadOnceSerialized implements PrimitiveCallable {
-    public java.lang.String escmName() {
-      return "load-once-serialized";
-    }
-
-    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
-        throw new Exceptionf("'(load-once-serialized <serialized-file-path>) didn't receive 1 string: %s", Exceptionf.profileArgs(parameters));
-      String filePath = FilePrimitives.AbsolutePath.logic(((escm.type.String)parameters.get(0)).value());
-      if(SystemPrimitives.LoadOnce.notLoadedYet(filePath)) {
-        SystemPrimitives.LoadOnce.registerLoadedFile(filePath);
-        return LoadSerialized.logic(filePath,continuation);
-      }
-      return continuation.run(Void.VALUE);
-    }
+  // @PRECONDITION: IsSerializedP.logic(serializePath)
+  public static Trampoline.Bounce loadSerializedFile(String primitiveName, String serializePath, Trampoline.Continuation continuation) throws Exception {
+    ArrayList<Instruction> instructions = getDeserializedEscmInstructions(primitiveName,serializePath);
+    return Interpreter.run(new ExecutionState(GlobalState.globalEnvironment,instructions),(evalResult) -> () -> {
+      if(evalResult instanceof Eof) return continuation.run(Void.VALUE);
+      return continuation.run(evalResult);
+    });
   }
 }

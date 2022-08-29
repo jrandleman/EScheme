@@ -4,52 +4,7 @@
 
 
 
-- `(serialized? <file-path-string>)`
-
-    * IF THIS IS IMPLEMENTED CORRECTLY: 
-      1. DON'T NEED THE NEW `-s`, `-ls` COMMAND LINE FLAGS BELOW
-         - CAN INSTEAD DETERMINE EVAL STRATEGY AUTOMATICALLY WHEN LOADING/INTERPRETING A GIVEN FILENAME
-      2. DON'T NEED `load-serialized` & `load-once-serialized` !!!
-         - RM FROM `help` & `primitives`
-         - EXECTUE `strfind load-serialized src` TO ADJUST/RM ALL INSTANCES
-         - CAN INSTEAD DETERMINE EVAL STRATEGY AUTOMATICALLY VIA `load` & `load-from` & `load-once` & `load-once-from`
-           * MENTION IN THEIR HELP ENTRY THAT THEY WILL AUTOMATICALLY WORK W/ SERIALIZED FILES TOO!
-      3. TEST THAT THE CMD-LINE & SOURCE-CODE LOADING OF SERIALIZED FILES WORKS SEAMLESSLY AS INTENDED
-
-
-
-
-<!-- 
-- COMMAND LINE SUPPORT FOR LOADING/INTERPRETTING SERIALIZED FILES!
-  `-s`, `--serialized <script> <arg1> ...` ; interpret & terminate the serialized `<script>` file
-  `-ls`, `--load-serialized <script> <arg1> ...` ; load the serialized `<script>` file into the REPL
-
-    ADD THESE TO THE README, `--help` RESULT, & `command-line` SECTION IN `help`
-
-
-
-    ```
-    Command-line flags may be used to modify EScheme's behavior:
-      1. -v,  --version                         | Print EScheme version information
-      2. -h,  --help                            | Print this information
-      3. -q,  --quiet                           | Launch the REPL without ASCII art
-      5. -l,  --load <script> <arg1> ...        | Load <script> with <arg> ... as *argv* into the REPL
-      6. -ls, --load-serial <script> <arg1> ... | Load serialized <script> into the REPL
-      4. -s,  --serial <script> <arg1> ...      | Interpret serialized <script>
-      7. <script> <arg1> ...                    | Interpret <script>
-      8. [no arguments]                         | Launch the REPL
-
-    ```
- -->
-
-
-
-
-
-
 - CONSIDER HAVING `load` & `load-from` ALSO POPULATE THE `load-once` BUFFER TOO !!!
-
-
 
 
 

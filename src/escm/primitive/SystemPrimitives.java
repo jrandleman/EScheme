@@ -80,7 +80,7 @@ public class SystemPrimitives {
       return "load";
     }
 
-    public static Trampoline.Bounce evalEachExpression(Environment env, ArrayList<Datum> exprs, int i, Stack<Pair<String,SourceInformation>> originalCallStack, Trampoline.Continuation continuation) throws Exception {
+    private static Trampoline.Bounce evalEachExpression(ArrayList<Datum> exprs, int i, Stack<Pair<String,SourceInformation>> originalCallStack, Trampoline.Continuation continuation) throws Exception {
       int n = exprs.size();
       if(i >= n) return continuation.run(Void.VALUE);
       Trampoline.Continuation nextContinuation;
@@ -90,24 +90,32 @@ public class SystemPrimitives {
         nextContinuation = (value) -> () -> {
           EscmCallStack.restore(originalCallStack); // residue frames may reside after call/cc nonsense
           if(value instanceof escm.type.port.Eof) return continuation.run(Void.VALUE);
-          return evalEachExpression(env,exprs,i+1,originalCallStack,continuation);
+          return evalEachExpression(exprs,i+1,originalCallStack,continuation);
         };
       }
       return escm.vm.Compiler.run(exprs.get(i),(compiled) -> () -> {
-        return escm.vm.Interpreter.run(new ExecutionState(env,escm.vm.Assembler.run(compiled)),nextContinuation);
+        return escm.vm.Interpreter.run(new ExecutionState(GlobalState.globalEnvironment,escm.vm.Assembler.run(compiled)),nextContinuation);
       });
     }
 
-    public static Trampoline.Bounce loadFileInEnvironment(String primitiveName, Environment env, String filename, Trampoline.Continuation continuation) throws Exception {
+    public static Trampoline.Bounce loadESchemeFile(String primitiveName, String filename, Trampoline.Continuation continuation) throws Exception {
       String buffer = FilePrimitives.FileRead.slurpFile(filename,primitiveName);
       ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(filename,buffer);
-      return evalEachExpression(env,exprs,0,EscmCallStack.copy(),continuation);
+      return evalEachExpression(exprs,0,EscmCallStack.copy(),continuation);
+    }
+
+    public static Trampoline.Bounce logic(String primitiveName, String filename, Trampoline.Continuation continuation) throws Exception {
+      if(SerializationPrimitives.IsSerializedP.logic(filename) == true) {
+        return SerializationPrimitives.loadSerializedFile(primitiveName,filename,continuation);
+      } else {
+        return loadESchemeFile(primitiveName,filename,continuation);
+      }
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(load <filename>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return loadFileInEnvironment("load",GlobalState.globalEnvironment,((escm.type.String)parameters.get(0)).value(),continuation);
+      return logic("load",((escm.type.String)parameters.get(0)).value(),continuation);
     }
   }
 
@@ -136,7 +144,7 @@ public class SystemPrimitives {
       if(!(file instanceof escm.type.String))
         throw new Exceptionf("'(load-from <directory> <filename>) 2nd arg isn't a string: %s", Exceptionf.profileArgs(parameters));
       String filePath = getPath(((escm.type.String)directory).value(),((escm.type.String)file).value());
-      return Load.loadFileInEnvironment("load-from",GlobalState.globalEnvironment,filePath,continuation);
+      return Load.logic("load-from",filePath,continuation);
     }
   }
 
@@ -162,7 +170,7 @@ public class SystemPrimitives {
       String filePath = FilePrimitives.AbsolutePath.logic(((escm.type.String)parameters.get(0)).value());
       if(notLoadedYet(filePath)) {
         registerLoadedFile(filePath);
-        return Load.loadFileInEnvironment("load-once",GlobalState.globalEnvironment,filePath,continuation);
+        return Load.logic("load-once",filePath,continuation);
       }
       return continuation.run(Void.VALUE);
     }
@@ -188,7 +196,7 @@ public class SystemPrimitives {
       String filePath = LoadFrom.getPath(((escm.type.String)directory).value(),((escm.type.String)file).value());
       if(LoadOnce.notLoadedYet(filePath)) {
         LoadOnce.registerLoadedFile(filePath);
-        return Load.loadFileInEnvironment("load-once-from",GlobalState.globalEnvironment,filePath,continuation);
+        return Load.logic("load-once-from",filePath,continuation);
       }
       return continuation.run(Void.VALUE);
     }

@@ -149,7 +149,7 @@
 ```scheme
 (exit <optional-integer-exit-code>)
 
-(load <filename-str>)
+(load <filename-str>) ; this (& all other <load> variants) work on both regular & <serialize>d EScheme files.
 (load-from <directory-str> <filename-str>) ; preferred for portability, esp. where <directory-str> is <#path>
 
 (load-once <filename-str>)                      ; prevents cyclic loading
@@ -501,9 +501,6 @@
 
 (serialize <escm-file-path> <serialized-file-path>)
 (serialized? <file-path>)
-
-(load-serialized <serialized-file-path>)
-(load-once-serialized <serialized-file-path>)
 ```
 
 

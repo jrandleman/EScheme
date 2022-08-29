@@ -8,6 +8,7 @@ import java.util.Stack;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import escm.type.Datum;
 import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
@@ -190,14 +191,9 @@ public class Main {
     //   could cause a read/write race condition should the loaded script spawn a 
     //   thread!
     if(parsedCmdLine.loadingIntoREPL) GlobalState.inREPL = true; // trigger exit message to be printed
-    String buffer = null;
-    try {
-      buffer = FilePrimitives.FileRead.slurpFile(parsedCmdLine.scriptName,"escm-load-script");
-    } catch(Exception e) {
-      throw new Exceptionf("%s\n  %s", e, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
-    }
-    ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(parsedCmdLine.scriptName,buffer);
-    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,new Stack<Pair<String,SourceInformation>>(),replIfReplingContinuation));
+    if(FilePrimitives.IsFileP.logic(Path.of(parsedCmdLine.scriptName)) == false)
+      throw new Exceptionf("\"--load\": \"%s\" isn't a file!\n  %s", parsedCmdLine.scriptName, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
+    Trampoline.resolve(SystemPrimitives.Load.logic("load",parsedCmdLine.scriptName,replIfReplingContinuation));
   }
 
 
