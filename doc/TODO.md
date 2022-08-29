@@ -33,6 +33,154 @@
 
 
 
+- CONCEPT OF GENERIC ALGO PRIMTIIVES THAT OPERATE ON `AssociativeCollection` (`AC` alias) & `OrderedCollection` (`OC` alias) INTERFACES
+
+```clj
+(define-interface AssociativeCollection
+  (:static (valueOf obj)
+    (cond ((AssociativeCollection? obj)
+            obj)
+          ((string? obj)
+            (escm-string->associative-collection obj))
+          ((list? obj)
+            (escm-list->associative-collection obj))
+          ((vector? obj)
+            (escm-vector->associative-collection obj))
+          ((hashmap? obj)
+            (escm-hashmap->associative-collection obj))
+          (else
+            (errorf "Invalid non-associative collection given: %wa of type %a" obj (typeof obj)))))
+  ref ; (lambda (keyValue) ...)
+  ; ETC.
+  )
+
+
+; Ordered collections are "associative" w/ idxs as their keys
+(define-interface OrderedCollection (:extends AssociativeCollection)
+  (:static (valueOf obj)
+    (cond ((OrderedCollection? obj)
+            obj)
+          ((string? obj)
+            (escm-string->ordered-collection obj))
+          ((list? obj)
+            (escm-list->ordered-collection obj))
+          ((vector? obj)
+            (escm-vector->ordered-collection obj))
+          (else
+            (errorf "Invalid non-ordered collection given: %wa of type %a" obj (typeof obj)))))
+  slice ; (fn ((start) ...) ((start end) ...) ((start end skip-callable) ...))
+  ; ... ETC.
+  )
+
+
+(define AC AssociativeCollection)
+(define AC? AssociativeCollection?)
+
+(define OC OrderedCollection)
+(define OC? OrderedCollection?)
+```
+
+
+```clj
+
+;;;;;;;;;;;;;;;;
+;;;; IN ESCHEME:
+
+; Predicates
+(AssociativeCollection? <object>) ; for objects (aliased by <AC?>)
+(OrderedCollection? <object>) ; aliased by <OC?>
+
+(associative-collection? <obj>) ; for objs (aliased by <ac?>)
+(ordered-collection? <obj>) ; aliased by <oc?>
+
+
+; ACs
+(empty? <ac>)
+(length <ac>)
+(length+ <list>)
+
+(fold <callable> <seed> <ac> ...)
+(fold-right <callable> <seed> <ac> ...)
+
+(map <callable> <ac> ...)
+(for-each <callable> <ac> ...)
+(filter <callable> <ac>)
+
+(count <predicate?> <ac>)
+(remove <predicate?> <ac>)
+
+(ref <ac> <key>)
+
+(append <ac> ...) ; all args must be of the same type
+
+(delete <ac> <key>) ; return copy of <ac> w/o <key>
+
+(any <predicate?> <ac> ...)
+(every <predicate?> <ac> ...)
+
+(conj <obj> <ac>)
+
+(associative-collection->list <ac>) ; (aliased by ac->list)
+(associative-collection->string <ac>) ; (aliased by ac->string)
+(associative-collection->vector <ac>) ; (aliased by ac->vector)
+(associative-collection->hashmap <ac>) ; (aliased by ac->hashmap)
+
+(union <elt=?> <ac> ...)
+(intersection <elt=?> <ac> ...)
+(difference <elt=?> <ac> ...)
+(symmetric-difference <elt=?> <ac> ...)
+
+(merge <ac> ...)
+
+(delete-duplicates <ac>)
+
+
+; OCs
+(map-from <start-key> <optional-length-or-end-predicate> <callable> <oc> ...)
+(for-each-from <start-key> <optional-length-or-end-predicate> <callable> <oc> ...)
+(filter-from <start-key> <optional-length-or-end-predicate> <callable> <oc>)
+
+(slice <oc> <start-key> <optional-length-or-end-predicate>)
+
+(reverse <oc>)
+
+(remove-first <predicate?> <oc>)
+(remove-last <predicate?> <oc>)
+
+(head <oc>)
+(tail <oc>)
+(init <oc>)
+(last <oc>)
+
+(skip <predicate?> <oc>)
+(skip-right <predicate?> <oc>)
+
+(key <predicate?> <oc>) ; returns key of left-most value satisfying <predicate?>
+(key-right <predicate?> <oc>) ; returns key of right-most value satisfying <predicate?>
+
+(drop <oc> <length>)
+(drop-right <oc> <length>)
+(drop-while <predicate?> <oc>)
+(drop-right-while <predicate?> <oc>)
+
+(take <oc> <length>)
+(take-right <oc> <length>)
+(take-while <predicate?> <oc>)
+(take-right-while <predicate?> <oc>)
+
+(sort <binary-predicate?> <oc>)
+(sorted? <binary-predicate?> <oc>)
+
+(delete-neighbor-duplicates <oc>)
+```
+
+
+
+
+
+
+
+
 
 
 - have anonymous lambdas print some unique id for slightly easier debugging
