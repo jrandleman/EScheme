@@ -39,6 +39,8 @@
   HEX CHARACTER CODES: #\xa ; equivalent to #\newline
   ```
 
+  => LIKE HASHMAPS & VECTORS, _HAVE STRINGS BE UNARY CALLABLES_ ACCEPTING AN INDEX AS ITS ARG TO GET A CHAR @ THAT POSITION
+
 
 
 
@@ -53,11 +55,11 @@
     (cond ((AssociativeCollection? obj)
             obj)
           ((string? obj)
-            (escm-string->AssociativeCollection obj))
+            (escm-string->OrderedCollection obj))
           ((list? obj)
-            (escm-list->AssociativeCollection obj))
+            (escm-list->OrderedCollection obj))
           ((vector? obj)
-            (escm-vector->AssociativeCollection obj))
+            (escm-vector->OrderedCollection obj))
           ((hashmap? obj)
             (escm-hashmap->AssociativeCollection obj))
           (else
