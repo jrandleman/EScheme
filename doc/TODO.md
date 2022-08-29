@@ -31,6 +31,18 @@
 
 
 
+- ADD IN THE `Character` TYPE PRIOR TO IMMUTABLE GENERIC ALGOS (REQUIRED FOR ITERATION IN STRING CONTAINERS)
+  => `#\` PREFIX AS PER REGULAR SCHEME (REPRESENTS AN INT UNDER THE HOOD)
+
+  ```clj
+  (list->string '(#\h #\e #\l #\l #\o #\! #\newline)) ; => "hello!\n"
+  HEX CHARACTER CODES: #\xa ; equivalent to #\newline
+  ```
+
+
+
+
+
 
 
 - CONCEPT OF GENERIC ALGO PRIMTIIVES THAT OPERATE ON `AssociativeCollection` (`AC` alias) & `OrderedCollection` (`OC` alias) INTERFACES
@@ -41,13 +53,13 @@
     (cond ((AssociativeCollection? obj)
             obj)
           ((string? obj)
-            (escm-string->associative-collection obj))
+            (escm-string->AssociativeCollection obj))
           ((list? obj)
-            (escm-list->associative-collection obj))
+            (escm-list->AssociativeCollection obj))
           ((vector? obj)
-            (escm-vector->associative-collection obj))
+            (escm-vector->AssociativeCollection obj))
           ((hashmap? obj)
-            (escm-hashmap->associative-collection obj))
+            (escm-hashmap->AssociativeCollection obj))
           (else
             (errorf "Invalid non-associative collection given: %wa of type %a" obj (typeof obj)))))
   ref ; (lambda (keyValue) ...)
@@ -61,11 +73,11 @@
     (cond ((OrderedCollection? obj)
             obj)
           ((string? obj)
-            (escm-string->ordered-collection obj))
+            (escm-string->OrderedCollection obj))
           ((list? obj)
-            (escm-list->ordered-collection obj))
+            (escm-list->OrderedCollection obj))
           ((vector? obj)
-            (escm-vector->ordered-collection obj))
+            (escm-vector->OrderedCollection obj))
           (else
             (errorf "Invalid non-ordered collection given: %wa of type %a" obj (typeof obj)))))
   slice ; (fn ((start) ...) ((start end) ...) ((start end skip-callable) ...))
@@ -345,6 +357,8 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 
            => ___POSSIBLE SOLUTION: POTENTIALLY SUPPORT `\uXXXX` FOR TRUE JAVA CHARACTERS___
               * ___ALSO SUPPORT `\Uxxxxxxxx` FOR 32-BIT CHARSEQS W/IN A STRING (MENTION THIS CORRELATES TO A CHAR SEQUENCE, NOT A CHAR!)___
+
+        => SUPPORT A CHARACTERS: `#\unicode` `#\Unicode` (for \u & \U)
 
 
   * ADD DETAILS TO `README` & `help` REGARDING WHAT ESCAPE CHARACTERS ARE / AREN'T SUPPORTED IN STRINGS !!!
