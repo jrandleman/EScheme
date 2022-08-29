@@ -108,7 +108,6 @@ Each symbol is given a private environment pointer that links to the private env
                    - maybe need to scrap multiple scoped modules & instead "#module" expression must be the first thing in a file
                    - then have "load" always get public symbols (effectively ignores the module declaration)
                      * then support `import` that accounts for module declarations (otherwises loaded non-module files regularly)
-               <!-- - not sure, shee-it jack this may be harder than anticipated (rip) ;; => oof ;; => nah actually though -->
 
                => MAYBE instead of having modules make things private by default, should have them be public, then 
                   their parameter-list has which symbols to make private, making hashing WAY more simple over-all
