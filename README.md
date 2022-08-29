@@ -96,13 +96,13 @@
 5. `#path` reader literal that expands to the current file's parent path string
 6. Keyword primitive types
    - Like symbols, but prefixed with `:`, & they always evaluate to themselves
-7. Vector literals have been reworked:
+7. Vector literals have been reworked
    - Uses `[<obj> ...]` instead of `#(<obj> ...)`
    - Quotes aren't always required: 
      * `[a b c]` compiles to vector of `a`, `b`, & `c` evaluated as variables
    - Quotes can be used though to get expected results: 
      * `(quote [a b c])` => `[(quote a) (quote b) (quote c)]`
-8. Hashmap literals have been added in:
+8. Hashmap literals have been added in
    - Use `{<key> <value> ...}`
    - A note on hashing:
      * Immutable values hash based on contents (think numbers, symbols, pairs, etc.)
@@ -114,10 +114,10 @@
      * `(quote {a 42})` => `{(quote a) (quote 42)}`
 9. Immutable pairs & strings
    - Mutable pairs may be implemented by users via the object system!
-10. `\` reader lambda literal support:
+10. `\` reader lambda literal support
     - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
     - `\%1` => `(lambda (%1) %1)`, `\(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
-11. Compile-time procedural macro system:
+11. Compile-time procedural macro system
     - No run-time expansion, all global in scope, deletable for localization!
 12. Object System (classes, interfaces, and objects!)
 13. Multithreading Support (threads and reentrant locks!)
