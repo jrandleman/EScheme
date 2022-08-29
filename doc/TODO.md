@@ -4,8 +4,6 @@
 
 
 
-
-
 - `(serialized? <file-path-string>)`
 
     * IF THIS IS IMPLEMENTED CORRECTLY: 
@@ -16,7 +14,6 @@
          - EXECTUE `strfind load-serialized src` TO ADJUST/RM ALL INSTANCES
          - CAN INSTEAD DETERMINE EVAL STRATEGY AUTOMATICALLY VIA `load` & `load-from` & `load-once` & `load-once-from`
            * MENTION IN THEIR HELP ENTRY THAT THEY WILL AUTOMATICALLY WORK W/ SERIALIZED FILES TOO!
-
       3. TEST THAT THE CMD-LINE & SOURCE-CODE LOADING OF SERIALIZED FILES WORKS SEAMLESSLY AS INTENDED
 
 
@@ -51,6 +48,65 @@
 
 
 - CONSIDER HAVING `load` & `load-from` ALSO POPULATE THE `load-once` BUFFER TOO !!!
+
+
+
+
+
+
+
+
+====================================================================================
+====================================================================================
+====================================================================================
+====================================================================================
+
+-> CHANGE THE READER MACRO `#path` TO BE `#!path`
+   * USE `STRFIND` TO VERIFY INSTANCE & CHANGE AS NEEDED ACCORDINGLY
+
+   - WHAT ABOUT CHANGING `#nil` => `#!nil`
+                         `#void` => `#!void`
+                         `#eof` => `#!eof`
+                         `#path` => `#!path`
+
+
+
+-> modules: every `load` instance offers a "module" opportunity
+   
+   * by default, `load` has it such that every symbol is "public" in the "module" (file)
+   * however, as soon as at least 1 file is exposed as public from the module, then all other global symbols are private by default
+   * defining a module w/ an empty parameter list makes every global symbol private
+   * The `#!module` syntax:
+     Contrary to most `#!` syntax instances, `#!module` denotes an operation that takes place at compile-time rather than read-time.
+     `#!module` tells the compiler to hash any symbol not exposed as "public" in the module with a prefix to 
+     obfuscate it in the global scope (ORR MAYBE GET TRICKY WITH HOW CAN MANIPULATE ENVIRONMENT POINTER USE, IE ONE ONLY TO PUBLIC & THE OTHER TO PRIVATE).
+
+     Moreover, modules _ALSO_ tell the compiler to compile and run each of the internal expressions entirely one after another, in order to be able to 
+               control exposure semantics of macros
+               - why do we give a fuck about this though? Can't this symbol obfuscation not just be reader?
+                 * then revert to `#module` (instead of `#!module`) since a reader-op (not a compile-op)
+                 * issue: don't want reader to obfuscate already "public" symbols in the process (ie don't hash "define")
+                   - maybe need to scrap multiple scoped modules & instead "#module" expression must be the first thing in a file
+                   - then have "load" always get public symbols (effectively ignores the module declaration)
+                     * then support `import` that accounts for module declarations (otherwises loaded non-module files regularly)
+               <!-- - not sure, shee-it jack this may be harder than anticipated (rip) ;; => oof ;; => nah actually though -->
+
+               => MAYBE instead of having modules make things private by default, should have them be public, then 
+                  their parameter-list has which symbols to make private, making hashing WAY more simple over-all
+
+               - what about potential creative obsfuscation-related abilities gained by having named modules ?
+
+
+     ```lisp
+     ; <public-symbol> ::= <local-name> :as <exposed-name> ; exposed as <exposed-name> in files that load this file
+     ;                   | <local-name> ; equivalent to: "<local-name> :as <local-name>"
+     (#!module (<public-symbol> ...) <expression> ...)
+     ```
+
+====================================================================================
+====================================================================================
+====================================================================================
+====================================================================================
 
 
 
@@ -185,7 +241,9 @@
 
   * ADD IN PRIMITIVE VARIABLE `*debug*` => SET THIS TO WHETHER GIVEN `-d`, `--debug` FLAG @ CMD-LINE
 
-  * ADD IN A PRIMTIIVE `(call-stack)` FUNCTION THAT RETURNS A LIST OF THE CURRENT CALL-STACK (FUNCTION NAMES ARE STRINGS)
+  * ADD IN A PRIMTIIVE `(call-stack)` FUNCTION THAT RETURNS A LIST OF THE CURRENT CALL-STACK (FUNCTION NAMES ARE STRINGS) 
+    => CONSIDER HOW TO ALSO RETURN DATA ABOUT SOURCE INFO IF AVAILABLE?
+       * RETURN AN ALIST THAT STARTS WITH THE FCN NAM EIN THE CALLSTACK, FOLLOWED BY A LIST (OR NIL) HOLDING DOURCE FILENAME, NEWLINE INTEGER, & COLUMN LINE INTEGER
 
 
 
