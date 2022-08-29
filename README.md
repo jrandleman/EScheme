@@ -85,7 +85,7 @@
 ------------------------------------------------------------------------------
 ## EScheme-Specific Concepts (Scheme Extensions/Deviations)
 
-1. Stackless function calls (no stack overflow from finite recursion)
+1. Stackless function calls (no stack overflow from recursion)
 2. Support for `bytecode`, `compile`, `eval-bytecode`
    - `bytecode`: special form to have the compiler reflect the given bytecode
    - `compile`: convert a quoted escm expression into a quoted bytecode list
