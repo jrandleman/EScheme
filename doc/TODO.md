@@ -71,6 +71,12 @@
 
 "module" statement processed (MUST be @ top of the file) signifies we are exporting new symbols to the set of "public" symbols.
 
+```clj
+(module <symbol> ...) ; ignored if being processed by <load>, only <import> is affected here. "<symbol> ..." are public in scope. <load> forces everything to be public.
+(module) ; everything in the file is private (but still loaded)
+<code> ...
+```
+
 When reading in (importing!) a module:
 Each symbol is given a private environment pointer that links to the private environment of the module they were defined in?
   => when setting/defining/getting a symbol -- WITHIN THE GLOBAL SCOPE -- first check whether the symbol is public. If so, 
