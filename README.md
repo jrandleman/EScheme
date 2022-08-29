@@ -118,7 +118,7 @@
     - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
     - `\%1` => `(lambda (%1) %1)`, `\(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
 11. Compile-time procedural macro system:
-    - No run-time expansion, all global in scope, deletable for localization!
+    - No run-time expansions, all global in scope, deletable for localization!
 12. Object System (classes, interfaces, and objects!)
 13. Multithreading Support (threads and reentrant locks!)
 14. Multi-arity and optional-parameter support via `fn`
