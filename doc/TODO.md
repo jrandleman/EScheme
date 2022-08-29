@@ -83,16 +83,24 @@ Each symbol is given a private environment pointer that links to the private env
      go ahead and operate on it in the global scope. Otherwise, do it in their attached "private global environment" scope.
 
 
+support `import-from` `import-once` `import-once-from`
+  => hence ideal "best practice" would be to use `(import-once-from #path <filename>)`
+  => ALTERNATIVELY: CONSIDER HAVING THERE BE `import` (the current `import-once`) and `import!` (the current `import`)
+     * THEN the ideal would be `(import-from #path <filename>)`
+       - ORR WHAT IF FOR IMPORTING WE SUPPORT `(import <path-part-1> <path-part-2> ...)`
+         => THEN INTERNALLY IMPORT EQV OF `(string-join (list <path-part-1> <path-part-2> ...) *file-separator*)`
+         => THEN COULD DO `(import #path <filename>)`
+            - but does this hide too much??? could it be deceptively simple?
+            - maybe keep the concept of `-once` in, but support the "path-pasting" instead of `-from`
+              * do the same for `load`?
 
 
 
--> CHANGE THE READER MACRO `#path` TO BE `#!path`
-   * USE `STRFIND` TO VERIFY INSTANCE & CHANGE AS NEEDED ACCORDINGLY
+PROBLEM: How can we intermix the notion of serialization and modules?
+  => MAYBE: if during serialization we detect a `module` clause, an error is signaled?
+  => OR WAIT: IS THIS EVEN REALLY STILL AN ISSUE IF WE USE THE "PRIVATE ENV" METHOD?
 
-   - WHAT ABOUT CHANGING `#nil` => `#!nil`
-                         `#void` => `#!void`
-                         `#eof` => `#!eof`
-                         `#path` => `#!path`
+
 
 
 
@@ -121,10 +129,10 @@ Each symbol is given a private environment pointer that links to the private env
                - what about potential creative obsfuscation-related abilities gained by having named modules ?
 
 
-     ```lisp
+     ```clj
      ; <public-symbol> ::= <local-name> :as <exposed-name> ; exposed as <exposed-name> in files that load this file
      ;                   | <local-name> ; equivalent to: "<local-name> :as <local-name>"
-     (#module (<public-symbol> ...) <expression> ...)
+     (module (<public-symbol> ...) <expression> ...)
      ```
 
 ====================================================================================
