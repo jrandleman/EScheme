@@ -372,8 +372,8 @@ public class Complex extends Number {
 
 
   public String toString(int radix) throws Exception {
-    if(radix < Character.MIN_RADIX || radix > Character.MAX_RADIX)
-      throw new Exceptionf("Can't print number %s with invalid radix %d (only %d-%d)", display(), radix, Character.MIN_RADIX, Character.MAX_RADIX);
+    if(radix < Number.MIN_RADIX || radix > Number.MAX_RADIX)
+      throw new Exceptionf("Can't print number %s with invalid radix %d (only %d-%d)", display(), radix, Number.MIN_RADIX, Number.MAX_RADIX);
     if(imag.isNegative() == false) {
       return real.toString(radix)+"+"+imag.toString(radix)+"i";
     } else {

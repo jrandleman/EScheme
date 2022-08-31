@@ -17,6 +17,12 @@
   "description": "Represents a Java <string> under the hood (hence immutable).\nLiterals are denoted via double-quotes.",
   "example": null
 }, {
+  "name": "character",
+  "aliases": ["char"],
+  "signatures": null,
+  "description": "Reader literals have the '#\\' prefix: #\\h #\\e #\\l #\\l #\\o #\\!\n\nRepresented by a 32bit codepoint internally:\n  * In keeping with Java, any codepoint <= 16bits correlates to a true, single\n    character in strings.\n  * Any codepoint above 16bits (as in Java) becomes 2 separate characters in \n    strings.\n\nSupports Named Characters:\n  #\\space,     #\\tab, #\\newline, #\\page, #\\return,\n  #\\backspace, #\\nul, #\\esc,     #\\delete\n\nSupports Unicode Codepoints (note 'u' vs. 'U'):\n  #\\uXXXX (create a 16bit hex-code character)\n  #\\UXXXXXXXX (create a 32bit hex-code character)\n\nDisplaying characters prints them in a human-readable way, whereas writing them\nprints characters with their prefix such that they can be re-read by the reader.",
+  "example": null
+}, {
   "name": "void",
   "aliases": ["#void"],
   "signatures": null,

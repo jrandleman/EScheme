@@ -618,8 +618,8 @@ public class Exact extends Real {
 
 
   public String toString(int radix) throws Exception {
-    if(radix < Character.MIN_RADIX || radix > Character.MAX_RADIX)
-      throw new Exceptionf("Can't print number %s with invalid radix %d (only %d-%d)", display(), radix, Character.MIN_RADIX, Character.MAX_RADIX);
+    if(radix < Number.MIN_RADIX || radix > Number.MAX_RADIX)
+      throw new Exceptionf("Can't print number %s with invalid radix %d (only %d-%d)", display(), radix, Number.MIN_RADIX, Number.MAX_RADIX);
     if(num.signum() == 0) return "0";
     BigInteger numer = null;
     BigInteger denom = null;

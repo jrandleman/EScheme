@@ -392,6 +392,43 @@ public class Reader {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Character Literal Identification & Parsing Helpers
+  private static escm.type.Character NUL_CHARACTER = new escm.type.Character('\0');
+
+
+  // @precondition: sourceCode.charAt(i) == '#' && sourceCode.charAt(i+1) == '\\'
+  // @param: <i> is where to start parsing
+  // @param: <n> is <sourceCode.length()>
+  private static boolean isCharacterLiteral(CharSequence sourceCode, int i, int n) {
+    return i+1 < n && sourceCode.charAt(i+1) == '\\';
+  }
+
+
+  // @return: pair of parsed character & position in <sourceCode> after the parsed literal
+  private static Pair<Datum,Integer> parseCharacterLiteral(CharSequence sourceCode, int i, int n, SourceInformation source) throws ReaderException {
+    if(i+2 == n) return new Pair<Datum,Integer>(NUL_CHARACTER,i+2);
+    SourceInformation charSource = source.clone();
+    int charIndex = i;
+    char firstChar = sourceCode.charAt(i+2);
+    StringBuilder sb = new StringBuilder();
+    sb.append(firstChar);
+    source.updatePosition("#\\");
+    source.updatePosition(firstChar);
+    i += 3;
+    while(i < n && isDelimiter(sourceCode.charAt(i)) == false) {
+      char c = sourceCode.charAt(i);
+      source.updatePosition(c);
+      sb.append(c);
+      ++i;
+    }
+    escm.type.Character ch = escm.type.Character.parse(sb.toString());
+    if(ch == null)
+      throw new ReaderException(charIndex,sourceCode,charSource,"READ ERROR: Invalid character literal \"#\\%s\"", sb.toString());
+    return new Pair<Datum,Integer>(ch,i);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // String Literal Parsing Helper
   // @param: <i> is where to start parsing
   // @return: pair of parsed string & position in <sourceCode> after the closing <">
@@ -602,6 +639,10 @@ public class Reader {
         // Parse EOF Literals
         if(isEofLiteral(sourceCode,i,n)) 
           return parseEofLiteral(sourceCode,i,source);
+
+        // Parse Character Literals
+        if(isCharacterLiteral(sourceCode,i,n)) 
+          return parseCharacterLiteral(sourceCode,i,n,source);
       }
 
       // Parse String Literals

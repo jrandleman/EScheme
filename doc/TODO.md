@@ -3,51 +3,320 @@
 ## MORE
 
 
-- ADD IN `(file-remove-extension <file-path-string> <extension-string>)` (ALSO REMOVES THE ".")
-
-
-
-
-
-
-
-- MAKE SURE ALL "Stream" & "File" & "Reader" & "Writer" INSTANCES ARE PROPERLY CLOSED IN JAVA
-  * MAKE SURE MOVE AS MANY "CLOSE" OPERATIONS AS POSSIBLE PRIOR THROWING ERRORS FOR FILES!
-
-
-
-
-
-
-
-- CONSIDER HAVING `eval` & `bytecode-eval` & `load` & `load-from` & `load-serialized` & `serialize` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
-  => OPTIONAL ARG TO THE EXISTING FCNS DENOTING WHETHER TO SANDBOX THE EVALUATION (#f BY DEFAULT)
-
-
-
-
-
-
-
 
 
 - ADD IN THE `Character` TYPE PRIOR TO IMMUTABLE GENERIC ALGOS (REQUIRED FOR ITERATION IN STRING CONTAINERS)
   => `#\` PREFIX AS PER REGULAR SCHEME (REPRESENTS AN INT UNDER THE HOOD)
+
+
+
+[X] FIX READERS TO ACCOUNT FOR BASIC SINGLE CHARACTERS
+[X] EXTEND READERS TO ALLOW FOR NAMED CHARACTERS (#\newline, #\tab, ETC.)
+    ```
+    #\space, #\tab, #\newline, #\page, #\return,
+    #\backspace, #\nul, #\esc (27), #\delete (127)
+    ```
+[X] EXTEND READERS TO ALLOW FOR CODEPOINT CHARACTERS (#\uXXXX, #\UXXXXXXXX)
+[X] UPDATE CHARACTER PRINTER TO PRINT OUT NAMED CHARS & CHAR HEX CODES AS NEEDED!
+[X] FIX SITUATION WHERE `#\newline` WILL NEVER BE READ W/O NAME B/C OF HOW `isDelimiter` WORKS
+[X] UPDATE `help` WITH A `Types > character` ENTRY CONTAINING INFO ON CODEPOINTS, DIFFERENT NAMED CHARS, ETC.
+    * mention that "write" & "display" are different for chars!
+
+[ ] ADD IN CHARACTER PRIMITIVE FUNCTIONS
+    * ADJUST `help` & `primitives.md` AS NEEDED
+[ ] UPDATE SOME OF THE STRING PRIMITIVES TO ACCOUNT FOR "CHAR" TYPE
+    * ADJUST `help` & `primitives.md` AS NEEDED
+
+[ ] UPLOAD TO GITHUB
+
+[ ] LIKE HASHMAPS & VECTORS, _HAVE STRINGS BE UNARY CALLABLES_ ACCEPTING AN INDEX AS ITS ARG TO GET A CHAR @ THAT POSITION
+    * MENTION THIS IN `help`!
+
+[ ] UPLOAD TO GITHUB
+
+
+
 
   ```clj
   (list->string '(#\h #\e #\l #\l #\o #\! #\newline)) ; => "hello!\n"
   HEX CHARACTER CODES: #\xa ; equivalent to #\newline
   ```
 
-  => LIKE HASHMAPS & VECTORS, _HAVE STRINGS BE UNARY CALLABLES_ ACCEPTING AN INDEX AS ITS ARG TO GET A CHAR @ THAT POSITION
+```
+CHAR-ALPHABETIC?    CHAR-NUMERIC?         CHAR-WHITESPACE?    CHAR-UPPER-CASE?
+CHAR-LOWER-CASE?    CHAR-ALPHANUMERIC?    CHAR-CONTROL?       CHAR-PRINT?     
+CHAR-GRAPH?         CHAR-PUNCTUATION?     CHAR-XDIGIT?        CHAR-UPCASE     
+CHAR-DOWNCASE       CHAR=?              CHAR<?          
+CHAR>?              CHAR<=?               CHAR>=?             CHAR-CI=?       
+CHAR-CI<?           CHAR-CI>?             CHAR-CI<=?          CHAR-CI>=?
+
+CHAR-CODEPOINT? ; to determine if holding a 32bit unicode "char-pair" rather than a true 16bit java character (32bit codepoints take up 2 char slots in a string)
+CHAR-32? ; alias for <CHAR-CODEPOINT?>
+CHAR-16? ; WHETHER A 16BIT TRUE JAVA CHAR
+```
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+====================================================================================
+====================================================================================
+====================================================================================
+====================================================================================
+
+```
+(union <elt=?> <ac> ...)
+(intersection <elt=?> <ac> ...)
+(difference <elt=?> <ac> ...)
+(symmetric-difference <elt=?> <ac> ...)
+
+(merge <predicate?> <ac> ...)
+
+(delete-duplicates <ac>)
+```
 
 
 
 - RECONSIDER WHETHER SHOULD REALLY HAVE AN ESCM-OO OBJECT VERSION TO PASS TO GENERIC ALGOS (MAY BE MORE TROUBLE THAN ITS WORTH)
+  => MAYBE HAVE IT, BUT WITH 2 INTERFACES THAT A JAVA CLASS CAN SELECT FROM IN ORDER TO IMPLEMENT A "`*Collection`" OBJECT
+  => HAVE "ITERATOR" CONCEPT?
+
+     ```java
+      public interface AssociativeCollectionIterator {
+        boolean finished(); // returns whether at end of the collection
+
+        Datum key() throws Exception;   // throws if <finished() == true>
+        Datum value() throws Exception; // throws if <finished() == true>
+
+        AssociativeCollectionIterator next(); // may return <this> if <finished() == true>
+
+        Datum fromList(Datum l); // convert list <l> into an <AssociativeCollection> Datum
+        Datum toList();          // convert remaining values until <finished() == true> to a list Datum
+      }
+
+
+
+      public interface AssociativeCollection {
+        //////////////////////////////////////////////////////////////////////
+        // Instance Methods
+        AssociativeCollectionIterator iterator();
+
+        Datum head();
+        AssociativeCollection tail();
+
+        int length();
+
+        Datum ref(Datum key) throws Exception;
+
+        AssociativeCollection append(AssociativeCollection ac) throws Exception;
+
+        AssociativeCollection delete(Datum key) throws Exception;
+
+        AssociativeCollection conj(Datum key, Datum val) throws Exception;
+
+        Datum toList();
+        Datum toVector();
+        Datum toString();
+        Datum toHashmap();
+
+
+        //////////////////////////////////////////////////////////////////////
+        // Extract iterators for the given collections 
+        private static AssociativeCollectionIterator[] getIterators(AssociativeCollection[] acs) {
+          AssociativeCollectionIterator[] iters = new AssociativeCollectionIterator[acs.length];
+          for(int i = 0; i < acs.length; ++i) iters[i] = acs[i].iterator();
+          return iters;
+        }
+
+
+        //////////////////////////////////////////////////////////////////////
+        // Folding Logic (returns Datum)
+        private static Trampoline.Bounce foldIter(Callable c, Datum seed, AssociativeCollectionIterator[] iters, Trampoline.Continuation continuation) throws Exception {
+          AssociativeCollectionIterator[] cdrs = new AssociativeCollectionIterator[iters.length];
+          ArrayList<Datum> args = new ArrayList<Datum>(1+iters.length);
+          args.add(seed);
+          for(int i = 0; i < iters.length; ++i) {
+            if(iters[i].finished()) return continuation.run(seed);
+            args.add(iters[i].value());
+            cdrs[i] = iters[i].next();
+          }
+          return c.callWith(args,(acc) -> () -> foldIter(c,acc,cdrs,continuation));
+        }
+
+
+        public static Trampoline.Bounce fold(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
+          if(acs.length == 0) return continuation.run(seed);
+          AssociativeCollectionIterator[] iters = getIterators(acs);
+          return foldIter(c,seed,iters,continuation);
+        }
+
+
+        //////////////////////////////////////////////////////////////////////
+        // Mapping Logic (returns AssociativeCollection)
+        private static Trampoline.Bounce mapIter(Callable c, AssociativeCollectionIterator[] iters, Trampoline.Continuation continuation) throws Exception {
+          AssociativeCollectionIterator[] cdrs = new AssociativeCollectionIterator[iters.length];
+          ArrayList<Datum> args = new ArrayList<Datum>(iters.length);
+          for(int i = 0; i < iters.length; ++i) {
+            if(iters[i].finished()) return continuation.run(escm.type.Nil.VALUE);
+            args.add(iters[i].value());
+            cdrs[i] = iters[i].next();
+          }
+          return c.callWith(args,(mappedValue) -> () -> mapIter(c,cdrs,(mappedList) -> () -> continuation.run(new escm.type.Pair(mappedValue,mappedList))));
+        }
+
+
+        public static Trampoline.Bounce map(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
+          if(acs.length == 0) throw new Exception("'(map <callable> <ac> ...) expects exactly at least 1 <ac>");
+          AssociativeCollectionIterator[] iters = getIterators(acs);
+          return mapIter(c,iters,(mappedList) -> () -> continuation.run(iters[0].fromList(mappedList)));
+        }
+
+
+        //////////////////////////////////////////////////////////////////////
+        // For-each Logic (returns Void)
+        private static Trampoline.Bounce forEachIter(Callable c, AssociativeCollectionIterator[] iters, Trampoline.Continuation continuation) throws Exception {
+          AssociativeCollectionIterator[] cdrs = new AssociativeCollectionIterator[iters.length];
+          ArrayList<Datum> args = new ArrayList<Datum>(iters.length);
+          for(int i = 0; i < iters.length; ++i) {
+            if(iters[i].finished()) return continuation.run(Void.VALUE);
+            args.add(iters[i].value());
+            cdrs[i] = iters[i].next();
+          }
+          return c.callWith(args,(ignore) -> () -> forEachIter(c,cdrs,continuation));
+        }
+
+
+        public static Trampoline.Bounce forEach(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
+          if(acs.length == 0) throw new Exception("'(for-each <callable> <ac> ...) expects exactly at least 1 <ac>");
+          AssociativeCollectionIterator[] iters = getIterators(acs);
+          return forEachIter(c,iters,continuation);
+        }
+
+
+        //////////////////////////////////////////////////////////////////////
+        // Filtering Logic (inverse of <remove>) (returns AssociativeCollection)
+        private static Trampoline.Bounce filterIter(Callable predicate, AssociativeCollectionIterator iter, Trampoline.Continuation continuation) throws Exception {
+          if(iter.finished()) return continuation.run(escm.type.Nil.VALUE);
+          AssociativeCollectionIterator cdr = iter.next();
+          Datum value = iter.value();
+          ArrayList<Datum> args = new ArrayList<Datum>(1);
+          args.add(value);
+          return predicate.callWith(args,(shouldKeep) -> () -> {
+            if(shouldKeep.isTruthy() == false) return filterIter(predicate,cdr,continuation);
+            return filterIter(predicate,cdr,(filteredList) -> () -> continuation.run(new escm.type.Pair(value,filteredList)));
+          });
+        }
+
+
+        public static Trampoline.Bounce filter(Callable predicate, AssociativeCollection ac, Trampoline.Continuation continuation) throws Exception {
+          AssociativeCollectionIterator iter = ac.iterator();
+          return filterIter(predicate,iter,(filteredList) -> () -> continuation.run(iter.fromList(filteredList)));
+        }
+
+
+        //////////////////////////////////////////////////////////////////////
+        // Counting Logic (returns Exact)
+        private static Trampoline.Bounce countIter(int count, Callable c, AssociativeCollectionIterator iter, Trampoline.Continuation continuation) throws Exception {
+          if(iter.finished()) return continuation.run(new escm.type.number.Exact(count));
+          AssociativeCollectionIterator cdr = iter.next();
+          ArrayList<Datum> args = new ArrayList<Datum>(1);
+          args.add(iter.value());
+          return c.callWith(args,(shouldCount) -> () -> {
+            if(shouldCount.isTruthy() == false) return countIter(count,c,cdr,continuation);
+            return countIter(count+1,c,cdr,continuation);
+          });
+        }
+
+
+        public static Trampoline.Bounce count(Callable predicate, AssociativeCollection ac, Trampoline.Continuation continuation) throws Exception {
+          return countIter(0,c,ac.iterator(),continuation);
+        }
+
+
+        //////////////////////////////////////////////////////////////////////
+        // Removing Logic (inverse of <filter>) (returns AssociativeCollection)
+        private static Trampoline.Bounce removeIter(Callable predicate, AssociativeCollectionIterator iter, Trampoline.Continuation continuation) throws Exception {
+          if(iter.finished()) return continuation.run(escm.type.Nil.VALUE);
+          AssociativeCollectionIterator cdr = iter.next();
+          Datum value = iter.value();
+          ArrayList<Datum> args = new ArrayList<Datum>(1);
+          args.add(value);
+          return predicate.callWith(args,(shouldRemove) -> () -> {
+            if(shouldRemove.isTruthy() == true) return removeIter(predicate,cdr,continuation);
+            return removeIter(predicate,cdr,(filteredList) -> () -> continuation.run(new escm.type.Pair(value,filteredList)));
+          });
+        }
+
+
+        public static Trampoline.Bounce remove(Callable predicate, AssociativeCollection ac, Trampoline.Continuation continuation) throws Exception {
+          AssociativeCollectionIterator iter = ac.iterator();
+          return removeIter(predicate,iter,(filteredList) -> () -> continuation.run(iter.fromList(filteredList)));
+        }
+
+
+        //////////////////////////////////////////////////////////////////////
+        // Key Logic (returns Datum [OR #f IF DNE])
+        private static Trampoline.Bounce keyIter(Callable predicate, AssociativeCollectionIterator iter, Trampoline.Continuation continuation) throws Exception {
+          if(iter.finished()) return continuation.run(escm.type.bool.Boolean.FALSE);
+          ArrayList<Datum> args = new ArrayList<Datum>(1);
+          args.add(iter.value());
+          return predicate.callWith(args,(foundKey) -> () -> {
+            if(foundKey.isTruthy() == true) return continuation.run(iter.key());
+            return keyIter(predicate,iter.next(),continuation);
+          });
+        }
+
+
+        public static Trampoline.Bounce key(Callable predicate, AssociativeCollection ac, Trampoline.Continuation continuation) throws Exception {
+          return keyIter(predicate,ac.iterator(),continuation);
+        }
+
+
+        //////////////////////////////////////////////////////////////////////
+        // Merging Logic (returns AssociativeCollection)
+        private static Trampoline.Bounce mergeIter(Callable predicate, AssociativeCollectionIterator iter1, AssociativeCollectionIterator iter2, Trampoline.Continuation continuation) throws Exception {
+          if(iter1.finished()) return continuation.run(iter2.toList());
+          if(iter2.finished()) return continuation.run(iter1.toList());
+          AssociativeCollectionIterator cdr1 = iter1.next();
+          AssociativeCollectionIterator cdr2 = iter2.next();
+          Datum value1 = iter1.value();
+          Datum value2 = iter2.value();
+          ArrayList<Datum> args = new ArrayList<Datum>(2);
+          args.add(value1);
+          args.add(value2);
+          return predicate.callWith(args,(keepValue1) -> () -> {
+            if(keepValue1.isTruthy() == true) 
+              return mergeIter(predicate,cdr1,iter2,(mergedList) -> () -> continuation.run(new escm.type.Pair(value1,mergedList)));
+            return mergeIter(predicate,iter1,cdr2,(mergedList) -> () -> continuation.run(new escm.type.Pair(value2,mergedList)));
+          });
+        }
+
+
+        public static Trampoline.Bounce merge(Callable predicate, AssociativeCollection ac1, AssociativeCollection ac2, Trampoline.Continuation continuation) throws Exception {
+          AssociativeCollectionIterator iter1 = ac1.iterator();
+          AssociativeCollectionIterator iter2 = ac2.iterator();
+          return mergeIter(predicate,iter1,iter2,(mergedList) -> () -> continuation.run(iter1.fromList(mergedList)));
+        }
+      ```
 
 
 
@@ -115,6 +384,9 @@
 
 ;;;;;;;;;;;;;;;;
 ; ACs
+(head <oc>)
+(tail <oc>)
+
 (empty? <ac>)
 (length <ac>)
 (length+ <list>)
@@ -123,12 +395,14 @@
 
 (map <callable> <ac> ...)
 (for-each <callable> <ac> ...)
-(filter <callable> <ac>)
+(filter <predicate?> <ac>)
 
 (count <predicate?> <ac>)
 (remove <predicate?> <ac>)
 
 (ref <ac> <key>)
+
+(key <predicate?> <ac>) ; returns key of left-most value satisfying <predicate?>
 
 (append <ac> ...) ; all args must be of the same type
 
@@ -149,17 +423,13 @@
 (difference <elt=?> <ac> ...)
 (symmetric-difference <elt=?> <ac> ...)
 
-(merge <ac> ...)
-
-(delete-duplicates <ac>)
+(merge <predicate?> <ac> <ac>)
 
 
 ;;;;;;;;;;;;;;;;
 ; OCs
 (conj <val> <oc>) ; add <val> as efficiently as possible to <oc>. Makes no guarentee about position.
 
-(head <oc>)
-(tail <oc>)
 (init <oc>)
 (last <oc>)
 
@@ -167,15 +437,14 @@
 
 (reverse <oc>)
 
-(fold-right <callable> <seed> <oc> ...) ; only ordered collections have the concept of "right-to-left"
-
 (remove-first <predicate?> <oc>)
 (remove-last <predicate?> <oc>)
 
 (skip <predicate?> <oc>)
 (skip-right <predicate?> <oc>)
 
-(key <predicate?> <oc>) ; returns key of left-most value satisfying <predicate?>
+(fold-right <callable> <seed> <oc> ...) ; only ordered collections have the concept of "right-to-left"
+
 (key-right <predicate?> <oc>) ; returns key of right-most value satisfying <predicate?>
 
 (drop <oc> <length>)
@@ -228,7 +497,27 @@ Datum toHashmap() throws Exception;
 ```
 
 
+====================================================================================
+====================================================================================
+====================================================================================
+====================================================================================
 
+
+
+
+
+- ADD IN `(file-remove-extension <file-path-string> <extension-string>)` (ALSO REMOVES THE ".")
+
+
+
+
+- MAKE SURE ALL "Stream" & "File" & "Reader" & "Writer" INSTANCES ARE PROPERLY CLOSED IN JAVA
+  * MAKE SURE MOVE AS MANY "CLOSE" OPERATIONS AS POSSIBLE PRIOR THROWING ERRORS FOR FILES!
+
+
+
+- CONSIDER HAVING `eval` & `bytecode-eval` & `load` & `load-from` & `load-serialized` & `serialize` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
+  => OPTIONAL ARG TO THE EXISTING FCNS DENOTING WHETHER TO SANDBOX THE EVALUATION (#f BY DEFAULT)
 
 
 
@@ -239,23 +528,7 @@ Datum toHashmap() throws Exception;
 
 
 
-
-
-
-
-
-
-
-
 - CHECK (& RECORD HERE) IPHONE NOTES ON ESCM !!!
-
-
-
-
-
-
-
-
 
 
 
@@ -363,6 +636,7 @@ PROBLEM: How can we intermix the notion of serialization and modules?
               * ___ALSO SUPPORT `\Uxxxxxxxx` FOR 32-BIT CHARSEQS W/IN A STRING (MENTION THIS CORRELATES TO A CHAR SEQUENCE, NOT A CHAR!)___
 
         => SUPPORT A CHARACTERS: `#\unicode` `#\Unicode` (for \u & \U)
+        ==============================================================
 
 
   * ADD DETAILS TO `README` & `help` REGARDING WHAT ESCAPE CHARACTERS ARE / AREN'T SUPPORTED IN STRINGS !!!

@@ -274,7 +274,7 @@ public class InputPort extends Port {
     SourceInformation datumSourceStart = new SourceInformation(name,lineNumber,columnNumber);
     while(true) {
       try {
-        Stack<Character> containerStack = new Stack<Character>();
+        Stack<java.lang.Character> containerStack = new Stack<java.lang.Character>();
         boolean foundLoneAtom = false;
         while(true) {
           int input = pr.read();
@@ -338,7 +338,7 @@ public class InputPort extends Port {
             }
             if(containerStack.empty()) break;
           // account for whitespace
-          } else if(Character.isWhitespace((char)input)) {
+          } else if(java.lang.Character.isWhitespace((char)input)) {
             updatePortPosition(input);
             sb.append((char)input);
           // skip comment
