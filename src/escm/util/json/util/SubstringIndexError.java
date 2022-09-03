@@ -3,6 +3,8 @@
 //    Class that generates the arrow-pointing substring message in JSON errors.
 
 package escm.util.json.util;
+import escm.util.Pair;
+import escm.util.StringParser;
 
 public class SubstringIndexError {
   private static String getArrowString(int arrowIndex, int strlength) {

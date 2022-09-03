@@ -12,8 +12,6 @@ import escm.vm.util.ExecutionState;
 public class Character extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Character parsing
-  // => Assumes given w/o the "#\" prefix 
-  // => Returns <null> if an invalid character
   private static final Character SPACE     = new Character(' ');
   private static final Character TAB       = new Character('\t');
   private static final Character NEWLINE   = new Character('\n');
@@ -39,6 +37,8 @@ public class Character extends Datum {
     return new Character(codePoint);
   }
 
+  // @PRECONDITION: Assumes given w/o the "#\" prefix 
+  // @POSTCONDITION: Returns <null> if an invalid character
   public static Character parse(java.lang.String token) {
     int n = token.length();
     if(n == 0) return NUL;

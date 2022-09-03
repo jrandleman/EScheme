@@ -7,6 +7,7 @@
 //
 //      - Vector()
 //      - Vector(ArrayList<Datum> arr)
+//      - Vector(Datum[] arr)
 //      - Vector(int size, Datum fillValue)
 //
 //      - int size()
@@ -31,6 +32,7 @@
 //      - Vector subvector(int idx, int length)
 //
 //      - Datum toList()
+//      - String toEscmString()
 //      - Hashmap toHashmap()
 //
 //      - callWith(...) // given an index, returns the entry at that position
@@ -39,6 +41,7 @@ package escm.type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Arrays;
 import escm.type.bool.Boolean;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
@@ -74,6 +77,10 @@ public class Vector extends Datum implements Callable {
 
   public Vector(ArrayList<Datum> arr) {
     value = new ArrayList<Datum>(arr);
+  }
+
+  public Vector(Datum[] arr) {
+    value = new ArrayList<Datum>(Arrays.asList(arr));
   }
 
   public Vector(int size, Datum fillValue) throws Exception {
@@ -233,6 +240,19 @@ public class Vector extends Datum implements Callable {
         lis = new escm.type.Pair(value.get(i),lis);
     }
     return lis; 
+  }
+
+  public escm.type.String toEscmString() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    synchronized(this) {
+      for(int i = 0, n = value.size(); i < n; ++i) {
+        Datum val = value.get(i);
+        if(!(val instanceof escm.type.Character))
+          throw new Exceptionf("VECTOR [TO-STRING]: Vector %s contains a non-character value %s", write(), val.profile());
+        sb.append(val.display());
+      }
+    }
+    return new escm.type.String(sb.toString());
   }
 
   public Hashmap toHashmap() throws Exception {

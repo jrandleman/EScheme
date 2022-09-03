@@ -83,6 +83,42 @@
   "description": "Convert a list of keys & values to a hashmap.",
   "example": null
 }, {
+  "name": "vector->string",
+  "aliases": null,
+  "signatures": ["(vector->string <vector>)"],
+  "description": "Convert a vector of chars to a string.",
+  "example": null
+}, {
+  "name": "string->vector",
+  "aliases": null,
+  "signatures": ["(string->vector <string>)"],
+  "description": "Convert a string to a vector of chars.",
+  "example": null
+}, {
+  "name": "string->list",
+  "aliases": null,
+  "signatures": ["(string->list <string>)"],
+  "description": "Convert a string to a list of chars.",
+  "example": null
+}, {
+  "name": "list->string",
+  "aliases": null,
+  "signatures": ["(list->string <list>)"],
+  "description": "Convert a list of chars to a string.",
+  "example": null
+}, {
+  "name": "char->integer",
+  "aliases": null,
+  "signatures": ["(char->integer <char>)"],
+  "description": "Convert a char to an integer codepoint value.",
+  "example": null
+}, {
+  "name": "integer->char",
+  "aliases": null,
+  "signatures": ["(integer->char <integer>)"],
+  "description": "Convert an integer codepoint value to a char.",
+  "example": null
+}, {
   "name": "write-to-string",
   "aliases": null,
   "signatures": ["(write-to-string <obj>)"],

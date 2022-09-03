@@ -362,46 +362,10 @@
 
 
 ------------------------
-## Equality:
-```scheme
-(eq? <obj> <obj> ...)
-(equal? <obj> <obj> ...)
-```
-
-
-------------------------
-## Type Coercions:
-```scheme
-(number->string <num> <optional-radix>)
-(string->number <str> <optional-radix>)
-
-(keyword->symbol <keyword>)
-(symbol->keyword <sym>)
-
-(string->symbol <str>)
-(symbol->string <sym>)
-
-(string->keyword <str>)
-(keyword->string <keyword>)
-
-(vector->list <vector>)
-(list->vector <list>)
-
-(hashmap->list <hashmap>)
-(list->hashmap <list>)
-
-(hashmap->vector <hashmap>)
-(vector->hashmap <vector>)
-
-(write-to-string <obj>)
-(display-to-string <obj>)
-(pretty-print-to-string <obj>)
-```
-
-
-------------------------
 ## Strings:
 ```scheme
+(string <str-or-char> ...)
+
 (string-length <str>)
 (string-empty? <str>)
 
@@ -446,6 +410,15 @@
 
 
 ------------------------
+## Characters:
+```scheme
+(char? <obj>)
+
+
+```
+
+
+------------------------
 ## Symbols:
 ```scheme
 (symbol-append <sym> ...)
@@ -473,6 +446,53 @@
 ## Void:
 ```scheme
 (void? <obj>)
+```
+
+
+------------------------
+## Equality:
+```scheme
+(eq? <obj> <obj> ...)
+(equal? <obj> <obj> ...)
+```
+
+
+------------------------
+## Type Coercions:
+```scheme
+(number->string <num> <optional-radix>)
+(string->number <str> <optional-radix>)
+
+(keyword->symbol <keyword>)
+(symbol->keyword <sym>)
+
+(string->symbol <str>)
+(symbol->string <sym>)
+
+(string->keyword <str>)
+(keyword->string <keyword>)
+
+(vector->list <vector>)
+(list->vector <list>)
+
+(hashmap->list <hashmap>)
+(list->hashmap <list>)
+
+(hashmap->vector <hashmap>)
+(vector->hashmap <vector>)
+
+(char->integer <char>)
+(integer->char <integer>)
+
+(list->string <list>)
+(string->list <string>)
+
+(vector->string <vector>)
+(string->vector <string>)
+
+(write-to-string <obj>)
+(display-to-string <obj>)
+(pretty-print-to-string <obj>)
 ```
 
 

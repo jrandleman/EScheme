@@ -15,6 +15,21 @@ import escm.vm.type.Primitive;
 
 public class StringPrimitives {
   ////////////////////////////////////////////////////////////////////////////
+  // string
+  public static class String implements Primitive {
+    public java.lang.String escmName() {
+      return "string";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      StringBuilder sb = new StringBuilder();
+      for(Datum p : parameters) sb.append(p.display());
+      return new escm.type.String(sb.toString());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // string-length
   public static class StringLength implements Primitive {
     public java.lang.String escmName() {
@@ -54,7 +69,7 @@ public class StringPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(string-reverse <string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      String str = ((escm.type.String)parameters.get(0)).value();
+      java.lang.String str = ((escm.type.String)parameters.get(0)).value();
       StringBuilder sb = new StringBuilder();
       for(int i = str.length()-1; i >= 0; --i)
         sb.append(str.charAt(i));
@@ -99,10 +114,10 @@ public class StringPrimitives {
       if(!ListPrimitives.isValidSize(index))
         throw new Exceptionf("'(string-ref <string> <index>) 2nd arg %s isn't a non-negative integer!", index.profile());
       int indexValue = ((Real)index).intValue();
-      String strValue = ((escm.type.String)str).value();
+      java.lang.String strValue = ((escm.type.String)str).value();
       if(indexValue >= strValue.length())
         throw new Exceptionf("'(string-ref <string> <index>) index %d exceeds length of string %s", indexValue, str.write());
-      return new escm.type.String(String.valueOf(strValue.charAt(indexValue)));
+      return new escm.type.String(java.lang.String.valueOf(strValue.charAt(indexValue)));
     }
   }
 
@@ -133,7 +148,7 @@ public class StringPrimitives {
       if(!ListPrimitives.isValidSize(startIndex)) 
         throw new Exceptionf("'(substring <string> <start-index> <optional-length>) 2nd %s arg isn't a non-negative integer!", startIndex.profile());
       double startIndexValue = ((Real)startIndex).doubleValue();
-      String strValue = ((escm.type.String)str).value();
+      java.lang.String strValue = ((escm.type.String)str).value();
       if(startIndexValue >= strValue.length() || substringLength == 0) 
         return new escm.type.String("");
       if(substringLength == Double.POSITIVE_INFINITY || substringLength+startIndexValue >= strValue.length())
@@ -278,7 +293,7 @@ public class StringPrimitives {
       return "string-join";
     }
     
-    private static String getJoinerString(ArrayList<Datum> parameters) throws Exception {
+    private static java.lang.String getJoinerString(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 1) return "";
       Datum joiner = parameters.get(1);
       if(!(joiner instanceof escm.type.String))
@@ -290,7 +305,7 @@ public class StringPrimitives {
       if(parameters.size() != 1 && parameters.size() != 2) 
         throw new Exceptionf("'(string-join <string-list> <optional-string>) didn't receive exactly 1 or 2 args: %s", Exceptionf.profileArgs(parameters));
       StringBuilder sb = new StringBuilder();
-      String joiner = getJoinerString(parameters);
+      java.lang.String joiner = getJoinerString(parameters);
       Datum iterator = parameters.get(0);
       if(!escm.type.Pair.isList(iterator))
         throw new Exceptionf("'(string-join <string-list> <optional-string>) 1st arg %s isn't a string list!", parameters.get(0).profile());
@@ -315,7 +330,7 @@ public class StringPrimitives {
       return "string-split";
     }
     
-    private static String getSplitterString(ArrayList<Datum> parameters) throws Exception {
+    private static java.lang.String getSplitterString(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 1) return "";
       Datum splitter = parameters.get(1);
       if(!(splitter instanceof escm.type.String))
@@ -326,7 +341,7 @@ public class StringPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if((parameters.size() != 1 && parameters.size() != 2) || !(parameters.get(0) instanceof escm.type.String))
         throw new Exceptionf("'(string-split <string> <optional-string>) didn't receive exactly 1 or 2 strings: %s", Exceptionf.profileArgs(parameters));
-      String[] strArray = ((escm.type.String)parameters.get(0)).value().split(getSplitterString(parameters));
+      java.lang.String[] strArray = ((escm.type.String)parameters.get(0)).value().split(getSplitterString(parameters));
       Datum strList = escm.type.Nil.VALUE;
       for(int i = strArray.length-1; i >= 0; --i)
         strList = new escm.type.Pair(new escm.type.String(strArray[i]),strList);
@@ -348,12 +363,12 @@ public class StringPrimitives {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string=? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
-      String lastValue = ((escm.type.String)p).value();
+      java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
           throw new Exceptionf("'(string=? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
-        String strValue = ((escm.type.String)str).value();
+        java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareTo(strValue) != 0) return Boolean.FALSE;
         lastValue = strValue;
       }
@@ -375,12 +390,12 @@ public class StringPrimitives {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string<? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
-      String lastValue = ((escm.type.String)p).value();
+      java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
           throw new Exceptionf("'(string<? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
-        String strValue = ((escm.type.String)str).value();
+        java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareTo(strValue) >= 0) return Boolean.FALSE;
         lastValue = strValue;
       }
@@ -402,12 +417,12 @@ public class StringPrimitives {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string>? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
-      String lastValue = ((escm.type.String)p).value();
+      java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
           throw new Exceptionf("'(string>? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
-        String strValue = ((escm.type.String)str).value();
+        java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareTo(strValue) <= 0) return Boolean.FALSE;
         lastValue = strValue;
       }
@@ -429,12 +444,12 @@ public class StringPrimitives {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string<=? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
-      String lastValue = ((escm.type.String)p).value();
+      java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
           throw new Exceptionf("'(string<=? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
-        String strValue = ((escm.type.String)str).value();
+        java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareTo(strValue) > 0) return Boolean.FALSE;
         lastValue = strValue;
       }
@@ -456,12 +471,12 @@ public class StringPrimitives {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string>=? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
-      String lastValue = ((escm.type.String)p).value();
+      java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
           throw new Exceptionf("'(string>=? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
-        String strValue = ((escm.type.String)str).value();
+        java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareTo(strValue) < 0) return Boolean.FALSE;
         lastValue = strValue;
       }
@@ -483,12 +498,12 @@ public class StringPrimitives {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string-ci=? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
-      String lastValue = ((escm.type.String)p).value();
+      java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
           throw new Exceptionf("'(string-ci=? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
-        String strValue = ((escm.type.String)str).value();
+        java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareToIgnoreCase(strValue) != 0) return Boolean.FALSE;
         lastValue = strValue;
       }
@@ -510,12 +525,12 @@ public class StringPrimitives {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string-ci<? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
-      String lastValue = ((escm.type.String)p).value();
+      java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
           throw new Exceptionf("'(string-ci<? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
-        String strValue = ((escm.type.String)str).value();
+        java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareToIgnoreCase(strValue) >= 0) return Boolean.FALSE;
         lastValue = strValue;
       }
@@ -537,12 +552,12 @@ public class StringPrimitives {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string-ci>? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
-      String lastValue = ((escm.type.String)p).value();
+      java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
           throw new Exceptionf("'(string-ci>? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
-        String strValue = ((escm.type.String)str).value();
+        java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareToIgnoreCase(strValue) <= 0) return Boolean.FALSE;
         lastValue = strValue;
       }
@@ -564,12 +579,12 @@ public class StringPrimitives {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string-ci<=? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
-      String lastValue = ((escm.type.String)p).value();
+      java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
           throw new Exceptionf("'(string-ci<=? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
-        String strValue = ((escm.type.String)str).value();
+        java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareToIgnoreCase(strValue) > 0) return Boolean.FALSE;
         lastValue = strValue;
       }
@@ -591,12 +606,12 @@ public class StringPrimitives {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string-ci>=? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
-      String lastValue = ((escm.type.String)p).value();
+      java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
           throw new Exceptionf("'(string-ci>=? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
-        String strValue = ((escm.type.String)str).value();
+        java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareToIgnoreCase(strValue) < 0) return Boolean.FALSE;
         lastValue = strValue;
       }

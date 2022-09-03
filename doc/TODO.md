@@ -24,7 +24,12 @@
 
 [ ] ADD IN CHARACTER PRIMITIVE FUNCTIONS
     * ADJUST `help` & `primitives.md` AS NEEDED
+
+[ ] UPLOAD TO GITHUB
+
 [ ] UPDATE SOME OF THE STRING PRIMITIVES TO ACCOUNT FOR "CHAR" TYPE
+    [ ] => MUST FIX `string-ref` !!!!
+    [ ] => consider changing `string-length` to be based on the number of codepoints within the string, then have a sperate `string-char-length`?
     * ADJUST `help` & `primitives.md` AS NEEDED
 
 [ ] UPLOAD TO GITHUB
@@ -36,26 +41,68 @@
 
 
 
+# CHAR PROCS FROM HEIST
+```
+[ ] ADD ALL REMAINING PRIMITIVES TO `primitives.md` & `help` b4 implementing any more in Java.
 
-  ```clj
-  (list->string '(#\h #\e #\l #\l #\o #\! #\newline)) ; => "hello!\n"
-  HEX CHARACTER CODES: #\xa ; equivalent to #\newline
-  ```
+
+read-char
+write-char   display-char   pprint-char   pretty-print-char
+
+
+### TEST PRIMITIVES & UPDATE HELP
+
+
+char-alphabetic?    char-numeric?         char-whitespace?    char-upper-case?
+char-lower-case?    char-alphanumeric?    char-control?       char-print?     
+char-graph?         char-punctuation?     char-xdigit?        char-ascii?
+
+
+### TEST PRIMITIVES & UPDATE HELP
+
+
+char-upcase   char-downcase
+
+
+### TEST PRIMITIVES & UPDATE HELP
+
+
+char=?    char<?    char>?    char<=?    char>=?
+char-ci=? char-ci<? char-ci>? char-ci<=? char-ci>=?
+```
+
+
+# NEW ESCHEME CHAR PROCS
+```
+char-codepoint? ; to determine if holding a 32bit unicode "char-pair" rather than a true 16bit java character (32bit codepoints take up 2 char slots in a string)
+char-32?        ; alias for <char-codepoint?>
+char-16?        ; WHETHER A 16BIT TRUE JAVA char
+char-8?         ; whether an 8bit char
+
+
+### TEST PRIMITIVES & UPDATE HELP
+
+
+(char-count <char>) ; number of chars to represent codepoint (1 if <char-16?>, else 2)
+
+(char-digit <char> <optional-radix>)        ; returns integer of <char> in <optional-radix> (defaults to 36) (Character.digit) => returns #f if an invalid <char>
+(char-for-digit <integer> <optional-radix>) ; returns char of <integer> in <optional-radix> (defaults to 36) (Character.forDigit) => returns #f if an invalid <integer>
+
+(char-name <char>) ; returns name of <char>, or #f if <char> is an unassigned codepoint (Character.getName)
+
+(char-high <char>)             ; returns top 16 bits of 32 bit codepoint (Character.highSurrogate)
+(char-low <char>)              ; returns bottom 16 bits of 32 bit codepoint (Character.lowSurrogate)
+(char-codepoint <char> <char>) ; returns a char formed by combining the bottom bits of both chars as the top & bottom 16 bits of a new 32bit codepoint (Character.toCodePoint)
+
+(char-defined? <char>) ; returns whether <char> is a defined unicode point (Character.isDefined)
+
+
+
+### TEST PRIMITIVES & UPDATE HELP
+
+
 
 ```
-CHAR-ALPHABETIC?    CHAR-NUMERIC?         CHAR-WHITESPACE?    CHAR-UPPER-CASE?
-CHAR-LOWER-CASE?    CHAR-ALPHANUMERIC?    CHAR-CONTROL?       CHAR-PRINT?     
-CHAR-GRAPH?         CHAR-PUNCTUATION?     CHAR-XDIGIT?        CHAR-UPCASE     
-CHAR-DOWNCASE       CHAR=?              CHAR<?          
-CHAR>?              CHAR<=?               CHAR>=?             CHAR-CI=?       
-CHAR-CI<?           CHAR-CI>?             CHAR-CI<=?          CHAR-CI>=?
-
-CHAR-CODEPOINT? ; to determine if holding a 32bit unicode "char-pair" rather than a true 16bit java character (32bit codepoints take up 2 char slots in a string)
-CHAR-32? ; alias for <CHAR-CODEPOINT?>
-CHAR-16? ; WHETHER A 16BIT TRUE JAVA CHAR
-```
-
-
 
 
 
@@ -291,31 +338,31 @@ CHAR-16? ; WHETHER A 16BIT TRUE JAVA CHAR
         }
 
 
-        //////////////////////////////////////////////////////////////////////
-        // Merging Logic (returns AssociativeCollection)
-        private static Trampoline.Bounce mergeIter(Callable predicate, AssociativeCollectionIterator iter1, AssociativeCollectionIterator iter2, Trampoline.Continuation continuation) throws Exception {
-          if(iter1.finished()) return continuation.run(iter2.toList());
-          if(iter2.finished()) return continuation.run(iter1.toList());
-          AssociativeCollectionIterator cdr1 = iter1.next();
-          AssociativeCollectionIterator cdr2 = iter2.next();
-          Datum value1 = iter1.value();
-          Datum value2 = iter2.value();
-          ArrayList<Datum> args = new ArrayList<Datum>(2);
-          args.add(value1);
-          args.add(value2);
-          return predicate.callWith(args,(keepValue1) -> () -> {
-            if(keepValue1.isTruthy() == true) 
-              return mergeIter(predicate,cdr1,iter2,(mergedList) -> () -> continuation.run(new escm.type.Pair(value1,mergedList)));
-            return mergeIter(predicate,iter1,cdr2,(mergedList) -> () -> continuation.run(new escm.type.Pair(value2,mergedList)));
-          });
-        }
+        // //////////////////////////////////////////////////////////////////////
+        // // Merging Logic (returns AssociativeCollection)
+        // private static Trampoline.Bounce mergeIter(Callable predicate, AssociativeCollectionIterator iter1, AssociativeCollectionIterator iter2, Trampoline.Continuation continuation) throws Exception {
+        //   if(iter1.finished()) return continuation.run(iter2.toList());
+        //   if(iter2.finished()) return continuation.run(iter1.toList());
+        //   AssociativeCollectionIterator cdr1 = iter1.next();
+        //   AssociativeCollectionIterator cdr2 = iter2.next();
+        //   Datum value1 = iter1.value();
+        //   Datum value2 = iter2.value();
+        //   ArrayList<Datum> args = new ArrayList<Datum>(2);
+        //   args.add(value1);
+        //   args.add(value2);
+        //   return predicate.callWith(args,(keepValue1) -> () -> {
+        //     if(keepValue1.isTruthy() == true) 
+        //       return mergeIter(predicate,cdr1,iter2,(mergedList) -> () -> continuation.run(new escm.type.Pair(value1,mergedList)));
+        //     return mergeIter(predicate,iter1,cdr2,(mergedList) -> () -> continuation.run(new escm.type.Pair(value2,mergedList)));
+        //   });
+        // }
 
 
-        public static Trampoline.Bounce merge(Callable predicate, AssociativeCollection ac1, AssociativeCollection ac2, Trampoline.Continuation continuation) throws Exception {
-          AssociativeCollectionIterator iter1 = ac1.iterator();
-          AssociativeCollectionIterator iter2 = ac2.iterator();
-          return mergeIter(predicate,iter1,iter2,(mergedList) -> () -> continuation.run(iter1.fromList(mergedList)));
-        }
+        // public static Trampoline.Bounce merge(Callable predicate, AssociativeCollection ac1, AssociativeCollection ac2, Trampoline.Continuation continuation) throws Exception {
+        //   AssociativeCollectionIterator iter1 = ac1.iterator();
+        //   AssociativeCollectionIterator iter2 = ac2.iterator();
+        //   return mergeIter(predicate,iter1,iter2,(mergedList) -> () -> continuation.run(iter1.fromList(mergedList)));
+        // }
       ```
 
 
@@ -400,7 +447,7 @@ CHAR-16? ; WHETHER A 16BIT TRUE JAVA CHAR
 (count <predicate?> <ac>)
 (remove <predicate?> <ac>)
 
-(ref <ac> <key>)
+(val <ac> <key>) ; "ref"
 
 (key <predicate?> <ac>) ; returns key of left-most value satisfying <predicate?>
 
@@ -422,8 +469,6 @@ CHAR-16? ; WHETHER A 16BIT TRUE JAVA CHAR
 (intersection <elt=?> <ac> ...)
 (difference <elt=?> <ac> ...)
 (symmetric-difference <elt=?> <ac> ...)
-
-(merge <predicate?> <ac> <ac>)
 
 
 ;;;;;;;;;;;;;;;;
@@ -459,6 +504,8 @@ CHAR-16? ; WHETHER A 16BIT TRUE JAVA CHAR
 
 (sort <binary-predicate?> <oc>)
 (sorted? <binary-predicate?> <oc>)
+
+(merge <predicate?> <ac> <ac>)
 
 (delete-neighbor-duplicates <oc>)
 ```

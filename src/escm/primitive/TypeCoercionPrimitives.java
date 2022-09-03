@@ -8,6 +8,7 @@ import escm.type.Datum;
 import escm.type.Nil;
 import escm.type.number.Number;
 import escm.type.number.Real;
+import escm.type.number.Exact;
 import escm.util.Exceptionf;
 import escm.vm.type.Primitive;
 
@@ -329,6 +330,121 @@ public class TypeCoercionPrimitives {
       if(v.size() % 2 != 0)
         throw new Exceptionf("'(vector->hashmap <vector>) <vector> doesn't have an even number of items: %s", Exceptionf.profileArgs(parameters));
       return v.toHashmap();
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char->integer
+  public static class CharToInteger implements Primitive {
+    public java.lang.String escmName() {
+      return "char->integer";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char->integer <char>) didn't receive exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      return new Exact(((escm.type.Character)parameters.get(0)).value());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // integer->char
+  public static class IntegerToChar implements Primitive {
+    public java.lang.String escmName() {
+      return "integer->char";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1)
+        throw new Exceptionf("'(integer->char <integer>) didn't receive exactly 1 integer: %s", Exceptionf.profileArgs(parameters));
+      Datum n = parameters.get(0);
+      if(!(n instanceof Real) || !((Real)n).isInteger())
+        throw new Exceptionf("'(integer->char <integer>) didn't receive exactly 1 integer: %s", Exceptionf.profileArgs(parameters));
+      return new escm.type.Character(((Real)n).intValue());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // list->string
+  public static class ListToString implements Primitive {
+    public java.lang.String escmName() {
+      return "list->string";
+    }
+
+    private escm.type.String logic(Datum lis, ArrayList<Datum> parameters) throws Exception {
+      StringBuilder sb = new StringBuilder();
+      while(lis instanceof escm.type.Pair) {
+        escm.type.Pair p = (escm.type.Pair)lis;
+        Datum item = p.car();
+        if(!(item instanceof escm.type.Character))
+          throw new Exceptionf("'(list->string <list>) list item %s isn't a character: %s", item.profile(), Exceptionf.profileArgs(parameters));
+        sb.append(item.display());
+        lis = p.cdr();
+      }
+      return new escm.type.String(sb.toString());
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || (!(parameters.get(0) instanceof escm.type.Pair) && !(parameters.get(0) instanceof Nil))) 
+        throw new Exceptionf("'(list->string <list>) didn't receive exactly 1 list: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters.get(0),parameters);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // string->list
+  public static class StringToList implements Primitive {
+    public java.lang.String escmName() {
+      return "string->list";
+    }
+
+    private Datum logic(escm.type.String str, ArrayList<Datum> parameters) throws Exception {
+      Datum lis = Nil.VALUE;
+      escm.type.Character[] chars = str.toChars();
+      for(int i = chars.length-1; i >= 0; --i) {
+        lis = new escm.type.Pair(chars[i],lis);
+      }
+      return lis;
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
+        throw new Exceptionf("'(string->list <string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
+      return logic((escm.type.String)parameters.get(0),parameters);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // vector->string
+  public static class VectorToString implements Primitive {
+    public java.lang.String escmName() {
+      return "vector->string";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector)) 
+        throw new Exceptionf("'(vector->string <vector>) didn't receive exactly 1 vector: %s", Exceptionf.profileArgs(parameters));
+      return ((escm.type.Vector)parameters.get(0)).toEscmString();
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // string->vector
+  public static class StringToVector implements Primitive {
+    public java.lang.String escmName() {
+      return "string->vector";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
+        throw new Exceptionf("'(string->vector <string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
+      return new escm.type.Vector(((escm.type.String)parameters.get(0)).toChars());
     }
   }
 }

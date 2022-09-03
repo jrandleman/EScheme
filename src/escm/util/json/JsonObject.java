@@ -6,7 +6,7 @@ package escm.util.json;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import escm.util.json.util.StringParser;
+import escm.util.StringParser;
 
 public class JsonObject extends JsonDatum {
   ////////////////////////////////////////////////////////////////////////////

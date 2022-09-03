@@ -3,6 +3,8 @@
 //    Class that generates exceptions from the JSON library
 
 package escm.util.json.util;
+import escm.util.Pair;
+import escm.util.StringParser;
 
 public class JsonException extends Exception {
   // Length of the substring to show for Json parsing errors

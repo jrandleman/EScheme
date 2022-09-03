@@ -2,7 +2,7 @@
   "name": "list",
   "aliases": null,
   "signatures": ["(list <obj> ...)", "(list)"],
-  "description": "Return a list containing \"<obj> ...\". Given no args, returns (quote ()).\nCreate list literals via the (<item> ...) syntax.",
+  "description": "Return a list containing \"<obj> ...\". Given no args, returns (quote ()).\nLists are right-nested pairs ending in nil: (quote ())\nCreate list literals via the (<item> ...) syntax.",
   "example": null
 }, {
   "name": "list*",

@@ -12,17 +12,23 @@ public class StringParser {
   // Implementing String Unescaping: "\\n" => "\n"
   private static boolean isEscapeableChar(char c) {
     return c=='\''|| c=='"' || c=='?' || c=='\\' || 
-           c=='b' || c=='f' || c=='n' || c=='r' || c=='t';
+           c=='b' || c=='f' || c=='n' || c=='r' || 
+           c=='t';
   }
 
 
-  private static boolean isHexDigit(char c) {
+  private static boolean isUnicodeDigit(char c) {
     return (c>='0' && c<='9')||(c>='A' && c<='F')||(c>='a' && c<='f');
   }
 
 
-  private static boolean isHexEscape(char c1, char c2) {
-    return c1=='x' && isHexDigit(c2);
+  private static boolean isUnicodeEscape(char c1, char c2) {
+    return c1=='u' && isUnicodeDigit(c2);
+  }
+
+
+  private static boolean isUnicodeSurrogatePairEscape(char c1, char c2) {
+    return c1=='U' && isUnicodeDigit(c2);
   }
 
 
@@ -43,24 +49,50 @@ public class StringParser {
   }
 
 
-  // Returns length of the escaped hex sequence
-  private static int insertHexUnescapedChar(StringBuilder sb, String str, int i, int n) {
+  // Returns length of the escaped unicode sequence
+  private static int insertUnicodeUnescapedChar(StringBuilder sb, String str, int i, int n) {
     StringBuilder numSb = new StringBuilder();
+    int count = 0;
     int start = i;
-    while(i < n && isHexDigit(str.charAt(i)))
+    while(i < n && count < 4 && isUnicodeDigit(str.charAt(i))) {
       numSb.append(str.charAt(i++));
+      ++count;
+    }
     sb.append((char)(int)Integer.valueOf(numSb.toString(),16));
     return i-start;
   }
 
 
-  // Returns length of the escaped oct sequence
+  // Returns length of the escaped unicode sequence
+  private static int insertUnicodeSurrogatePairUnescapedChar(StringBuilder sb, String str, int i, int n) {
+    StringBuilder numSb = new StringBuilder();
+    int count = 0;
+    int start = i;
+    while(i < n && count < 8 && isUnicodeDigit(str.charAt(i))) {
+      numSb.append(str.charAt(i++));
+      ++count;
+    }
+    sb.append(java.lang.Character.toString((int)Integer.valueOf(numSb.toString(),16)));
+    return i-start;
+  }
+
+
+  // Returns length of the escaped oct sequence (supports \0-\177777 [0-65535 in decimal])
   private static int insertOctUnescapedChar(StringBuilder sb, String str, int i, int n) {
     StringBuilder numSb = new StringBuilder();
+    int count = 0;
     int start = i;
-    while(i < n && isOctEscape(str.charAt(i)))
+    while(i < n && count < 6 && isOctEscape(str.charAt(i))) {
       numSb.append(str.charAt(i++));
-    sb.append((char)(int)Integer.valueOf(numSb.toString(),8));
+      ++count;
+    }
+    int val = (int)Integer.valueOf(numSb.toString(),8);
+    if(val > 65535) {
+      numSb.deleteCharAt(numSb.length()-1);
+      val = (int)Integer.valueOf(numSb.toString(),8);
+      --i;
+    }
+    sb.append((char)val);
     return i-start;
   }
 
@@ -73,9 +105,12 @@ public class StringParser {
         if(isEscapeableChar(str.charAt(i+1))) {
           sb.append(specialCharVariant(str.charAt(i+1)));
           i += 2;
-        } else if(i+2 < n && isHexEscape(str.charAt(i+1),str.charAt(i+2))) {
+        } else if(i+2 < n && isUnicodeEscape(str.charAt(i+1),str.charAt(i+2))) {
           i += 2;
-          i += insertHexUnescapedChar(sb,str,i,n);
+          i += insertUnicodeUnescapedChar(sb,str,i,n);
+        } else if(i+2 < n && isUnicodeSurrogatePairEscape(str.charAt(i+1),str.charAt(i+2))) {
+          i += 2;
+          i += insertUnicodeSurrogatePairUnescapedChar(sb,str,i,n);
         } else if(isOctEscape(str.charAt(i+1))) {
           ++i;
           i += insertOctUnescapedChar(sb,str,i,n);
@@ -93,8 +128,8 @@ public class StringParser {
   ////////////////////////////////////////////////////////////////////////////
   // Implementing String Escaping: "\n" => "\\n"
   private static String escapedChar(char c) {
-    c %= 256;
-    if(c < 0) c += 256;
+    c %= 65536; // 2^16
+    if(c < 0) c += 65536;
     switch(c) {
       case '"':  return "\\\"";
       case '\\': return "\\\\";
@@ -103,24 +138,51 @@ public class StringParser {
       case '\n': return "\\n";
       case '\r': return "\\r";
       case '\t': return "\\t";
-      default: // Escape non-printable chars that are NOT one of the above in hex
-        char left_digit = (char)(c/16), right_digit = (char)(c%16);
-        StringBuilder sb = new StringBuilder("\\x");
-        sb.append((char)(left_digit>9?'a'+left_digit-10:'0'+left_digit));
-        sb.append((char)(right_digit>9?'a'+right_digit-10:'0'+right_digit));
+      default: // Escape non-printable chars that are NOT one of the above as unicode
+        String hexString = Integer.toHexString((int)c);
+        StringBuilder sb = new StringBuilder("\\u");
+        for(int i = 0, n = 4-hexString.length(); i < n; ++i) {
+          sb.append('0');
+        }
+        sb.append(hexString);
         return sb.toString();
     }
+  }
+
+
+  private static boolean noCharEscapeNeeded(char c) {
+    return c != '"' && c != '\\' && c >= 32 && c <= 126;
   }
 
 
   public static String escape(String str) {
     StringBuilder escaped = new StringBuilder();
     for(int i = 0, n = str.length(); i < n; ++i) {
-      if(str.charAt(i) != '"' && str.charAt(i) != '\\' && !Character.isISOControl(str.charAt(i)))
-        escaped.append(str.charAt(i));
-      else
-        escaped.append(escapedChar(str.charAt(i)));
+      char c = str.charAt(i);
+      if(noCharEscapeNeeded(c)) {
+        escaped.append(c);
+      } else {
+        escaped.append(escapedChar(c));
+      }
     }
     return escaped.toString();
+  }
+
+
+  // Returned int represents the new idx position of <indexToUpdate> in escaped version of <str>
+  public static Pair<Integer,String> escape(int indexToUpdate, String str) {
+    int originalIndexToUpdate = indexToUpdate;
+    StringBuilder escaped = new StringBuilder();
+    for(int i = 0, n = str.length(); i < n; ++i) {
+      char c = str.charAt(i);
+      if(noCharEscapeNeeded(c)) {
+        escaped.append(c);
+      } else {
+        String escapedChar = escapedChar(c);
+        if(i < originalIndexToUpdate) indexToUpdate += escapedChar.length()-1;
+        escaped.append(escapedChar);
+      }
+    }
+    return new Pair<Integer,String>(indexToUpdate,escaped.toString());
   }
 }

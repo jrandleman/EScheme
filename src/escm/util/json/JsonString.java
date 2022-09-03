@@ -4,7 +4,7 @@
 
 package escm.util.json;
 import java.util.Objects;
-import escm.util.json.util.StringParser;
+import escm.util.StringParser;
 
 public class JsonString extends JsonDatum {
   ////////////////////////////////////////////////////////////////////////////

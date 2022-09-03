@@ -8,9 +8,9 @@
 package escm.util.json;
 import java.util.ArrayList;
 import java.util.HashMap;
-import escm.util.json.util.Pair;
+import escm.util.Pair;
+import escm.util.StringParser;
 import escm.util.json.util.JsonException;
-import escm.util.json.util.StringParser;
 
 public abstract class JsonDatum {
   ////////////////////////////////////////////////////////////////////////////

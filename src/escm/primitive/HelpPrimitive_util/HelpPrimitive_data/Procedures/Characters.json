@@ -1,0 +1,7 @@
+[{
+  "name": "char?",
+  "aliases": ["character?"],
+  "signatures": ["(char? <obj>)"],
+  "description": "Returns whether <obj> is a character value.",
+  "example": null
+}]

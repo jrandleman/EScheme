@@ -21,6 +21,21 @@ public class String extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // EScheme Char Extraction
+  // From: https://stackoverflow.com/questions/1527856/how-can-i-iterate-through-the-unicode-codepoints-of-a-java-string
+  public escm.type.Character[] toChars() {
+    int offset = 0, charsIdx = 0, strLength = value.length();
+    escm.type.Character[] chars = new escm.type.Character[value.codePointCount(0,strLength)];
+    while(offset < strLength) {
+      int codepoint = value.codePointAt(offset);
+      chars[charsIdx++] = new escm.type.Character(codepoint);
+      offset += java.lang.Character.charCount(codepoint);
+    }
+    return chars;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Constructor
   public String(java.lang.String s) {
     value = s;
