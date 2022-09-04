@@ -139,6 +139,8 @@
 (read <optional-input-port>)
 (read-string <str>) ; returns a pair: (cons <read-datum> <str-without-read-datum>)
 (read-line <optional-input-port>)
+(read-char <optional-input-port>)
+(read-chars <integer> <optional-input-port>)
 
 (eof? <obj>)
 ```

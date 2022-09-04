@@ -122,6 +122,6 @@
   "name": "peek-port",
   "aliases": null,
   "signatures": ["(peek-port <input-port>)"],
-  "description": "Peek the first character (as a string) in <input-port>. Returns #eof if empty.",
+  "description": "Peek the first character in <input-port>. Returns #eof if empty.",
   "example": null
 }]

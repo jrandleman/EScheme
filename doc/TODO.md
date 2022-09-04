@@ -46,9 +46,6 @@
 [ ] ADD ALL REMAINING PRIMITIVES TO `primitives.md` & `help` b4 implementing any more in Java.
 
 
-read-char
-write-char   display-char   pprint-char   pretty-print-char
-
 
 ### TEST PRIMITIVES & UPDATE HELP
 

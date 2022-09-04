@@ -15,8 +15,8 @@
 //
 //      - boolean ready()
 //
-//      - String peek()                // returns <null> if reached EOF
-//      - String readCharacter()       // returns <null> if reached EOF
+//      - Integer peek()               // returns <null> if reached EOF
+//      - Integer readCharacter()      // returns <null> if reached EOF
 //      - String readCharacters(int n) // returns <null> if reached EOF
 //      - String readLine()            // returns <null> if reached EOF
 //      - Datum readReplDatum()        // returns <null> if reached EOF
@@ -41,6 +41,9 @@ public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Internal Reader Value
   private PushbackReader pr = null;
+
+  // To work with codepoints (rather than chars) in files
+  private static final int PUSHBACK_READER_SIZE = 2;
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -100,7 +103,7 @@ public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Static STDIN field
   private InputPort() {
-    pr = new PushbackReader(new InputStreamReader(System.in));
+    pr = new PushbackReader(new InputStreamReader(System.in),PUSHBACK_READER_SIZE);
     name = "System.in";
   }
 
@@ -123,7 +126,7 @@ public class InputPort extends Port {
   // Constructor
   public InputPort(String filename) throws Exception {
     try {
-      pr = new PushbackReader(new FileReader(filename));
+      pr = new PushbackReader(new FileReader(filename),PUSHBACK_READER_SIZE);
       name = FilePrimitives.AbsolutePath.logic(filename);
     } catch(Exception e) {
       throw new Exceptionf("Can't open port \"%s\" for input: %s", filename, e);
@@ -151,12 +154,22 @@ public class InputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Peek Logic
-  public synchronized String peek() throws Exception {
+  public synchronized Integer peek() throws Exception {
     try {
-      int c = pr.read();
-      pr.unread(c);
-      if(c == -1) return null;
-      return String.valueOf((char)c);
+      int high = pr.read();
+      char highChar = (char)high;
+      if(java.lang.Character.isHighSurrogate(highChar) == false) {
+        pr.unread(high);
+        if(high == -1) return null;
+        return high;
+      } else {
+        int low = pr.read();
+        char lowChar = (char)low;
+        pr.unread(new char[]{highChar,lowChar});
+        if(low == -1 || !java.lang.Character.isLowSurrogate(lowChar)) 
+          throw new Exceptionf("Invalid surrogate pair with high value \"%c\"", highChar);
+        return Character.toCodePoint(highChar,lowChar);
+      }
     } catch(Exception e) {
       throw new Exceptionf("Can't peek port \"%s\": %s", name, e);
     }
@@ -189,12 +202,28 @@ public class InputPort extends Port {
   }
 
 
-  public synchronized String readCharacter() throws Exception {
+  private Integer readCharacterLogic() throws Exception {
+    int high = pr.read();
+    char highChar = (char)high;
+    if(java.lang.Character.isHighSurrogate(highChar) == false) {
+      updatePortPosition(high);
+      if(high == -1) return null;
+      return high;
+    } else {
+      int low = pr.read();
+      char lowChar = (char)low;
+      if(low == -1 || !java.lang.Character.isLowSurrogate(lowChar)) 
+        throw new Exceptionf("Invalid surrogate pair with high value \"%c\"", highChar);
+      int codepoint = Character.toCodePoint(highChar,lowChar);
+      updatePortPosition(codepoint);
+      return codepoint;
+    }
+  }
+
+
+  public synchronized Integer readCharacter() throws Exception {
     try {
-      int c = pr.read();
-      updatePortPosition(c);
-      if(c == -1) return null;
-      return String.valueOf((char)c);
+      return readCharacterLogic();
     } catch(Exception e) {
       throw new Exceptionf("Can't read a char from port \"%s\": %s", name, e);
     }
@@ -203,15 +232,15 @@ public class InputPort extends Port {
 
   public synchronized String readCharacters(int n) throws Exception {
     if(n == 0) return "";
-    if(n < 0) {
+    if(n < 0)
       throw new Exceptionf("Can't read chars from port \"%s\" with negative char-count %d!", name, n);
-    }
     try {
-      char[] chars = new char[n];
-      int readCount = pr.read(chars,0,n);
-      updatePortPosition(chars);
-      if(readCount == -1) return null;
-      return new String(chars);
+      StringBuilder sb = new StringBuilder();
+      while(n > 0) {
+        sb.append(java.lang.Character.toString(readCharacterLogic().intValue()));
+        --n;
+      }
+      return sb.toString();
     } catch(Exception e) {
       throw new Exceptionf("Can't read chars from port \"%s\": %s", name, e);
     }
@@ -226,9 +255,9 @@ public class InputPort extends Port {
         sb.append((char)c);
         c = pr.read();
       }
-      if(c != -1) sb.append((char)c);
       String s = sb.toString();
       updatePortPosition(s);
+      if(c != -1) updatePortPosition('\n');
       if(c == -1) return null;
       return s;
     } catch(Exception e) {
@@ -255,6 +284,7 @@ public class InputPort extends Port {
         }
         if(input.length() == 0) continue;
         sb.append(input);
+        sb.append('\n');
         escm.util.Pair<Datum,Integer> result = Reader.read(sb.toString(),replDatumSourceStart.clone(),Reader.GIVE_EMPTY_INCOMPLETE_ERRORS);
         GlobalState.setLastPrintedANewline(true); // from the newline input by the user's <enter>/<return> key stroke
         if(result.first instanceof Eof) return null; // only reading #eof is equivalent to typing ^D

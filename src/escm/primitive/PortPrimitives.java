@@ -390,9 +390,9 @@ public class PortPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof InputPort))
         throw new Exceptionf("'(peek-port <input-port>) didn't receive 1 input-port: %s", Exceptionf.profileArgs(parameters));
-      String c = ((InputPort)parameters.get(0)).peek();
-      if(c == null) return escm.type.port.Eof.VALUE;
-      return new escm.type.String(c);
+      Integer codepoint = ((InputPort)parameters.get(0)).peek();
+      if(codepoint == null) return escm.type.port.Eof.VALUE;
+      return new escm.type.Character(codepoint.intValue());
     }
   }
 }

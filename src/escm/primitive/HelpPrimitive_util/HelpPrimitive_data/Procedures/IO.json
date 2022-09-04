@@ -59,6 +59,18 @@
   "description": "Read a line of text as a string from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.",
   "example": null
 }, {
+  "name": "read-char",
+  "aliases": null,
+  "signatures": ["(read-char)", "(read-char <input-port>)"],
+  "description": "Read a char from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.",
+  "example": null
+}, {
+  "name": "read-chars",
+  "aliases": null,
+  "signatures": ["(read-chars <integer>)", "(read-chars <integer> <input-port>)"],
+  "description": "Read <integer> chars as a string from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.",
+  "example": null
+}, {
   "name": "eof?",
   "aliases": null,
   "signatures": ["(eof? <obj>)"],

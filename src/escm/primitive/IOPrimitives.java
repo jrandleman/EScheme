@@ -13,6 +13,7 @@ import escm.type.bool.Boolean;
 import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
 import escm.type.port.Eof;
+import escm.type.number.Real;
 import escm.util.Exceptionf;
 import escm.vm.Reader;
 import escm.vm.type.Primitive;
@@ -340,6 +341,63 @@ public class IOPrimitives {
       String line = port.readLine();
       if(line == null) return escm.type.port.Eof.VALUE; // EOF in a <read> call yields an #eof
       return new escm.type.String(line);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // read-char
+  public static class ReadChar implements Primitive {
+    public java.lang.String escmName() {
+      return "read-char";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() > 1) 
+        throw new Exceptionf("'(read-char <optional-input-port>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      InputPort port = null;
+      if(parameters.size() == 1) {
+        Datum portDatum = parameters.get(0);
+        if(!(portDatum instanceof InputPort))
+          throw new Exceptionf("'(read-char <optional-input-port>) arg isn't an input port: %s", Exceptionf.profileArgs(parameters));
+        port = (InputPort)portDatum;
+      } else {
+        port = InputPort.getCurrent();
+      }
+      Integer codepoint = port.readCharacter();
+      if(codepoint == null) return escm.type.port.Eof.VALUE; // EOF in a <read> call yields an #eof
+      return new escm.type.Character(codepoint.intValue());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // read-chars
+  public static class ReadChars implements Primitive {
+    public java.lang.String escmName() {
+      return "read-chars";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      int n = parameters.size();
+      if(n < 1 || n > 2) 
+        throw new Exceptionf("'(read-chars <integer> <optional-input-port>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      Datum intArg = parameters.get(0);
+      if(!ListPrimitives.isValidSize(intArg))
+        throw new Exceptionf("'(read-chars <integer> <optional-input-port>) 1st arg isn't a non-negative integer: %s", Exceptionf.profileArgs(parameters));
+      int totalCharsToRead = ((Real)intArg).intValue();
+      InputPort port = null;
+      if(n == 2) {
+        Datum portDatum = parameters.get(1);
+        if(!(portDatum instanceof InputPort))
+          throw new Exceptionf("'(read-chars <integer> <optional-input-port>) 2nd arg isn't an input port: %s", Exceptionf.profileArgs(parameters));
+        port = (InputPort)portDatum;
+      } else {
+        port = InputPort.getCurrent();
+      }
+      String chars = port.readCharacters(totalCharsToRead);
+      if(chars == null) return escm.type.port.Eof.VALUE; // EOF in a <read> call yields an #eof
+      return new escm.type.String(chars);
     }
   }
 

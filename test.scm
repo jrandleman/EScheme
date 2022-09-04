@@ -1,5 +1,3 @@
-
-
 (define-class C1 
   ((get-msg) "In class C1!")
   ((print-msg)
