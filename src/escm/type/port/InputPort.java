@@ -237,7 +237,12 @@ public class InputPort extends Port {
     try {
       StringBuilder sb = new StringBuilder();
       while(n > 0) {
-        sb.append(java.lang.Character.toString(readCharacterLogic().intValue()));
+        Integer codepoint = readCharacterLogic();
+        if(codepoint == null) {
+          if(sb.length() == 0) return null;
+          return sb.toString();
+        }
+        sb.append(java.lang.Character.toString(codepoint.intValue()));
         --n;
       }
       return sb.toString();
