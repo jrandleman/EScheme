@@ -4,4 +4,70 @@
   "signatures": ["(char? <obj>)"],
   "description": "Returns whether <obj> is a character value.",
   "example": null
+}, {
+  "name": "char-alphabetic?",
+  "aliases": null,
+  "signatures": ["(char-alphabetic? <char>)"],
+  "description": "Returns whether <char> is alphabetic.",
+  "example": null
+}, {
+  "name": "char-numeric?",
+  "aliases": null,
+  "signatures": ["(char-numeric? <char>)"],
+  "description": "Returns whether <char> is numeric.",
+  "example": null
+}, {
+  "name": "char-whitespace?",
+  "aliases": null,
+  "signatures": ["(char-whitespace? <char>)"],
+  "description": "Returns whether <char> is whitespace.",
+  "example": null
+}, {
+  "name": "char-upper-case?",
+  "aliases": null,
+  "signatures": ["(char-upper-case? <char>)"],
+  "description": "Returns whether <char> is uppercase.",
+  "example": null
+}, {
+  "name": "char-lower-case?",
+  "aliases": null,
+  "description": "Returns whether <char> is lowercase.",
+  "description": "",
+  "example": null
+}, {
+  "name": "char-alphanumeric?",
+  "aliases": null,
+  "description": "Returns whether <char> is alphabetic or numeric.",
+  "description": "",
+  "example": null
+}, {
+  "name": "char-control?",
+  "aliases": null,
+  "signatures": ["(char-control? <char>)"],
+  "description": "Returns whether <char> is a control character.",
+  "example": null
+}, {
+  "name": "char-print?",
+  "aliases": null,
+  "signatures": ["(char-print? <char>)"],
+  "description": "Returns whether <char> is printable, equivalent to:\n  (or (char-graph? <char>) (eq? #\\space <char>))",
+  "example": null
+}, {
+  "name": "char-graph?",
+  "aliases": null,
+  "signatures": ["(char-graph? <char>)"],
+  "description": "Returns whether <char> is a graph character, equivalent to:\n  (or (char-alphanumeric? <char>) (char-punctuation? <char>))",
+  "example": null
+}, {
+  "name": "char-punctuation?",
+  "aliases": null,
+  "signatures": ["(char-punctuation? <char>)"],
+  "description": "Returns whether <char> is a punctuation character.",
+  "example": null
+}, {
+  "name": "char-xdigit?",
+  "aliases": null,
+  "signatures": ["(char-xdigit? <char>)"],
+  "description": "Returns whether <char> is a hexadecimal digit.",
+  "example": null
 }]

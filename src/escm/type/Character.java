@@ -87,9 +87,17 @@ public class Character extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Codepoint Predicate
+  // Size Predicates
   public boolean isCodePoint() {
     return (value & 0x00000000ffffffffL) > 0xffffL;
+  }
+
+  public boolean isJavaChar() {
+    return (value & 0x00000000ffffffffL) <= 0xffffL;
+  }
+
+  public boolean isAsciiChar() {
+    return (value & 0x00000000ffffffffL) <= 0xffL;
   }
 
 

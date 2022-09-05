@@ -416,7 +416,17 @@
 ```scheme
 (char? <obj>)
 
-
+(char-alphabetic? <char>)
+(char-numeric? <char>)
+(char-whitespace? <char>)
+(char-upper-case? <char>)
+(char-lower-case? <char>)
+(char-alphanumeric? <char>)
+(char-control? <char>)
+(char-print? <char>)
+(char-graph? <char>)
+(char-punctuation? <char>)
+(char-xdigit? <char>)
 ```
 
 

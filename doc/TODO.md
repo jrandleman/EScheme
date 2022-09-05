@@ -6,8 +6,6 @@
 - ADD IN THE `Character` TYPE PRIOR TO IMMUTABLE GENERIC ALGOS (REQUIRED FOR ITERATION IN STRING CONTAINERS)
   => `#\` PREFIX AS PER REGULAR SCHEME (REPRESENTS AN INT UNDER THE HOOD)
 
-
-
 [X] FIX READERS TO ACCOUNT FOR BASIC SINGLE CHARACTERS
 [X] EXTEND READERS TO ALLOW FOR NAMED CHARACTERS (#\newline, #\tab, ETC.)
     ```
@@ -41,25 +39,10 @@
 
 # CHAR PROCS FROM HEIST
 ```
-[ ] ADD ALL REMAINING PRIMITIVES TO `primitives.md` & `help` b4 implementing any more in Java.
-
-
-
-### TEST PRIMITIVES & UPDATE HELP
-
-
-char-alphabetic?    char-numeric?         char-whitespace?    char-upper-case?
-char-lower-case?    char-alphanumeric?    char-control?       char-print?     
-char-graph?         char-punctuation?     char-xdigit?        char-ascii?
-
-
-### TEST PRIMITIVES & UPDATE HELP
-
-
 char-upcase   char-downcase
 
 
-### TEST PRIMITIVES & UPDATE HELP
+### TEST PRIMITIVES & UPDATE `primitives.md` & `help`
 
 
 char=?    char<?    char>?    char<=?    char>=?
@@ -69,13 +52,15 @@ char-ci=? char-ci<? char-ci>? char-ci<=? char-ci>=?
 
 # NEW ESCHEME CHAR PROCS
 ```
-char-codepoint? ; to determine if holding a 32bit unicode "char-pair" rather than a true 16bit java character (32bit codepoints take up 2 char slots in a string)
-char-32?        ; alias for <char-codepoint?>
-char-16?        ; WHETHER A 16BIT TRUE JAVA char
-char-8?         ; whether an 8bit char
+char-pair?  ; to determine if holding a 32bit unicode char surrogate pair rather than a true 16bit java character (32bit codepoints take up 2 char slots in a string)
+char-java?  ; whether a 16bit char
+char-ascii? ; whether a 8bit char
+char-32?    ; alias for <char-pair?>
+char-16?    ; alias for <char-java?>
+char-8?     ; alias for <char-ascii?>
 
 
-### TEST PRIMITIVES & UPDATE HELP
+### TEST PRIMITIVES & UPDATE `primitives.md` & `help`
 
 
 (char-count <char>) ; number of chars to represent codepoint (1 if <char-16?>, else 2)
@@ -93,7 +78,7 @@ char-8?         ; whether an 8bit char
 
 
 
-### TEST PRIMITIVES & UPDATE HELP
+### TEST PRIMITIVES & UPDATE `primitives.md` & `help`
 
 
 
