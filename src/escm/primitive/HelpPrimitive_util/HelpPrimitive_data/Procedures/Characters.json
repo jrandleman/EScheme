@@ -160,4 +160,64 @@
   "signatures": ["(ascii-char? <char>)"],
   "description": "Returns whether <char> is an 8bit ascii char, correlating to exactly 1 char\nwithin strings.",
   "example": null
+}, {
+  "name": "char-count",
+  "aliases": null,
+  "signatures": ["(char-count <char>)"],
+  "description": "Returns the number of java chars <char> stringifies to.\nReturns 2 if (char-pair? <char>), else returns 1.",
+  "example": null
+}, {
+  "name": "char-digit",
+  "aliases": null,
+  "signatures": ["(char-digit <char>)", "(char-digit <char> <radix>)"],
+  "description": "Returns the digit represented by <char> in <radix> (defaults to 36).\nReturns #f if <radix> is an invalid non-negative int or <char> isn't a digit.",
+  "example": null
+}, {
+  "name": "char-for-digit",
+  "aliases": null,
+  "signatures": ["(char-for-digit <integer>)", "(char-for-digit <integer> <radix>)"],
+  "description": "Returns the char representing digit <integer> in <radix> (defaults to 36).\nReturns #f if <radix> is an invalid non-negative int or <integer> isn't a digit.",
+  "example": null
+}, {
+  "name": "char-name",
+  "aliases": null,
+  "signatures": ["(char-name <char>)"],
+  "description": "Returns <char>'s name as a string, or #f if its an unassigned unicode value.",
+  "example": null
+}, {
+  "name": "char-defined?",
+  "aliases": null,
+  "signatures": ["(char-defined? <char>)"],
+  "description": "Returns whether <char> is an unassigned unicode value.",
+  "example": null
+}, {
+  "name": "char-high?",
+  "aliases": null,
+  "signatures": ["(char-high? <char>)"],
+  "description": "Returns whether <char> is the high portion of a 32bit surrogate char pair.",
+  "example": null
+}, {
+  "name": "char-low?",
+  "aliases": null,
+  "signatures": ["(char-low? <char>)"],
+  "description": "Returns whether <char> is the low portion of a 32bit surrogate char pair.",
+  "example": null
+}, {
+  "name": "char-high",
+  "aliases": null,
+  "signatures": ["(char-high <char>)"],
+  "description": "Returns the high portion of <char> if it's a 32 surrogate pair.\nIf (java-char? <char>), returns #f.",
+  "example": null
+}, {
+  "name": "char-low",
+  "aliases": null,
+  "signatures": ["(char-low <char>)"],
+  "description": "Returns the low portion of <char> if it's a 32 surrogate pair.\nIf (java-char? <char>), returns #f.",
+  "example": null
+}, {
+  "name": "char-codepoint",
+  "aliases": null,
+  "signatures": ["(char-codepoint <high-char> <low-char>)"],
+  "description": "Returns a new character formed by combining <high-char> & <low-char> into\na single 32bit surrogate char pair.\nReturns #f if (not (and (char-high? <high-char>) (char-low? <low-char>)))",
+  "example": null
 }]

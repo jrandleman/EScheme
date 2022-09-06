@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.bool.Boolean;
 import escm.type.number.Exact;
+import escm.type.number.Real;
 import escm.util.Exceptionf;
 import escm.vm.type.Primitive;
 
@@ -502,6 +503,188 @@ public class CharacterPrimitives {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
         throw new Exceptionf("'(ascii-char? <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
       return Boolean.valueOf(((escm.type.Character)parameters.get(0)).isAsciiChar());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-count
+  public static class CharCount implements Primitive {
+    public java.lang.String escmName() {
+      return "char-count";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-count <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      return new Exact(Character.charCount(((escm.type.Character)parameters.get(0)).value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-digit
+  public static class CharDigit implements Primitive {
+    public java.lang.String escmName() {
+      return "char-digit";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || parameters.size() > 2 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-digit <char> <optional-radix>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      int radix = 36;
+      if(parameters.size() == 2) {
+        Datum radixDatum = parameters.get(1);
+        if(!ListPrimitives.isValidSize(radixDatum))
+          throw new Exceptionf("'(char-digit <char> <optional-radix>) invalid radix (only 2-36): %s", Exceptionf.profileArgs(parameters));
+        radix = ((Real)radixDatum).intValue();
+        if(radix < 2 || radix > 36) return Boolean.FALSE;
+      }
+      int digit = Character.digit(((escm.type.Character)parameters.get(0)).value(),radix);
+      if(digit == -1) return Boolean.FALSE;
+      return new Exact(digit);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-for-digit
+  public static class CharForDigit implements Primitive {
+    public java.lang.String escmName() {
+      return "char-for-digit";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || parameters.size() > 2 || !ListPrimitives.isValidSize(parameters.get(0))) 
+        throw new Exceptionf("'(char-for-digit <non-negative-integer> <optional-radix>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      int radix = 36;
+      if(parameters.size() == 2) {
+        Datum radixDatum = parameters.get(1);
+        if(!ListPrimitives.isValidSize(radixDatum))
+          throw new Exceptionf("'(char-for-digit <char> <optional-radix>) invalid radix (only 2-36): %s", Exceptionf.profileArgs(parameters));
+        radix = ((Real)radixDatum).intValue();
+        if(radix < 2 || radix > 36) return Boolean.FALSE;
+      }
+      char ch = Character.forDigit(((Real)parameters.get(0)).intValue(),radix);
+      if(ch == '\0') return Boolean.FALSE;
+      return new escm.type.Character(ch);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-name
+  public static class CharName implements Primitive {
+    public java.lang.String escmName() {
+      return "char-name";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-name <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      String name = Character.getName(((escm.type.Character)parameters.get(0)).value());
+      if(name == null) return Boolean.FALSE;
+      return new escm.type.String(name);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-defined?
+  public static class IsCharDefined implements Primitive {
+    public java.lang.String escmName() {
+      return "char-defined?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-defined? <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(Character.isDefined(((escm.type.Character)parameters.get(0)).value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-high?
+  public static class IsCharHigh implements Primitive {
+    public java.lang.String escmName() {
+      return "char-high?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-high? <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      escm.type.Character ch = (escm.type.Character)parameters.get(0);
+      return Boolean.valueOf(ch.isJavaChar() && Character.isHighSurrogate((char)ch.value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-low?
+  public static class IsCharLow implements Primitive {
+    public java.lang.String escmName() {
+      return "char-low?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-low? <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      escm.type.Character ch = (escm.type.Character)parameters.get(0);
+      return Boolean.valueOf(ch.isJavaChar() && Character.isLowSurrogate((char)ch.value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-high
+  public static class CharHigh implements Primitive {
+    public java.lang.String escmName() {
+      return "char-high";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-high <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      escm.type.Character ch = (escm.type.Character)parameters.get(0);
+      if(ch.isJavaChar()) return Boolean.FALSE;
+      return new escm.type.Character(Character.highSurrogate(ch.value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-low
+  public static class CharLow implements Primitive {
+    public java.lang.String escmName() {
+      return "char-low";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-low <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      escm.type.Character ch = (escm.type.Character)parameters.get(0);
+      if(ch.isJavaChar()) return Boolean.FALSE;
+      return new escm.type.Character(Character.lowSurrogate(ch.value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-codepoint
+  public static class CharCodepoint implements Primitive {
+    public java.lang.String escmName() {
+      return "char-codepoint";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.Character) || !(parameters.get(1) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-codepoint <high-char> <low-char>) expects exactly 2 chars: %s", Exceptionf.profileArgs(parameters));
+      escm.type.Character high = (escm.type.Character)parameters.get(0);
+      escm.type.Character low = (escm.type.Character)parameters.get(1);
+      if(!high.isJavaChar() || !Character.isHighSurrogate((char)high.value())) return Boolean.FALSE;
+      if(!low.isJavaChar() || !Character.isLowSurrogate((char)low.value())) return Boolean.FALSE;
+      return new escm.type.Character(Character.toCodePoint((char)high.value(),(char)low.value()));
     }
   }
 }

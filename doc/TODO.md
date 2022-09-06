@@ -18,10 +18,10 @@
 [X] UPDATE `help` WITH A `Types > character` ENTRY CONTAINING INFO ON CODEPOINTS, DIFFERENT NAMED CHARS, ETC.
     * mention that "write" & "display" are different for chars!
 
-[ ] ADD IN CHARACTER PRIMITIVE FUNCTIONS
+[X] ADD IN CHARACTER PRIMITIVE FUNCTIONS
     * ADJUST `help` & `primitives.md` AS NEEDED
 
-[ ] UPLOAD TO GITHUB
+[X] UPLOAD TO GITHUB
 
 [ ] UPDATE SOME OF THE STRING PRIMITIVES TO ACCOUNT FOR "CHAR" TYPE
     [ ] => MUST FIX `string-ref` !!!!
@@ -34,61 +34,6 @@
     * MENTION THIS IN `help`!
 
 [ ] UPLOAD TO GITHUB
-
-
-
-# NEW ESCHEME CHAR PROCS
-```
-### TEST PRIMITIVES & UPDATE `primitives.md` & `help`
-
-
-[ ] UPLOAD TO GITHUB
-
-
-(char-count <char>) ; number of chars to represent codepoint (1 if <char-16?>, else 2)
-                    ; Character.charCount(int codepoint)
-
-(char-digit <char> <optional-radix>)        ; returns integer of <char> in <optional-radix> (defaults to 36) => returns #f if an invalid <char>
-                                            ; int Character.digit(int codePoint, int radix)
-(char-for-digit <integer> <optional-radix>) ; returns char of <integer> in <optional-radix> (defaults to 36) => returns #f if an invalid <integer>
-                                            ; int Character.forDigit(int digit, int radix)
-
-(char-name <char>) ; returns name of <char>, or #f if <char> is an unassigned codepoint
-                   ; String Character.getName(int codepoint)
-
-(char-high <char>)             ; returns top 16 bits of 32 bit codepoint
-                               ; char Character.highSurrogate(int codepoint)
-(char-low <char>)              ; returns bottom 16 bits of 32 bit codepoint
-                               ; char Character.lowSurrogate(int codepoint)
-(char-codepoint <char> <char>) ; returns a char formed by combining the bottom bits of both chars as the top & bottom 16 bits of a new 32bit codepoint
-                               ; int Character.toCodePoint(char high, char low)
-
-(char-defined? <char>) ; returns whether <char> is a defined unicode point
-                       ; boolean Character.isDefined(int codepoint)
-
-
-
-### TEST PRIMITIVES & UPDATE `primitives.md` & `help`
-
-[ ] UPLOAD TO GITHUB
-
-
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

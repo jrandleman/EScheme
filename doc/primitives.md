@@ -446,6 +446,20 @@
 (char-pair? <char>)
 (java-char? <char>)
 (ascii-char? <char>)
+
+(char-count <char>)
+
+(char-digit <char> <optional-radix>)
+(char-for-digit <integer> <optional-radix>)
+
+(char-name <char>)
+(char-defined? <char>)
+
+(char-high? <char>)
+(char-low? <char>)
+(char-high <char>)
+(char-low <char>)
+(char-codepoint <high-char> <low-char>)
 ```
 
 
