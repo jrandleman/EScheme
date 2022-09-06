@@ -39,11 +39,6 @@
 
 # NEW ESCHEME CHAR PROCS
 ```
-char-32?    ; alias for <char-pair?>
-char-16?    ; alias for <java-char?>
-char-8?     ; alias for <ascii-char?>
-
-
 ### TEST PRIMITIVES & UPDATE `primitives.md` & `help`
 
 
@@ -51,17 +46,25 @@ char-8?     ; alias for <ascii-char?>
 
 
 (char-count <char>) ; number of chars to represent codepoint (1 if <char-16?>, else 2)
+                    ; Character.charCount(int codepoint)
 
-(char-digit <char> <optional-radix>)        ; returns integer of <char> in <optional-radix> (defaults to 36) (Character.digit) => returns #f if an invalid <char>
-(char-for-digit <integer> <optional-radix>) ; returns char of <integer> in <optional-radix> (defaults to 36) (Character.forDigit) => returns #f if an invalid <integer>
+(char-digit <char> <optional-radix>)        ; returns integer of <char> in <optional-radix> (defaults to 36) => returns #f if an invalid <char>
+                                            ; int Character.digit(int codePoint, int radix)
+(char-for-digit <integer> <optional-radix>) ; returns char of <integer> in <optional-radix> (defaults to 36) => returns #f if an invalid <integer>
+                                            ; int Character.forDigit(int digit, int radix)
 
-(char-name <char>) ; returns name of <char>, or #f if <char> is an unassigned codepoint (Character.getName)
+(char-name <char>) ; returns name of <char>, or #f if <char> is an unassigned codepoint
+                   ; String Character.getName(int codepoint)
 
-(char-high <char>)             ; returns top 16 bits of 32 bit codepoint (Character.highSurrogate)
-(char-low <char>)              ; returns bottom 16 bits of 32 bit codepoint (Character.lowSurrogate)
-(char-codepoint <char> <char>) ; returns a char formed by combining the bottom bits of both chars as the top & bottom 16 bits of a new 32bit codepoint (Character.toCodePoint)
+(char-high <char>)             ; returns top 16 bits of 32 bit codepoint
+                               ; char Character.highSurrogate(int codepoint)
+(char-low <char>)              ; returns bottom 16 bits of 32 bit codepoint
+                               ; char Character.lowSurrogate(int codepoint)
+(char-codepoint <char> <char>) ; returns a char formed by combining the bottom bits of both chars as the top & bottom 16 bits of a new 32bit codepoint
+                               ; int Character.toCodePoint(char high, char low)
 
-(char-defined? <char>) ; returns whether <char> is a defined unicode point (Character.isDefined)
+(char-defined? <char>) ; returns whether <char> is a defined unicode point
+                       ; boolean Character.isDefined(int codepoint)
 
 
 
