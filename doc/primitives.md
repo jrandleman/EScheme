@@ -427,6 +427,21 @@
 (char-graph? <char>)
 (char-punctuation? <char>)
 (char-xdigit? <char>)
+
+(char-upcase <char>)
+(char-downcase <char>)
+
+(char=? <char> ...)
+(char<? <char> ...)
+(char>? <char> ...)
+(char<=? <char> ...)
+(char>=? <char> ...)
+
+(char-ci=? <char> ...)
+(char-ci<? <char> ...)
+(char-ci>? <char> ...)
+(char-ci<=? <char> ...)
+(char-ci>=? <char> ...)
 ```
 
 

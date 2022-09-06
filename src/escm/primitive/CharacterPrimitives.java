@@ -193,4 +193,270 @@ public class CharacterPrimitives {
       return Boolean.valueOf((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'));
     }
   }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-upcase
+  public static class CharUpcase implements Primitive {
+    public java.lang.String escmName() {
+      return "char-upcase";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-upcase <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      return new escm.type.Character(Character.toUpperCase(((escm.type.Character)parameters.get(0)).value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-downcase
+  public static class CharDowncase implements Primitive {
+    public java.lang.String escmName() {
+      return "char-downcase";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-downcase <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      return new escm.type.Character(Character.toLowerCase(((escm.type.Character)parameters.get(0)).value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char=?
+  public static class IsCharEqual implements Primitive {
+    public java.lang.String escmName() {
+      return "char=?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char=? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      int mainValue = ((escm.type.Character)parameters.get(0)).value();
+      for(int i = 1, n = parameters.size(); i < n; ++i) {
+        Datum p = parameters.get(i);
+        if(!(p instanceof escm.type.Character))
+          throw new Exceptionf("'(char=? <char> ...) arg %s isn't a char: %s", p.profile(), Exceptionf.profileArgs(parameters));
+        if(mainValue != ((escm.type.Character)p).value()) return Boolean.FALSE;
+      }
+      return Boolean.TRUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char<?
+  public static class IsCharLessThan implements Primitive {
+    public java.lang.String escmName() {
+      return "char<?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char<? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      int lastValue = ((escm.type.Character)parameters.get(0)).value();
+      for(int i = 1, n = parameters.size(); i < n; ++i) {
+        Datum p = parameters.get(i);
+        if(!(p instanceof escm.type.Character))
+          throw new Exceptionf("'(char<? <char> ...) arg %s isn't a char: %s", p.profile(), Exceptionf.profileArgs(parameters));
+        int currValue = ((escm.type.Character)p).value();
+        if(lastValue >= currValue) return Boolean.FALSE;
+        lastValue = currValue;
+      }
+      return Boolean.TRUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char>?
+  public static class IsCharGreaterThan implements Primitive {
+    public java.lang.String escmName() {
+      return "char>?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char>? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      int lastValue = ((escm.type.Character)parameters.get(0)).value();
+      for(int i = 1, n = parameters.size(); i < n; ++i) {
+        Datum p = parameters.get(i);
+        if(!(p instanceof escm.type.Character))
+          throw new Exceptionf("'(char>? <char> ...) arg %s isn't a char: %s", p.profile(), Exceptionf.profileArgs(parameters));
+        int currValue = ((escm.type.Character)p).value();
+        if(lastValue <= currValue) return Boolean.FALSE;
+        lastValue = currValue;
+      }
+      return Boolean.TRUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char<=?
+  public static class IsCharLessThanOrEqual implements Primitive {
+    public java.lang.String escmName() {
+      return "char<=?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char<=? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      int lastValue = ((escm.type.Character)parameters.get(0)).value();
+      for(int i = 1, n = parameters.size(); i < n; ++i) {
+        Datum p = parameters.get(i);
+        if(!(p instanceof escm.type.Character))
+          throw new Exceptionf("'(char<=? <char> ...) arg %s isn't a char: %s", p.profile(), Exceptionf.profileArgs(parameters));
+        int currValue = ((escm.type.Character)p).value();
+        if(lastValue > currValue) return Boolean.FALSE;
+        lastValue = currValue;
+      }
+      return Boolean.TRUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char>=?
+  public static class IsCharGreaterThanOrEqual implements Primitive {
+    public java.lang.String escmName() {
+      return "char>=?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char>=? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      int lastValue = ((escm.type.Character)parameters.get(0)).value();
+      for(int i = 1, n = parameters.size(); i < n; ++i) {
+        Datum p = parameters.get(i);
+        if(!(p instanceof escm.type.Character))
+          throw new Exceptionf("'(char>=? <char> ...) arg %s isn't a char: %s", p.profile(), Exceptionf.profileArgs(parameters));
+        int currValue = ((escm.type.Character)p).value();
+        if(lastValue < currValue) return Boolean.FALSE;
+        lastValue = currValue;
+      }
+      return Boolean.TRUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-ci=?
+  public static class IsCharEqualCI implements Primitive {
+    public java.lang.String escmName() {
+      return "char-ci=?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-ci=? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      int mainValue = Character.toUpperCase(((escm.type.Character)parameters.get(0)).value());
+      for(int i = 1, n = parameters.size(); i < n; ++i) {
+        Datum p = parameters.get(i);
+        if(!(p instanceof escm.type.Character))
+          throw new Exceptionf("'(char-ci=? <char> ...) arg %s isn't a char: %s", p.profile(), Exceptionf.profileArgs(parameters));
+        if(mainValue != Character.toUpperCase(((escm.type.Character)p).value())) return Boolean.FALSE;
+      }
+      return Boolean.TRUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-ci<?
+  public static class IsCharLessThanCI implements Primitive {
+    public java.lang.String escmName() {
+      return "char-ci<?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-ci<? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      int lastValue = Character.toUpperCase(((escm.type.Character)parameters.get(0)).value());
+      for(int i = 1, n = parameters.size(); i < n; ++i) {
+        Datum p = parameters.get(i);
+        if(!(p instanceof escm.type.Character))
+          throw new Exceptionf("'(char-ci<? <char> ...) arg %s isn't a char: %s", p.profile(), Exceptionf.profileArgs(parameters));
+        int currValue = Character.toUpperCase(((escm.type.Character)p).value());
+        if(lastValue >= currValue) return Boolean.FALSE;
+        lastValue = currValue;
+      }
+      return Boolean.TRUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-ci>?
+  public static class IsCharGreaterThanCI implements Primitive {
+    public java.lang.String escmName() {
+      return "char-ci>?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-ci>? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      int lastValue = Character.toUpperCase(((escm.type.Character)parameters.get(0)).value());
+      for(int i = 1, n = parameters.size(); i < n; ++i) {
+        Datum p = parameters.get(i);
+        if(!(p instanceof escm.type.Character))
+          throw new Exceptionf("'(char-ci>? <char> ...) arg %s isn't a char: %s", p.profile(), Exceptionf.profileArgs(parameters));
+        int currValue = Character.toUpperCase(((escm.type.Character)p).value());
+        if(lastValue <= currValue) return Boolean.FALSE;
+        lastValue = currValue;
+      }
+      return Boolean.TRUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-ci<=?
+  public static class IsCharLessThanOrEqualCI implements Primitive {
+    public java.lang.String escmName() {
+      return "char-ci<=?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-ci<=? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      int lastValue = Character.toUpperCase(((escm.type.Character)parameters.get(0)).value());
+      for(int i = 1, n = parameters.size(); i < n; ++i) {
+        Datum p = parameters.get(i);
+        if(!(p instanceof escm.type.Character))
+          throw new Exceptionf("'(char-ci<=? <char> ...) arg %s isn't a char: %s", p.profile(), Exceptionf.profileArgs(parameters));
+        int currValue = Character.toUpperCase(((escm.type.Character)p).value());
+        if(lastValue > currValue) return Boolean.FALSE;
+        lastValue = currValue;
+      }
+      return Boolean.TRUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-ci>=?
+  public static class IsCharGreaterThanOrEqualCI implements Primitive {
+    public java.lang.String escmName() {
+      return "char-ci>=?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-ci>=? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      int lastValue = Character.toUpperCase(((escm.type.Character)parameters.get(0)).value());
+      for(int i = 1, n = parameters.size(); i < n; ++i) {
+        Datum p = parameters.get(i);
+        if(!(p instanceof escm.type.Character))
+          throw new Exceptionf("'(char-ci>=? <char> ...) arg %s isn't a char: %s", p.profile(), Exceptionf.profileArgs(parameters));
+        int currValue = Character.toUpperCase(((escm.type.Character)p).value());
+        if(lastValue < currValue) return Boolean.FALSE;
+        lastValue = currValue;
+      }
+      return Boolean.TRUE;
+    }
+  }
 }

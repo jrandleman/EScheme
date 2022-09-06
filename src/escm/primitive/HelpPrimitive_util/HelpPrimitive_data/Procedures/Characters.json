@@ -70,4 +70,76 @@
   "signatures": ["(char-xdigit? <char>)"],
   "description": "Returns whether <char> is a hexadecimal digit.",
   "example": null
+}, {
+  "name": "char-upcase",
+  "aliases": null,
+  "signatures": ["(char-upcase <char>)"],
+  "description": "Returns the upper-case version of <char>.",
+  "example": null
+}, {
+  "name": "char-downcase",
+  "aliases": null,
+  "signatures": ["(char-downcase <char>)"],
+  "description": "Returns the lower-case version of <char>.",
+  "example": null
+}, {
+  "name": "char=?",
+  "aliases": null,
+  "signatures": ["(char=? <char> ...)"],
+  "description": "Returns whether \"<char> ...\" are equal to one another.",
+  "example": null
+}, {
+  "name": "char<?",
+  "aliases": null,
+  "signatures": ["(char<? <char> ...)"],
+  "description": "Returns whether \"<char> ...\" are less than one another.",
+  "example": null
+}, {
+  "name": "char>?",
+  "aliases": null,
+  "signatures": ["(char>? <char> ...)"],
+  "description": "Returns whether \"<char> ...\" are greater than one another.",
+  "example": null
+}, {
+  "name": "char<=?",
+  "aliases": null,
+  "signatures": ["(char<=? <char> ...)"],
+  "description": "Returns whether \"<char> ...\" are less than or equal to one another.",
+  "example": null
+}, {
+  "name": "char>=?",
+  "aliases": null,
+  "signatures": ["(char>=? <char> ...)"],
+  "description": "Returns whether \"<char> ...\" are greater than or equal to one another.",
+  "example": null
+}, {
+  "name": "char-ci=?",
+  "aliases": null,
+  "signatures": ["(char-ci=? <char> ...)"],
+  "description": "Returns whether \"<char> ...\" are equal to one another (case-insensitive).",
+  "example": null
+}, {
+  "name": "char-ci<?",
+  "aliases": null,
+  "signatures": ["(char-ci<? <char> ...)"],
+  "description": "Returns whether \"<char> ...\" are less than one another (case-insensitive).",
+  "example": null
+}, {
+  "name": "char-ci>?",
+  "aliases": null,
+  "signatures": ["(char-ci>? <char> ...)"],
+  "description": "Returns whether \"<char> ...\" are greater than one another (case-insensitive).",
+  "example": null
+}, {
+  "name": "char-ci<=?",
+  "aliases": null,
+  "signatures": ["(char-ci<=? <char> ...)"],
+  "description": "Returns whether \"<char> ...\" are less than or equal to one another\n(case-insensitive).",
+  "example": null
+}, {
+  "name": "char-ci>=?",
+  "aliases": null,
+  "signatures": ["(char-ci>=? <char> ...)"],
+  "description": "Returns whether \"<char> ...\" are greater than or equal to one another\n(case-insensitive).",
+  "example": null
 }]

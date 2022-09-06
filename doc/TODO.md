@@ -37,19 +37,6 @@
 
 
 
-# CHAR PROCS FROM HEIST
-```
-char-upcase   char-downcase
-
-
-### TEST PRIMITIVES & UPDATE `primitives.md` & `help`
-
-
-char=?    char<?    char>?    char<=?    char>=?
-char-ci=? char-ci<? char-ci>? char-ci<=? char-ci>=?
-```
-
-
 # NEW ESCHEME CHAR PROCS
 ```
 char-pair?  ; to determine if holding a 32bit unicode char surrogate pair rather than a true 16bit java character (32bit codepoints take up 2 char slots in a string)
@@ -61,6 +48,9 @@ char-8?     ; alias for <char-ascii?>
 
 
 ### TEST PRIMITIVES & UPDATE `primitives.md` & `help`
+
+
+[ ] UPLOAD TO GITHUB
 
 
 (char-count <char>) ; number of chars to represent codepoint (1 if <char-16?>, else 2)
