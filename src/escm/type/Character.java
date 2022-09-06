@@ -88,7 +88,7 @@ public class Character extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Size Predicates
-  public boolean isCodePoint() {
+  public boolean isSurrogateCharPair() {
     return (value & 0x00000000ffffffffL) > 0xffffL;
   }
 

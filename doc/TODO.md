@@ -39,12 +39,9 @@
 
 # NEW ESCHEME CHAR PROCS
 ```
-char-pair?  ; to determine if holding a 32bit unicode char surrogate pair rather than a true 16bit java character (32bit codepoints take up 2 char slots in a string)
-char-java?  ; whether a 16bit char
-char-ascii? ; whether a 8bit char
 char-32?    ; alias for <char-pair?>
-char-16?    ; alias for <char-java?>
-char-8?     ; alias for <char-ascii?>
+char-16?    ; alias for <java-char?>
+char-8?     ; alias for <ascii-char?>
 
 
 ### TEST PRIMITIVES & UPDATE `primitives.md` & `help`
@@ -70,6 +67,7 @@ char-8?     ; alias for <char-ascii?>
 
 ### TEST PRIMITIVES & UPDATE `primitives.md` & `help`
 
+[ ] UPLOAD TO GITHUB
 
 
 ```

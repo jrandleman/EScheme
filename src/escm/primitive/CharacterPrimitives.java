@@ -459,4 +459,49 @@ public class CharacterPrimitives {
       return Boolean.TRUE;
     }
   }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // char-pair?
+  public static class IsCharPair implements Primitive {
+    public java.lang.String escmName() {
+      return "char-pair?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char-pair? <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(((escm.type.Character)parameters.get(0)).isSurrogateCharPair());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // java-char?
+  public static class IsJavaChar implements Primitive {
+    public java.lang.String escmName() {
+      return "java-char?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(java-char? <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(((escm.type.Character)parameters.get(0)).isJavaChar());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // ascii-char?
+  public static class IsAsciiChar implements Primitive {
+    public java.lang.String escmName() {
+      return "ascii-char?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(ascii-char? <char>) expects exactly 1 char: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(((escm.type.Character)parameters.get(0)).isAsciiChar());
+    }
+  }
 }

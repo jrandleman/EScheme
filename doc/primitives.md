@@ -442,6 +442,10 @@
 (char-ci>? <char> ...)
 (char-ci<=? <char> ...)
 (char-ci>=? <char> ...)
+
+(char-pair? <char>)
+(java-char? <char>)
+(ascii-char? <char>)
 ```
 
 

@@ -142,4 +142,22 @@
   "signatures": ["(char-ci>=? <char> ...)"],
   "description": "Returns whether \"<char> ...\" are greater than or equal to one another\n(case-insensitive).",
   "example": null
+}, {
+  "name": "char-pair?",
+  "aliases": null,
+  "signatures": ["(char-pair? <char>)"],
+  "description": "Returns whether <char> is a 32bit surrogate java char pair.\nUsed to represent 32bit unicode values, such codepoints\nbecome 2 java chars once stringified.",
+  "example": null
+}, {
+  "name": "java-char?",
+  "aliases": null,
+  "signatures": ["(java-char? <char>)"],
+  "description": "Returns whether <char> is a 16bit java char, correlating to exactly 1 char\nwithin strings.",
+  "example": null
+}, {
+  "name": "ascii-char?",
+  "aliases": null,
+  "signatures": ["(ascii-char? <char>)"],
+  "description": "Returns whether <char> is an 8bit ascii char, correlating to exactly 1 char\nwithin strings.",
+  "example": null
 }]
