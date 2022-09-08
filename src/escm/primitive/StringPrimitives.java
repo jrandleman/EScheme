@@ -39,6 +39,21 @@ public class StringPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(string-length <string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
+      return new Exact(((escm.type.String)parameters.get(0)).codePointLength());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // string-java-length
+  public static class StringJavaLength implements Primitive {
+    public java.lang.String escmName() {
+      return "string-java-length";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
+        throw new Exceptionf("'(string-java-length <string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
       return new Exact(((escm.type.String)parameters.get(0)).value().length());
     }
   }
@@ -69,10 +84,10 @@ public class StringPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(string-reverse <string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      java.lang.String str = ((escm.type.String)parameters.get(0)).value();
+      int[] codepoints = ((escm.type.String)parameters.get(0)).toCodePoints();
       StringBuilder sb = new StringBuilder();
-      for(int i = str.length()-1; i >= 0; --i)
-        sb.append(str.charAt(i));
+      for(int i = codepoints.length-1; i >= 0; --i)
+        sb.append(java.lang.Character.toString(codepoints[i]));
       return new escm.type.String(sb.toString());
     }
   }
@@ -114,10 +129,10 @@ public class StringPrimitives {
       if(!ListPrimitives.isValidSize(index))
         throw new Exceptionf("'(string-ref <string> <index>) 2nd arg %s isn't a non-negative integer!", index.profile());
       int indexValue = ((Real)index).intValue();
-      java.lang.String strValue = ((escm.type.String)str).value();
-      if(indexValue >= strValue.length())
+      escm.type.String strValue = (escm.type.String)str;
+      if(indexValue >= strValue.codePointLength())
         throw new Exceptionf("'(string-ref <string> <index>) index %d exceeds length of string %s", indexValue, str.write());
-      return new escm.type.String(java.lang.String.valueOf(strValue.charAt(indexValue)));
+      return new escm.type.Character(strValue.codePointAt(indexValue));
     }
   }
 
@@ -148,12 +163,15 @@ public class StringPrimitives {
       if(!ListPrimitives.isValidSize(startIndex)) 
         throw new Exceptionf("'(substring <string> <start-index> <optional-length>) 2nd %s arg isn't a non-negative integer!", startIndex.profile());
       double startIndexValue = ((Real)startIndex).doubleValue();
-      java.lang.String strValue = ((escm.type.String)str).value();
-      if(startIndexValue >= strValue.length() || substringLength == 0) 
+      escm.type.String strValue = (escm.type.String)str;
+      if(startIndexValue >= strValue.codePointLength() || substringLength == 0) 
         return new escm.type.String("");
-      if(substringLength == Double.POSITIVE_INFINITY || substringLength+startIndexValue >= strValue.length())
-        return new escm.type.String(strValue.substring((int)startIndexValue));
-      return new escm.type.String(strValue.substring((int)startIndexValue,(int)(substringLength+startIndexValue)));
+      int[] codepoints = strValue.toCodePoints();
+      StringBuilder sb = new StringBuilder();
+      for(int i = (int)startIndexValue, n = Math.min((int)(substringLength+startIndexValue),codepoints.length); i < n; ++i) {
+        sb.append(java.lang.Character.toString(codepoints[i]));
+      }
+      return new escm.type.String(sb.toString());
     }
   }
 
@@ -198,6 +216,21 @@ public class StringPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(string-escape <string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
+      return new escm.type.String(StringParser.escapeWithCustomUnicodeEscape(((escm.type.String)parameters.get(0)).value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // string-java-escape
+  public static class StringJavaEscape implements Primitive {
+    public java.lang.String escmName() {
+      return "string-java-escape";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
+        throw new Exceptionf("'(string-java-escape <string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
       return new escm.type.String(StringParser.escape(((escm.type.String)parameters.get(0)).value()));
     }
   }
@@ -338,13 +371,32 @@ public class StringPrimitives {
       return ((escm.type.String)splitter).value();
     }
 
+    private static boolean canUnifyStrings(java.lang.String lhs, java.lang.String rhs) {
+      return lhs.length() == 1 && rhs.length() == 1 && java.lang.Character.isHighSurrogate(lhs.charAt(0)) && java.lang.Character.isLowSurrogate(rhs.charAt(0));
+    }
+
+    // We want the result of (string-split <str>), if <str> has surrogate pairs, to split
+    // the string with those surrogate char pairs preserved in the same string together.
+    private static ArrayList<java.lang.String> unifySurrogatePairsIntoOneString(java.lang.String[] splitStrs) {
+      ArrayList<java.lang.String> unified = new ArrayList<java.lang.String>();
+      for(int i = 0; i < splitStrs.length-1; ++i) {
+        if(canUnifyStrings(splitStrs[i],splitStrs[i+1])) {
+          unified.add(java.lang.Character.toString(java.lang.Character.toCodePoint(splitStrs[i].charAt(0),splitStrs[i+1].charAt(0))));
+          ++i;
+        } else {
+          unified.add(splitStrs[i]);
+        }
+      }
+      return unified;
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if((parameters.size() != 1 && parameters.size() != 2) || !(parameters.get(0) instanceof escm.type.String))
         throw new Exceptionf("'(string-split <string> <optional-string>) didn't receive exactly 1 or 2 strings: %s", Exceptionf.profileArgs(parameters));
-      java.lang.String[] strArray = ((escm.type.String)parameters.get(0)).value().split(getSplitterString(parameters));
+      ArrayList<java.lang.String> strArray = unifySurrogatePairsIntoOneString(((escm.type.String)parameters.get(0)).value().split(getSplitterString(parameters)));
       Datum strList = escm.type.Nil.VALUE;
-      for(int i = strArray.length-1; i >= 0; --i)
-        strList = new escm.type.Pair(new escm.type.String(strArray[i]),strList);
+      for(int i = strArray.size()-1; i >= 0; --i)
+        strList = new escm.type.Pair(new escm.type.String(strArray.get(i)),strList);
       return strList;
     }
   }

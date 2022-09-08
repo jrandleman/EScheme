@@ -366,22 +366,26 @@
 ------------------------
 ## Strings:
 ```scheme
+(string? <obj>)
+
 (string <str-or-char> ...)
 
 (string-length <str>)
+(string-java-length <str>)
 (string-empty? <str>)
 
 (string-reverse <str>)
 
 (string-append <str> ...)
 
-(string-ref <str> <index-num>) ; returns a substring of length 1 (since no characters)
+(string-ref <str> <index-num>)
 (substring <str> <index-num> <optional-length-num>)  ; length defaults to end of string
 
 (string-upcase <str>)
 (string-downcase <str>)
 
 (string-escape <str>)
+(string-java-escape <str>)
 (string-unescape <str>)
 
 (string-replace <str> <regex-str> <replacement-str>)
@@ -404,8 +408,6 @@
 (string-ci>? <str> <str> ...)
 (string-ci<=? <str> <str> ...)
 (string-ci>=? <str> <str> ...)
-
-(string? <obj>)
 
 (stringf <format-string> <arg> ...)
 ```

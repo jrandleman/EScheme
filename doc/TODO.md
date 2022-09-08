@@ -23,15 +23,16 @@
 
 [X] UPLOAD TO GITHUB
 
-[ ] UPDATE SOME OF THE STRING PRIMITIVES TO ACCOUNT FOR "CHAR" TYPE
-    [ ] => MUST FIX `string-ref` !!!!
-    [ ] => consider changing `string-length` to be based on the number of codepoints within the string, then have a sperate `string-char-length`?
+[X] UPDATE SOME OF THE STRING PRIMITIVES TO ACCOUNT FOR "CHAR" TYPE
     * ADJUST `help` & `primitives.md` AS NEEDED
 
-[ ] UPLOAD TO GITHUB
-
-[ ] LIKE HASHMAPS & VECTORS, _HAVE STRINGS BE UNARY CALLABLES_ ACCEPTING AN INDEX AS ITS ARG TO GET A CHAR @ THAT POSITION
+[X] LIKE HASHMAPS & VECTORS, _HAVE STRINGS BE UNARY CALLABLES_ ACCEPTING AN INDEX AS ITS ARG TO GET A CHAR @ THAT POSITION
     * MENTION THIS IN `help`!
+
+[X] UPLOAD TO GITHUB
+
+[ ] ALLOW SEEDED `gensym` TO EMBED A SYMBOL IN THE GENERATED NAME (HELPS WITH DEBUGGABILITY WHEN PRINTING ITS NAME OUT IN A CALLSTACK)
+    [ ] !!! SEED ALL OF THE GENSYMS USED IN THE STDLIB !!!
 
 [ ] UPLOAD TO GITHUB
 
@@ -51,10 +52,6 @@
 (intersection <elt=?> <ac> ...)
 (difference <elt=?> <ac> ...)
 (symmetric-difference <elt=?> <ac> ...)
-
-(merge <predicate?> <ac> ...)
-
-(delete-duplicates <ac>)
 ```
 
 
@@ -96,9 +93,9 @@
 
         AssociativeCollection conj(Datum key, Datum val) throws Exception;
 
-        Datum toList();
-        Datum toVector();
-        Datum toString();
+        Datum toList() throws Exception;
+        Datum toVector() throws Exception;
+        Datum toString() throws Exception;
         Datum toHashmap();
 
 
@@ -573,36 +570,6 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 ====================================================================================
 ====================================================================================
 ====================================================================================
-
-
-
-
-
-
-
-- SUPPORT OTHER ESCAPE JAVA CHARS IN STRINGS AS NEEDED
-  * ESCPECIALLY UNICODE (`\u`) SUPPORT !!!
-    => SEE `StringParser.java`
-       * ___UPDATE IN `json` AS WELL___
-
-
-       `Character.toString(unicodeCodePointInt)` 
-        => NOTE: CONSIDER HOW ESCM SHOULD SUPPORT THIS: want to be able to support 32 bit unicode printing.
-           BUT doing `(string-split <string> "")` splits across 16bit chars
-
-        => MAYBE HAVE escm.type.String BE MORE COMPLEX? 
-           => ARRAY OF PAIRS OF CODEPOINTS ?
-
-           => ___ISSUE: CAN'T LEVERAGE JAVA REGEX FUNCTIONS IFF USING THIS ADVANCED STRUCTURE___
-
-           => ___POSSIBLE SOLUTION: POTENTIALLY SUPPORT `\uXXXX` FOR TRUE JAVA CHARACTERS___
-              * ___ALSO SUPPORT `\Uxxxxxxxx` FOR 32-BIT CHARSEQS W/IN A STRING (MENTION THIS CORRELATES TO A CHAR SEQUENCE, NOT A CHAR!)___
-
-        => SUPPORT A CHARACTERS: `#\unicode` `#\Unicode` (for \u & \U)
-        ==============================================================
-
-
-  * ADD DETAILS TO `README` & `help` REGARDING WHAT ESCAPE CHARACTERS ARE / AREN'T SUPPORTED IN STRINGS !!!
 
 
 

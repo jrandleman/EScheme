@@ -29,10 +29,10 @@
   - You can now run `escm` anywhere in the command-line to launch EScheme!
 
 ### Execution:
-* If you didn't do the optional step during installation:
-  - Run `java Main` within the `EScheme/bin` directory!
-* Else:
+* If you did the optional step during installation:
   - Run `escm` anywhere in your terminal!
+* Else:
+  - Run `java Main` within the `EScheme/bin` directory!
 
 
 

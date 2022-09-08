@@ -8,7 +8,13 @@
   "name": "string-length",
   "aliases": null,
   "signatures": ["(string-length <str>)"],
-  "description": "Returns the length of <str>. Quite exciting.",
+  "description": "Returns the length of <str>, with surrogate pairs counting as 1 char.",
+  "example": null
+}, {
+  "name": "string-java-length",
+  "aliases": null,
+  "signatures": ["(string-length <str>)"],
+  "description": "Returns the length of <str>, with surrogate pairs counting as 2 chars.",
   "example": null
 }, {
   "name": "string-empty?",
@@ -32,7 +38,7 @@
   "name": "string-ref",
   "aliases": null,
   "signatures": ["(string-ref <str> <index-num>)"],
-  "description": "Returns the character at <index-num> index in <str> as a\nsubstring of length 1.",
+  "description": "Returns the character at <index-num> index in <str>.",
   "example": null
 }, {
   "name": "substring",
@@ -56,13 +62,19 @@
   "name": "string-escape",
   "aliases": null,
   "signatures": ["(string-escape <str>)"],
-  "description": "Returns <str> with special characters escaped (like\nwhen printing via <write>).",
+  "description": "Returns <str> with special characters escaped (like when printing via <write>).\nNote that this escapes surrogate pairs using EScheme's custom \"\\U\" syntax.\n<string-java-escape> should be used to escape such with 2 \"\\u\" instances.",
+  "example": null
+}, {
+  "name": "string-java-escape",
+  "aliases": null,
+  "signatures": ["(string-java-escape <str>)"],
+  "description": "Returns <str> with special characters escaped (like when printing via <write>).\nNote that this escapes surrogate pairs using 2 \"\\u\" instances.\n<string-escape> should be used to escape such with EScheme's custom \"\\U\" syntax.",
   "example": null
 }, {
   "name": "string-unescape",
   "aliases": null,
   "signatures": ["(string-unescape <str>)"],
-  "description": "Returns <str> with special characters unescaped (like\nwhen printing via <display>).",
+  "description": "Returns <str> with special characters unescaped (like when printing via <display>).\nNote that this also unescapes EScheme's custom \"\\U\" syntax.",
   "example": null
 }, {
   "name": "string-replace",

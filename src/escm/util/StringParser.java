@@ -3,6 +3,10 @@
 //    String parsing utility to provide string escaping and unescaping via
 //    "escm.util.StringParser.escape" & "escm.util.StringParser.unescape" 
 //    when reading/printing strings in human and machine readable formats.
+//
+//    Also provides "escm.util.StringParser.escapeWithCustomUnicodeEscape"
+//    to escape surrogate char pairs using EScheme's custom "U" literal 
+//    syntax.
 
 package escm.util;
 import java.util.ArrayList;
@@ -127,9 +131,29 @@ public class StringParser {
 
   ////////////////////////////////////////////////////////////////////////////
   // Implementing String Escaping: "\n" => "\\n"
+  private static String get16bitHexString(char c) {
+    String hexString = Integer.toHexString((int)c);
+    StringBuilder sb = new StringBuilder("\\u");
+    for(int i = 0, n = 4-hexString.length(); i < n; ++i) {
+      sb.append('0');
+    }
+    sb.append(hexString);
+    return sb.toString();
+  }
+
+
+  private static String get32bitHexString(int c) {
+    String hexString = Integer.toHexString(c);
+    StringBuilder sb = new StringBuilder("\\U");
+    for(int i = 0, n = 8-hexString.length(); i < n; ++i) {
+      sb.append('0');
+    }
+    sb.append(hexString);
+    return sb.toString();
+  }
+
+
   private static String escapedChar(char c) {
-    c %= 65536; // 2^16
-    if(c < 0) c += 65536;
     switch(c) {
       case '"':  return "\\\"";
       case '\\': return "\\\\";
@@ -138,23 +162,54 @@ public class StringParser {
       case '\n': return "\\n";
       case '\r': return "\\r";
       case '\t': return "\\t";
-      default: // Escape non-printable chars that are NOT one of the above as unicode
-        String hexString = Integer.toHexString((int)c);
-        StringBuilder sb = new StringBuilder("\\u");
-        for(int i = 0, n = 4-hexString.length(); i < n; ++i) {
-          sb.append('0');
-        }
-        sb.append(hexString);
-        return sb.toString();
+      default: return get16bitHexString(c); // Escape non-printable chars that are NOT one of the above as unicode
     }
   }
 
 
-  private static boolean noCharEscapeNeeded(char c) {
+  private static String escapedCodePoint(int i) {
+    switch(i) {
+      case '"':  return "\\\"";
+      case '\\': return "\\\\";
+      case '\b': return "\\b";
+      case '\f': return "\\f";
+      case '\n': return "\\n";
+      case '\r': return "\\r";
+      case '\t': return "\\t";
+      default: { // Escape non-printable chars that are NOT one of the above as unicode
+        if((i & 0x00000000ffffffffL) <= 0xffffL) {
+          return get16bitHexString((char)i);
+        } else {
+          return get32bitHexString(i);
+        }
+      }
+    }
+  }
+
+
+  private static boolean noCharEscapeNeeded(int c) {
     return c != '"' && c != '\\' && c >= 32 && c <= 126;
   }
 
 
+  // Prints 32bit surrogate char pairs as 1 "U" instance (an invalid Java String)
+  public static String escapeWithCustomUnicodeEscape(String str) {
+    StringBuilder escaped = new StringBuilder();
+    int offset = 0, strLength = str.length();
+    while(offset < strLength) {
+      int codepoint = str.codePointAt(offset);
+      if(noCharEscapeNeeded(codepoint)) {
+        escaped.append(java.lang.Character.toString(codepoint));
+      } else {
+        escaped.append(escapedCodePoint(codepoint));
+      }
+      offset += java.lang.Character.charCount(codepoint);
+    }
+    return escaped.toString();
+  }
+
+
+  // Prints 32bit surrogate char pairs as 2 "u" instances (a valid Java String)
   public static String escape(String str) {
     StringBuilder escaped = new StringBuilder();
     for(int i = 0, n = str.length(); i < n; ++i) {
@@ -170,6 +225,7 @@ public class StringParser {
 
 
   // Returned int represents the new idx position of <indexToUpdate> in escaped version of <str>
+  // Prints 32bit surrogate char pairs as 2 "u" instances (a valid Java String)
   public static Pair<Integer,String> escape(int indexToUpdate, String str) {
     int originalIndexToUpdate = indexToUpdate;
     StringBuilder escaped = new StringBuilder();
