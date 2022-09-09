@@ -3,38 +3,13 @@
 ## MORE
 
 
-- ADD IN THE `Character` TYPE PRIOR TO IMMUTABLE GENERIC ALGOS (REQUIRED FOR ITERATION IN STRING CONTAINERS)
-  => `#\` PREFIX AS PER REGULAR SCHEME (REPRESENTS AN INT UNDER THE HOOD)
-
-[X] FIX READERS TO ACCOUNT FOR BASIC SINGLE CHARACTERS
-[X] EXTEND READERS TO ALLOW FOR NAMED CHARACTERS (#\newline, #\tab, ETC.)
-    ```
-    #\space, #\tab, #\newline, #\page, #\return,
-    #\backspace, #\nul, #\esc (27), #\delete (127)
-    ```
-[X] EXTEND READERS TO ALLOW FOR CODEPOINT CHARACTERS (#\uXXXX, #\UXXXXXXXX)
-[X] UPDATE CHARACTER PRINTER TO PRINT OUT NAMED CHARS & CHAR HEX CODES AS NEEDED!
-[X] FIX SITUATION WHERE `#\newline` WILL NEVER BE READ W/O NAME B/C OF HOW `isDelimiter` WORKS
-[X] UPDATE `help` WITH A `Types > character` ENTRY CONTAINING INFO ON CODEPOINTS, DIFFERENT NAMED CHARS, ETC.
-    * mention that "write" & "display" are different for chars!
-
-[X] ADD IN CHARACTER PRIMITIVE FUNCTIONS
-    * ADJUST `help` & `primitives.md` AS NEEDED
-
-[X] UPLOAD TO GITHUB
-
-[X] UPDATE SOME OF THE STRING PRIMITIVES TO ACCOUNT FOR "CHAR" TYPE
-    * ADJUST `help` & `primitives.md` AS NEEDED
-
-[X] LIKE HASHMAPS & VECTORS, _HAVE STRINGS BE UNARY CALLABLES_ ACCEPTING AN INDEX AS ITS ARG TO GET A CHAR @ THAT POSITION
-    * MENTION THIS IN `help`!
-
-[X] UPLOAD TO GITHUB
-
 [ ] ALLOW SEEDED `gensym` TO EMBED A SYMBOL IN THE GENERATED NAME (HELPS WITH DEBUGGABILITY WHEN PRINTING ITS NAME OUT IN A CALLSTACK)
     [ ] !!! SEED ALL OF THE GENSYMS USED IN THE STDLIB !!!
+    [ ] UPDATE `help` & `primitives.md` ACCORDINGLY
 
 [ ] UPLOAD TO GITHUB
+
+[ ] ADD IN `(file-remove-extension <file-path-string> <extension-string>)` (ALSO REMOVES THE ".")
 
 
 
@@ -64,13 +39,15 @@
       public interface AssociativeCollectionIterator {
         boolean finished(); // returns whether at end of the collection
 
-        Datum key() throws Exception;   // throws if <finished() == true>
-        Datum value() throws Exception; // throws if <finished() == true>
+        Datum key() throws Exception; // throws if <finished() == true>
+        Datum val() throws Exception; // throws if <finished() == true>
 
         AssociativeCollectionIterator next(); // may return <this> if <finished() == true>
 
         Datum fromList(Datum l); // convert list <l> into an <AssociativeCollection> Datum
-        Datum toList();          // convert remaining values until <finished() == true> to a list Datum
+        // Datum toList();          // convert remaining values until <finished() == true> to a list Datum
+
+        Datum reify(); // convert remaining values to an <AssociativeCollection> Datum
       }
 
 
@@ -85,7 +62,7 @@
 
         int length();
 
-        Datum ref(Datum key) throws Exception;
+        Datum val(Datum key) throws Exception;
 
         AssociativeCollection append(AssociativeCollection ac) throws Exception;
 
@@ -116,7 +93,7 @@
           args.add(seed);
           for(int i = 0; i < iters.length; ++i) {
             if(iters[i].finished()) return continuation.run(seed);
-            args.add(iters[i].value());
+            args.add(iters[i].val());
             cdrs[i] = iters[i].next();
           }
           return c.callWith(args,(acc) -> () -> foldIter(c,acc,cdrs,continuation));
@@ -137,7 +114,7 @@
           ArrayList<Datum> args = new ArrayList<Datum>(iters.length);
           for(int i = 0; i < iters.length; ++i) {
             if(iters[i].finished()) return continuation.run(escm.type.Nil.VALUE);
-            args.add(iters[i].value());
+            args.add(iters[i].val());
             cdrs[i] = iters[i].next();
           }
           return c.callWith(args,(mappedValue) -> () -> mapIter(c,cdrs,(mappedList) -> () -> continuation.run(new escm.type.Pair(mappedValue,mappedList))));
@@ -158,7 +135,7 @@
           ArrayList<Datum> args = new ArrayList<Datum>(iters.length);
           for(int i = 0; i < iters.length; ++i) {
             if(iters[i].finished()) return continuation.run(Void.VALUE);
-            args.add(iters[i].value());
+            args.add(iters[i].val());
             cdrs[i] = iters[i].next();
           }
           return c.callWith(args,(ignore) -> () -> forEachIter(c,cdrs,continuation));
@@ -177,7 +154,7 @@
         private static Trampoline.Bounce filterIter(Callable predicate, AssociativeCollectionIterator iter, Trampoline.Continuation continuation) throws Exception {
           if(iter.finished()) return continuation.run(escm.type.Nil.VALUE);
           AssociativeCollectionIterator cdr = iter.next();
-          Datum value = iter.value();
+          Datum value = iter.val();
           ArrayList<Datum> args = new ArrayList<Datum>(1);
           args.add(value);
           return predicate.callWith(args,(shouldKeep) -> () -> {
@@ -199,7 +176,7 @@
           if(iter.finished()) return continuation.run(new escm.type.number.Exact(count));
           AssociativeCollectionIterator cdr = iter.next();
           ArrayList<Datum> args = new ArrayList<Datum>(1);
-          args.add(iter.value());
+          args.add(iter.val());
           return c.callWith(args,(shouldCount) -> () -> {
             if(shouldCount.isTruthy() == false) return countIter(count,c,cdr,continuation);
             return countIter(count+1,c,cdr,continuation);
@@ -217,7 +194,7 @@
         private static Trampoline.Bounce removeIter(Callable predicate, AssociativeCollectionIterator iter, Trampoline.Continuation continuation) throws Exception {
           if(iter.finished()) return continuation.run(escm.type.Nil.VALUE);
           AssociativeCollectionIterator cdr = iter.next();
-          Datum value = iter.value();
+          Datum value = iter.val();
           ArrayList<Datum> args = new ArrayList<Datum>(1);
           args.add(value);
           return predicate.callWith(args,(shouldRemove) -> () -> {
@@ -236,18 +213,44 @@
         //////////////////////////////////////////////////////////////////////
         // Key Logic (returns Datum [OR #f IF DNE])
         private static Trampoline.Bounce keyIter(Callable predicate, AssociativeCollectionIterator iter, Trampoline.Continuation continuation) throws Exception {
-          if(iter.finished()) return continuation.run(escm.type.bool.Boolean.FALSE);
-          ArrayList<Datum> args = new ArrayList<Datum>(1);
-          args.add(iter.value());
-          return predicate.callWith(args,(foundKey) -> () -> {
-            if(foundKey.isTruthy() == true) return continuation.run(iter.key());
-            return keyIter(predicate,iter.next(),continuation);
-          });
+         if(iter.finished()) return continuation.run(escm.type.bool.Boolean.FALSE);
+         ArrayList<Datum> args = new ArrayList<Datum>(1);
+         args.add(iter.value());
+         return predicate.callWith(args,(foundKey) -> () -> {
+           if(foundKey.isTruthy() == true) return continuation.run(iter.key());
+           return keyIter(predicate,iter.next(),continuation);
+         });
         }
 
 
         public static Trampoline.Bounce key(Callable predicate, AssociativeCollection ac, Trampoline.Continuation continuation) throws Exception {
-          return keyIter(predicate,ac.iterator(),continuation);
+         return keyIter(predicate,ac.iterator(),continuation);
+        }
+
+
+        //////////////////////////////////////////////////////////////////////
+        // Drop Logic (returns AssociativeCollection)
+        private static Trampoline.Bounce dropIter(AssociativeCollectionIterator iter, int length, Trampoline.Continuation continuation) throws Exception {
+          if(iter.finished() || length <= 0) return continuation.run(iter.reify());
+          return () -> dropIter(iter.next(),length-1,continuation);
+        }
+
+
+        public static Trampoline.Bounce drop(AssociativeCollection ac, int length, Trampoline.Continuation continuation) throws Exception {
+          return dropIter(ac.iterator(),length,continuation);
+        }
+
+
+        //////////////////////////////////////////////////////////////////////
+        // Take Logic (returns AssociativeCollection)
+        private static Trampoline.Bounce takeIter(Datum takenValues, AssociativeCollectionIterator iter, int length, Trampoline.Continuation continuation) throws Exception {
+          if(iter.finished() || length <= 0) return continuation.run(iter.fromList(takenValues));
+          return () -> takeIter(new escm.type.Pair(iter.val(),takenValues),iter.next(),length-1,continuation);
+        }
+
+
+        public static Trampoline.Bounce take(AssociativeCollection ac, int length, Trampoline.Continuation continuation) throws Exception {
+          return takeIter(escm.type.Nil.VALUE,ac.iterator(),length,continuation);
         }
 
 
@@ -258,8 +261,8 @@
         //   if(iter2.finished()) return continuation.run(iter1.toList());
         //   AssociativeCollectionIterator cdr1 = iter1.next();
         //   AssociativeCollectionIterator cdr2 = iter2.next();
-        //   Datum value1 = iter1.value();
-        //   Datum value2 = iter2.value();
+        //   Datum value1 = iter1.val();
+        //   Datum value2 = iter2.val();
         //   ArrayList<Datum> args = new ArrayList<Datum>(2);
         //   args.add(value1);
         //   args.add(value2);
@@ -378,6 +381,9 @@
 (associative-collection->vector <ac>) ; (aliased by ac->vector)
 (associative-collection->hashmap <ac>) ; (aliased by ac->hashmap)
 
+(drop <ac> <length>)
+(take <ac> <length>)
+
 (union <elt=?> <ac> ...)
 (intersection <elt=?> <ac> ...)
 (difference <elt=?> <ac> ...)
@@ -405,12 +411,10 @@
 
 (key-right <predicate?> <oc>) ; returns key of right-most value satisfying <predicate?>
 
-(drop <oc> <length>)
 (drop-right <oc> <length>)
 (drop-while <predicate?> <oc>)
 (drop-right-while <predicate?> <oc>)
 
-(take <oc> <length>)
 (take-right <oc> <length>)
 (take-while <predicate?> <oc>)
 (take-right-while <predicate?> <oc>)
@@ -418,7 +422,7 @@
 (sort <binary-predicate?> <oc>)
 (sorted? <binary-predicate?> <oc>)
 
-(merge <predicate?> <ac> <ac>)
+(merge <predicate?> <oc> <oc>)
 
 (delete-neighbor-duplicates <oc>)
 ```
@@ -442,7 +446,7 @@ int length();
 
 Trampoline.Bounce forEach(Callable c, Trampoline.Continuation continuation) throws Exception; // -> Void
 
-ValueType ref(KeyType key) throws Exception;
+ValueType val(KeyType key) throws Exception;
 
 AssociativeCollection append(AssociativeCollection ac) throws Exception;
 
@@ -461,12 +465,6 @@ Datum toHashmap() throws Exception;
 ====================================================================================
 ====================================================================================
 ====================================================================================
-
-
-
-
-
-- ADD IN `(file-remove-extension <file-path-string> <extension-string>)` (ALSO REMOVES THE ".")
 
 
 
@@ -524,6 +522,18 @@ support `import-from` `import-once` `import-once-from`
             - but does this hide too much??? could it be deceptively simple?
             - maybe keep the concept of `-once` in, but support the "path-pasting" instead of `-from`
               * do the same for `load`?
+
+
+
+
+
+--
+thread-local global stack of filename symbol origin prefixes (or any module-specific prefix) to use as a hash of private variables during environment binding/refing
+  => no prefix needed for public variables
+  => should be flexible to add modules imported halfway through a module file to affect subsequent potential public variables in said module file
+  => using a stack enables us to import additional modules in 1 thread. import = push, finish importing = pop. peek = the current thread's module's hash-prefix data.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 
 
@@ -723,6 +733,9 @@ PROBLEM: How can we intermix the notion of serialization and modules?
             :port
             :input-port
             :output-port
+
+            :associative-container ; :ac
+            :ordered-container     ; :oc
             ```
 
 
