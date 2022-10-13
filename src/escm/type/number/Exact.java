@@ -470,7 +470,7 @@ public class Exact extends Real {
 
   public boolean isOdd() {
     try {
-      if(den.equals(BigInteger.ONE)) return num.remainder(TWO).equals(BigInteger.ONE);
+      if(den.equals(BigInteger.ONE)) return num.abs().remainder(TWO).equals(BigInteger.ONE);
     } catch(Exception e) {}
     return false;
   }
