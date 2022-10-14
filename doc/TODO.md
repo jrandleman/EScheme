@@ -3,6 +3,23 @@
 ## MORE
 
 
+[ ] FROM THE CMD LINE USING `escm` AS A CMD:
+    [ ] ALLOW THE ADDING OF NEW FILES TO ESCM'S SET OF FILES TO LOAD UP UPON AN INITIAL ESCM PROGRAM LAUNCH
+        (BASICALLY JUST A WAY FOR USERS TO ADD THEIR OWN "stdlib"S TO BE LOADED UPON UPON BOOT-TIME)
+        `$ escm -lbs, --list-boot-scripts`
+        `$ escm -abs, --add-boot-scripts <filename> ...`
+        `$ escm -rbs, --remove-boot-scripts <filename> ...`
+        `$ escm -sbs, --swap-boot-scripts <filename1> <filename2>` // swap their order of evaluation
+        [ ] ALSO HAVE A WAY TO DO THIS PROGRAMATICALLY:
+            `(list-boot-scripts)`
+            `(add-boot-scripts! <filename-str> ...)`
+            `(remove-boot-scripts! <filename-str> ...)`
+            `(swap-boot-scripts! <filename1-str> <filename2-str>)`
+
+
+
+
+
 [ ] ALLOW SEEDED `gensym` TO EMBED A SYMBOL IN THE GENERATED NAME (HELPS WITH DEBUGGABILITY WHEN PRINTING ITS NAME OUT IN A CALLSTACK)
     [ ] !!! SEED ALL OF THE GENSYMS USED IN THE STDLIB !!!
     [ ] UPDATE `help` & `primitives.md` ACCORDINGLY
