@@ -1,21 +1,6 @@
-<!-- TODO.md -->
+xz<!-- TODO.md -->
 
 ## MORE
-
-
-[ ] FROM THE CMD LINE USING `escm` AS A CMD:
-    [ ] ALLOW THE ADDING OF NEW FILES TO ESCM'S SET OF FILES TO LOAD UP UPON AN INITIAL ESCM PROGRAM LAUNCH
-        (BASICALLY JUST A WAY FOR USERS TO ADD THEIR OWN "stdlib"S TO BE LOADED UPON UPON BOOT-TIME)
-        `$ escm -lbs, --list-boot-scripts`
-        `$ escm -abs, --add-boot-scripts <filename> ...`
-        `$ escm -rbs, --remove-boot-scripts <filename> ...`
-        `$ escm -sbs, --swap-boot-scripts <filename1> <filename2>` // swap their order of evaluation
-        [ ] ALSO HAVE A WAY TO DO THIS PROGRAMATICALLY:
-            `(list-boot-scripts)`
-            `(add-boot-scripts! <filename-str> ...)`
-            `(remove-boot-scripts! <filename-str> ...)`
-            `(swap-boot-scripts! <filename1-str> <filename2-str>)`
-
 
 
 
@@ -236,19 +221,19 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 
   * CONSIDER: `(define-type <keyword> <unary-predicate-callable>)` `(type? <keyword>)` `(delete-type! <keyword>)` `(type-predicate <keyword>)`
 
-  BASICS: `(def :string (f :string s :any a))` use keywords to denote basic type checks
-                ^          ^         ^
-            return value  string     any-type!
+  BASICS: `(def :string (f (:string s) (:any a)))` use keywords to denote basic type checks
+                ^           ^           ^
+            return value   string       any-type!
 
           ***NOTE:*** SUPPORT FALSE-ABLE TYPES (SIMILAR TO NULLABILITY) VIA: `:string?`
           
-          ARBITRARY PREDICATE TYPING: `(def (g :type even? arg-name))` `:type <predicate?-fcn>` => check validity of arg based on predicate. ALSO SUPPORT FALSABLE `:type?`
+          ARBITRARY PREDICATE TYPING: `(def (g (:type even? arg-name)))` `:type <predicate?-fcn>` => check validity of arg based on predicate. ALSO SUPPORT FALSABLE `:type?`
 
           COULD THEN HAVE:
             ```scheme
             (defn fun
-              (:list (:string s) (list s)) ; !!! can dispatch on type !!!
-              (:integer (:number n) n))
+              (:list ((:string s)) (list s)) ; !!! can dispatch on type !!!
+              (:integer ((:number n)) n))
             ```
 
           NEW LAMBDA SYNTAX: `(lambda <return-type> (<parameter> ...) <body>)`
@@ -298,10 +283,37 @@ PROBLEM: How can we intermix the notion of serialization and modules?
             :port
             :input-port
             :output-port
-
-            :associative-container ; :ac
-            :ordered-container     ; :oc
             ```
+
+
+
+
+
+
+
+
+
+
+[ ] FROM THE CMD LINE USING `escm` AS A CMD:
+    [ ] BOOT SCRIPTS STORED IN A FILE NAMED "`.escm-boot-scripts`"
+    [ ] ALLOW THE ADDING OF NEW FILES TO ESCM'S SET OF FILES TO LOAD UP UPON AN INITIAL ESCM PROGRAM LAUNCH
+        (BASICALLY JUST A WAY FOR USERS TO ADD THEIR OWN "stdlib"S TO BE LOADED UPON UPON BOOT-TIME)
+        `$ escm -bs-ls,  --boot-script-list`
+        `$ escm -bs-mk,  --boot-script-make <filename> ...` // moves `<filename>` to the end of the boot-script list if it already exists (can't have 1 file 2+ times)
+        `$ escm -bs-rm,  --boot-script-remove <filename> ...` // returns whether successfully deleted all of them.
+        `$ escm -bs-s,   --boot-script-swap <src-filename> <dest-filename>` // put `<src>` into `<dest>`'s position, & `<dest>` into `<src>`'s if `<src>` already exists
+        `$ escm -bs-e,   --boot-script-exists <filename> ...` // returns whether each filename is a boot script (`#t` vs `#f`)
+        `$ escm -bs-cat, --boot-script-concatenate <filename>` // appends all of the boot-script entries in `<filename>` to the current boot-script list.
+        [ ] ALSO HAVE A WAY TO DO THIS PROGRAMATICALLY:
+            `(boot-script-list)`
+            `(boot-script-make! <filename-str> ...)`
+            `(boot-script-remove! <filename-str> ...)`
+            `(boot-script-swap! <src-filename-str> <dest-filename-str>)`
+            `(boot-script-exists? <filename-str> ...)`
+            `(boot-script-concatenate! <filename-str>)`
+    [ ] HENCE IN THE INSTALL JAVA SCRIPT:
+        `$ escm --serialize-stdlib`
+        `$ escm --boot-script-make ../bin/stdlib.ser`
 
 
 
