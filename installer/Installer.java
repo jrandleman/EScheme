@@ -7,7 +7,7 @@
     
     1. Generate a file to store the path to our EScheme implementation.
 
-    2. Generate a file to store the path prefix to our JVM/JRE.
+    2. Generate a file to store the path prefix to our EScheme's JVM/JRE.
     
     3. Generate a loader file to interpret src/stdlib.scm upon EScheme's launch.
 
