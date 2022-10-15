@@ -17,7 +17,7 @@
   - Use the `-v` or `--verbose` command-line flag to print extra progress messages
   - Use the `-i` or `--interpret-stdlib` flag to skip serializing `stdlib.scm`
     * Useful to tinker/experiment with core EScheme syntax extensions
-  - Use the `-j` or `--java-bin-path <path>` flag to set the bin path for EScheme's JVM
+  - Use the `-j` or `--java-bin-path <path>` flag to set the path to our JVM bin directory
     * Useful if your machine's default `java` precedes Java 11 or 17
 * ___Optional:___ if you're using `bash` or `zsh` as your shell:
   - `bash`:
