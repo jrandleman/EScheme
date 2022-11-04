@@ -15,4 +15,11 @@ public class UniqueSymbol {
     currentThread.uniqueCounter = currentThread.uniqueCounter.add(BigInteger.ONE);
     return new Symbol("escm-gensym-" + currentThread.getId() + "-" + currentCount);
   }
+
+  public static escm.type.Symbol generate(String nameForReadability) {
+    EscmThread currentThread = (EscmThread)Thread.currentThread();
+    BigInteger currentCount = currentThread.uniqueCounter;
+    currentThread.uniqueCounter = currentThread.uniqueCounter.add(BigInteger.ONE);
+    return new Symbol("escm-gensym-" + currentThread.getId() + "-" + currentCount + "-" + nameForReadability);
+  }
 };

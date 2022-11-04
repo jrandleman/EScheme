@@ -582,7 +582,7 @@
 
 (eval <quoted-escm-expression>)
 
-(gensym)
+(gensym <optional-name-symbol>) ; optional arg improves readability when printing generated symbols
 
 (syntax? <macro-name-symbol>)
 (expand-syntax <quoted-macro-expression>)

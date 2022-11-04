@@ -108,9 +108,13 @@ public class MetaPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 0)
-        throw new Exceptionf("'(gensym) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
-      return UniqueSymbol.generate();
+      if(parameters.size() > 1)
+        throw new Exceptionf("'(gensym <optional-name-symbol>) received more than 1 arg: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() == 0) return UniqueSymbol.generate();
+      Datum name = parameters.get(0);
+      if(!(name instanceof Symbol))
+        throw new Exceptionf("'(gensym <optional-name-symbol>) <name> arg isn't a symbol: %s", Exceptionf.profileArgs(parameters));
+      return UniqueSymbol.generate(((Symbol)name).value());
     }
   }
 

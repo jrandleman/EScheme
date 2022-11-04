@@ -25,8 +25,8 @@
 }, {
   "name": "gensym",
   "aliases": null,
-  "signatures": ["(gensym)"],
-  "description": "Returns a fresh, unique symbol. Guarentees that the symbol is unique across\nthreads as well. Used extensively by macros.",
+  "signatures": ["(gensym)", "(gensym <name-symbol>)"],
+  "description": "Returns a fresh, unique symbol. Guarentees that the symbol is unique across\nthreads as well. Used extensively by macros. Pass a <name-symbol> to improve\nreadability when printing generated symbols.",
   "example": null
 }, {
   "name": "syntax?",

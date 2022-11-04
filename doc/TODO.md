@@ -7,12 +7,6 @@
 
 
 
-[ ] ALLOW SEEDED `gensym` TO EMBED A SYMBOL IN THE GENERATED NAME (HELPS WITH DEBUGGABILITY WHEN PRINTING ITS NAME OUT IN A CALLSTACK)
-    [ ] !!! SEED ALL OF THE GENSYMS USED IN THE STDLIB !!!
-    [ ] UPDATE `help` & `primitives.md` ACCORDINGLY
-
-
-
 [ ] ADD IN `(file-remove-extension <file-path-string> <extension-string>)` (ALSO REMOVES THE ".")
 
 
@@ -134,6 +128,13 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 ====================================================================================
 
 
+
+
+
+
+
+
+- at some point generic algorithms for primitive data strcutures?
 
 
 

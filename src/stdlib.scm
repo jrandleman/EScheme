@@ -505,7 +505,7 @@
 ;; Implementing Boolean OR: (or <obj> ...)
 (define-syntax or
   (lambda (. conditions)
-    (define or-value (gensym))
+    (define or-value (gensym 'or-value))
     (fold-right (lambda (item acc)
                   (list (list (quote lambda) (list or-value)
                               (list (quote if) or-value or-value acc))
@@ -518,8 +518,8 @@
 ;; Implementing DELAY: (delay <obj>)
 (define-syntax delay
   (lambda (x)
-    (define forced? (gensym))
-    (define result (gensym))
+    (define forced? (gensym 'delay-forced?))
+    (define result (gensym 'delay-result))
     (list (quote let) (list (list forced? #f) (list result #f))
       (list (quote lambda) (quote ())
         (list (quote if) forced?
@@ -540,7 +540,7 @@
     (define (make-consequence c) (cons (quote begin) c))
     (define (arrow-syntax? c) (and (= (length c) 3) (eq? (quote =>) (cadr c))))
     (define (arrow->let c a) 
-      (define condition-result (gensym))
+      (define condition-result (gensym 'cond-result))
       (list (quote let) (list (list condition-result (car c)))
         (list (quote if) condition-result
             (list (caddr c) condition-result)
@@ -651,7 +651,7 @@
       (if (and (= (length c) 3) (eq? (cadr c) (quote =>)))
           (cdr c)
           (list (cons (quote begin) (cdr c)))))
-    (define cached-value (gensym))
+    (define cached-value (gensym 'case-key-value))
       (define converted-clauses
         (map (lambda (c) 
               (if (list? (car c))
@@ -727,7 +727,7 @@
       (if (pair? break-returns)
           (cdr break-returns)
           (quote ())))
-    (define loop-procedure-name (gensym))
+    (define loop-procedure-name (gensym 'do-loop-name))
     `(letrec ((,loop-procedure-name 
                 (lambda ,vars
                   (if ,break-cond
@@ -754,7 +754,7 @@
 ;;            IE: (curry (x . xs) x) ; INVALID!
 (define-syntax curry 
   (lambda (params . body)
-    (define curried-lambdas (gensym))
+    (define curried-lambdas (gensym 'curry-lambdas))
     (cond ((null? params) 
             `(lambda () ,@body))
           ((null? (cdr params))
@@ -787,7 +787,7 @@
 ;; Implementing DOSYNC-WITH
 (define-syntax dosync-with 
   (lambda (lock-expr . exprs)
-    (define lock (gensym))
+    (define lock (gensym 'dosync-with-lock))
     `(begin
       (define ,lock ,lock-expr) ; cache the lock!
       (dynamic-wind
@@ -807,7 +807,7 @@
   (define test (caar expr))
   (define results (cdar expr))
   (define clauses (cdr expr))
-  (define temp (gensym))
+  (define temp (gensym 'guard-temp))
   `(let ((,temp ,test))
     (if ,temp
         ,(if (null? results) temp (cons 'begin results))
@@ -823,10 +823,10 @@
   (lambda (var-and-clauses . exprs) ; (guard (var clause ...) e1 e2 ...)
     (define var (car var-and-clauses))
     (define clauses (cdr var-and-clauses))
-    (define guard-k (gensym))
-    (define condition (gensym))
-    (define handler-k (gensym))
-    (define args (gensym))
+    (define guard-k (gensym 'guard-k))
+    (define condition (gensym 'guard-condition))
+    (define handler-k (gensym 'guard-handler-k))
+    (define args (gensym 'guard-args))
     `((call-with-current-continuation
        (lambda (,guard-k)
          (with-exception-handler
@@ -999,7 +999,7 @@
 
 (define-syntax yield 
   (fn (()
-        (define k (gensym))
+        (define k (gensym 'yield-k))
         `(set! escm-generator-escape 
           (call/cc 
             (lambda (,k)
@@ -1009,7 +1009,7 @@
                   (lambda () 
                     (call/cc (lambda (escm-generator-escape) (,k escm-generator-escape))))))))))
       ((yielded)
-        (define k (gensym))
+        (define k (gensym 'yield-k))
         `(set! escm-generator-escape 
           (call/cc 
             (lambda (,k)
@@ -1021,7 +1021,7 @@
 
 (define-syntax define-generator 
   (lambda (bindings . body)
-    (define generator-object (gensym))
+    (define generator-object (gensym 'define-generator-object))
     `(define ,bindings
       (define ,generator-object
         (cons
@@ -1180,7 +1180,7 @@
 ; <define-class> macro to bind names to anonymous classes!
 (define-syntax define-class
   (lambda (name . class-components)
-    (define obj (gensym))
+    (define obj (gensym (symbol-append name '? '-obj)))
     `(begin
       (define (,(symbol-append name '?) ,obj) (and (object? ,obj) (oo-is? ,obj ,name))) ; predicate generation!
       (define ,name (class ,@class-components)))))
@@ -1232,7 +1232,7 @@
 ; <define-interface> macro to bind names to anonymous interfaces!
 (define-syntax define-interface
   (lambda (name . interface-components)
-    (define obj (gensym))
+    (define obj (gensym (symbol-append name '? '-obj)))
     `(begin
       (define (,(symbol-append name '?) ,obj) (and (object? ,obj) (oo-is? ,obj ,name))) ; predicate generation!
       (define ,name (interface ,@interface-components)))))
