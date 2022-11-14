@@ -20,22 +20,22 @@ import escm.vm.util.SourceInformation;
 
 public abstract class EscmThread extends Thread {
   ////////////////////////////////////////////////////////////////////////////
-  // <escm.type.concurrent.Thread> thread-local object
+  // EScheme <Datum> "current thread" handle
   public escm.type.concurrent.Thread currentThread = null;
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // <CallStack> thread-local call stack
+  // Thread-local call stack [used by <CallStack>]
   public Stack<Pair<String,SourceInformation>> callStack = new Stack<Pair<String,SourceInformation>>();
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // <escm.primitive.UtilityPrimitives.DynamicWind> thread-local set of winds
+  // Thread-local set of winds [used by <escm.primitive.UtilityPrimitives.DynamicWind>]
   public Datum dynamicWinds = Nil.VALUE;
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // <escm.primitive.UtilityPrimitives.WithExceptionHandler> thread-local set of winds
+  // Thread-local set of winds [used by <escm.primitive.UtilityPrimitives.WithExceptionHandler>]
   public Datum currentExceptionHandlers = escm.type.Pair.List(
     new PrimitiveProcedure(
       "unhandled-exception-handler",
@@ -48,17 +48,17 @@ public abstract class EscmThread extends Thread {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // <escm.util.UniqueSymbolString> thread-local counter
+  // Thread-local gensym counter [used by <escm.util.UniqueSymbolString>]
   public BigInteger uniqueCounter = BigInteger.ZERO;
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // <escm.type.concurrent.Thread> thread-local dynamic environment
+  // Thread-local dynamic environment [used by <escm.type.concurrent.Thread>]
   public Environment dynamicEnvironment = new Environment();
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // <escm.type.port.Port> thread-local current input & output ports
+  // Thread-local current input & output ports [used by <escm.type.port.Port>]
   public InputPort currentInputPort   = InputPort.STDIN;
   public OutputPort currentOutputPort = OutputPort.STDOUT;
 

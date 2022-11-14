@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.primtiive.UtilityPrimitives_util.ContinuationProcedure
+// Author: Jordan Randleman - escm.primitive.UtilityPrimitives_util.ContinuationProcedure
 // Purpose:
 //    Java continuation procedure specialization of "escm.type.procedure.Procedure".
 //    Wraps a "escm.util.Trampoline.Continuation" object under the hood.

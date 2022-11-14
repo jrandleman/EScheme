@@ -9,17 +9,18 @@ import escm.type.Symbol;
 import escm.vm.runtime.EscmThread;
 
 public class UniqueSymbol {
-  public static escm.type.Symbol generate() {
+  private static String generateUniqueSymbolValue() {
     EscmThread currentThread = (EscmThread)Thread.currentThread();
     BigInteger currentCount = currentThread.uniqueCounter;
     currentThread.uniqueCounter = currentThread.uniqueCounter.add(BigInteger.ONE);
-    return new Symbol("escm-gensym-" + currentThread.getId() + "-" + currentCount);
+    return "escm-gensym-" + currentThread.getId() + "-" + currentCount;
+  }
+
+  public static escm.type.Symbol generate() {
+    return new Symbol(generateUniqueSymbolValue());
   }
 
   public static escm.type.Symbol generate(String nameForReadability) {
-    EscmThread currentThread = (EscmThread)Thread.currentThread();
-    BigInteger currentCount = currentThread.uniqueCounter;
-    currentThread.uniqueCounter = currentThread.uniqueCounter.add(BigInteger.ONE);
-    return new Symbol("escm-gensym-" + currentThread.getId() + "-" + currentCount + "-" + nameForReadability);
+    return new Symbol(generateUniqueSymbolValue() + "-" + nameForReadability);
   }
 };

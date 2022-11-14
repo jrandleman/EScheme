@@ -291,10 +291,10 @@ public class ConcurrentPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // current-thread-interrupted?!
+  // interrupted?!
   public static class IsInterruptedBang implements Primitive {
     public java.lang.String escmName() {
-      return "current-thread-interrupted?!";
+      return "interrupted?!";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -306,10 +306,10 @@ public class ConcurrentPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // current-thread-sleep
+  // sleep
   public static class Sleep implements Primitive {
     public java.lang.String escmName() {
-      return "current-thread-sleep";
+      return "sleep";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

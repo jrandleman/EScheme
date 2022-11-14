@@ -938,13 +938,13 @@
       (stream-ref (scdr s) (- index 1))))
 
 (define (stream-map callable . streams)
-    (define (stream-map streams)
-      (if (null? (car streams))
-          '()
-          (scons
-            (apply callable (map scar streams))
-            (stream-map (map scdr streams)))))
-    (stream-map streams))
+  (define (stream-map streams)
+    (if (null? (car streams))
+        '()
+        (scons
+          (apply callable (map scar streams))
+          (stream-map (map scdr streams)))))
+  (stream-map streams))
 
 (define (stream-filter ? s)
   (cond ((null? s) (quote ()))
@@ -973,9 +973,9 @@
   (if (null? streams) s (stream-append s streams)))
 
 (define (stream-interleave stream1 stream2)
-    (if (null? stream1)
-        stream2
-        (scons (scar stream1) (stream-interleave stream2 (scdr stream1)))))
+  (if (null? stream1)
+      stream2
+      (scons (scar stream1) (stream-interleave stream2 (scdr stream1)))))
 
 (define (stream->generator stream-obj)
   (define s (scons #f stream-obj))

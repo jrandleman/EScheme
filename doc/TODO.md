@@ -4,6 +4,12 @@
 
 
 
+[ ] => BE CAREFUL W/ FCNS LIKE `assoc` => SHOULD QUERY GLOBAL SCOPE FOR `equal?` RATHER THAN USING THE REAL PRIMTIIVE
+       [ ] => LEST THE USER HAVE OVERLOADED IT TO SUPPORT A CUSTOM TYPE (THINK OVERLOADING IT FOR A CUSTOM CLASS)
+
+
+
+
 
 
 
@@ -134,7 +140,11 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 
 
 
+
+
 - at some point generic algorithms for primitive data strcutures?
+
+
 
 
 
