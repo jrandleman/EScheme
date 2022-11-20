@@ -109,8 +109,8 @@
 }, {
   "name": "string-split",
   "aliases": null,
-  "signatures": ["(string-split <str> <regex-str>)"],
-  "description": "Returns a list of strings made from splitting <str> at each <regex-str>\ninstance.",
+  "signatures": ["(string-split <str>)", "(string-split <str> <regex-str>)"],
+  "description": "Returns a list of strings made from splitting <str> at each <regex-str>\ninstance. Defaults to splitting into characters.",
   "example": null
 }, {
   "name": "string=?",

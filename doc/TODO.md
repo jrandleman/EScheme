@@ -3,9 +3,9 @@
 ## MORE
 
 
-
 [ ] at some point generic algorithms for primitive data structures?
     [ ] => SEE OLD CODE FOR SUCH
+    [ ] => ACCOUNT FOR SUCH WHEN IMPLEMENTING THE OPTIONAL TYPE SYSTEM
 
 
 
