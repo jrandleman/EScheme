@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.vm.runtime.State
+// Author: Jordan Randleman - escm.vm.runtime.GlobalState
 // Purpose:
 //    Class to encapsulate the global runtime state of the interpreter.
 

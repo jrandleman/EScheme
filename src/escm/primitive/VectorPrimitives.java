@@ -356,38 +356,38 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-memq
-  public static class VectorMemq implements Primitive {
+  public static class VectorMemq implements PrimitiveCallable {
     public java.lang.String escmName() {
       return "vector-memq";
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(vector-memq <vector> <obj>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum v = parameters.get(0);
       Datum o = parameters.get(1);
       if(!(v instanceof escm.type.Vector))
         throw new Exceptionf("'(vector-memq <vector> <obj>) 1st arg isn't a vector: %s", Exceptionf.profileArgs(parameters));
-      return ((escm.type.Vector)v).memq(o);
+      return ((escm.type.Vector)v).indexOf(ListPrimitives.Memq.getGlobalEqpProcedure(),o,continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-member
-  public static class VectorMember implements Primitive {
+  public static class VectorMember implements PrimitiveCallable {
     public java.lang.String escmName() {
       return "vector-member";
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(vector-member <vector> <obj>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum v = parameters.get(0);
       Datum o = parameters.get(1);
       if(!(v instanceof escm.type.Vector))
         throw new Exceptionf("'(vector-member <vector> <obj>) 1st arg isn't a vector: %s", Exceptionf.profileArgs(parameters));
-      return ((escm.type.Vector)v).member(o);
+      return ((escm.type.Vector)v).indexOf(ListPrimitives.Member.getGlobalEqualpProcedure(),o,continuation);
     }
   }
 

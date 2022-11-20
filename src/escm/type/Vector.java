@@ -13,8 +13,7 @@
 //      - int size()
 //
 //      - Datum get(int idx)
-//      - Datum memq(Datum d)
-//      - Datum member(Datum d)
+//      - Trampoline.Bounce indexOf(Callable eqp, Datum d, Trampoline.Continuation c)
 //
 //      - void set(int idx, Datum d)
 //      - void fill(Datum d)
@@ -109,19 +108,22 @@ public class Vector extends Datum implements Callable {
     }
   }
 
-  public Datum memq(Datum d) {
+  private Trampoline.Bounce indexOfRecur(Callable eqp, Datum d, int n, int i, Trampoline.Continuation continuation) throws Exception {
+    if(i >= n) return continuation.run(Boolean.FALSE);
+    ArrayList<Datum> args = new ArrayList<Datum>(2);
     synchronized(this) {
-      for(int i = 0, n = value.size(); i < n; ++i)
-        if(value.get(i).eq(d)) return new Exact(i);
-      return Boolean.FALSE;
+      args.add(value.get(i));
     }
+    args.add(d);
+    return eqp.callWith(args,(isEqp) -> () -> {
+      if(isEqp.isTruthy()) return continuation.run(new Exact(i));
+      return indexOfRecur(eqp,d,n,i+1,continuation);
+    });
   }
 
-  public Datum member(Datum d) {
+  public Trampoline.Bounce indexOf(Callable eqp, Datum d, Trampoline.Continuation continuation) throws Exception {
     synchronized(this) {
-      for(int i = 0, n = value.size(); i < n; ++i)
-        if(value.get(i).equal(d)) return new Exact(i);
-      return Boolean.FALSE;
+      return indexOfRecur(eqp,d,value.size(),0,continuation);
     }
   }
 

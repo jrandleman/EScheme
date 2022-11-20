@@ -4,8 +4,9 @@
 
 
 
-[ ] => BE CAREFUL W/ FCNS LIKE `assoc` => SHOULD QUERY GLOBAL SCOPE FOR `equal?` RATHER THAN USING THE REAL PRIMTIIVE
-       [ ] => LEST THE USER HAVE OVERLOADED IT TO SUPPORT A CUSTOM TYPE (THINK OVERLOADING IT FOR A CUSTOM CLASS)
+[ ] at some point generic algorithms for primitive data structures?
+    [ ] => SEE OLD CODE FOR SUCH
+
 
 
 
@@ -26,13 +27,18 @@
 
 
 
+
+
+
 - CONSIDER HAVING `eval` & `bytecode-eval` & `load` & `load-from` & `load-serialized` & `serialize` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
   => OPTIONAL ARG TO THE EXISTING FCNS DENOTING WHETHER TO SANDBOX THE EVALUATION (#f BY DEFAULT)
 
 
 
 
+
 - have anonymous lambdas print some unique id for slightly easier debugging
+
 
 
 
@@ -133,16 +139,6 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 ====================================================================================
 ====================================================================================
 
-
-
-
-
-
-
-
-
-
-- at some point generic algorithms for primitive data strcutures?
 
 
 

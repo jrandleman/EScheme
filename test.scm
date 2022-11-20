@@ -26,7 +26,6 @@
 
 
 
-
 (define-class Rectangle
   ((new w l)
     (define self.w w)

@@ -8,6 +8,7 @@ import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Void;
+import escm.type.Symbol;
 import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.type.bool.Boolean;
@@ -17,6 +18,7 @@ import escm.util.Trampoline;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
+import escm.vm.runtime.GlobalState;
 
 public class ListPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -238,106 +240,111 @@ public class ListPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // memq
-  public static class Memq implements Primitive {
+  public static class Memq implements PrimitiveCallable {
     public java.lang.String escmName() {
       return "memq";
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+    private static Symbol EQP_SYMBOL = new Symbol("eq?");
+
+    public static Callable getGlobalEqpProcedure() throws Exception {
+      Datum eqp = GlobalState.globalEnvironment.get(EQP_SYMBOL);
+      if(eqp instanceof Callable) return (Callable)eqp;
+      throw new Exceptionf("<eq?> global variable %s isn't a callable!", eqp.profile());
+    }
+
+    public static Trampoline.Bounce logic(Callable eqp, Datum obj, Datum iterator, Trampoline.Continuation continuation) throws Exception {
+      if(!(iterator instanceof Pair)) return continuation.run(Boolean.FALSE);
+      Pair iteratorPair = (Pair)iterator;
+      ArrayList<Datum> args = new ArrayList<Datum>(2);
+      args.add(iteratorPair.car());
+      args.add(obj);
+      return eqp.callWith(args,(isEqp) -> () -> {
+        if(isEqp.isTruthy()) return continuation.run(iteratorPair);
+        return logic(eqp,obj,iteratorPair.cdr(),continuation);
+      });
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(memq <obj> <list>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       if(!Pair.isList(parameters.get(1))) 
         throw new Exceptionf("'(memq <obj> <list>) 2nd arg %s isn't a list!", parameters.get(1).profile());
-      Datum obj = parameters.get(0);
-      Datum iterator = parameters.get(1);
-      while(iterator instanceof Pair) {
-        Pair iteratorPair = (Pair)iterator;
-        if(iteratorPair.car().eq(obj))
-          return iteratorPair;
-        iterator = iteratorPair.cdr();
-      }
-      return Boolean.FALSE;
+      return logic(getGlobalEqpProcedure(),parameters.get(0),parameters.get(1),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // member
-  public static class Member implements Primitive {
+  public static class Member implements PrimitiveCallable {
     public java.lang.String escmName() {
       return "member";
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+    private static Symbol EQUALP_SYMBOL = new Symbol("equal?");
+
+    public static Callable getGlobalEqualpProcedure() throws Exception {
+      Datum equalp = GlobalState.globalEnvironment.get(EQUALP_SYMBOL);
+      if(equalp instanceof Callable) return (Callable)equalp;
+      throw new Exceptionf("<equal?> global variable %s isn't a callable!", equalp.profile());
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(member <obj> <list>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       if(!Pair.isList(parameters.get(1))) 
         throw new Exceptionf("'(member <obj> <list>) 2nd arg %s isn't a list!", parameters.get(1).profile());
-      Datum obj = parameters.get(0);
-      Datum iterator = parameters.get(1);
-      while(iterator instanceof Pair) {
-        Pair iteratorPair = (Pair)iterator;
-        if(iteratorPair.car().equal(obj))
-          return iteratorPair;
-        iterator = iteratorPair.cdr();
-      }
-      return Boolean.FALSE;
+      return Memq.logic(getGlobalEqualpProcedure(),parameters.get(0),parameters.get(1),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // assq
-  public static class Assq implements Primitive {
+  public static class Assq implements PrimitiveCallable {
     public java.lang.String escmName() {
       return "assq";
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+    public static Trampoline.Bounce logic(Callable eqp, String fcnName, Datum originalList, Datum key, Datum iterator, Trampoline.Continuation continuation) throws Exception {
+      if(!(iterator instanceof Pair)) return continuation.run(Boolean.FALSE);
+      Pair iteratorPair = (Pair)iterator;
+      if(!(iteratorPair.car() instanceof Pair))
+        throw new Exceptionf("'(%s <key> <alist>) 2nd arg %s isn't an alist (list of key-value pair lists)!", fcnName, originalList.profile());
+      Pair innerList = (Pair)iteratorPair.car();
+      ArrayList<Datum> args = new ArrayList<Datum>(2);
+      args.add(innerList.car());
+      args.add(key);
+      return eqp.callWith(args,(isEqp) -> () -> {
+        if(isEqp.isTruthy()) return continuation.run(innerList);
+        return logic(eqp,fcnName,originalList,key,iteratorPair.cdr(),continuation);
+      });
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(assq <key> <alist>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       if(!Pair.isList(parameters.get(1))) 
         throw new Exceptionf("'(assq <key> <alist>) 2nd arg %s isn't an alist (list of key-value pair lists)!", parameters.get(1).profile());
-      Datum key = parameters.get(0);
-      Datum iterator = parameters.get(1);
-      while(iterator instanceof Pair) {
-        Pair iteratorPair = (Pair)iterator;
-        if(!(iteratorPair.car() instanceof Pair))
-          throw new Exceptionf("'(assq <key> <alist>) 2nd arg %s isn't an alist (list of key-value pair lists)!", parameters.get(1).profile());
-        Pair innerList = (Pair)iteratorPair.car();
-        if(innerList.car().eq(key))
-          return innerList;
-        iterator = iteratorPair.cdr();
-      }
-      return Boolean.FALSE;
+      return logic(Memq.getGlobalEqpProcedure(),"assq",parameters.get(1),parameters.get(0),parameters.get(1),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // assoc
-  public static class Assoc implements Primitive {
+  public static class Assoc implements PrimitiveCallable {
     public java.lang.String escmName() {
       return "assoc";
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(assoc <key> <alist>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       if(!Pair.isList(parameters.get(1))) 
-        throw new Exceptionf("'(assoc <key> <alist>) 2nd arg %s isn't an alist (list of key-value pair lists)!", parameters.get(0).profile());
-      Datum key = parameters.get(0);
-      Datum iterator = parameters.get(1);
-      while(iterator instanceof Pair) {
-        Pair iteratorPair = (Pair)iterator;
-        if(!(iteratorPair.car() instanceof Pair))
-          throw new Exceptionf("'(assoc <key> <alist>) 2nd arg %s isn't an alist (list of key-value pair lists)!", parameters.get(0).profile());
-        Pair innerList = (Pair)iteratorPair.car();
-        if(innerList.car().equal(key))
-          return innerList;
-        iterator = iteratorPair.cdr();
-      }
-      return Boolean.FALSE;
+        throw new Exceptionf("'(assoc <key> <alist>) 2nd arg %s isn't an alist (list of key-value pair lists)!", parameters.get(1).profile());
+      return Assq.logic(Member.getGlobalEqualpProcedure(),"assoc",parameters.get(1),parameters.get(0),parameters.get(1),continuation);
     }
   }
 
