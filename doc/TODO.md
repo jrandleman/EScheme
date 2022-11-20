@@ -6,6 +6,8 @@
 [ ] at some point generic algorithms for primitive data structures?
     [ ] => SEE OLD CODE FOR SUCH
     [ ] => ACCOUNT FOR SUCH WHEN IMPLEMENTING THE OPTIONAL TYPE SYSTEM
+    [ ] => CONSIDER TREATING `map` AS A GENERIC DISPATCH FOR `map`, `vector-map`, `string-map`, ETC.
+           - E.G. DOESN'T WORK IF YOU PASS A STRING, LIST, & VECTOR, RATHER ALL CONTAINER ARGS MUCH BE OF THE SAME TYPE!
 
 
 

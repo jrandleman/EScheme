@@ -395,7 +395,7 @@
 (string-contains-right <str1> <str2>) ; returns index of appearance or #f if not present
 
 (string-join <string-list> <optional-str>) ; str defaults to ""
-(string-split <str> <regex-str>)
+(string-split <str> <optional-regex-str>)
 
 (string=? <str> <str> ...)
 (string<? <str> <str> ...)
