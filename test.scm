@@ -1,28 +1,111 @@
-(define-class C1 
-  ((get-msg) "In class C1!")
-  ((print-msg)
-    (displayf "%a\n" (self.get-msg))))
+; (define-class C1 
+;   ((get-msg) "In class C1!")
+;   ((print-msg)
+;     (displayf "%a\n" (self.get-msg))))
 
 
-(define-class C2 (:extends C1)
-  ((get-msg) "In class C2!"))
-
-
-
+; (define-class C2 (:extends C1)
+;   ((get-msg) "In class C2!"))
 
 
 
-(def o2 (C2))
-(display C2)
-(newline)
-
-(o2.print-msg)
 
 
 
+; (def o2 (C2))
+; (display C2)
+; (newline)
+
+; (o2.print-msg)
+
+
+
+
+;; UNIT TEST FOR AC ALGO PRIMS ON LISTS
+(define-syntax profile-call 
+  (lambda (call)
+    (define fcn (car call))
+    (define args (cdr call))
+    `(displayf "Effect of applying %wa to %wa = %wa\n" ,fcn (list ,@args) (apply ,fcn (list ,@args)))))
+
+; (define l1 {0 #\a 1 #\b 2 #\c})
+(define l1 "123")
+(define l2 "426")
+
+
+(profile-call (ac-union char=? l1 l2 l1 l2))
+
+
+
+; (profile-call (ac-head l1))
+; (profile-call (ac-tail l1))
+
+; (profile-call (ac-empty? l1))
+; (profile-call (ac-empty? {}))
+; (profile-call (ac-length l1))
+; (profile-call (ac-length {}))
+; (profile-call (ac-length+ l1))
+; (profile-call (ac-length+ {}))
+; (profile-call (ac-length+ '(1 2 . 3)))
+
+; (profile-call (ac-fold \(stringf "%a%a%a" %1 %2 %3) {} l1 l2))
+
+; (profile-call (ac-map \(* %1 %2) l1 l2))
+; (profile-call (ac-for-each \(displayf "%wa, %wa\n" %1 %2) l1 l2))
+; (profile-call (ac-filter \(even? %1) l2))
+
+; (profile-call (ac-count \(even? %1) l2))
+; (profile-call (ac-remove \(even? %1) l2))
+
+; (profile-call (ac-val l1 :a))
+
+; (profile-call (ac-key \(= %1 5) l2))
+
+; (profile-call (ac-append {} l1 {} l2 {}))
+
+; (profile-call (ac-delete l1 :c))
+
+; (profile-call (ac-conj :z 99 l2))
+
+; (profile-call (ac-take l1 1))
+; (profile-call (ac-drop l1 1))
+
+; (profile-call (ac-ac->list l1))
+; (profile-call (ac-ac->string l1))
+; (profile-call (ac-ac->vector l1))
+; (profile-call (ac-ac->hashmap l1))
 
 
 #eof
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -4,17 +4,27 @@
 
 
 [ ] at some point generic algorithms for primitive data structures?
-    [ ] => SEE OLD CODE FOR SUCH
-    [ ] => ACCOUNT FOR SUCH WHEN IMPLEMENTING THE OPTIONAL TYPE SYSTEM
-    [ ] => CONSIDER TREATING `map` AS A GENERIC DISPATCH FOR `map`, `vector-map`, `string-map`, ETC.
-           - E.G. DOESN'T WORK IF YOU PASS A STRING, LIST, & VECTOR, RATHER ALL CONTAINER ARGS MUCH BE OF THE SAME TYPE!
+    [X] => TEST ___ALL AC PRIMITIVES___ USING LISTS, THEN DO WITH VECTOR, ETC.
+           [X] => LISTS
+           [X] => VECTORS
+           [X] => STRINGS
+           [X] => HASHMAPS
+    [X] => BUILD ON EXISTING `AC` PRIMS TO ADD IN `any?`, `every?`
+    [ ] => BUILD OUT `OC` PRIMS
+           [ ] => CONDUCT UNIT TESTS FOR ALL TYPES
+    [ ] => RM/ADJUST EXISTING PRIMS & ___TAKE OFF `ac-`/`oc-` PREFIX!___
+    [ ] => ADD TO/ADJUST `primitives.md`
+    [ ] => ADD TO/ADJUST `help`
+    [ ] => UPDATE GITHUB + TEST ON SCU SERVERS
 
 
 
 
 
 
+[ ] INVESTIGATE POTENTIAL ISUEE WITH `(stringf "%w..." '(1 2 3))`
 
+[ ] CONSIDER CHANGING '= TO OVERLOAD TO 'eq? FOR NON-NUMERICS & HAVE '>= (ETC.) OVERLOAD FOR 'char>=? AND 'string>=? AS NEEDED
 
 [ ] ADD IN `(file-remove-extension <file-path-string> <extension-string>)` (ALSO REMOVES THE ".")
 
@@ -294,6 +304,9 @@ PROBLEM: How can we intermix the notion of serialization and modules?
             :port
             :input-port
             :output-port
+
+            :ac ; :associative-collection
+            :oc ; :ordered-collection
             ```
 
 

@@ -349,7 +349,7 @@
 
 (hashmap-ref <hashmap> <key>)          ; equivalent to: (<hashmap> <key>)
 (hashmap-set! <hashmap> <key> <value>) ; returns whether replaced another entry
-(hashmap-delete! <hashmap> <key>)      ; returns success status
+(hashmap-delete! <hashmap> <key>)      ; returns whether deleted an entry
 
 (hashmap-length <hashmap>)
 (hashmap-empty? <hashmap>)

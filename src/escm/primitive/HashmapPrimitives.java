@@ -129,7 +129,7 @@ public class HashmapPrimitives {
       Datum h = parameters.get(0);
       if(!(h instanceof escm.type.Hashmap))
         throw new Exceptionf("'(hashmap-delete! <hashmap> <key>) 1st arg %s isn't a hashmap: %s", h.profile(), Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(((escm.type.Hashmap)h).delete(parameters.get(1)));
+      return Boolean.valueOf(((escm.type.Hashmap)h).del(parameters.get(1)));
     }
   }
 
