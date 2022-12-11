@@ -17,6 +17,36 @@ import escm.vm.type.PrimitiveCallable;
 
 public class AssociativeCollectionPrimitives {
   ////////////////////////////////////////////////////////////////////////////
+  // ac-associative-collection?
+  public static class ACIsAssociativeCollection implements Primitive {
+    public java.lang.String escmName() {
+      return "ac-associative-collection?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1) 
+        throw new Exceptionf("'(ac-associative-collection? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(parameters.get(0) instanceof AssociativeCollection);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // ac-ac?
+  public static class ACIsAC implements Primitive {
+    public java.lang.String escmName() {
+      return "ac-ac?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1) 
+        throw new Exceptionf("'(ac-ac? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(parameters.get(0) instanceof AssociativeCollection);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // ac-head
   public static class ACHead implements Primitive {
     public java.lang.String escmName() {
@@ -41,7 +71,7 @@ public class AssociativeCollectionPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
         throw new Exceptionf("'(ac-tail <associative-collection>) expects exactly 1 <ac>: %s", Exceptionf.profileArgs(parameters));
-      return ((AssociativeCollection)parameters.get(0)).tail();
+      return (Datum)((AssociativeCollection)parameters.get(0)).tail();
     }
   }
 

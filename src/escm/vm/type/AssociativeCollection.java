@@ -47,6 +47,13 @@ public interface AssociativeCollection {
           acs[i] = (AssociativeCollection)acs[i].toACHashmap();
         }
       }
+    } else {
+      StringBuilder sb = new StringBuilder();
+      for(int i = 0; i < acs.length; ++i) {
+        sb.append(((Datum)acs[i]).profile());
+        if(i+1 < acs.length) sb.append(", ");
+      }
+      throw new Exceptionf("Unknown <AssociativeCollection> type code \"%d\" given for unification: %s", type, sb.toString());
     }
   }
 
@@ -87,7 +94,7 @@ public interface AssociativeCollection {
   //      (that's had its ACs coerced to a single type), e.g. _not_ on 
   //      the <this> pointer (which is often in the given array anyway)
   Datum head() throws Exception;
-  Datum tail() throws Exception;
+  AssociativeCollection tail() throws Exception;
 
   int length();
 

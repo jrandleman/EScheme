@@ -1,23 +1,3 @@
-; (define-class C1 
-;   ((get-msg) "In class C1!")
-;   ((print-msg)
-;     (displayf "%a\n" (self.get-msg))))
-
-
-; (define-class C2 (:extends C1)
-;   ((get-msg) "In class C2!"))
-
-
-
-
-
-
-; (def o2 (C2))
-; (display C2)
-; (newline)
-
-; (o2.print-msg)
-
 
 
 
@@ -28,14 +8,192 @@
     (define args (cdr call))
     `(displayf "Effect of applying %wa to %wa = %wa\n" ,fcn (list ,@args) (apply ,fcn (list ,@args)))))
 
-; (define l1 {0 #\a 1 #\b 2 #\c})
+
+; (define l1 '(1 2 3))
+; (define l2 '(4 5 6))
+; (define l3 '(9 9 0 0 7 7 2 2 5 5 4 4 3 3 6 6 1 1 8 8))
+; (define l4 '(1 3 5))
+; (define l5 '(2 4 6))
+
 (define l1 "123")
-(define l2 "426")
+(define l2 "456")
+(define l3 "99007722554433661188")
+(define l4 "135")
+(define l5 "246")
+
+(define char->integer
+  (let ((original char->integer))
+    (lambda (c)
+      (- (original c) (original #\0)))))
+
+(define (char-odd? c) (odd? (char->integer c)))
+(define (char-even? c) (even? (char->integer c)))
 
 
-(profile-call (ac-union char=? l1 l2 l1 l2))
+(profile-call (oc-conj #\9 l1))
+
+(profile-call (oc-init l1))
+(profile-call (oc-last l1))
+
+(profile-call (oc-slice l1 1))
+(profile-call (oc-slice l1 0 1))
+(profile-call (oc-slice l1 0 4))
+(profile-call (oc-slice "l1" 0 \(char=? %1 #\2)))
+(profile-call (oc-slice "l1" 1 \(char=? %1 #\2)))
+(profile-call (oc-slice "l1" 2 \(char=? %1 #\2)))
+
+(profile-call (oc-reverse "l1"))
+
+(profile-call (oc-remove-first char-odd? l1))
+(profile-call (oc-remove-last char-odd? l1))
+
+(profile-call (oc-remove-first char-even? l1))
+(profile-call (oc-remove-last char-even? l1))
+
+(profile-call (oc-remove-first \(< (char->integer %1) 4) l1))
+(profile-call (oc-remove-last \(< (char->integer %1) 4) l1))
+
+(profile-call (oc-skip char-even? l1))
+(profile-call (oc-skip-right char-even? l1))
+
+(profile-call (oc-skip char-odd? l1))
+(profile-call (oc-skip-right char-odd? l1))
+
+(profile-call (oc-fold-right \(integer->char (apply - (map char->integer %%))) #\0 l1 l2))
+
+(profile-call (oc-key-right char-odd? l1))
+(profile-call (oc-key-right char-even? l1))
+
+(profile-call (oc-drop-right l1 0))
+(profile-call (oc-drop-right l1 1))
+(profile-call (oc-drop-right l1 2))
+(profile-call (oc-drop-right l1 3))
+(profile-call (oc-drop-right l1 4))
+
+(profile-call (oc-drop-while char-odd? l1))
+(profile-call (oc-drop-while char-even? l1))
+(profile-call (oc-drop-while \(< (char->integer %1) 3) l1))
+(profile-call (oc-drop-while \(>= (char->integer %1) 3) l1))
+
+(profile-call (oc-drop-right-while char-odd? l1))
+(profile-call (oc-drop-right-while char-even? l1))
+(profile-call (oc-drop-right-while \(< (char->integer %1) 3) l1))
+(profile-call (oc-drop-right-while \(>= (char->integer %1) 3) l1))
+
+(profile-call (oc-take-right l1 0))
+(profile-call (oc-take-right l1 1))
+(profile-call (oc-take-right l1 2))
+(profile-call (oc-take-right l1 3))
+(profile-call (oc-take-right l1 4))
+
+(profile-call (oc-take-while char-odd? l1))
+(profile-call (oc-take-while char-even? l1))
+(profile-call (oc-take-while \(< (char->integer %1) 3) l1))
+(profile-call (oc-take-while \(>= (char->integer %1) 3) l1))
+
+(profile-call (oc-take-right-while char-odd? l1))
+(profile-call (oc-take-right-while char-even? l1))
+(profile-call (oc-take-right-while \(< (char->integer %1) 3) l1))
+(profile-call (oc-take-right-while \(>= (char->integer %1) 3) l1))
 
 
+(profile-call (oc-sort char<? l3))
+(profile-call (oc-sort char>? l3))
+
+(profile-call (oc-sorted? char<=? l3))
+(profile-call (oc-sorted? char>=? l3))
+(profile-call (oc-sorted? char<=? (oc-sort char<? l3)))
+(profile-call (oc-sorted? char>=? (oc-sort char>? l3)))
+
+(profile-call (oc-merge char<? l4 l5))
+
+(profile-call (oc-delete-neighbor-duplicates char=? l3))
+
+; ------------------------------------------------------------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+; (profile-call (oc-conj 99 l1))
+
+; (profile-call (oc-init l1))
+; (profile-call (oc-last l1))
+
+; (profile-call (oc-slice l1 1))
+; (profile-call (oc-slice l1 0 1))
+; (profile-call (oc-slice l1 0 4))
+; (profile-call (oc-slice l1 0 \(= %1 2)))
+; (profile-call (oc-slice l1 1 \(= %1 2)))
+; (profile-call (oc-slice l1 2 \(= %1 2)))
+
+; (profile-call (oc-reverse l1))
+
+; (profile-call (oc-remove-first odd? l1))
+; (profile-call (oc-remove-last odd? l1))
+
+; (profile-call (oc-remove-first even? l1))
+; (profile-call (oc-remove-last even? l1))
+
+; (profile-call (oc-remove-first \(< %1 4) l1))
+; (profile-call (oc-remove-last \(< %1 4) l1))
+
+; (profile-call (oc-skip even? l1))
+; (profile-call (oc-skip-right even? l1))
+
+; (profile-call (oc-skip odd? l1))
+; (profile-call (oc-skip-right odd? l1))
+
+; (profile-call (oc-fold-right - 0 l1 l2))
+
+; (profile-call (oc-key-right odd? l1))
+; (profile-call (oc-key-right even? l1))
+
+; (profile-call (oc-drop-right l1 0))
+; (profile-call (oc-drop-right l1 1))
+; (profile-call (oc-drop-right l1 2))
+; (profile-call (oc-drop-right l1 3))
+; (profile-call (oc-drop-right l1 4))
+
+; (profile-call (oc-drop-while odd? l1))
+; (profile-call (oc-drop-while even? l1))
+; (profile-call (oc-drop-while \(< %1 3) l1))
+; (profile-call (oc-drop-while \(>= %1 3) l1))
+
+; (profile-call (oc-drop-right-while odd? l1))
+; (profile-call (oc-drop-right-while even? l1))
+; (profile-call (oc-drop-right-while \(< %1 3) l1))
+; (profile-call (oc-drop-right-while \(>= %1 3) l1))
+
+; (profile-call (oc-take-right l1 0))
+; (profile-call (oc-take-right l1 1))
+; (profile-call (oc-take-right l1 2))
+; (profile-call (oc-take-right l1 3))
+; (profile-call (oc-take-right l1 4))
+
+; (profile-call (oc-take-while odd? l1))
+; (profile-call (oc-take-while even? l1))
+; (profile-call (oc-take-while \(< %1 3) l1))
+; (profile-call (oc-take-while \(>= %1 3) l1))
+
+; (profile-call (oc-take-right-while odd? l1))
+; (profile-call (oc-take-right-while even? l1))
+; (profile-call (oc-take-right-while \(< %1 3) l1))
+; (profile-call (oc-take-right-while \(>= %1 3) l1))
+
+
+; (profile-call (oc-sort < l3))
+; (profile-call (oc-sort > l3))
+
+; (profile-call (oc-sorted? <= l3))
+; (profile-call (oc-sorted? >= l3))
+; (profile-call (oc-sorted? <= (oc-sort < l3)))
+; (profile-call (oc-sorted? >= (oc-sort > l3)))
+
+; (profile-call (oc-merge < l4 l5))
+
+; (profile-call (oc-delete-neighbor-duplicates = l3))
+
+; ------------------------------------------------------------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ; (profile-call (ac-head l1))
 ; (profile-call (ac-tail l1))

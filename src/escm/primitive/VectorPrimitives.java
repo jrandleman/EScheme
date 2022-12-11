@@ -319,7 +319,7 @@ public class VectorPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector))
         throw new Exceptionf("'(vector-reverse <vector>) expects exactly 1 vector: %s", Exceptionf.profileArgs(parameters));
-      return ((escm.type.Vector)parameters.get(0)).reverse();
+      return ((escm.type.Vector)parameters.get(0)).reversed();
     }
   }
 

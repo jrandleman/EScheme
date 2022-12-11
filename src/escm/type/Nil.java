@@ -6,15 +6,17 @@ package escm.type;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Objects;
+import escm.type.bool.Boolean;
 import escm.type.number.Number;
 import escm.type.number.Exact;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.util.ExecutionState;
 import escm.vm.type.AssociativeCollection;
+import escm.vm.type.OrderedCollection;
 import escm.vm.type.Callable;
 
-public class Nil extends Datum implements AssociativeCollection {
+public class Nil extends Datum implements OrderedCollection {
   ////////////////////////////////////////////////////////////////////////////
   // Static Value
   public static final Nil VALUE = new Nil();
@@ -100,11 +102,11 @@ public class Nil extends Datum implements AssociativeCollection {
   // basic accessors
   //////////////////////////////////////
   public Datum head() throws Exception {
-    throw new Exceptionf("'() can't get <head> (<car>) of NIL!");
+    throw new Exceptionf("NIL [HEAD]: can't get <head> (<car>) of NIL!");
   }
 
-  public Datum tail() throws Exception {
-    throw new Exceptionf("'() can't get <tail> (<cdr>) of NIL!");
+  public AssociativeCollection tail() throws Exception {
+    throw new Exceptionf("NIL [TAIL]: can't get <tail> (<cdr>) of NIL!");
   }
 
   public int length() {
@@ -150,14 +152,14 @@ public class Nil extends Datum implements AssociativeCollection {
   //////////////////////////////////////
 
   public Datum val(Datum key) throws Exception {
-    throw new Exceptionf("'() can't get value of key %s in NIL!", key.profile());
+    throw new Exceptionf("NIL [VAL]: can't get value of key %s in NIL!", key.profile());
   }
 
   public Trampoline.Bounce key(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> Datum 
     if(predicate instanceof Datum) {
-      throw new Exceptionf("'() can't get key of predicate %s in NIL!", predicate);
+      throw new Exceptionf("NIL [KEY]: can't get key of predicate %s in NIL!", predicate);
     }
-    throw new Exceptionf("'() can't get key of predicate %s in NIL!", predicate);
+    throw new Exceptionf("NIL [KEY]: can't get key of predicate %s in NIL!", predicate);
     
   }
 
@@ -183,7 +185,7 @@ public class Nil extends Datum implements AssociativeCollection {
   //////////////////////////////////////
 
   public AssociativeCollection delete(Datum key) throws Exception { // returns <this> if deletion fails
-    throw new Exceptionf("'() can't delete with key %s from NIL!", key.profile());
+    throw new Exceptionf("NIL [DELETE]: can't delete with key %s from NIL!", key.profile());
   }
 
   //////////////////////////////////////
@@ -191,8 +193,8 @@ public class Nil extends Datum implements AssociativeCollection {
   //////////////////////////////////////
 
   public AssociativeCollection conj(Datum key, Datum value) throws Exception {
-    if(key instanceof Number && ((Number)key).eqs(ZERO)) return (AssociativeCollection)Pair.List(value);
-    throw new Exceptionf("'() can't conj non-0 key %s with value %s onto NIL!", key.profile(), value.profile());
+    if(key instanceof Number && ((Number)key).eqs(ZERO)) return (AssociativeCollection)(new Pair(value,Nil.VALUE));
+    throw new Exceptionf("NIL [CONJ]: can't conj non-0 key %s with value %s onto NIL!", key.profile(), value.profile());
   }
 
   //////////////////////////////////////
@@ -201,13 +203,13 @@ public class Nil extends Datum implements AssociativeCollection {
 
   public AssociativeCollection drop(int length) throws Exception {
     if(length == 0) return Nil.VALUE;
-    throw new Exceptionf("'() can't drop %d items from NIL of length 0!", length);
+    throw new Exceptionf("NIL [DROP]: can't drop %d items from NIL of length 0!", length);
   }
 
 
   public AssociativeCollection take(int length) throws Exception {
     if(length == 0) return Nil.VALUE;
-    throw new Exceptionf("'() can't take %d items from NIL of length 0!", length);
+    throw new Exceptionf("NIL [TAKE]: can't take %d items from NIL of length 0!", length);
   }
 
   //////////////////////////////////////
@@ -268,5 +270,156 @@ public class Nil extends Datum implements AssociativeCollection {
       if(acs[i].length() > 0) nonEmptyACs[nonEmptyCount++] = acs[i];
     }
     return nonEmptyACs[0].SymmetricDifferenceArray(eltPredicate,nonEmptyACs,continuation);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // <OrderedCollection> Instance Methods
+
+  //////////////////////////////////////
+  // constructor
+  //////////////////////////////////////
+
+  public OrderedCollection conj(Datum value) throws Exception {
+    return new Pair(value,Nil.VALUE);
+  }
+
+  //////////////////////////////////////
+  // basic accessors
+  //////////////////////////////////////
+
+  public OrderedCollection init() throws Exception {
+    throw new Exceptionf("NIL [INIT]: can't get <init> of NIL!");
+  }
+
+  public Datum last() throws Exception {
+    throw new Exceptionf("NIL [LAST]: can't get <last> of NIL!");
+  }
+
+  //////////////////////////////////////
+  // slicing
+  //////////////////////////////////////
+
+  public OrderedCollection slice(int startIdx) throws Exception {
+    return Nil.VALUE;
+  }
+
+  public OrderedCollection slice(int startIdx, int length) throws Exception {
+    return Nil.VALUE;
+  }
+
+  public Trampoline.Bounce slice(int startIdx, Callable endPredicate, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(Nil.VALUE);
+  }
+
+  //////////////////////////////////////
+  // reversing
+  //////////////////////////////////////
+
+  public OrderedCollection reverse() throws Exception {
+    return Nil.VALUE;
+  }
+
+  //////////////////////////////////////
+  // removing items
+  //////////////////////////////////////
+
+  public Trampoline.Bounce removeFirst(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(Nil.VALUE);
+  }
+
+  public Trampoline.Bounce removeLast(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(Nil.VALUE);
+  }
+
+  //////////////////////////////////////
+  // skipping
+  //////////////////////////////////////
+
+  public Trampoline.Bounce skip(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(Boolean.FALSE);
+  }
+
+  public Trampoline.Bounce skipRight(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(Boolean.FALSE);
+  }
+
+  //////////////////////////////////////
+  // fold-right
+  //////////////////////////////////////
+
+  public Trampoline.Bounce FoldRightArray(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(seed);
+  }
+
+  //////////////////////////////////////
+  // key-right
+  //////////////////////////////////////
+
+  public Trampoline.Bounce keyRight(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    if(predicate instanceof Datum) {
+      throw new Exceptionf("NIL [key-right]: can't get the right key from NIL with predicate %s!", ((Datum)predicate).profile());
+    }
+    throw new Exceptionf("NIL [key-right]: can't get the right key from NIL with predicate %s!", predicate);
+  }
+
+  //////////////////////////////////////
+  // dropping
+  //////////////////////////////////////
+
+  public OrderedCollection dropRight(int length) throws Exception {
+    return Nil.VALUE;
+  }
+
+  public Trampoline.Bounce dropWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(Nil.VALUE);
+  }
+
+  public Trampoline.Bounce dropRightWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(Nil.VALUE);
+  }
+
+  //////////////////////////////////////
+  // taking
+  //////////////////////////////////////
+
+  public OrderedCollection takeRight(int length) throws Exception {
+    return Nil.VALUE;
+  }
+
+  public Trampoline.Bounce takeWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(Nil.VALUE);
+  }
+
+  public Trampoline.Bounce takeRightWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(Nil.VALUE);
+  }
+
+  //////////////////////////////////////
+  // sorting
+  //////////////////////////////////////
+
+  public Trampoline.Bounce sort(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(Nil.VALUE);
+  }
+
+  public Trampoline.Bounce sorted(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(Boolean.TRUE);
+  }
+
+  //////////////////////////////////////
+  // merging
+  //////////////////////////////////////
+
+  public Trampoline.Bounce merge(Callable binaryPredicate, OrderedCollection oc, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run((Datum)oc);
+  }
+
+  //////////////////////////////////////
+  // duplicate neighbor deletion
+  //////////////////////////////////////
+
+  public Trampoline.Bounce deleteNeighborDuplicates(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(Nil.VALUE);
   }
 }

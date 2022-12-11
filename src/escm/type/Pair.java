@@ -9,13 +9,15 @@ import escm.type.bool.Boolean;
 import escm.type.number.Number;
 import escm.type.number.Exact;
 import escm.type.number.Real;
+import escm.type.procedure.PrimitiveProcedure;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.util.ExecutionState;
 import escm.vm.type.AssociativeCollection;
+import escm.vm.type.OrderedCollection;
 import escm.vm.type.Callable;
 
-public class Pair extends Datum implements AssociativeCollection {
+public class Pair extends Datum implements OrderedCollection {
   ////////////////////////////////////////////////////////////////////////////
   // Value returned by <length> for dotted lists
   public static final int DOTTED_LIST_LENGTH = -1;
@@ -170,7 +172,7 @@ public class Pair extends Datum implements AssociativeCollection {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Pretty-Printing
+  // Pretty-Printing (adapted from my Heist-Scheme C++ pretty-printer)
   private static final int PRETTY_PRINT_COLUMN_WIDTH = 80;
   
 
@@ -385,8 +387,9 @@ public class Pair extends Datum implements AssociativeCollection {
     return car;
   }
 
-  public Datum tail() throws Exception {
-    return cdr;
+  public AssociativeCollection tail() throws Exception {
+    if(cdr instanceof AssociativeCollection) return (AssociativeCollection)cdr;
+    throw new Exceptionf("PAIR [TAIL]: can't get <tail> of DOTTED-LIST %s", write());
   }
 
   //////////////////////////////////////
@@ -394,19 +397,20 @@ public class Pair extends Datum implements AssociativeCollection {
   //////////////////////////////////////
 
   private static Trampoline.Bounce FoldIter(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> Datum
+    AssociativeCollection[] tails = new AssociativeCollection[acs.length];
     ArrayList<Datum> args = new ArrayList<Datum>(acs.length+1);
     args.add(seed);
     for(int i = 0; i < acs.length; ++i) {
       if(acs[i].length() == 0) return continuation.run(seed);
       args.add(acs[i].head());
-      acs[i] = (AssociativeCollection)acs[i].tail();
+      tails[i] = (AssociativeCollection)acs[i].tail();
     }
-    return c.callWith(args,(acc) -> () -> FoldIter(c,acc,acs,continuation));
+    return c.callWith(args,(acc) -> () -> FoldIter(c,acc,tails,continuation));
   }
 
   public Trampoline.Bounce FoldArray(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> Datum
     if(length == DOTTED_LIST_LENGTH) {
-      throw new Exceptionf("'fold can't fold over dotted-list %s", profile());
+      throw new Exceptionf("PAIR [FOLD]: can't fold over dotted-list %s", profile());
     }
     return FoldIter(c,seed,acs,continuation);
   }
@@ -416,18 +420,19 @@ public class Pair extends Datum implements AssociativeCollection {
   ///////////////////////////////////////
 
   private Trampoline.Bounce MapIter(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
+    AssociativeCollection[] tails = new AssociativeCollection[acs.length];
     ArrayList<Datum> args = new ArrayList<Datum>(acs.length);
     for(int i = 0; i < acs.length; ++i) {
       if(acs[i].length() == 0) return continuation.run(Nil.VALUE);
       args.add(acs[i].head());
-      acs[i] = (AssociativeCollection)acs[i].tail();
+      tails[i] = (AssociativeCollection)acs[i].tail();
     }
-    return c.callWith(args,(mappedVal) -> () -> MapIter(c,acs,(mappedRest) -> () -> continuation.run(new Pair(mappedVal,mappedRest))));
+    return c.callWith(args,(mappedVal) -> () -> MapIter(c,tails,(mappedRest) -> () -> continuation.run(new Pair(mappedVal,mappedRest))));
   }
 
   public Trampoline.Bounce MapArray(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
     if(length == DOTTED_LIST_LENGTH) {
-      throw new Exceptionf("'map can't map over dotted-list %s", profile());
+      throw new Exceptionf("PAIR [MAP]: can't map over dotted-list %s", profile());
     }
     return MapIter(c,acs,continuation);
   }
@@ -437,18 +442,19 @@ public class Pair extends Datum implements AssociativeCollection {
   //////////////////////////////////////
 
   private Trampoline.Bounce ForEachIter(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
+    AssociativeCollection[] tails = new AssociativeCollection[acs.length];
     ArrayList<Datum> args = new ArrayList<Datum>(acs.length);
     for(int i = 0; i < acs.length; ++i) {
       if(acs[i].length() == 0) return continuation.run(Void.VALUE);
       args.add(acs[i].head());
-      acs[i] = (AssociativeCollection)acs[i].tail();
+      tails[i] = (AssociativeCollection)acs[i].tail();
     }
-    return c.callWith(args,(ignore) -> () -> ForEachIter(c,acs,continuation));
+    return c.callWith(args,(ignore) -> () -> ForEachIter(c,tails,continuation));
   }
 
   public Trampoline.Bounce ForEachArray(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
     if(length == DOTTED_LIST_LENGTH) {
-      throw new Exceptionf("'for-each can't iterate over dotted-list %s", profile());
+      throw new Exceptionf("PAIR [FOR-EACH]: can't iterate over dotted-list %s", profile());
     }
     return ForEachIter(c,acs,continuation);
   }
@@ -472,7 +478,7 @@ public class Pair extends Datum implements AssociativeCollection {
 
   public Trampoline.Bounce filter(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
     if(length == DOTTED_LIST_LENGTH) {
-      throw new Exceptionf("'filter can't filter a dotted-list %s", profile());
+      throw new Exceptionf("PAIR [FILTER]: can't filter a dotted-list %s", profile());
     }
     return filterIter(predicate,this,continuation);
   }
@@ -497,7 +503,7 @@ public class Pair extends Datum implements AssociativeCollection {
 
   public Trampoline.Bounce count(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> Exact
     if(length == DOTTED_LIST_LENGTH) {
-      throw new Exceptionf("'count can't count in a dotted-list %s", profile());
+      throw new Exceptionf("PAIR [COUNT]: can't count in a dotted-list %s", profile());
     }
     return countIter(predicate,ZERO,this,continuation);
   }
@@ -521,7 +527,7 @@ public class Pair extends Datum implements AssociativeCollection {
 
   public Trampoline.Bounce remove(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
     if(length == DOTTED_LIST_LENGTH) {
-      throw new Exceptionf("'remove can't remove from a dotted-list %s", profile());
+      throw new Exceptionf("PAIR [REMOVE]: can't remove from a dotted-list %s", profile());
     }
     return removeIter(predicate,this,continuation);
   }
@@ -532,12 +538,12 @@ public class Pair extends Datum implements AssociativeCollection {
 
   public Datum val(Datum key) throws Exception {
     if(length == DOTTED_LIST_LENGTH)
-      throw new Exceptionf("'val can't get value in a dotted-list %s", profile());
+      throw new Exceptionf("PAIR [VAL]: can't get value in a dotted-list %s", profile());
     if(!(key instanceof Real) || !((Real)key).isInteger())
-      throw new Exceptionf("'val invalid index %s for list value", key.profile());
+      throw new Exceptionf("PAIR [VAL]: invalid index %s for list value", key.profile());
     Real r = (Real)key;
     if(r.lt(ZERO) || r.gte(new Exact(length)))
-      throw new Exceptionf("'val index %s out of list range [0,%d)", r.write(), length);
+      throw new Exceptionf("PAIR [VAL]: index %s out of list range [0,%d)", r.write(), length);
     Number idx = ZERO;
     Datum l = this;
     while(l instanceof Pair) {
@@ -546,7 +552,7 @@ public class Pair extends Datum implements AssociativeCollection {
       idx = idx.add(ONE);
       l = p.cdr;
     }
-    throw new Exceptionf("'val invalid index %s for list value", key.profile());
+    throw new Exceptionf("PAIR [VAL]: invalid index %s for list value", key.profile());
   }
 
   //////////////////////////////////////
@@ -556,9 +562,9 @@ public class Pair extends Datum implements AssociativeCollection {
   private static Trampoline.Bounce keyIter(Callable predicate, Datum orginalL, Number idx, Datum l, Trampoline.Continuation continuation) throws Exception {
     if(!(l instanceof Pair)) {
       if(predicate instanceof Datum) {
-        throw new Exceptionf("'key no value in %s satisfies value predicate %s", orginalL.write(), ((Datum)predicate).profile());
+        throw new Exceptionf("PAIR [KEY]: no value in %s satisfies value predicate %s", orginalL.write(), ((Datum)predicate).profile());
       }
-      throw new Exceptionf("'key no value in %s satisfies value predicate %s", orginalL.write(), predicate);
+      throw new Exceptionf("PAIR [KEY]: no value in %s satisfies value predicate %s", orginalL.write(), predicate);
     }
     Pair p = (Pair)l;
     ArrayList<Datum> args = new ArrayList<Datum>(1);
@@ -571,7 +577,7 @@ public class Pair extends Datum implements AssociativeCollection {
 
   public Trampoline.Bounce key(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> Datum 
     if(length == DOTTED_LIST_LENGTH) {
-      throw new Exceptionf("'key can't get key in a dotted-list %s", profile());
+      throw new Exceptionf("PAIR [KEY]: can't get key in a dotted-list %s", profile());
     }
     return keyIter(predicate,this,ZERO,this,continuation);
   }
@@ -600,7 +606,7 @@ public class Pair extends Datum implements AssociativeCollection {
 
   private static AssociativeCollection deleteIter(Real key, Number idx, Datum l) throws Exception {
     if(!(l instanceof Pair)) 
-      throw new Exceptionf("'delete invalid index %s for list deletion", key.profile());
+      throw new Exceptionf("PAIR [DELETE]: invalid index %s for list deletion", key.profile());
     Pair p = (Pair)l;
     if(key.eqs(idx)) return (AssociativeCollection)p.cdr;
     return new Pair(p.car,(Datum)deleteIter(key,idx.add(ONE),p.cdr));
@@ -608,12 +614,12 @@ public class Pair extends Datum implements AssociativeCollection {
 
   public AssociativeCollection delete(Datum key) throws Exception { // returns <this> if deletion fails
     if(length == DOTTED_LIST_LENGTH)
-      throw new Exceptionf("'delete can't delete in a dotted-list %s", profile());
+      throw new Exceptionf("PAIR [DELETE]: can't delete in a dotted-list %s", profile());
     if(!(key instanceof Real) || !((Real)key).isInteger())
-      throw new Exceptionf("'delete invalid index %s for list deletion", key.profile());
+      throw new Exceptionf("PAIR [DELETE]: invalid index %s for list deletion", key.profile());
     Real r = (Real)key;
     if(r.lt(ZERO) || r.gte(new Exact(length)))
-      throw new Exceptionf("'delete index %s out of list range [0,%d)", r.write(), length);
+      throw new Exceptionf("PAIR [DELETE]: index %s out of list range [0,%d)", r.write(), length);
     return deleteIter(r,ZERO,this);
   }
 
@@ -625,11 +631,11 @@ public class Pair extends Datum implements AssociativeCollection {
 
   public AssociativeCollection conj(Datum key, Datum value) throws Exception {
     if(length == DOTTED_LIST_LENGTH)
-      throw new Exceptionf("'conj can't conj onto a dotted-list %s", profile());
+      throw new Exceptionf("PAIR [CONJ]: can't conj onto a dotted-list %s", profile());
     if(!(key instanceof Real) || !((Real)key).isInteger())
-      throw new Exceptionf("'conj invalid index %s for list", key.profile());
+      throw new Exceptionf("PAIR [CONJ]: invalid index %s for list", key.profile());
     if(!((Real)key).eqs(NEGATIVE_ONE))
-      throw new Exceptionf("'conj index %s isn't index \"-1\" in list", key.write());
+      throw new Exceptionf("PAIR [CONJ]: index %s isn't index \"-1\" in list", key.write());
     return new Pair(value,this);
   }
 
@@ -639,7 +645,7 @@ public class Pair extends Datum implements AssociativeCollection {
 
   public AssociativeCollection drop(int amount) throws Exception {
     if(amount < 0 || amount > length)
-      throw new Exceptionf("'drop invalid drop amount %d for list %s", length, profile());
+      throw new Exceptionf("PAIR [DROP]: invalid drop amount %d for list %s", length, profile());
     Datum p = this;
     while(amount > 0 && p instanceof Pair) {
       --amount;
@@ -660,7 +666,7 @@ public class Pair extends Datum implements AssociativeCollection {
 
   public AssociativeCollection take(int amount) throws Exception {
     if(amount < 0 || amount > length)
-      throw new Exceptionf("'take invalid take amount %d for list %s", length, profile());
+      throw new Exceptionf("PAIR [TAKE]: invalid take amount %d for list %s", length, profile());
     return (AssociativeCollection)takeRecur(amount,(Datum)this);
   }
 
@@ -678,7 +684,7 @@ public class Pair extends Datum implements AssociativeCollection {
     while(l instanceof Pair) {
       Pair p = (Pair)l;
       if(!(p.car instanceof Character))
-        throw new Exceptionf("'ac->string can't convert list with non-char %s into a string", p.car.profile());
+        throw new Exceptionf("PAIR [AC->STRING]: can't convert list with non-char %s into a string", p.car.profile());
       sb.append(p.car.display());
       l = p.cdr;
     }
@@ -829,5 +835,386 @@ public class Pair extends Datum implements AssociativeCollection {
 
   public Trampoline.Bounce SymmetricDifferenceArray(Callable eltPredicate, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
     return SymmetricDifferenceArrayIter(eltPredicate,acs[0],acs,1,continuation);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // <OrderedCollection> Instance Methods
+
+  //////////////////////////////////////
+  // constructor
+  //////////////////////////////////////
+
+  public OrderedCollection conj(Datum value) throws Exception {
+    return new Pair(value,this);
+  }
+
+  //////////////////////////////////////
+  // basic accessors
+  //////////////////////////////////////
+
+  public OrderedCollection init() throws Exception {
+    if(!(cdr instanceof Pair)) return Nil.VALUE;
+    if(!(((Pair)cdr).cdr instanceof Pair)) return new Pair(car,Nil.VALUE);
+    return new Pair(car,(Datum)((Pair)cdr).init());
+  }
+
+  public Datum last() throws Exception {
+    if(!(cdr instanceof Pair)) return car;
+    return ((Pair)cdr).last();
+  }
+
+  //////////////////////////////////////
+  // slicing
+  //////////////////////////////////////
+
+  public OrderedCollection slice(int startIdx) throws Exception {
+    return slice(startIdx,length);
+  }
+
+  public OrderedCollection slice(int startIdx, int length) throws Exception {
+    if(startIdx <= 0) {
+      if(length <= 0) return Nil.VALUE;
+      if(!(cdr instanceof Pair)) return new Pair(car,Nil.VALUE);
+      return new Pair(car,(Datum)((Pair)cdr).slice(0,length-1));
+    }
+    if(!(cdr instanceof Pair)) return Nil.VALUE;
+    return ((Pair)cdr).slice(startIdx-1,length);
+  }
+
+  public Trampoline.Bounce slice(int startIdx, Callable endPredicate, Trampoline.Continuation continuation) throws Exception {
+    if(startIdx <= 0) {
+      ArrayList<Datum> args = new ArrayList<Datum>();
+      args.add(car);
+      return endPredicate.callWith(args,(shouldEnd) -> () -> {
+        if(shouldEnd.isTruthy() || !(cdr instanceof Pair)) {
+          return continuation.run(new Pair(car,Nil.VALUE));
+        }
+        return ((Pair)cdr).slice(0,endPredicate,(sliced) -> () -> continuation.run(new Pair(car,sliced)));
+      });
+    }
+    if(!(cdr instanceof Pair)) return continuation.run(Nil.VALUE);
+    return () -> ((Pair)cdr).slice(startIdx-1,endPredicate,continuation);
+  }
+
+  //////////////////////////////////////
+  // reversing
+  //////////////////////////////////////
+
+  private OrderedCollection reverse(OrderedCollection acc) throws Exception {
+    if(!(cdr instanceof Pair)) return new Pair(car,(Datum)acc);
+    return ((Pair)cdr).reverse(new Pair(car,(Datum)acc));
+  }
+
+  public OrderedCollection reverse() throws Exception {
+    return reverse(Nil.VALUE);
+  }
+
+  //////////////////////////////////////
+  // removing items
+  //////////////////////////////////////
+
+  private Trampoline.Bounce removeLastIter(Callable predicate, int i, Vector v, Trampoline.Continuation continuation) throws Exception {
+    synchronized(v) {
+      int vLength = v.size();
+      if(i >= vLength) i = vLength-1;
+      if(i < 0) return continuation.run(Boolean.FALSE);
+      ArrayList<Datum> args = new ArrayList<Datum>();
+      args.add(v.get(i));
+      final int finalI = i; // required for lambda capture
+      return predicate.callWith(args,(shouldRemove) -> () -> {
+        if(shouldRemove.isTruthy()) return continuation.run(new Exact(finalI));
+        if(!(cdr instanceof Pair)) return continuation.run(Boolean.FALSE);
+        return () -> ((Pair)cdr).removeLastIter(predicate,finalI-1,v,continuation);
+      });
+    }
+  }
+
+  private Datum removeLastCreateList(int index) throws Exception {
+    if(index <= 0 || !(cdr instanceof Pair)) return cdr;
+    return new Pair(car,((Pair)cdr).removeLastCreateList(index-1));
+  }
+
+  public Trampoline.Bounce removeFirst(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    ArrayList<Datum> args = new ArrayList<Datum>();
+    args.add(car);
+    return predicate.callWith(args,(shouldRemove) -> () -> {
+      if(shouldRemove.isTruthy()) return continuation.run(cdr);
+      if(!(cdr instanceof Pair)) return continuation.run(this);
+      return () -> ((Pair)cdr).removeFirst(predicate,(removed) -> () -> continuation.run(new Pair(car,removed)));
+    });
+  }
+
+  public Trampoline.Bounce removeLast(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    Vector v = toACVector();
+    return removeLastIter(predicate,v.size()-1,v,(index) -> () -> {
+      if(index instanceof Real) {
+        return continuation.run(removeLastCreateList(((Real)index).intValue()));
+      }
+      return continuation.run(this);
+    });
+  }
+
+  //////////////////////////////////////
+  // skipping
+  //////////////////////////////////////
+
+  public Trampoline.Bounce skip(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    ArrayList<Datum> args = new ArrayList<Datum>();
+    args.add(car);
+    return predicate.callWith(args,(keepSkipping) -> () -> {
+      if(keepSkipping.isTruthy()) {
+        if(!(cdr instanceof Pair)) return continuation.run(Boolean.FALSE);
+        return ((Pair)cdr).skip(predicate,continuation);
+      }
+      return continuation.run(car);
+    });
+  }
+
+  public Trampoline.Bounce skipRight(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    ArrayList<Datum> args = new ArrayList<Datum>();
+    args.add(car);
+    return predicate.callWith(args,(keepSkipping) -> () -> {
+      if(cdr instanceof Pair) {
+        return ((Pair)cdr).skipRight(predicate,(elt) -> () -> {
+          if(!(elt instanceof Boolean) || keepSkipping.isTruthy()) return continuation.run(elt);
+          return continuation.run(car);
+        });
+      }
+      if(keepSkipping.isTruthy()) return continuation.run(Boolean.FALSE);
+      return continuation.run(car);
+    });
+  }
+
+  //////////////////////////////////////
+  // fold-right
+  //////////////////////////////////////
+
+  private static Trampoline.Bounce FoldRightIter(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> Datum
+    AssociativeCollection[] tails = new AssociativeCollection[acs.length];
+    ArrayList<Datum> params = new ArrayList<Datum>(acs.length);
+    for(int i = 0; i < acs.length; ++i) {
+      if(acs[i].length() == 0) return continuation.run(seed);
+      params.add(acs[i].head());
+      tails[i] = (AssociativeCollection)acs[i].tail();
+    }
+    return () -> FoldRightIter(c,seed,tails,(acc) -> () -> {
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
+      args.add(acc);
+      return c.callWith(args,continuation);
+    });
+  }
+
+  public Trampoline.Bounce FoldRightArray(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
+    if(length == DOTTED_LIST_LENGTH) {
+      throw new Exceptionf("PAIR [FOLD-RIGHT]: can't fold over dotted-list %s", profile());
+    }
+    return FoldRightIter(c,seed,acs,continuation);
+  }
+
+  //////////////////////////////////////
+  // key-right
+  //////////////////////////////////////
+
+  private Trampoline.Bounce keyRight(Callable predicate, int idx, Trampoline.Continuation continuation) throws Exception {
+    ArrayList<Datum> args = new ArrayList<Datum>();
+    args.add(car);
+    return predicate.callWith(args,(shouldGetKey) -> () -> {
+      if(cdr instanceof Pair) {
+        return ((Pair)cdr).keyRight(predicate,idx+1,(key) -> () -> {
+          if(key instanceof Real || !shouldGetKey.isTruthy()) return continuation.run(key);
+          return continuation.run(new Exact(idx));
+        });
+      }
+      if(!shouldGetKey.isTruthy()) return continuation.run(Boolean.FALSE);
+      return continuation.run(new Exact(idx));
+    });
+  }
+
+  public Trampoline.Bounce keyRight(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return keyRight(predicate,0,(key) -> () -> {
+      if(key instanceof Real) return continuation.run(key);
+      if(predicate instanceof Datum) {
+        throw new Exceptionf("PAIR [KEY-RIGHT]: no value in %s satisfies value predicate %s", write(), ((Datum)predicate).profile());
+      }
+      throw new Exceptionf("PAIR [KEY-RIGHT]: no value in %s satisfies value predicate %s", write(), predicate);
+    });
+  }
+
+  //////////////////////////////////////
+  // dropping
+  //////////////////////////////////////
+
+  private static final Boolean KEEP_DROPPING_FLAG = Boolean.valueOf(false);
+
+  public OrderedCollection dropRight(int length) throws Exception {
+    if(this.length == DOTTED_LIST_LENGTH) {
+      throw new Exceptionf("PAIR [DROP-RIGHT]: can't drop %d from dotted-list %s", length, profile());
+    }
+    if(this.length <= length) return Nil.VALUE;
+    if(!(cdr instanceof Pair)) return new Pair(car,Nil.VALUE);
+    return new Pair(car,(Datum)((Pair)cdr).dropRight(length));
+  }
+
+  public Trampoline.Bounce dropWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    ArrayList<Datum> args = new ArrayList<Datum>(1);
+    args.add(car);
+    return predicate.callWith(args,(keepDropping) -> () -> {
+      if(!keepDropping.isTruthy()) return continuation.run(this);
+      if(!(cdr instanceof Pair)) return continuation.run(Nil.VALUE);
+      return ((Pair)cdr).dropWhile(predicate,continuation);
+    });
+  }
+
+  private Trampoline.Bounce dropRightWhileIter(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    ArrayList<Datum> args = new ArrayList<Datum>();
+    args.add(car);
+    return predicate.callWith(args,(keepDropping) -> () -> {
+      if(cdr instanceof Pair) {
+        return ((Pair)cdr).dropRightWhileIter(predicate,(dropped) -> () -> {
+          if(!dropped.eq(KEEP_DROPPING_FLAG)) return continuation.run(new Pair(car,dropped));
+          if(keepDropping.isTruthy()) return continuation.run(KEEP_DROPPING_FLAG);
+          return continuation.run(new Pair(car,Nil.VALUE));
+        });
+      }
+      if(keepDropping.isTruthy()) return continuation.run(KEEP_DROPPING_FLAG);
+      return continuation.run(new Pair(car,Nil.VALUE));
+    });
+  }
+
+  public Trampoline.Bounce dropRightWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return dropRightWhileIter(predicate,(result) -> () -> {
+      if(result.eq(KEEP_DROPPING_FLAG)) return continuation.run(Nil.VALUE);
+       return continuation.run(result);
+    });
+  }
+
+  //////////////////////////////////////
+  // taking
+  //////////////////////////////////////
+
+  private Trampoline.Bounce takeRightWhileCounter(Callable predicate, int n, Trampoline.Continuation continuation) throws Exception {
+    ArrayList<Datum> args = new ArrayList<Datum>();
+    args.add(car);
+    return predicate.callWith(args,(shouldTake) -> () -> {
+      if(shouldTake.isTruthy()) {
+        if(!(cdr instanceof Pair)) return continuation.run(new Exact(n+1));
+        return ((Pair)cdr).takeRightWhileCounter(predicate,n+1,continuation);
+      }
+      if(!(cdr instanceof Pair)) return continuation.run(new Exact(0));
+      return ((Pair)cdr).takeRightWhileCounter(predicate,0,continuation);
+    });
+  }
+
+  public OrderedCollection takeRight(int length) throws Exception {
+    if(this.length == DOTTED_LIST_LENGTH) {
+      throw new Exceptionf("PAIR [TAKE-RIGHT]: can't take %d from dotted-list %s", length, profile());
+    }
+    if(this.length <= length) return this;
+    if(!(cdr instanceof Pair)) return Nil.VALUE;
+    return ((Pair)cdr).takeRight(length);
+  }
+
+  public Trampoline.Bounce takeWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    ArrayList<Datum> args = new ArrayList<Datum>(1);
+    args.add(car);
+    return predicate.callWith(args,(keepTaking) -> () -> {
+      if(!keepTaking.isTruthy()) return continuation.run(Nil.VALUE);
+      if(!(cdr instanceof Pair)) return continuation.run(new Pair(car,Nil.VALUE));
+      return ((Pair)cdr).takeWhile(predicate,(taken) -> () -> continuation.run(new Pair(car,taken)));
+    });
+  }
+
+  public Trampoline.Bounce takeRightWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return takeRightWhileCounter(predicate,0,(length) -> () -> continuation.run((Datum)takeRight(((Real)length).intValue())));
+  }
+
+  //////////////////////////////////////
+  // sorting
+  //////////////////////////////////////
+
+  public Trampoline.Bounce sort(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
+    if(this.length == DOTTED_LIST_LENGTH) {
+      if(binaryPredicate instanceof Datum) {
+        throw new Exceptionf("PAIR [SORT]: can't sort dotted-list %s with predicate %s", write(), ((Datum)binaryPredicate).profile());
+      }
+      throw new Exceptionf("PAIR [SORT]: can't sort dotted-list %s with predicate %s", write(), binaryPredicate);
+    }
+    Callable trueCondPrimitive = (params, cont) -> {
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
+      args.add(car);
+      return binaryPredicate.callWith(args,cont);
+    };
+    Callable falseCondPrimitive = (params, cont) -> {
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
+      args.add(car);
+      return binaryPredicate.callWith(args,(value) -> () -> cont.run(Boolean.valueOf(!value.isTruthy())));
+    };
+    PrimitiveProcedure trueCond = new PrimitiveProcedure("escm-sort-in-lhs?", trueCondPrimitive);
+    PrimitiveProcedure falseCond = new PrimitiveProcedure("escm-sort-in-rhs?", falseCondPrimitive);
+    return filterIter(trueCond,cdr,(lhs) -> () -> {
+      return ((OrderedCollection)lhs).sort(binaryPredicate,(sortedLhs) -> () -> {
+        return filterIter(falseCond,cdr,(rhs) -> () -> {
+          return ((OrderedCollection)rhs).sort(binaryPredicate,(sortedRhs) -> () -> {
+            return continuation.run(binaryAppend(sortedLhs,new Pair(car,sortedRhs)));
+          });
+        });
+      });
+    });
+  }
+
+  public Trampoline.Bounce sorted(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
+    if(!(cdr instanceof Pair)) return continuation.run(Boolean.TRUE);
+    Pair pcdr = (Pair)cdr;
+    ArrayList<Datum> args = new ArrayList<Datum>(2);
+    args.add(car);
+    args.add(pcdr.car);
+    return binaryPredicate.callWith(args,(isEq) -> () -> {
+      if(isEq.isTruthy()) return pcdr.sorted(binaryPredicate,continuation);
+      return continuation.run(Boolean.FALSE);
+    });
+  }
+
+  //////////////////////////////////////
+  // merging
+  //////////////////////////////////////
+
+  private static Trampoline.Bounce mergeIter(Callable binaryPredicate, AssociativeCollection ac1, AssociativeCollection ac2, Trampoline.Continuation continuation) throws Exception {
+    if(ac1.length() == 0) return continuation.run((Datum)ac2);
+    if(ac2.length() == 0) return continuation.run((Datum)ac1);
+    ArrayList<Datum> args = new ArrayList<Datum>(2);
+    args.add(ac1.head());
+    args.add(ac2.head());
+    return binaryPredicate.callWith(args,(lt) -> () -> {
+      if(lt.isTruthy()) {
+        return mergeIter(binaryPredicate,ac1.tail(),ac2,(merged) -> () -> continuation.run(new Pair(ac1.head(),merged)));
+      }
+      return mergeIter(binaryPredicate,ac1,ac2.tail(),(merged) -> () -> continuation.run(new Pair(ac2.head(),merged)));
+    });
+  }
+
+  public Trampoline.Bounce merge(Callable binaryPredicate, OrderedCollection oc, Trampoline.Continuation continuation) throws Exception {
+    return mergeIter(binaryPredicate,this,oc,continuation);
+  }
+
+  //////////////////////////////////////
+  // duplicate neighbor deletion
+  //////////////////////////////////////
+
+  private static Trampoline.Bounce skipWhileHaveDuplicates(Callable binaryPredicate, Datum d, OrderedCollection tail, Trampoline.Continuation continuation) throws Exception {
+    Callable matchCondPrimitive = (params, cont) -> {
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
+      args.add(d);
+      return binaryPredicate.callWith(args,cont);
+    };
+    PrimitiveProcedure matchCond = new PrimitiveProcedure("escm-del-neigh-dups-eq?", matchCondPrimitive);
+    return tail.dropWhile(matchCond,continuation);
+  }
+
+  public Trampoline.Bounce deleteNeighborDuplicates(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
+    if(!(cdr instanceof Pair)) return continuation.run(this);
+    return skipWhileHaveDuplicates(binaryPredicate,car,(Pair)cdr,(withoutLeadingDuplicates) -> () -> {
+      return ((OrderedCollection)withoutLeadingDuplicates).deleteNeighborDuplicates(binaryPredicate,(deld) -> () -> continuation.run(new Pair(car,deld)));
+    });
   }
 }

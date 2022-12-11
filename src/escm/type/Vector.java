@@ -27,7 +27,7 @@
 //      - Datum pop()
 //      - Datum popFront()
 //
-//      - Vector reverse()
+//      - Vector reversed()
 //      - Vector subvector(int idx, int length)
 //
 //      - Datum toList()
@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Arrays;
 import escm.type.bool.Boolean;
+import escm.type.procedure.PrimitiveProcedure;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.number.Number;
@@ -49,9 +50,10 @@ import escm.type.number.Exact;
 import escm.type.number.Real;
 import escm.vm.util.ExecutionState;
 import escm.vm.type.AssociativeCollection;
+import escm.vm.type.OrderedCollection;
 import escm.vm.type.Callable;
 
-public class Vector extends Datum implements AssociativeCollection, Callable {
+public class Vector extends Datum implements OrderedCollection, Callable {
   ////////////////////////////////////////////////////////////////////////////
   // Factory Generator
   static public Vector append(ArrayList<Vector> vects) {
@@ -110,23 +112,21 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
     }
   }
 
-  private Trampoline.Bounce indexOfRecur(Callable eqp, Datum d, int n, int i, Trampoline.Continuation continuation) throws Exception {
-    if(i >= n) return continuation.run(Boolean.FALSE);
-    ArrayList<Datum> args = new ArrayList<Datum>(2);
+  private Trampoline.Bounce indexOfRecur(Callable eqp, Datum d, int i, Trampoline.Continuation continuation) throws Exception {
     synchronized(this) {
+      if(i >= value.size()) return continuation.run(Boolean.FALSE);
+      ArrayList<Datum> args = new ArrayList<Datum>(2);
       args.add(value.get(i));
+      args.add(d);
+      return eqp.callWith(args,(isEqp) -> () -> {
+        if(isEqp.isTruthy()) return continuation.run(new Exact(i));
+        return indexOfRecur(eqp,d,i+1,continuation);
+      });
     }
-    args.add(d);
-    return eqp.callWith(args,(isEqp) -> () -> {
-      if(isEqp.isTruthy()) return continuation.run(new Exact(i));
-      return indexOfRecur(eqp,d,n,i+1,continuation);
-    });
   }
 
   public Trampoline.Bounce indexOf(Callable eqp, Datum d, Trampoline.Continuation continuation) throws Exception {
-    synchronized(this) {
-      return indexOfRecur(eqp,d,value.size(),0,continuation);
-    }
+    return indexOfRecur(eqp,d,0,continuation);
   }
 
 
@@ -215,7 +215,7 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
     value = arr;
   }
 
-  public Vector reverse() {
+  public Vector reversed() {
     synchronized(this) {
       ArrayList<Datum> copy = new ArrayList<Datum>(value);
       Collections.reverse(copy);
@@ -225,7 +225,7 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
 
   public Vector subvector(int idx, int length) throws Exception {
     if(idx < 0)
-      throw new Exceptionf("VECTOR [SUBVECTOR]: Invalid negative index %d for vector %s", idx, write());
+      throw new Exceptionf("VECTOR [SUBVECTOR]: can't get subvector of %s with negative index %d", write(), idx);
     ArrayList<Datum> subvect = new ArrayList<Datum>();
     synchronized(this) {
       for(int n = value.size(), count = 0; idx < n && count < length; ++idx, ++count)
@@ -243,7 +243,7 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
       for(int i = value.size()-1; i >= 0; --i)
         lis = new escm.type.Pair(value.get(i),lis);
     }
-    return lis; 
+    return lis;
   }
 
   public escm.type.String toEscmString() throws Exception {
@@ -394,7 +394,7 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
     }
   }
 
-  public Datum tail() throws Exception {
+  public AssociativeCollection tail() throws Exception {
     synchronized(this) {
       return subvector(1,value.size()-1);
     }
@@ -481,8 +481,13 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
     }
   }
 
+  // Helper also used by <sort>
+  private Trampoline.Bounce filterFrom(Callable predicate, int acPos, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
+    return filterIter(predicate,acPos,(filteredList) -> () -> continuation.run(((AssociativeCollection)filteredList).toACVector()));
+  }
+
   public Trampoline.Bounce filter(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
-    return filterIter(predicate,0,(filteredList) -> () -> continuation.run(((AssociativeCollection)filteredList).toACVector()));
+    return filterFrom(predicate,0,continuation);
   }
 
   //////////////////////////////////////
@@ -538,11 +543,11 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
 
   public Datum val(Datum key) throws Exception {
     if(!(key instanceof Real) || !((Real)key).isInteger())
-      throw new Exceptionf("'val invalid index %s for vector value", key.profile());
+      throw new Exceptionf("VECTOR [VAL]: invalid index %s for vector value", key.profile());
     Real r = (Real)key;
     synchronized(this) {
       if(r.lt(ZERO) || r.gte(new Exact(value.size())))
-        throw new Exceptionf("'val index %s out of vector range [0,%d)", r.write(), value.size());
+        throw new Exceptionf("VECTOR [VAL]: index %s out of vector range [0,%d)", r.write(), value.size());
       return value.get(r.intValue());
     }
   }
@@ -555,9 +560,9 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
     synchronized(this) {
       if(acPos >= value.size()) {
         if(predicate instanceof Datum) {
-          throw new Exceptionf("'key no value in %s satisfies value predicate %s", write(), ((Datum)predicate).profile());
+          throw new Exceptionf("VECTOR [KEY]: no value in %s satisfies value predicate %s", write(), ((Datum)predicate).profile());
         }
-        throw new Exceptionf("'key no value in %s satisfies value predicate %s", write(), predicate);
+        throw new Exceptionf("VECTOR [KEY]: no value in %s satisfies value predicate %s", write(), predicate);
       }
       ArrayList<Datum> args = new ArrayList<Datum>(1);
       args.add(value.get(acPos));
@@ -592,11 +597,11 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
 
   public AssociativeCollection delete(Datum key) throws Exception { // returns <this> if deletion fails
     if(!(key instanceof Real) || !((Real)key).isInteger())
-      throw new Exceptionf("'delete invalid index %s for vector deletion", key.profile());
+      throw new Exceptionf("VECTOR [DELETE]: invalid index %s for vector deletion", key.profile());
     int deleteIdx = ((Real)key).intValue();
     synchronized(this) {
       if(deleteIdx < 0 || deleteIdx >= value.size())
-        throw new Exceptionf("'delete index %d out of vector range [0,%d)", deleteIdx, value.size());
+        throw new Exceptionf("VECTOR [DELETE]: index %d out of vector range [0,%d)", deleteIdx, value.size());
       Vector v = copy();
       v.delete(deleteIdx);
       return v;
@@ -609,12 +614,12 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
 
   public AssociativeCollection conj(Datum key, Datum newValue) throws Exception {
     if(!(key instanceof Real) || !((Real)key).isInteger())
-      throw new Exceptionf("'conj invalid index %s for vector", key.profile());
+      throw new Exceptionf("VECTOR [CONJ]: invalid index %s for vector", key.profile());
     synchronized(this) {
       int n = value.size();
       int idx = ((Real)key).intValue();
       if(idx < -1 || idx > n)
-        throw new Exceptionf("'conj index %d extends vector bounds [-1,%d)", idx, n);
+        throw new Exceptionf("VECTOR [CONJ]: index %d extends vector bounds [-1,%d)", idx, n);
       Vector v = copy();
       if(idx == -1) {
         v.pushFront(newValue);
@@ -635,7 +640,7 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
     synchronized(this) {
       int n = value.size();
       if(amount < 0 || amount > n)
-        throw new Exceptionf("'drop invalid drop amount %d for vector %s", n, profile());
+        throw new Exceptionf("VECTOR [DROP]: invalid drop amount %d for vector %s", n, profile());
       return subvector(amount,n-amount);
     }
   }
@@ -647,7 +652,7 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
   public AssociativeCollection take(int amount) throws Exception {
     synchronized(this) {
       if(amount < 0 || amount > value.size())
-        throw new Exceptionf("'take invalid take amount %d for vector %s", value.size(), profile());
+        throw new Exceptionf("VECTOR [TAKE]: invalid take amount %d for vector %s", value.size(), profile());
       return subvector(0,amount);
     }
   }
@@ -666,7 +671,7 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
       for(int i = 0, n = value.size(); i < n; ++i) {
         Datum val = value.get(i);
         if(!(val instanceof Character))
-          throw new Exceptionf("'ac->string can't convert vector with non-char %s into a string", val.profile());
+          throw new Exceptionf("VECTOR [AC->STRING]: can't convert vector with non-char %s into a string", val.profile());
         sb.append(val.display());
       }
       return new String(sb.toString());
@@ -853,5 +858,448 @@ public class Vector extends Datum implements AssociativeCollection, Callable {
 
   public Trampoline.Bounce SymmetricDifferenceArray(Callable eltPredicate, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
     return SymmetricDifferenceArrayIter(eltPredicate,acs[0],acs,1,continuation);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // <OrderedCollection> Instance Methods
+
+  //////////////////////////////////////
+  // constructor
+  //////////////////////////////////////
+
+  public OrderedCollection conj(Datum value) throws Exception {
+    ArrayList<Datum> conjd;
+    synchronized(this) {
+      conjd = new ArrayList<Datum>(this.value);
+    }
+    conjd.add(value);
+    return new Vector(0,conjd);
+  }
+
+  //////////////////////////////////////
+  // basic accessors
+  //////////////////////////////////////
+
+  public OrderedCollection init() throws Exception {
+    synchronized(this) {
+      if(value.size() == 0) throw new Exceptionf("VECTOR [INIT]: can't get <init> of []!");
+      ArrayList<Datum> initVals = new ArrayList<Datum>(value);
+      initVals.remove(value.size()-1);
+      return new Vector(0,initVals);
+    }
+  }
+
+  public Datum last() throws Exception {
+    synchronized(this) {
+      if(value.size() == 0) throw new Exceptionf("VECTOR [LAST]: can't get <last> of []!");
+      return value.get(value.size()-1);
+    }
+  }
+
+  //////////////////////////////////////
+  // slicing
+  //////////////////////////////////////
+
+  private Trampoline.Bounce sliceGetLastIdx(int i, Callable endPredicate, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if(i >= value.size()) return continuation.run(new Exact(i));
+      ArrayList<Datum> args = new ArrayList<Datum>(1);
+      args.add(value.get(i));
+      return endPredicate.callWith(args,(shouldEnd) -> () -> {
+        if(shouldEnd.isTruthy()) return continuation.run(new Exact(i+1));
+        return sliceGetLastIdx(i+1,endPredicate,continuation);
+      });
+    }
+  }
+
+  public OrderedCollection slice(int startIdx) throws Exception {
+    synchronized(this) {
+      return slice(startIdx,value.size());
+    }
+  }
+
+  public OrderedCollection slice(int startIdx, int length) throws Exception {
+    synchronized(this) {
+      if(startIdx < 0 || length <= 0 || startIdx >= value.size()) return new Vector();
+      int sliceLength = Math.min(length,value.size()-startIdx);
+      ArrayList<Datum> sliced = new ArrayList<Datum>(sliceLength);
+      for(int count = 0; count < sliceLength; ++count, ++startIdx) {
+        sliced.add(value.get(startIdx));
+      }
+      return new Vector(0,sliced);
+    }
+  }
+
+  public Trampoline.Bounce slice(int startIdx, Callable endPredicate, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if(startIdx < 0 || startIdx >= value.size()) return continuation.run(new Vector());
+      return sliceGetLastIdx(startIdx,endPredicate,(endIdx) -> () -> {
+        synchronized(this) {
+          return continuation.run(subvector(startIdx,((Real)endIdx).intValue()-startIdx));
+        }
+      });
+    }
+  }
+
+  //////////////////////////////////////
+  // reversing
+  //////////////////////////////////////
+
+  public OrderedCollection reverse() throws Exception {
+    return reversed();
+  }
+
+  //////////////////////////////////////
+  // removing items
+  //////////////////////////////////////
+
+  private Trampoline.Bounce removeIter(Callable predicate, int i, boolean increasing, int mod, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if((increasing && i >= value.size()) || (!increasing && i < 0)) return continuation.run(copy());
+      ArrayList<Datum> args = new ArrayList<Datum>(1);
+      args.add(value.get(i));
+      return predicate.callWith(args,(shouldRemove) -> () -> {
+        if(shouldRemove.isTruthy()) {
+          ArrayList<Datum> removed;
+          synchronized(this) {
+            removed = new ArrayList<Datum>(value);
+          }
+          removed.remove(i);
+          return continuation.run(new Vector(0,removed));
+        }
+        return removeIter(predicate,i+mod,increasing,mod,continuation);
+      });
+    }
+  }
+
+  public Trampoline.Bounce removeFirst(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return removeIter(predicate,0,true,1,continuation);
+  }
+
+  public Trampoline.Bounce removeLast(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      return removeIter(predicate,value.size()-1,false,-1,continuation);
+    }
+  }
+
+  //////////////////////////////////////
+  // skipping
+  //////////////////////////////////////
+
+  private Trampoline.Bounce skipIter(Callable predicate, int i, boolean increasing, int mod, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if((increasing && i >= value.size()) || (!increasing && i < 0)) return continuation.run(Boolean.FALSE);
+      Datum val = value.get(i);
+      ArrayList<Datum> args = new ArrayList<Datum>(1);
+      args.add(val);
+      return predicate.callWith(args,(keepSkipping) -> () -> {
+        if(keepSkipping.isTruthy()) return skipIter(predicate,i+mod,increasing,mod,continuation);
+        return continuation.run(val);
+      });
+    }
+  }
+
+  public Trampoline.Bounce skip(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return skipIter(predicate,0,true,1,continuation);
+  }
+
+  public Trampoline.Bounce skipRight(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      return skipIter(predicate,value.size()-1,false,-1,continuation);
+    }
+  }
+
+  //////////////////////////////////////
+  // fold-right
+  //////////////////////////////////////
+
+  private static Trampoline.Bounce FoldRightArray(Callable c, Datum seed, int eltIdx, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
+    ArrayList<Datum> params = new ArrayList<Datum>(acs.length);
+    for(int i = 0; i < acs.length; ++i) {
+      Vector v = (Vector)acs[i];
+      synchronized(v) {
+        if(eltIdx >= v.value.size()) return continuation.run(seed);  
+        params.add(v.value.get(eltIdx));
+      }
+    }
+    return () -> FoldRightArray(c,seed,eltIdx+1,acs,(acc) -> () -> {
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
+      args.add(acc);
+      return c.callWith(args,continuation);
+    });
+  }
+
+
+  public Trampoline.Bounce FoldRightArray(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
+    return FoldRightArray(c,seed,0,acs,continuation);
+  }
+
+  //////////////////////////////////////
+  // key-right
+  //////////////////////////////////////
+
+  private Trampoline.Bounce keyRight(Callable predicate, int idx, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if(idx < 0 || idx >= value.size()) {
+        if(predicate instanceof Datum) {
+          throw new Exceptionf("VECTOR [KEY-RIGHT]: can't find a right key from %s with predicate %s!", write(), ((Datum)predicate).profile());
+        }
+        throw new Exceptionf("VECTOR [KEY-RIGHT]: can't find a right key from %s with predicate %s!", write(), predicate);
+      }
+      ArrayList<Datum> args = new ArrayList<Datum>();
+      args.add(value.get(idx));
+      return predicate.callWith(args,(shouldGetKey) -> () -> {
+        if(!shouldGetKey.isTruthy()) return keyRight(predicate,idx-1,continuation);
+        return continuation.run(new Exact(idx));
+      });
+    }
+  }
+
+  public Trampoline.Bounce keyRight(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      return keyRight(predicate,value.size()-1,(key) -> () -> {
+        if(key instanceof Real) return continuation.run(key);
+        if(predicate instanceof Datum) {
+          throw new Exceptionf("VECTOR [KEY-RIGHT]: no value in %s satisfies value predicate %s", write(), ((Datum)predicate).profile());
+        }
+        throw new Exceptionf("VECTOR [KEY-RIGHT]: no value in %s satisfies value predicate %s", write(), predicate);
+      }); 
+    }
+  }
+
+  //////////////////////////////////////
+  // dropping
+  //////////////////////////////////////
+
+  private static final Boolean KEEP_DROPPING_FLAG = Boolean.valueOf(false);
+
+  public OrderedCollection dropRight(int length) throws Exception {
+    synchronized(this) {
+      return subvector(0,value.size()-length);
+    }
+  }
+
+  private Trampoline.Bounce dropWhile(Callable predicate, int idx, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if(idx >= value.size()) return continuation.run(new Vector());
+      ArrayList<Datum> args = new ArrayList<Datum>(1);
+      args.add(value.get(idx));
+      return predicate.callWith(args,(keepDropping) -> () -> {
+        synchronized(this) {
+          if(!keepDropping.isTruthy()) return continuation.run(subvector(idx,value.size()));
+          return dropWhile(predicate,idx+1,continuation);
+        }
+      });
+    }
+  }
+
+  public Trampoline.Bounce dropWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return dropWhile(predicate,0,continuation);
+  }
+
+  private Trampoline.Bounce dropRightWhile(Callable predicate, int idx, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if(idx < 0) return continuation.run(new Vector());
+      ArrayList<Datum> args = new ArrayList<Datum>(1);
+      args.add(value.get(idx));
+      return predicate.callWith(args,(keepDropping) -> () -> {
+        synchronized(this) {
+          if(!keepDropping.isTruthy()) return continuation.run(subvector(0,idx+1));
+          return dropRightWhile(predicate,idx-1,continuation);
+        }
+      });
+    }
+  }
+
+  public Trampoline.Bounce dropRightWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      return dropRightWhile(predicate,value.size()-1,continuation);
+    }
+  }
+
+  //////////////////////////////////////
+  // taking
+  //////////////////////////////////////
+
+  public OrderedCollection takeRight(int length) throws Exception {
+    synchronized(this) {
+      int n = value.size();
+      if(length >= n) return copy();
+      return subvector(n-length,n);
+    }
+  }
+
+  private Trampoline.Bounce takeWhile(Callable predicate, int idx, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if(idx >= value.size()) return continuation.run(copy());
+      ArrayList<Datum> args = new ArrayList<Datum>(1);
+      args.add(value.get(idx));
+      return predicate.callWith(args,(keepTaking) -> () -> {
+        synchronized(this) {
+          if(!keepTaking.isTruthy()) return continuation.run(subvector(0,idx));
+          return takeWhile(predicate,idx+1,continuation);
+        }
+      });
+    }
+  }
+
+  public Trampoline.Bounce takeWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    return takeWhile(predicate,0,continuation);
+  }
+
+  private Trampoline.Bounce takeRightWhile(Callable predicate, int idx, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if(idx < 0) return continuation.run(copy());
+      ArrayList<Datum> args = new ArrayList<Datum>(1);
+      args.add(value.get(idx));
+      return predicate.callWith(args,(keepTaking) -> () -> {
+        synchronized(this) {
+          if(!keepTaking.isTruthy()) return continuation.run(subvector(idx+1,value.size()));
+          return takeRightWhile(predicate,idx-1,continuation);
+        }
+      });
+    }
+  }
+
+  public Trampoline.Bounce takeRightWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      return takeRightWhile(predicate,value.size()-1,continuation);
+    }
+  }
+
+  //////////////////////////////////////
+  // sorting
+  //////////////////////////////////////
+
+  private Datum mergeSortedHalves(Vector lhs, Datum hd, Vector rhs) throws Exception {
+    ArrayList<Datum> appended = new ArrayList<Datum>();
+    synchronized(lhs) {
+      appended.addAll(lhs.value);
+    }
+    appended.add(hd);
+    synchronized(rhs) {
+      appended.addAll(rhs.value);
+    }
+    return new Vector(0,appended);
+  }
+
+  private Trampoline.Bounce sort(Callable binaryPredicate, int idx, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if(idx >= value.size()) return continuation.run(new Vector());
+      Datum hd = value.get(idx);
+      Callable trueCondPrimitive = (params, cont) -> {
+        ArrayList<Datum> args = new ArrayList<Datum>(params);
+        args.add(hd);
+        return binaryPredicate.callWith(args,cont);
+      };
+      Callable falseCondPrimitive = (params, cont) -> {
+        ArrayList<Datum> args = new ArrayList<Datum>(params);
+        args.add(hd);
+        return binaryPredicate.callWith(args,(value) -> () -> cont.run(Boolean.valueOf(!value.isTruthy())));
+      };
+      PrimitiveProcedure trueCond = new PrimitiveProcedure("escm-sort-in-lhs?", trueCondPrimitive);
+      PrimitiveProcedure falseCond = new PrimitiveProcedure("escm-sort-in-rhs?", falseCondPrimitive);
+      return filterFrom(trueCond,idx+1,(lhs) -> () -> {
+        return ((OrderedCollection)lhs).sort(binaryPredicate,(sortedLhs) -> () -> {
+          return filterFrom(falseCond,idx+1,(rhs) -> () -> {
+            return ((OrderedCollection)rhs).sort(binaryPredicate,(sortedRhs) -> () -> {
+              return continuation.run(mergeSortedHalves((Vector)sortedLhs,hd,(Vector)sortedRhs));
+            });
+          });
+        });
+      });
+    }
+  }
+
+  public Trampoline.Bounce sort(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
+    return sort(binaryPredicate,0,continuation);
+  }
+
+  private Trampoline.Bounce sorted(Callable binaryPredicate, int idx, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if(idx+1 >= value.size()) return continuation.run(Boolean.TRUE);
+      ArrayList<Datum> args = new ArrayList<Datum>(2);
+      args.add(value.get(idx));
+      args.add(value.get(idx+1));
+      return binaryPredicate.callWith(args,(isEq) -> () -> {
+        if(isEq.isTruthy()) return sorted(binaryPredicate,idx+1,continuation);
+        return continuation.run(Boolean.FALSE);
+      });
+    }
+  }
+
+  public Trampoline.Bounce sorted(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
+    return sorted(binaryPredicate,0,continuation);
+  }
+
+  //////////////////////////////////////
+  // merging
+  //////////////////////////////////////
+
+  private Datum toListFromIndex(int idx) throws Exception {
+    Datum lis = escm.type.Nil.VALUE;
+    synchronized(this) {
+      for(int i = value.size()-1; i >= idx; --i)
+        lis = new escm.type.Pair(value.get(i),lis);
+    }
+    return lis;
+  }
+
+  private static Trampoline.Bounce mergeIter(Callable binaryPredicate, Vector v1, Vector v2, int i1, int i2, Trampoline.Continuation continuation) throws Exception {
+    synchronized(v1) {
+      synchronized(v2) {
+        if(i1 >= v1.value.size()) return continuation.run(v2.toListFromIndex(i2));
+        if(i2 >= v2.value.size()) return continuation.run(v1.toListFromIndex(i1));
+        Datum v1Elt = v1.value.get(i1);
+        Datum v2Elt = v2.value.get(i2);
+        ArrayList<Datum> args = new ArrayList<Datum>(2);
+        args.add(v1Elt);
+        args.add(v2Elt);
+        return binaryPredicate.callWith(args,(lt) -> () -> {
+          if(lt.isTruthy()) {
+            return mergeIter(binaryPredicate,v1,v2,i1+1,i2,(merged) -> () -> continuation.run(new Pair(v1Elt,merged)));
+          }
+          return mergeIter(binaryPredicate,v1,v2,i1,i2+1,(merged) -> () -> continuation.run(new Pair(v2Elt,merged)));
+        });
+      }
+    }
+  }
+
+  public Trampoline.Bounce merge(Callable binaryPredicate, OrderedCollection oc, Trampoline.Continuation continuation) throws Exception {
+    return mergeIter(binaryPredicate,this,(Vector)oc,0,0,(mergedList) -> () -> continuation.run(((AssociativeCollection)mergedList).toACVector()));
+  }
+
+  //////////////////////////////////////
+  // duplicate neighbor deletion
+  //////////////////////////////////////
+
+  private Trampoline.Bounce skipWhileHaveDuplicates(Callable binaryPredicate, Datum d, int idx, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if(idx >= value.size()) return continuation.run(new Exact(idx));
+      ArrayList<Datum> args = new ArrayList<Datum>(2);
+      args.add(d);
+      args.add(value.get(idx));
+      return binaryPredicate.callWith(args,(isEq) -> () -> {
+        if(isEq.isTruthy()) {
+          return skipWhileHaveDuplicates(binaryPredicate,d,idx+1,continuation);
+        }
+        return continuation.run(new Exact(idx));
+      });
+    }
+  }
+
+  private Trampoline.Bounce deleteListNeighborDuplicates(Callable binaryPredicate, int idx, Trampoline.Continuation continuation) throws Exception {
+    synchronized(this) {
+      if(idx+1 >= value.size()) return continuation.run(toListFromIndex(idx));
+      Datum elt = value.get(idx);
+      return skipWhileHaveDuplicates(binaryPredicate,elt,idx+1,(idxAfterDups) -> () -> {
+        return deleteListNeighborDuplicates(binaryPredicate,((Real)idxAfterDups).intValue(),(deldList) -> () -> continuation.run(new Pair(elt,deldList)));
+      });
+    }
+  }
+
+  public Trampoline.Bounce deleteNeighborDuplicates(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
+    return deleteListNeighborDuplicates(binaryPredicate,0,(deldList) -> () -> continuation.run(((AssociativeCollection)deldList).toACVector()));
   }
 }

@@ -10,9 +10,13 @@
            [X] => STRINGS
            [X] => HASHMAPS
     [X] => BUILD ON EXISTING `AC` PRIMS TO ADD IN `any?`, `every?`
-    [ ] => BUILD OUT `OC` PRIMS
-           [ ] => CONDUCT UNIT TESTS FOR ALL TYPES
+    [X] => BUILD OUT `OC` PRIMS
+           [X] => LISTS
+           [X] => VECTORS
+           [X] => STRINGS
     [ ] => RM/ADJUST EXISTING PRIMS & ___TAKE OFF `ac-`/`oc-` PREFIX!___
+           [ ] => REANALYZE PLACE OF CURRENT LIST/STRING/VECTOR/HASHMAP PRIMTIVES W/IN ESCM
+               [ ] => WILL LIKELY CLIP SOME & KEEP SOME (ESP. FOR HASHMAP KEY INTROSPECTION & STRING OPS)
     [ ] => ADD TO/ADJUST `primitives.md`
     [ ] => ADD TO/ADJUST `help`
     [ ] => UPDATE GITHUB + TEST ON SCU SERVERS
@@ -21,8 +25,14 @@
 
 
 
+[ ] => WHAT ABOUT PRIMITIVES LIKE `unfold` ??? LOOK INTO THIS FROM _HEIST_ !!!
 
-[ ] INVESTIGATE POTENTIAL ISUEE WITH `(stringf "%w..." '(1 2 3))`
+
+
+
+
+
+[ ] INVESTIGATE POTENTIAL ISSUE WITH `(stringf "%w..." '(1 2 3))`
 
 [ ] CONSIDER CHANGING '= TO OVERLOAD TO 'eq? FOR NON-NUMERICS & HAVE '>= (ETC.) OVERLOAD FOR 'char>=? AND 'string>=? AS NEEDED
 

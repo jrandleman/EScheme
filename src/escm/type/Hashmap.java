@@ -261,7 +261,7 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
     throw new Exceptionf("HASHMAP [HEAD]: Can't get head of an empty hashmap!");
   }
 
-  public Datum tail() throws Exception {
+  public AssociativeCollection tail() throws Exception {
     if(value.size() == 0) throw new Exceptionf("HASHMAP [TAIL]: Can't get tail of an empty hashmap!");
     Hashmap h = new Hashmap();
     int count = 0;
@@ -451,9 +451,9 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   private Trampoline.Bounce keyIter(Callable predicate, HashmapEntry[] ac, int acPos, Trampoline.Continuation continuation) throws Exception {
     if(acPos >= ac.length) {
       if(predicate instanceof Datum) {
-        throw new Exceptionf("'key no value in %s satisfies value predicate %s", write(), ((Datum)predicate).profile());
+        throw new Exceptionf("HASHMAP [KEY]: no value in %s satisfies value predicate %s", write(), ((Datum)predicate).profile());
       }
-      throw new Exceptionf("'key no value in %s satisfies value predicate %s", write(), predicate);
+      throw new Exceptionf("HASHMAP [KEY]: no value in %s satisfies value predicate %s", write(), predicate);
     }
     ArrayList<Datum> args = new ArrayList<Datum>(1);
     args.add(ac[acPos].getValue());
@@ -488,7 +488,7 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   public AssociativeCollection delete(Datum key) throws Exception { // returns <this> if deletion fails
     Hashmap cpy = copy();
     if(cpy.del(key) == false)
-      throw new Exceptionf("'delete invalid key %s for hashmap %s deletion", key.profile(), cpy.write());
+      throw new Exceptionf("HASHMAP [DELETE]: invalid key %s for hashmap %s deletion", key.profile(), cpy.write());
     return (AssociativeCollection)cpy;
   }
 
@@ -544,7 +544,7 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
     for(ConcurrentHashMap.Entry<Datum,Datum> entry : value.entrySet()) {
       Datum key = entry.getKey();
       if(!validIndex(key,en) || contents[((Real)key).intValue()] != null)
-        throw new Exceptionf("'ac->list can't convert hashmap %s to an <ac-list>", write());
+        throw new Exceptionf("HASHMAP [AC->LIST]: can't convert hashmap %s to an <ac-list>", write());
       contents[((Real)key).intValue()] = entry.getValue();
     }
     Datum l = Nil.VALUE;
@@ -559,10 +559,10 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
     for(ConcurrentHashMap.Entry<Datum,Datum> entry : value.entrySet()) {
       Datum key = entry.getKey();
       if(!validIndex(key,en) || contents[((Real)key).intValue()] != null)
-        throw new Exceptionf("'ac->string can't convert hashmap %s to an <ac-string>", write());
+        throw new Exceptionf("HASHMAP [AC->STRING]: can't convert hashmap %s to an <ac-string>", write());
       Datum val = entry.getValue();
       if(!(val instanceof escm.type.Character))
-        throw new Exceptionf("'ac->string can't convert hashmap %s to an <ac-string>", write());
+        throw new Exceptionf("HASHMAP [AC->STRING]: can't convert hashmap %s to an <ac-string>", write());
       contents[((Real)key).intValue()] = (escm.type.Character)val;
     }
     StringBuilder sb = new StringBuilder();
@@ -577,7 +577,7 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
     for(ConcurrentHashMap.Entry<Datum,Datum> entry : value.entrySet()) {
       Datum key = entry.getKey();
       if(!validIndex(key,en) || contents[((Real)key).intValue()] != null)
-        throw new Exceptionf("'ac->vector can't convert hashmap %s to an <ac-vector>", write());
+        throw new Exceptionf("HASHMAP [AC->VECTOR]: can't convert hashmap %s to an <ac-vector>", write());
       contents[((Real)key).intValue()] = entry.getValue();
     }
     return new Vector(contents);
