@@ -16,6 +16,7 @@ import escm.util.Trampoline;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
+import escm.vm.type.AssociativeCollection;
 
 public class VectorPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -248,6 +249,52 @@ public class VectorPrimitives {
       }
       ((escm.type.Vector)appendedTo).pushAll(appends);
       return Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // vector-unfold
+  public static class VectorUnfold implements PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "vector-unfold";
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 4) 
+        throw new Exceptionf("'(vector-unfold <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(0) instanceof Callable))
+        throw new Exceptionf("'(vector-unfold <break-condition> <map-callable> <successor-callable> <seed>) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(1) instanceof Callable))
+        throw new Exceptionf("'(vector-unfold <break-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(2) instanceof Callable))
+        throw new Exceptionf("'(vector-unfold <break-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      return ListPrimitives.Unfold.logic(Nil.VALUE,(Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),parameters.get(3),(resultList) -> () -> {
+        return continuation.run(((AssociativeCollection)resultList).toACVector());
+      });
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // vector-unfold-right
+  public static class VectorUnfoldRight implements PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "vector-unfold-right";
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 4) 
+        throw new Exceptionf("'(vector-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(0) instanceof Callable))
+        throw new Exceptionf("'(vector-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(1) instanceof Callable))
+        throw new Exceptionf("'(vector-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(2) instanceof Callable))
+        throw new Exceptionf("'(vector-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      return ListPrimitives.UnfoldRight.logic(Nil.VALUE,(Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),parameters.get(3),(resultList) -> () -> {
+        return continuation.run(((AssociativeCollection)resultList).toACVector());
+      });
     }
   }
 

@@ -3,16 +3,12 @@
 ## MORE
 
 
-[ ] => WHAT ABOUT PRIMITIVES LIKE `unfold` ? LOOK INTO THIS FROM _HEIST_ !
-
-
-
-
-
-
 [ ] INVESTIGATE POTENTIAL ISSUE WITH `(stringf "%w..." '(1 2 3))`
 
+[ ] RECONSIDER DIRECTORY LAYOUT (UTIL VS. VM/UTIL ETC.)
+
 [ ] CONSIDER CHANGING '= TO OVERLOAD TO 'eq? FOR NON-NUMERICS & HAVE '>= (ETC.) OVERLOAD FOR 'char>=? AND 'string>=? AS NEEDED
+    [ ] SIMILAR FOR '+ ???
 
 [ ] ADD IN `(file-remove-extension <file-path-string> <extension-string>)` (ALSO REMOVES THE ".")
 
@@ -24,28 +20,6 @@
 
 - MAKE SURE ALL "Stream" & "File" & "Reader" & "Writer" INSTANCES ARE PROPERLY CLOSED IN JAVA
   * MAKE SURE MOVE AS MANY "CLOSE" OPERATIONS AS POSSIBLE PRIOR THROWING ERRORS FOR FILES!
-
-
-
-
-
-
-- CONSIDER HAVING `eval` & `bytecode-eval` & `load` & `load-from` & `load-serialized` & `serialize` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
-  => OPTIONAL ARG TO THE EXISTING FCNS DENOTING WHETHER TO SANDBOX THE EVALUATION (#f BY DEFAULT)
-
-
-
-
-
-- have anonymous lambdas print some unique id for slightly easier debugging
-
-
-
-
-
-
-- CHECK (& RECORD HERE) IPHONE NOTES ON ESCM !!!
-
 
 
 
@@ -141,28 +115,6 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 
 
 
-
-
-
-
-
-
-
-- CONSIDER OPTIONAL SUPPORT FOR ANSI COLORS!
-  * have a flag to disable these
-  * NOTE: ERRORS/WARNINGS MIGHT BE ABLE TO GET AWAY WITH USING EMOJIS INSTEAD
-  * `-n`, `--nansi`
-
-
-
-
-
-
-
-
-
-
-- CHECK WHETHER SHOULD ALWAYS SET LOCAL TO ENGLISH OR NOT WHEN RUNNING ESCM (DOING SO PROGRAMMATICALLY)
 
 
 
@@ -342,21 +294,49 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 
 
 
+
+
+
+
+- CHECK (& RECORD HERE) IPHONE NOTES ON ESCM !!!
+
+- CONSIDER HAVING `eval` & `bytecode-eval` & `load` & `load-from` & `load-serialized` & `serialize` (ETC. AS NEEDED) SUPPORT SANDBOXING FUNCTIONALITY TO EVAL CODE IN A SEPERATE GLOBAL ENVIRONMENT
+  => OPTIONAL ARG TO THE EXISTING FCNS DENOTING WHETHER TO SANDBOX THE EVALUATION (#f BY DEFAULT)
+
+- have anonymous lambdas print some unique id for slightly easier debugging
+
+- CONSIDER OPTIONAL SUPPORT FOR ANSI COLORS!
+  * have a flag to disable these
+  * NOTE: ERRORS/WARNINGS MIGHT BE ABLE TO GET AWAY WITH USING EMOJIS INSTEAD
+  * `-n`, `--nansi`
+
+- CHECK WHETHER SHOULD ALWAYS SET LOCAL TO ENGLISH OR NOT WHEN RUNNING ESCM (DOING SO PROGRAMMATICALLY)
+
+
+
+
+
+
+
+
+
 - ADD IN MORE DIVERSE/COMPLEX SAMPLE FILES TO THE `doc/example` DIRECTORY
 
 
 
 
 
-- LOGIC PROGRAMMING FUNCTIONS ???
+
+
 
 - NETWORKING PRIMITIVES
 
 - GUI PRIMITIVES
-  
-  * GET TO THE POINT WHERE CAN GENERATE A FRACTAL !!!
 
+  * GET TO THE POINT WHERE CAN GENERATE A FRACTAL !!!
   * CONSIDER A -i, --interactive FLAG TO LAUNCH THE REPL IN A GUI WINDOW THAT DETECTS KEYSTROKES, STORES HISTORY VIA ^v, ETC. 
+
+- LOGIC PROGRAMMING FUNCTIONS ???
 
 - LOOK BACK AT HEIST-SCHEME FOR ANY OTHER FEATURES TO IMPLEMENT
 

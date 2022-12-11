@@ -77,6 +77,18 @@
   "description": "Returns a list of strings made from splitting <str> at each <regex-str>\ninstance. Defaults to splitting into characters.",
   "example": null
 }, {
+  "name": "string-unfold",
+  "aliases": null,
+  "signatures": ["(string-unfold <break-condition> <map-callable> <successor-callable> <seed>)"],
+  "description": "Unfolds a string from left to right, starting with <seed>. <break-condition>\ndetermines when unfolding stops, <map-callable> maps the <seed> to a value\nin the unfolded string, and <successor-callable> increments <seed> for the\nnext round of unfolding.\n\nNote that the result of <map-callable> must always be a character.",
+  "example": null
+}, {
+  "name": "string-unfold-right",
+  "aliases": null,
+  "signatures": ["(string-unfold-right <break-condition> <map-callable> <successor-callable> <seed>)"],
+  "description": "Unfolds a string from right to left, starting with <seed>. <break-condition>\ndetermines when unfolding stops, <map-callable> maps the <seed> to a value\nin the unfolded string, and <successor-callable> increments <seed> for the\nnext round of unfolding.\n\nNote that the result of <map-callable> must always be a character.",
+  "example": null
+}, {
   "name": "string=?",
   "aliases": null,
   "signatures": ["(string=? <str> <str> ...)"],

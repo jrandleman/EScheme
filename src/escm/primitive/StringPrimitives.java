@@ -6,12 +6,17 @@ package escm.primitive;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import escm.type.Datum;
+import escm.type.Nil;
 import escm.type.bool.Boolean;
 import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.util.Exceptionf;
 import escm.util.StringParser;
+import escm.util.Trampoline;
 import escm.vm.type.Primitive;
+import escm.vm.type.PrimitiveCallable;
+import escm.vm.type.Callable;
+import escm.vm.type.AssociativeCollection;
 
 public class StringPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -266,6 +271,52 @@ public class StringPrimitives {
       for(int i = strArray.size()-1; i >= 0; --i)
         strList = new escm.type.Pair(new escm.type.String(strArray.get(i)),strList);
       return strList;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // string-unfold
+  public static class StringUnfold implements PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "string-unfold";
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 4) 
+        throw new Exceptionf("'(string-unfold <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(0) instanceof Callable))
+        throw new Exceptionf("'(string-unfold <break-condition> <map-callable> <successor-callable> <seed>) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(1) instanceof Callable))
+        throw new Exceptionf("'(string-unfold <break-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(2) instanceof Callable))
+        throw new Exceptionf("'(string-unfold <break-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      return ListPrimitives.Unfold.logic(Nil.VALUE,(Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),parameters.get(3),(resultList) -> () -> {
+        return continuation.run(((AssociativeCollection)resultList).toACString());
+      });
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // string-unfold-right
+  public static class StringUnfoldRight implements PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "string-unfold-right";
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 4) 
+        throw new Exceptionf("'(string-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(0) instanceof Callable))
+        throw new Exceptionf("'(string-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(1) instanceof Callable))
+        throw new Exceptionf("'(string-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(2) instanceof Callable))
+        throw new Exceptionf("'(string-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      return ListPrimitives.UnfoldRight.logic(Nil.VALUE,(Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),parameters.get(3),(resultList) -> () -> {
+        return continuation.run(((AssociativeCollection)resultList).toACString());
+      });
     }
   }
 

@@ -63,6 +63,84 @@ public class ListPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // unfold
+  public static class Unfold implements PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "unfold";
+    }
+
+    public static Trampoline.Bounce logic(Datum acc, Callable breakCond, Callable mapper, Callable successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
+      ArrayList<Datum> breakArgs = new ArrayList<Datum>(1);
+      breakArgs.add(seed);
+      return breakCond.callWith(breakArgs,(shouldBreak) -> () -> {
+        if(shouldBreak.isTruthy()) return continuation.run(acc);
+        ArrayList<Datum> mapArgs = new ArrayList<Datum>(1);
+        mapArgs.add(seed);
+        return mapper.callWith(mapArgs,(mapValue) -> () -> {
+          ArrayList<Datum> sucArgs = new ArrayList<Datum>(1);
+          sucArgs.add(seed);
+          return successor.callWith(sucArgs,(sucValue) -> () -> {
+            return logic(acc,breakCond,mapper,successor,sucValue,(unfolded) -> () -> {
+              return continuation.run(new Pair(mapValue,unfolded));
+            });
+          });
+        });
+      });
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 4) 
+        throw new Exceptionf("'(unfold <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(0) instanceof Callable))
+        throw new Exceptionf("'(unfold <break-condition> <map-callable> <successor-callable> <seed>) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(1) instanceof Callable))
+        throw new Exceptionf("'(unfold <break-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(2) instanceof Callable))
+        throw new Exceptionf("'(unfold <break-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      return logic(Nil.VALUE,(Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),parameters.get(3),continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // unfold-right
+  public static class UnfoldRight implements PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "unfold-right";
+    }
+
+    public static Trampoline.Bounce logic(Datum acc, Callable breakCond, Callable mapper, Callable successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
+      ArrayList<Datum> breakArgs = new ArrayList<Datum>(1);
+      breakArgs.add(seed);
+      return breakCond.callWith(breakArgs,(shouldBreak) -> () -> {
+        if(shouldBreak.isTruthy()) return continuation.run(acc);
+        ArrayList<Datum> mapArgs = new ArrayList<Datum>(1);
+        mapArgs.add(seed);
+        return mapper.callWith(mapArgs,(mapValue) -> () -> {
+          ArrayList<Datum> sucArgs = new ArrayList<Datum>(1);
+          sucArgs.add(seed);
+          return successor.callWith(sucArgs,(sucValue) -> () -> {
+            return logic(new Pair(mapValue,acc),breakCond,mapper,successor,sucValue,continuation);
+          });
+        });
+      });
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 4) 
+        throw new Exceptionf("'(unfold-right <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(0) instanceof Callable))
+        throw new Exceptionf("'(unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(1) instanceof Callable))
+        throw new Exceptionf("'(unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(2) instanceof Callable))
+        throw new Exceptionf("'(unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      return logic(Nil.VALUE,(Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),parameters.get(3),continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // memq
   public static class Memq implements PrimitiveCallable {
     public java.lang.String escmName() {

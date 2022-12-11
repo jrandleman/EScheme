@@ -266,6 +266,9 @@
 (list <obj> ...) (list)
 (list* <obj> <obj> ...) ; create a dotted list
 
+(unfold <break-condition> <map-callable> <successor-callable> <seed>)
+(unfold-right <break-condition> <map-callable> <successor-callable> <seed>)
+
 (memq <obj> <list>)
 (member <obj> <list>)
 
@@ -297,6 +300,9 @@
 (vector-pop-front! <vector>) ; returns the popped item
 
 (vector-append! <vector> <appended-vector> ...)
+
+(vector-unfold <break-condition> <map-callable> <successor-callable> <seed>)
+(vector-unfold-right <break-condition> <map-callable> <successor-callable> <seed>)
 
 (vector-memq <vector> <obj>)   ; returns index of position, or #f if DNE. Uses <eq?> for comparisons.
 (vector-member <vector> <obj>) ; returns index of position, or #f if DNE. Uses <equal?> for comparisons.
@@ -351,6 +357,9 @@
 
 (string-join <string-list> <optional-str>) ; str defaults to ""
 (string-split <str> <optional-regex-str>)
+
+(string-unfold <break-condition> <map-callable> <successor-callable> <seed>)
+(string-unfold-right <break-condition> <map-callable> <successor-callable> <seed>)
 
 (string=? <str> <str> ...)
 (string<? <str> <str> ...)

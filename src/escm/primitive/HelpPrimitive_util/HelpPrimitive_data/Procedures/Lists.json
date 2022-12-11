@@ -11,6 +11,18 @@
   "description": "Return a dotted.list containing \"<obj1> <obj2> ...\".",
   "example": null
 }, {
+  "name": "unfold",
+  "aliases": null,
+  "signatures": ["(unfold <break-condition> <map-callable> <successor-callable> <seed>)"],
+  "description": "Unfolds a list from left to right, starting with <seed>. <break-condition>\ndetermines when unfolding stops, <map-callable> maps the <seed> to a value\nin the unfolded list, and <successor-callable> increments <seed> for the\nnext round of unfolding.",
+  "example": null
+}, {
+  "name": "unfold-right",
+  "aliases": null,
+  "signatures": ["(unfold-right <break-condition> <map-callable> <successor-callable> <seed>)"],
+  "description": "Unfolds a list from right to left, starting with <seed>. <break-condition>\ndetermines when unfolding stops, <map-callable> maps the <seed> to a value\nin the unfolded list, and <successor-callable> increments <seed> for the\nnext round of unfolding.",
+  "example": null
+}, {
   "name": "memq",
   "aliases": null,
   "signatures": ["(memq <obj> <list>)"],
