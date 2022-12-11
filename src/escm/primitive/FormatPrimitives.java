@@ -394,7 +394,7 @@ public class FormatPrimitives {
           }
           String unpacked = fmtArg.write();
           sb.append(unpacked.substring(1,unpacked.length()-1));
-          i += 2;
+          i += 3;
           continue;
         }
         if(token.startsWith("p...")) {
@@ -403,7 +403,7 @@ public class FormatPrimitives {
           }
           String unpacked = fmtArg.pprint();
           sb.append(unpacked.substring(1,unpacked.length()-1));
-          i += 2;
+          i += 3;
           continue;
         }
         // Parse <b>
