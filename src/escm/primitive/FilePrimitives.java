@@ -589,7 +589,7 @@ public class FilePrimitives {
       if(p == null) return null;
       String pString = p.toString();
       int idx = pString.lastIndexOf('.');
-      if(idx == 0) return null;
+      if(idx == -1) return null;
       return pString.substring(idx+1);
     }
 
@@ -648,8 +648,32 @@ public class FilePrimitives {
       if(p == null) return new escm.type.String(pathStr+"."+extStr);
       String pString = p.toString();
       int idx = pString.lastIndexOf('.');
-      if(idx == 0) return new escm.type.String(pathStr+"."+extStr);
+      if(idx == -1) return new escm.type.String(pathStr+"."+extStr);
       return new escm.type.String(pString.substring(0,idx)+"."+extStr);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // remove-file-extension
+  public static class RemoveFileExtension implements Primitive {
+    public java.lang.String escmName() {
+      return "remove-file-extension";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1) 
+        throw new Exceptionf("'(remove-file-extension <path-string>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      Datum pathStrDatum = parameters.get(0);
+      if(!(pathStrDatum instanceof escm.type.String))
+        throw new Exceptionf("'(remove-file-extension <path-string>) path isn't a string: %s", Exceptionf.profileArgs(parameters));
+      String pathStr = ((escm.type.String)pathStrDatum).value();
+      Path p = Path.of(pathStr).getFileName();
+      if(p == null) return pathStrDatum;
+      String pString = p.toString();
+      int idx = pString.lastIndexOf('.');
+      if(idx == -1) return pathStrDatum;
+      return new escm.type.String(pString.substring(0,idx));
     }
   }
 

@@ -202,6 +202,7 @@
 (file-extension <path-str>)
 (file-has-extension? <path-str> <extension-str>)
 (swap-file-extension <path-str> <new-extension-str>)
+(remove-file-extension <path-str>)
 
 (file-size <file-path-str>)
 

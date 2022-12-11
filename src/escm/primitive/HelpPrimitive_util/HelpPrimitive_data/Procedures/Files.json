@@ -167,6 +167,12 @@
   "description": "Returns <path-str> with <new-extension-str> as its file extension.",
   "example": null
 }, {
+  "name": "remove-file-extension",
+  "aliases": null,
+  "signatures": ["(remove-file-extension <path-str>)"],
+  "description": "Returns <path-str> without its extension, including the \".\".\nReturns <path-str> if it doesn't have an extension or is an invalid path.",
+  "example": null
+}, {
   "name": "file-size",
   "aliases": null,
   "signatures": ["(file-size <file-path-str>)"],
