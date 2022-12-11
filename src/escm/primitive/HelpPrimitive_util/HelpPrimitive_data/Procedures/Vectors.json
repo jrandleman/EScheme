@@ -11,18 +11,6 @@
   "description": "Construct a vector of <length> instances of <fill-value>.",
   "example": null
 }, {
-  "name": "vector-length",
-  "aliases": null,
-  "signatures": ["(vector-length <vector>)"],
-  "description": "Returns the length of <vector>. Quite thrilling.",
-  "example": null
-}, {
-  "name": "vector-ref",
-  "aliases": null,
-  "signatures": ["(vector-ref <vector> <index>)"],
-  "description": "Returns the item in <vector> at <index>.\nCan also be achieved by applying <vector> to the <index>: (<vector> <index>)",
-  "example": null
-}, {
   "name": "vector-set!",
   "aliases": null,
   "signatures": ["(vector-set! <vector> <index> <obj>)"],
@@ -77,28 +65,10 @@
   "description": "Pops <obj> from the front of <vector>. Returns the popped item.",
   "example": null
 }, {
-  "name": "vector-append",
-  "aliases": null,
-  "signatures": ["(vector-append <vector> ...)"],
-  "description": "Create a new vector by appending \"<vector> ...\" to one another.",
-  "example": null
-}, {
   "name": "vector-append!",
   "aliases": null,
   "signatures": ["(vector-append! <vector> <appended-vector> ...)"],
   "description": "Append \"<appended-vector> ...\" to <vector> (thereby mutating it).",
-  "example": null
-}, {
-  "name": "vector-reverse",
-  "aliases": null,
-  "signatures": ["(vector-reverse <vector>)"],
-  "description": "Get a reversed version of <vector>.",
-  "example": null
-}, {
-  "name": "subvector",
-  "aliases": null,
-  "signatures": ["(subvector <vector> <index>)", "(subvector <vector> <index> <length>)"],
-  "description": "Returns a vector of the items in <vector> starting at <index> spanning <length>\nitems. Note that <length> will default to the end of <vector>.",
   "example": null
 }, {
   "name": "vector-memq",
@@ -113,27 +83,9 @@
   "description": "Returns the index of <obj> in <vector>, or #f if its missing.\nUses <equal?> for comparisons.",
   "example": null
 }, {
-  "name": "vector-sort",
-  "aliases": null,
-  "signatures": ["(vector-sort <binary-predicate?> <vector>)"],
-  "description": "Create a vector by sorting <vector> according to <predicate?>.",
-  "example": null
-}, {
-  "name": "vector-sorted?",
-  "aliases": null,
-  "signatures": ["(vector-sorted? <binary-predicate?> <vector>)"],
-  "description": "Verify <vector> is sorted according to <predicate?>.",
-  "example": null
-}, {
   "name": "vector?",
   "aliases": null,
   "signatures": ["(vector? <obj>)"],
   "description": "Returns whether <obj> is a vector.",
-  "example": null
-}, {
-  "name": "vector-empty?",
-  "aliases": null,
-  "signatures": ["(vector-empty? <vector>)"],
-  "description": "Returns whether <vector> is empty.",
   "example": null
 }]

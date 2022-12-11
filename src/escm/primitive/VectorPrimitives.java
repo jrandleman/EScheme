@@ -51,42 +51,6 @@ public class VectorPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // vector-length
-  public static class VectorLength implements Primitive {
-    public java.lang.String escmName() {
-      return "vector-length";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector))
-        throw new Exceptionf("'(vector-length <vector>) expects exactly 1 vector: %s", Exceptionf.profileArgs(parameters));
-      return new Exact(((escm.type.Vector)parameters.get(0)).size());
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // vector-ref
-  public static class VectorRef implements Primitive {
-    public java.lang.String escmName() {
-      return "vector-ref";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 2)
-        throw new Exceptionf("'(vector-ref <vector> <index>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum v = parameters.get(0);
-      Datum i = parameters.get(1);
-      if(!(v instanceof escm.type.Vector))
-        throw new Exceptionf("'(vector-ref <vector> <index>) 1st arg isn't a vector: %s", Exceptionf.profileArgs(parameters));
-      if(!ListPrimitives.isValidSize(i))
-        throw new Exceptionf("'(vector-ref <vector> <index>) 2nd arg is an invalid index: %s", Exceptionf.profileArgs(parameters));
-      return ((escm.type.Vector)v).get(((Real)i).intValue());
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // vector-set!
   public static class VectorSetBang implements Primitive {
     public java.lang.String escmName() {
@@ -263,27 +227,6 @@ public class VectorPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // vector-append
-  public static class VectorAppend implements Primitive {
-    public java.lang.String escmName() {
-      return "vector-append";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1)
-        throw new Exceptionf("'(vector-append <vector> ...) expects at least 1 vector: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<escm.type.Vector> appends = new ArrayList<escm.type.Vector>();
-      for(Datum d : parameters) {
-        if(!(d instanceof escm.type.Vector))
-          throw new Exceptionf("'(vector-append <vector> ...) invalid non-vector %s given: %s", d.profile(), Exceptionf.profileArgs(parameters));
-        appends.add((escm.type.Vector)d);
-      }
-      return escm.type.Vector.append(appends);
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // vector-append!
   public static class VectorAppendBang implements Primitive {
     public java.lang.String escmName() {
@@ -305,51 +248,6 @@ public class VectorPrimitives {
       }
       ((escm.type.Vector)appendedTo).pushAll(appends);
       return Void.VALUE;
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // vector-reverse
-  public static class VectorReverse implements Primitive {
-    public java.lang.String escmName() {
-      return "vector-reverse";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector))
-        throw new Exceptionf("'(vector-reverse <vector>) expects exactly 1 vector: %s", Exceptionf.profileArgs(parameters));
-      return ((escm.type.Vector)parameters.get(0)).reversed();
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // subvector
-  public static class Subvector implements Primitive {
-    public java.lang.String escmName() {
-      return "subvector";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2 || parameters.size() > 3)
-        throw new Exceptionf("'(subvector <vector> <index> <optional-length>) invalid number of args: %s", Exceptionf.profileArgs(parameters));
-      Datum v = parameters.get(0);
-      Datum i = parameters.get(1);
-      if(!(v instanceof escm.type.Vector))
-        throw new Exceptionf("'(subvector <vector> <index> <optional-length>) 1st arg isn't a vector: %s", Exceptionf.profileArgs(parameters));
-      if(!ListPrimitives.isValidSize(i))
-        throw new Exceptionf("'(subvector <vector> <index> <optional-length>) 2nd arg is an invalid index: %s", Exceptionf.profileArgs(parameters));
-      escm.type.Vector vect = (escm.type.Vector)v;
-      int idx = ((Real)i).intValue();
-      int length = vect.size();
-      if(parameters.size() == 3) {
-        Datum l = parameters.get(2);
-        if(!ListPrimitives.isValidSize(l))
-          throw new Exceptionf("'(subvector <vector> <index> <optional-length>) 3rd arg is an invalid length: %s", Exceptionf.profileArgs(parameters));
-        length = ((Real)l).intValue();
-      }
-      return vect.subvector(idx,length);
     }
   }
 
@@ -393,50 +291,6 @@ public class VectorPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // vector-sort
-  public static class VectorSort implements PrimitiveCallable {
-    public java.lang.String escmName() {
-      return "vector-sort";
-    }
-
-    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() != 2)
-        throw new Exceptionf("'(vector-sort <predicate?> <vector>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum procedure = parameters.get(0);
-      if(!(procedure instanceof Callable))
-        throw new Exceptionf("'(vector-sort <predicate?> <vector>) 1st arg %s isn't a callable: %s", procedure.profile(), Exceptionf.profileArgs(parameters));
-      Datum target = parameters.get(1);
-      if(!(target instanceof escm.type.Vector))
-        throw new Exceptionf("'(vector-sort <predicate?> <vector>) 2nd arg %s isn't a vector: %s", target.profile(), Exceptionf.profileArgs(parameters));
-      return ListPrimitives.Sort.logic((Callable)procedure,((escm.type.Vector)target).toList(),(sorted) -> () -> {
-        return continuation.run(TypeCoercionPrimitives.ListToVector.logic(sorted));
-      });
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // vector-sorted?
-  public static class IsVectorSorted implements PrimitiveCallable {
-    public java.lang.String escmName() {
-      return "vector-sorted?";
-    }
-
-    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() != 2)
-        throw new Exceptionf("'(vector-sorted? <predicate?> <vector>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum procedure = parameters.get(0);
-      if(!(procedure instanceof Callable))
-        throw new Exceptionf("'(vector-sorted? <predicate?> <vector>) 1st arg %s isn't a callable: %s", procedure.profile(), Exceptionf.profileArgs(parameters));
-      Datum target = parameters.get(1);
-      if(!(target instanceof escm.type.Vector))
-        throw new Exceptionf("'(vector-sorted? <predicate?> <vector>) 2nd arg %s isn't a vector: %s", target.profile(), Exceptionf.profileArgs(parameters));
-      return ListPrimitives.IsSorted.logic((Callable)procedure,((escm.type.Vector)target).toList(),continuation);
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // vector?
   public static class IsVector implements Primitive {
     public java.lang.String escmName() {
@@ -447,21 +301,6 @@ public class VectorPrimitives {
       if(parameters.size() != 1)
         throw new Exceptionf("'(vector? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
       return Boolean.valueOf(parameters.get(0) instanceof escm.type.Vector);
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // vector-empty?
-  public static class IsVectorEmpty implements Primitive {
-    public java.lang.String escmName() {
-      return "vector-empty?";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector))
-        throw new Exceptionf("'(vector-empty? <vector>) expects exactly 1 vector: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(((escm.type.Vector)parameters.get(0)).size() == 0);
     }
   }
 }

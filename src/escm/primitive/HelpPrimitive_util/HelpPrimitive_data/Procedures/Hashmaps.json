@@ -23,12 +23,6 @@
   "description": "Returns whether <obj> is a key in <hashmap>.",
   "example": null
 }, {
-  "name": "hashmap-ref",
-  "aliases": null,
-  "signatures": ["(hashmap-ref <hashmap> <key>)"],
-  "description": "Get the value associated with <key> in <hashmap>.\nTriggers an error if <key> isn't in <hashmap>.\nEquivalent to: (<hashmap> <key>)",
-  "example": null
-}, {
   "name": "hashmap-set!",
   "aliases": null,
   "signatures": ["(hashmap-set! <hashmap> <key> <value>)"],
@@ -39,18 +33,6 @@
   "aliases": null,
   "signatures": ["(hashmap-delete! <hashmap> <key>)"],
   "description": "Delete <key>'s association in <hashmap>. Returns whether succeeded.",
-  "example": null
-}, {
-  "name": "hashmap-length",
-  "aliases": null,
-  "signatures": ["(hashmap-length <hashmap>)"],
-  "description": "Returns the number of key-value associations in <hashmap>.",
-  "example": null
-}, {
-  "name": "hashmap-empty?",
-  "aliases": null,
-  "signatures": ["(hashmap-empty? <hashmap>)"],
-  "description": "Take a wild guess. No really, this one's pretty tricky. Alright, placed\nyour bets? Well, here's the shocking truth ladies and gentlemen, this\nprocedure (strangely enough) returns whether <hashmap> is as empty as I\nfeel when writing this documentation instead of programming.",
   "example": null
 }, {
   "name": "hashmap-merge",

@@ -16,9 +16,9 @@ import escm.type.Nil;
 import escm.type.procedure.Procedure;
 import escm.type.number.Exact;
 import escm.util.Trampoline;
-import escm.primitive.ListPrimitives;
 import escm.primitive.MetaPrimitives;
 import escm.vm.type.Callable;
+import escm.vm.type.OrderedCollection;
 
 public class Compiler {
   ////////////////////////////////////////////////////////////////////////////
@@ -69,9 +69,9 @@ public class Compiler {
       });
     } else {
       return () -> run(hd,(valueInstructions) -> () -> {
-        Datum instructions = ListPrimitives.Append.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
+        Datum instructions = Pair.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
         return generateVectorCallInstructions(vPair.cdr(),count+1,(applicationInstructions) -> {
-          return continuation.run(ListPrimitives.Append.binaryAppend(instructions,applicationInstructions));
+          return continuation.run(Pair.binaryAppend(instructions,applicationInstructions));
         });
       });
     }
@@ -79,7 +79,7 @@ public class Compiler {
 
 
   private static Trampoline.Bounce compileVectorLiteral(Vector v, Trampoline.Continuation continuation) throws Exception {
-    return generateVectorCallInstructions(ListPrimitives.Reverse.logic(v.toList()),1,continuation);
+    return generateVectorCallInstructions((Datum)((OrderedCollection)v.toList()).reverse(),1,continuation);
   }
 
 
@@ -95,9 +95,9 @@ public class Compiler {
       });
     } else {
       return () -> run(hd,(valueInstructions) -> () -> {
-        Datum instructions = ListPrimitives.Append.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
+        Datum instructions = Pair.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
         return generateHashmapCallInstructions(vPair.cdr(),count+1,(applicationInstructions) -> {
-          return continuation.run(ListPrimitives.Append.binaryAppend(instructions,applicationInstructions));
+          return continuation.run(Pair.binaryAppend(instructions,applicationInstructions));
         });
       });
     }
@@ -105,7 +105,7 @@ public class Compiler {
 
 
   private static Trampoline.Bounce compileHashmapLiteral(Hashmap h, Trampoline.Continuation continuation) throws Exception {
-    return generateHashmapCallInstructions(ListPrimitives.Reverse.logic(h.toList()),1,continuation);
+    return generateHashmapCallInstructions((Datum)((OrderedCollection)h.toList()).reverse(),1,continuation);
   }
 
 
@@ -121,9 +121,9 @@ public class Compiler {
       });
     } else {
       return () -> run(hd,(valueInstructions) -> () -> {
-        Datum instructions = ListPrimitives.Append.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
+        Datum instructions = Pair.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
         return compileProcedureApplication(appPair.cdr(),count+1,(applicationInstructions) -> {
-          return continuation.run(ListPrimitives.Append.binaryAppend(instructions,applicationInstructions));
+          return continuation.run(Pair.binaryAppend(instructions,applicationInstructions));
         });
       });
     }
@@ -144,7 +144,7 @@ public class Compiler {
     // Compile procedure application
     } else {
       // Reverse the application expression to use the faster negative <call> argument @ runtime
-      return compileProcedureApplication(ListPrimitives.Reverse.logic(d),0,continuation);
+      return compileProcedureApplication((Datum)d.reverse(),0,continuation);
     }
   }
 

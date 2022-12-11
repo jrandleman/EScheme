@@ -1,0 +1,139 @@
+[{
+  "name": "ordered-collection?",
+  "aliases": null,
+  "signatures": ["(ordered-collection? <obj>)"],
+  "description": "Returns whether <obj> is an ordered collection: String | List | Vector",
+  "example": null
+}, {
+  "name": "oc?",
+  "aliases": null,
+  "signatures": ["(oc? <obj>)"],
+  "description": "Returns whether <obj> is an ordered collection: String | List | Vector",
+  "example": null
+}, {
+  "name": "conj",
+  "aliases": null,
+  "signatures": ["(conj <key> <val> <ac>)", "(conj <val> <oc>)"],
+  "description": "Given 3 args:\n  Returns a copy of <ac> with <val> associated to <key>.\nGiven 2 args:\n  Returns a copy of <oc> with <val> added as efficiently as possible.\n  <val>'s position will depend on <ac>'s specific collection type.\nNote:\n  <ac> denotes an associative-collection\n  <oc> denotes an ordered-collection",
+  "example": null
+}, {
+  "name": "init",
+  "aliases": null,
+  "signatures": ["(init <oc>)"],
+  "description": "Returns everything except the last item in <oc>.",
+  "example": null
+}, {
+  "name": "last",
+  "aliases": null,
+  "signatures": ["(last <oc>)"],
+  "description": "Returns the last item in <oc>.",
+  "example": null
+}, {
+  "name": "slice",
+  "aliases": null,
+  "signatures": ["(slice <oc> <start-index>)", "(slice <oc> <start-index> <length>)", "(slice <oc> <start-index> <end-predicate?>)"],
+  "description": "Slices a subset of the items in <oc> starting from <start-index>.\nIf no other args are given, returns the rest of the items from <start-index>.\nIf <length> is given, returns at most <length> items.\nGiven <end-predicate?>, slices until a value satisfies <end-predicate?>.",
+  "example": null
+}, {
+  "name": "reverse",
+  "aliases": null,
+  "signatures": ["(reverse <oc>)"],
+  "description": "Returns <oc> in reverse.",
+  "example": null
+}, {
+  "name": "remove-first",
+  "aliases": null,
+  "signatures": ["(remove-first <predicate?> <oc>)"],
+  "description": "Returns <oc> without the first value satisfying <predicate?>.",
+  "example": null
+}, {
+  "name": "remove-last",
+  "aliases": null,
+  "signatures": ["(remove-last <predicate?> <oc>)"],
+  "description": "Returns <oc> without the last value satisfying <predicate?>.",
+  "example": null
+}, {
+  "name": "skip",
+  "aliases": null,
+  "signatures": ["(skip <predicate?> <oc>)"],
+  "description": "Returns the first item that doesn't satisfy <predicate?>.",
+  "example": null
+}, {
+  "name": "skip-right",
+  "aliases": null,
+  "signatures": ["(skip-right <predicate?> <oc>)"],
+  "description": "Returns the last item that doesn't satisfy <predicate?>.",
+  "example": null
+}, {
+  "name": "fold-right",
+  "aliases": null,
+  "signatures": ["(fold-right <callable> <seed> <oc> ...)"],
+  "description": "Accumulate the values in \"<oc> ...\" from right to left by applying\n<callable> to \"<previous-result>\" and <item> with <seed-obj> acting\nas the initial \"<previous-result>\".\n\n  => Note that the \"<oc> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector",
+  "example": null
+}, {
+  "name": "key-right",
+  "aliases": null,
+  "signatures": ["(key-right <predicate?> <oc>)"],
+  "description": "Get the last index in <ac> who's associated value satisfies <predicate?>.",
+  "example": null
+}, {
+  "name": "drop-right",
+  "aliases": null,
+  "signatures": ["(drop-right <oc> <length>)"],
+  "description": "Returns <oc> without <length> items from its right side.",
+  "example": null
+}, {
+  "name": "drop-while",
+  "aliases": null,
+  "signatures": ["(drop-while <predicate?> <oc>)"],
+  "description": "Returns <oc> with items dropped from its left side while <predicate?> was\nsatisfied.",
+  "example": null
+}, {
+  "name": "drop-right-while",
+  "aliases": null,
+  "signatures": ["(drop-right-while <predicate?> <oc>)"],
+  "description": "Returns <oc> with items dropped from its right side while <predicate?> was\nsatisfied.",
+  "example": null
+}, {
+  "name": "take-right",
+  "aliases": null,
+  "signatures": ["(take-right <oc> <length>)"],
+  "description": "Returns <oc> with <length> items from its right side.",
+  "example": null
+}, {
+  "name": "take-while",
+  "aliases": null,
+  "signatures": ["(take-while <predicate?> <oc>)"],
+  "description": "Returns items taken from <oc>'s left side while <predicate?> was\nsatisfied.",
+  "example": null
+}, {
+  "name": "take-right-while",
+  "aliases": null,
+  "signatures": ["(take-right-while <predicate?> <oc>)"],
+  "description": "Returns items taken from <oc>'s right side while <predicate?> was\nsatisfied.",
+  "example": null
+}, {
+  "name": "sort",
+  "aliases": null,
+  "signatures": ["(sort <binary-predicate?> <oc>)"],
+  "description": "Returns <oc> sorted according to <binary-predicate?>'s comparison.",
+  "example": null
+}, {
+  "name": "sorted?",
+  "aliases": null,
+  "signatures": ["(sorted? <binary-predicate?> <oc>)"],
+  "description": "Returns whether <oc> was sorted according to <binary-predicate?>'s comparison.",
+  "example": null
+}, {
+  "name": "merge",
+  "aliases": null,
+  "signatures": ["(merge <predicate?> <oc> <oc>)"],
+  "description": "Returns the <oc>'s merged with one another according to <predicate?>'s\ncomparison.",
+  "example": null
+}, {
+  "name": "delete-neighbor-duplicates",
+  "aliases": null,
+  "signatures": ["(delete-neighbor-duplicates <elt=?> <oc>)"],
+  "description": "Returns <oc> with any adjacent items matching with <elt=?> reduced to a single\nitem.",
+  "example": null
+}]

@@ -81,24 +81,6 @@ public class HashmapPrimitives {
 
   
   ////////////////////////////////////////////////////////////////////////////
-  // hashmap-ref
-  public static class HashmapRef implements Primitive {
-    public java.lang.String escmName() {
-      return "hashmap-ref";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 2)
-        throw new Exceptionf("'(hashmap-ref <hashmap> <key>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum h = parameters.get(0);
-      if(!(h instanceof escm.type.Hashmap))
-        throw new Exceptionf("'(hashmap-ref <hashmap> <key>) 1st arg %s isn't a hashmap: %s", h.profile(), Exceptionf.profileArgs(parameters));
-      return ((escm.type.Hashmap)h).get(parameters.get(1));
-    }
-  }
-
-  
-  ////////////////////////////////////////////////////////////////////////////
   // hashmap-set!
   public static class HashmapSetBang implements Primitive {
     public java.lang.String escmName() {
@@ -130,36 +112,6 @@ public class HashmapPrimitives {
       if(!(h instanceof escm.type.Hashmap))
         throw new Exceptionf("'(hashmap-delete! <hashmap> <key>) 1st arg %s isn't a hashmap: %s", h.profile(), Exceptionf.profileArgs(parameters));
       return Boolean.valueOf(((escm.type.Hashmap)h).del(parameters.get(1)));
-    }
-  }
-
-  
-  ////////////////////////////////////////////////////////////////////////////
-  // hashmap-length
-  public static class HashmapLength implements Primitive {
-    public java.lang.String escmName() {
-      return "hashmap-length";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Hashmap))
-        throw new Exceptionf("'(hashmap-length <hashmap>) didn't receive exactly 1 hashmap: %s", Exceptionf.profileArgs(parameters));
-      return new Exact(((escm.type.Hashmap)parameters.get(0)).size());
-    }
-  }
-
-  
-  ////////////////////////////////////////////////////////////////////////////
-  // hashmap-empty?
-  public static class HashmapIsEmpty implements Primitive {
-    public java.lang.String escmName() {
-      return "hashmap-empty?";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Hashmap))
-        throw new Exceptionf("'(hashmap-empty? <hashmap>) didn't receive exactly 1 hashmap: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(((escm.type.Hashmap)parameters.get(0)).size() == 0);
     }
   }
 

@@ -11,78 +11,6 @@
   "description": "Return a dotted.list containing \"<obj1> <obj2> ...\".",
   "example": null
 }, {
-  "name": "append",
-  "aliases": null,
-  "signatures": ["(append <list> ...)", "(append <list> ... <obj>)"],
-  "description": "Create a new list by appending \"<list> ...\" together.\nIf given <obj>, tacks it on to create a dotted-list.",
-  "example": null
-}, {
-  "name": "length",
-  "aliases": null,
-  "signatures": ["(length <list>)"],
-  "description": "Returns the length of <list>.",
-  "example": null
-}, {
-  "name": "reverse",
-  "aliases": null,
-  "signatures": ["(reverse <list>)"],
-  "description": "Returns a reversed version of <list>.",
-  "example": null
-}, {
-  "name": "map",
-  "aliases": null,
-  "signatures": ["(map <callable> <list> ...)"],
-  "description": "Creates a new list by applying <callable> to each item in \"<list> ...\".",
-  "example": null
-}, {
-  "name": "filter",
-  "aliases": null,
-  "signatures": ["(filter <predicate?> <list>)"],
-  "description": "Creates a new list by filtering items in <list> that don't satisfy\nthe <predicate?> callable.",
-  "example": null
-}, {
-  "name": "for-each",
-  "aliases": null,
-  "signatures": ["(for-each <callable> <list> ...)"],
-  "description": "Applies <callable> to each item in \"<list> ...\".",
-  "example": null
-}, {
-  "name": "fold",
-  "aliases": ["fold-left"],
-  "signatures": ["(fold <callable> <seed-obj> <list> ...)"],
-  "description": "Accumulate the values in \"<list> ...\" from left to right by applying\n<callable> to \"<previous-result>\" and <item> with <seed-obj> acting\nas the initial \"<previous-result>\".",
-  "example": null
-}, {
-  "name": "fold-right",
-  "aliases": null,
-  "signatures": ["(fold-right <callable> <seed-obj> <list> ...)"],
-  "description": "Accumulate the values in \"<list> ...\" from right to left by applying\n<callable> to <item> and \"<previous-result>\" with <seed-obj> acting\nas the initial \"<previous-result>\".",
-  "example": null
-}, {
-  "name": "last",
-  "aliases": null,
-  "signatures": ["(last <list>)"],
-  "description": "Returns the last item in <list>. An error is triggered if (null? <list>).",
-  "example": null
-}, {
-  "name": "init",
-  "aliases": null,
-  "signatures": ["(init <list>)"],
-  "description": "Returns everything except the last item in <list>. An error is triggered if (null? <list>).",
-  "example": null
-}, {
-  "name": "ref",
-  "aliases": null,
-  "signatures": ["(ref <list> <index-num>)"],
-  "description": "Get the <index-num>th item in <list>.",
-  "example": null
-}, {
-  "name": "sublist",
-  "aliases": null,
-  "signatures": ["(sublist <list> <index-num>)", "(sublist <list> <index-num> <length-num>)"],
-  "description": "Returns a sublist from <list> starting at <index-num> and spanning\n<length-num> items (defaults to end of <list>).",
-  "example": null
-}, {
   "name": "memq",
   "aliases": null,
   "signatures": ["(memq <obj> <list>)"],
@@ -105,18 +33,6 @@
   "aliases": null,
   "signatures": ["(assoc <key-obj> <alist>)"],
   "description": "Returns the pair in associative-lsit <alist> starting with <key-obj> based\non <equal?> item equality. Returns #f if <obj> isn't a key in in <alist>.",
-  "example": null
-}, {
-  "name": "sort",
-  "aliases": null,
-  "signatures": ["(sort <binary-predicate?> <list>)"],
-  "description": "Returns a sorted version of <list> using the <binary-predicate?> callable\nas a comparator.",
-  "example": null
-}, {
-  "name": "sorted?",
-  "aliases": null,
-  "signatures": ["(sorted? <binary-predicate?> <list>)"],
-  "description": "Returns whether <list> is sorted using the <binary-predicate?> callable\nas a comparator.",
   "example": null
 }, {
   "name": "list?",

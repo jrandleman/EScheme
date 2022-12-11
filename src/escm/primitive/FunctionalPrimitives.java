@@ -16,6 +16,7 @@ import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
+import escm.vm.type.AssociativeCollection;
 
 public class FunctionalPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -72,7 +73,6 @@ public class FunctionalPrimitives {
       return "compose";
     }
 
-
     public static Datum convertArrayListToList(ArrayList<Datum> vals) {
       Datum lis = Nil.VALUE;
       for(int i = vals.size()-1; i >= 0; --i) 
@@ -97,10 +97,9 @@ public class FunctionalPrimitives {
           return p.callWith(foldLambdaParams,foldLambdaCont);
         };
         PrimitiveProcedure foldProcedure = new PrimitiveProcedure(Procedure.DEFAULT_NAME,foldPrimitive);
+        AssociativeCollection[] lis = new AssociativeCollection[]{(AssociativeCollection)convertArrayListToList(parametersCopy)};
         return fstFcn.callWith(params,(seed) -> () -> {
-          ArrayList<Datum> ls = new ArrayList<Datum>(1);
-          ls.add(convertArrayListToList(parametersCopy));
-          return ListPrimitives.Fold.logic(foldProcedure,seed,ls,cont);
+          return AssociativeCollectionPrimitives.Fold.logic(foldProcedure,seed,lis,cont);
         });
       };
       return new PrimitiveProcedure(Procedure.DEFAULT_NAME,composedProcedures);

@@ -1,0 +1,181 @@
+[{
+  "name": "associative-collection?",
+  "aliases": null,
+  "signatures": ["(associative-collection? <obj>)"],
+  "description": "Returns whether <obj> is an associative collection:\n    String | List | Vector | Hashmap",
+  "example": null
+}, {
+  "name": "ac?",
+  "aliases": null,
+  "signatures": ["(ac? <obj>)"],
+  "description": "Returns whether <obj> is an associative collection:\n    String | List | Vector | Hashmap",
+  "example": null
+}, {
+  "name": "head",
+  "aliases": null,
+  "signatures": ["(head <ac>)"],
+  "description": "Get the first item in <ac>.",
+  "example": null
+}, {
+  "name": "tail",
+  "aliases": null,
+  "signatures": ["(tail <ac>)"],
+  "description": "Get everything after the first item in <ac>.",
+  "example": null
+}, {
+  "name": "empty?",
+  "aliases": null,
+  "signatures": ["(empty? <ac>)"],
+  "description": "Returns whether <ac> is empty.",
+  "example": null
+}, {
+  "name": "length",
+  "aliases": null,
+  "signatures": ["(length <ac>)"],
+  "description": "Returns <ac>'s length.",
+  "example": null
+}, {
+  "name": "length+",
+  "aliases": null,
+  "signatures": ["(length+ <ac>)"],
+  "description": "Returns <ac>'s length. If <ac> is a dotted-list, returns #f.\nThis is instead of triggering an error, as <length> would.",
+  "example": null
+}, {
+  "name": "fold",
+  "aliases": null,
+  "signatures": ["(fold <callable> <seed> <ac> ...)"],
+  "description": "Accumulate the values in \"<ac> ...\" from left to right by applying\n<callable> to \"<previous-result>\" and <item> with <seed-obj> acting\nas the initial \"<previous-result>\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap",
+  "example": null
+}, {
+  "name": "map",
+  "aliases": null,
+  "signatures": ["(map <callable> <ac> ...)"],
+  "description": "Creates a new associative collection by applying <callable> to each item in\n\"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap",
+  "example": null
+}, {
+  "name": "for-each",
+  "aliases": null,
+  "signatures": ["(for-each <callable> <ac> ...)"],
+  "description": "Applies <callable> to each item in \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap",
+  "example": null
+}, {
+  "name": "filter",
+  "aliases": null,
+  "signatures": ["(filter <predicate?> <ac>)"],
+  "description": "Creates a new associative collection by filtering items in <ac> that don't\nsatisfy the <predicate?> callable.",
+  "example": null
+}, {
+  "name": "count",
+  "aliases": null,
+  "signatures": ["(count <predicate?> <ac>)"],
+  "description": "Count the number of times <predicate?> is satisfied in <ac>.",
+  "example": null
+}, {
+  "name": "remove",
+  "aliases": null,
+  "signatures": ["(remove <predicate?> <ac>)"],
+  "description": "Creates a new associative collection by removing items in <ac> that\nsatisfy the <predicate?> callable.",
+  "example": null
+}, {
+  "name": "val",
+  "aliases": null,
+  "signatures": ["(val <ac> <key>)"],
+  "description": "Get the value in <ac> associated to <key>.",
+  "example": null
+}, {
+  "name": "key",
+  "aliases": null,
+  "signatures": ["(key <predicate?> <ac>)"],
+  "description": "Get the first key in <ac> who's associated value satisfies <predicate?>.",
+  "example": null
+}, {
+  "name": "append",
+  "aliases": null,
+  "signatures": ["(append <ac> ...)"],
+  "description": "Creates a new associative collection by appending \"<ac> ...\" together.\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap",
+  "example": null
+}, {
+  "name": "delete",
+  "aliases": null,
+  "signatures": ["(delete <ac> <key>)"],
+  "description": "Return a copy of <ac> without <key>'s association.",
+  "example": null
+}, {
+  "name": "conj",
+  "aliases": null,
+  "signatures": ["(conj <key> <val> <ac>)", "(conj <val> <oc>)"],
+  "description": "Given 3 args:\n  Returns a copy of <ac> with <val> associated to <key>.\nGiven 2 args:\n  Returns a copy of <oc> with <val> added as efficiently as possible.\n  <val>'s position will depend on <ac>'s specific collection type.\nNote:\n  <ac> denotes an associative-collection\n  <oc> denotes an ordered-collection",
+  "example": null
+}, {
+  "name": "any?",
+  "aliases": null,
+  "signatures": ["(any? <predicate?> <ac> ...)"],
+  "description": "Returns whether any of the <ac>s satisfy <predicate?>.",
+  "example": null
+}, {
+  "name": "every?",
+  "aliases": null,
+  "signatures": ["(every? <predicate?> <ac> ...)"],
+  "description": "Returns whether every one of the <ac>s satisfy <predicate?>.",
+  "example": null
+}, {
+  "name": "take",
+  "aliases": null,
+  "signatures": ["(take <ac> <length>)"],
+  "description": "Returns <length> items taken from the left of <ac>.",
+  "example": null
+}, {
+  "name": "drop",
+  "aliases": null,
+  "signatures": ["(drop <ac> <length>)"],
+  "description": "Returns <ac> with <length> items dropped from its left side.",
+  "example": null
+}, {
+  "name": "ac->list",
+  "aliases": null,
+  "signatures": ["(ac->list <ac>)"],
+  "description": "Convert <ac> to a list (note that its keys must be increasing integers starting\nfrom 0).",
+  "example": null
+}, {
+  "name": "ac->string",
+  "aliases": null,
+  "signatures": ["(ac->string <ac>)"],
+  "description": "Convert <ac> to a string (note that its keys must be increasing integers\nstarting from 0, and its values must be characters).",
+  "example": null
+}, {
+  "name": "ac->vector",
+  "aliases": null,
+  "signatures": ["(ac->vector <ac>)"],
+  "description": "Convert <ac> to a vector (note that its keys must be increasing integers\nstarting from 0).",
+  "example": null
+}, {
+  "name": "ac->hashmap",
+  "aliases": null,
+  "signatures": ["(ac->hashmap <ac>)"],
+  "description": "Convert <ac> to a hashmap.",
+  "example": null
+}, {
+  "name": "union",
+  "aliases": null,
+  "signatures": ["(union <elt=?> <ac> ...)"],
+  "description": "Returns the set union of values (compared by <elt=?>) in \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap",
+  "example": null
+}, {
+  "name": "intersection",
+  "aliases": null,
+  "signatures": ["(intersection <elt=?> <ac> ...)"],
+  "description": "Returns the intersection of values (compared by <elt=?>) between \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap",
+  "example": null
+}, {
+  "name": "difference",
+  "aliases": null,
+  "signatures": ["(difference <elt=?> <ac> ...)"],
+  "description": "Returns the set difference of values (compared by <elt=?>) in \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap",
+  "example": null
+}, {
+  "name": "symmetric-difference",
+  "aliases": null,
+  "signatures": ["(symmetric-difference <elt=?> <ac> ...)"],
+  "description": "Returns the set symmetric-difference of values (compared by <elt=?>) in\n\"<ac> ...\". SymDiff(a,b) = Union(Diff(a,b),Diff(b,a))\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap",
+  "example": null
+}]

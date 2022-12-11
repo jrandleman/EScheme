@@ -3,29 +3,7 @@
 ## MORE
 
 
-[ ] at some point generic algorithms for primitive data structures?
-    [X] => TEST ___ALL AC PRIMITIVES___ USING LISTS, THEN DO WITH VECTOR, ETC.
-           [X] => LISTS
-           [X] => VECTORS
-           [X] => STRINGS
-           [X] => HASHMAPS
-    [X] => BUILD ON EXISTING `AC` PRIMS TO ADD IN `any?`, `every?`
-    [X] => BUILD OUT `OC` PRIMS
-           [X] => LISTS
-           [X] => VECTORS
-           [X] => STRINGS
-    [ ] => RM/ADJUST EXISTING PRIMS & ___TAKE OFF `ac-`/`oc-` PREFIX!___
-           [ ] => REANALYZE PLACE OF CURRENT LIST/STRING/VECTOR/HASHMAP PRIMTIVES W/IN ESCM
-               [ ] => WILL LIKELY CLIP SOME & KEEP SOME (ESP. FOR HASHMAP KEY INTROSPECTION & STRING OPS)
-    [ ] => ADD TO/ADJUST `primitives.md`
-    [ ] => ADD TO/ADJUST `help`
-    [ ] => UPDATE GITHUB + TEST ON SCU SERVERS
-
-
-
-
-
-[ ] => WHAT ABOUT PRIMITIVES LIKE `unfold` ??? LOOK INTO THIS FROM _HEIST_ !!!
+[ ] => WHAT ABOUT PRIMITIVES LIKE `unfold` ? LOOK INTO THIS FROM _HEIST_ !
 
 
 

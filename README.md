@@ -123,5 +123,8 @@
     - No run-time expansion, all global in scope, deletable for localization!
 12. Object System (classes, interfaces, and objects!)
 13. Multithreading Support (threads and reentrant locks!)
-14. Multi-arity and optional-parameter support via `fn`
-15. No `eqv?`: only `eq?` and `equal?`
+14. Multi-arity and optional-parameter support via `fn`!
+15. Generic algorithmic primitives for associative & ordered collections!
+    * Associative collections: strings, lists, vectors, hashmaps
+    * Ordered collections: strings, lists, vectors
+16. No `eqv?`: only `eq?` and `equal?`

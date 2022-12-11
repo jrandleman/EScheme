@@ -1,4 +1,16 @@
 [{
+  "name": "associative-collection",
+  "aliases": ["ac"],
+  "signatures": null,
+  "description": "Family of collection types that associate keys to values.\nUsed to provide a generic interface across algorithmic primitives!\n\nHashmaps are the most flexible example of such (supporting arbitrary key &\nvalue types), while strings are the most restrictive (only supporting index\nkeys and character values).\n\nTheir coercion hierarchy is as follows: String < List < Vector < Hashmap",
+  "example": null
+}, {
+  "name": "ordered-collection",
+  "aliases": ["oc"],
+  "signatures": null,
+  "description": "Family of collection types that associate ordered indices to values.\nUsed to provide a generic interface across algorithmic primitives!\nTheir coercion hierarchy is as follows: String < List < Vector",
+  "example": null
+}, {
   "name": "meta-object",
   "aliases": ["metaobject", "object"],
   "signatures": null,

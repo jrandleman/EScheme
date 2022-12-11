@@ -17,94 +17,94 @@ import escm.vm.type.PrimitiveCallable;
 
 public class OrderedCollectionPrimitives {
   ////////////////////////////////////////////////////////////////////////////
-  // oc-ordered-collection?
-  public static class OCIsOrderedCollection implements Primitive {
+  // ordered-collection?
+  public static class IsOrderedCollection implements Primitive {
     public java.lang.String escmName() {
-      return "oc-ordered-collection?";
+      return "ordered-collection?";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
-        throw new Exceptionf("'(oc-ordered-collection? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(ordered-collection? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
       return Boolean.valueOf(parameters.get(0) instanceof OrderedCollection);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-oc?
-  public static class OCIsOC implements Primitive {
+  // oc?
+  public static class IsOC implements Primitive {
     public java.lang.String escmName() {
-      return "oc-oc?";
+      return "oc?";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
-        throw new Exceptionf("'(oc-oc? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(oc? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
       return Boolean.valueOf(parameters.get(0) instanceof OrderedCollection);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-conj
-  public static class OCConj implements Primitive {
+  // conj
+  public static class Conj implements Primitive {
     public java.lang.String escmName() {
-      return "oc-conj";
+      return "conj";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(1) instanceof OrderedCollection)) 
-        throw new Exceptionf("'(oc-conj <value> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(conj <value> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return (Datum)((OrderedCollection)parameters.get(1)).conj(parameters.get(0));
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-init
-  public static class OCInit implements Primitive {
+  // init
+  public static class Init implements Primitive {
     public java.lang.String escmName() {
-      return "oc-init";
+      return "init";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof OrderedCollection)) 
-        throw new Exceptionf("'(oc-init <ordered-collection>) expects exactly 1 <oc>: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(init <ordered-collection>) expects exactly 1 <oc>: %s", Exceptionf.profileArgs(parameters));
       return (Datum)((OrderedCollection)parameters.get(0)).init();
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-last
-  public static class OCLast implements Primitive {
+  // last
+  public static class Last implements Primitive {
     public java.lang.String escmName() {
-      return "oc-last";
+      return "last";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof OrderedCollection)) 
-        throw new Exceptionf("'(oc-last <ordered-collection>) expects exactly 1 <oc>: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(last <ordered-collection>) expects exactly 1 <oc>: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(0)).last();
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-slice
-  public static class OCSlice implements PrimitiveCallable {
+  // slice
+  public static class Slice implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-slice";
+      return "slice";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() < 2 || parameters.size() > 3) 
-        throw new Exceptionf("'(oc-slice <ordered-collection> <start-index> <end-predicate-or-length>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(slice <ordered-collection> <start-index> <end-predicate-or-length>) invalid args: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-slice <ordered-collection> <start-index> <end-predicate-or-length>) 1st arg isn't an <oc>: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(slice <ordered-collection> <start-index> <end-predicate-or-length>) 1st arg isn't an <oc>: %s", Exceptionf.profileArgs(parameters));
       if(!ListPrimitives.isValidSize(parameters.get(1)))
-        throw new Exceptionf("'(oc-slice <ordered-collection> <start-index> <end-predicate-or-length>) 2nd arg isn't an index: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(slice <ordered-collection> <start-index> <end-predicate-or-length>) 2nd arg isn't an index: %s", Exceptionf.profileArgs(parameters));
       if(parameters.size() == 2) {
         return continuation.run((Datum)((OrderedCollection)parameters.get(0)).slice(((Real)parameters.get(1)).intValue()));
       }
@@ -114,251 +114,251 @@ public class OrderedCollectionPrimitives {
       if(parameters.get(2) instanceof Callable) {
         return ((OrderedCollection)parameters.get(0)).slice(((Real)parameters.get(1)).intValue(),(Callable)parameters.get(2),continuation);
       }
-      throw new Exceptionf("'(oc-slice <ordered-collection> <start-index> <end-predicate-or-length>) invalid 3rd arg: %s", Exceptionf.profileArgs(parameters));
+      throw new Exceptionf("'(slice <ordered-collection> <start-index> <end-predicate-or-length>) invalid 3rd arg: %s", Exceptionf.profileArgs(parameters));
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-reverse
-  public static class OCReverse implements Primitive {
+  // reverse
+  public static class Reverse implements Primitive {
     public java.lang.String escmName() {
-      return "oc-reverse";
+      return "reverse";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof OrderedCollection)) 
-        throw new Exceptionf("'(oc-reverse <ordered-collection>) expects exactly 1 <oc>: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(reverse <ordered-collection>) expects exactly 1 <oc>: %s", Exceptionf.profileArgs(parameters));
       return (Datum)((OrderedCollection)parameters.get(0)).reverse();
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-remove-first
-  public static class OCRemoveFirst implements PrimitiveCallable {
+  // remove-first
+  public static class RemoveFirst implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-remove-first";
+      return "remove-first";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-remove-first <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(remove-first <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(1)).removeFirst((Callable)parameters.get(0),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-remove-last
-  public static class OCRemoveLast implements PrimitiveCallable {
+  // remove-last
+  public static class RemoveLast implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-remove-last";
+      return "remove-last";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-remove-last <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(remove-last <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(1)).removeLast((Callable)parameters.get(0),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-skip
-  public static class OCSkip implements PrimitiveCallable {
+  // skip
+  public static class Skip implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-skip";
+      return "skip";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-skip <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(skip <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(1)).skip((Callable)parameters.get(0),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-skip-right
-  public static class OCSkipRight implements PrimitiveCallable {
+  // skip-right
+  public static class SkipRight implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-skip-right";
+      return "skip-right";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-skip-right <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(skip-right <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(1)).skipRight((Callable)parameters.get(0),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-fold-right
-  public static class OCFoldRight implements PrimitiveCallable {
+  // fold-right
+  public static class FoldRight implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-fold-right";
+      return "fold-right";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() < 3) 
-        throw new Exceptionf("'(oc-fold-right <callable> <seed> <ordered-collection> ...) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(fold-right <callable> <seed> <ordered-collection> ...) invalid args: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof Callable))
-        throw new Exceptionf("'(oc-fold-right <callable> <seed> <ordered-collection> ...) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(fold-right <callable> <seed> <ordered-collection> ...) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       Callable c = (Callable)parameters.get(0);
       Datum seed = parameters.get(1);
-      OrderedCollection[] ocs = OrderedCollection.parseParameters("(oc-fold-right <callable> <seed> <ordered-collection> ...)",parameters,2);
+      OrderedCollection[] ocs = OrderedCollection.parseParameters("(fold-right <callable> <seed> <ordered-collection> ...)",parameters,2);
       return ocs[0].FoldRightArray(c,seed,ocs,continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-key-right
-  public static class OCKeyRight implements PrimitiveCallable {
+  // key-right
+  public static class KeyRight implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-key-right";
+      return "key-right";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-key-right <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(key-right <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(1)).keyRight((Callable)parameters.get(0),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-drop-right
-  public static class OCDropRight implements Primitive {
+  // drop-right
+  public static class DropRight implements Primitive {
     public java.lang.String escmName() {
-      return "oc-drop-right";
+      return "drop-right";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof OrderedCollection) || !ListPrimitives.isValidSize(parameters.get(1)))
-        throw new Exceptionf("'(oc-drop-right <ordered-collection> <length>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(drop-right <ordered-collection> <length>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return (Datum)((OrderedCollection)parameters.get(0)).dropRight(((Real)parameters.get(1)).intValue());
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-drop-while
-  public static class OCDropWhile implements PrimitiveCallable {
+  // drop-while
+  public static class DropWhile implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-drop-while";
+      return "drop-while";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-drop-while <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(drop-while <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(1)).dropWhile((Callable)parameters.get(0),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-drop-right-while
-  public static class OCDropRightWhile implements PrimitiveCallable {
+  // drop-right-while
+  public static class DropRightWhile implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-drop-right-while";
+      return "drop-right-while";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-drop-right-while <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(drop-right-while <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(1)).dropRightWhile((Callable)parameters.get(0),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-take-right
-  public static class OCTakeRight implements Primitive {
+  // take-right
+  public static class TakeRight implements Primitive {
     public java.lang.String escmName() {
-      return "oc-take-right";
+      return "take-right";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof OrderedCollection) || !ListPrimitives.isValidSize(parameters.get(1)))
-        throw new Exceptionf("'(oc-take-right <ordered-collection> <length>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(take-right <ordered-collection> <length>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return (Datum)((OrderedCollection)parameters.get(0)).takeRight(((Real)parameters.get(1)).intValue());
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-take-while
-  public static class OCTakeWhile implements PrimitiveCallable {
+  // take-while
+  public static class TakeWhile implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-take-while";
+      return "take-while";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-take-while <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(take-while <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(1)).takeWhile((Callable)parameters.get(0),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-take-right-while
-  public static class OCTakeRightWhile implements PrimitiveCallable {
+  // take-right-while
+  public static class TakeRightWhile implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-take-right-while";
+      return "take-right-while";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-take-right-while <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(take-right-while <predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(1)).takeRightWhile((Callable)parameters.get(0),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-sort
-  public static class OCSort implements PrimitiveCallable {
+  // sort
+  public static class Sort implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-sort";
+      return "sort";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-sort <binary-predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(sort <binary-predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(1)).sort((Callable)parameters.get(0),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-sorted?
-  public static class OCIsSorted implements PrimitiveCallable {
+  // sorted?
+  public static class IsSorted implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-sorted?";
+      return "sorted?";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-sorted? <binary-predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(sorted? <binary-predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(1)).sorted((Callable)parameters.get(0),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-merge
-  public static class OCMerge implements PrimitiveCallable {
+  // merge
+  public static class Merge implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-merge";
+      return "merge";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 3 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection) || !(parameters.get(2) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-merge <binary-predicate?> <ordered-collection> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(merge <binary-predicate?> <ordered-collection> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       OrderedCollection oc1 = (OrderedCollection)parameters.get(1);
       OrderedCollection oc2 = OrderedCollection.unifyType(oc1,(OrderedCollection)parameters.get(2));
       return oc1.merge((Callable)parameters.get(0),oc2,continuation);
@@ -367,15 +367,15 @@ public class OrderedCollectionPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc-delete-neighbor-duplicates
-  public static class OCDeleteNeighborDuplicates implements PrimitiveCallable {
+  // delete-neighbor-duplicates
+  public static class DeleteNeighborDuplicates implements PrimitiveCallable {
     public java.lang.String escmName() {
-      return "oc-delete-neighbor-duplicates";
+      return "delete-neighbor-duplicates";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
-        throw new Exceptionf("'(oc-delete-neighbor-duplicates <binary-predicate?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(delete-neighbor-duplicates <elt=?> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return ((OrderedCollection)parameters.get(1)).deleteNeighborDuplicates((Callable)parameters.get(0),continuation);
     }
   }

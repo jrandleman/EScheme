@@ -265,32 +265,12 @@
 ```scheme
 (list <obj> ...) (list)
 (list* <obj> <obj> ...) ; create a dotted list
-(append <list> ... <obj>)
-
-(length <list>)
-
-(reverse <list>)
-
-(map <callable> <list> ...)
-(filter <predicate?> <list>)
-(for-each <callable> <list> ...)
-
-(fold <callable> <seed-obj> <list> ...)
-(fold-right <callable> <seed-obj> <list> ...)
-
-(last <list>)
-(init <list>)
-(ref <list> <index-num>)
-(sublist <list> <index-num> <optional-length-num>) ; length defaults to end of list
 
 (memq <obj> <list>)
 (member <obj> <list>)
 
 (assq <key-obj> <alist>)
 (assoc <key-obj> <alist>)
-
-(sort <binary-predicate?> <list>)
-(sorted? <binary-predicate?> <list>)
 
 (list? <obj>)
 (list*? <obj>)
@@ -304,10 +284,6 @@
 ```scheme
 (vector <obj> ...)
 (make-vector <length> <fill-value>)
-
-(vector-length <vector>)
-
-(vector-ref <vector> <index>) ; equivalent to (<vector> <index>)
 (vector-set! <vector> <index> <obj>)
 
 (vector-fill! <vector> <fill-value>)
@@ -320,20 +296,12 @@
 (vector-pop! <vector>) ; returns the popped item
 (vector-pop-front! <vector>) ; returns the popped item
 
-(vector-append <vector> ...)
 (vector-append! <vector> <appended-vector> ...)
-
-(vector-reverse <vector>)
-(subvector <vector> <index> <optional-length>) ; defaults to the end fo the vector
 
 (vector-memq <vector> <obj>)   ; returns index of position, or #f if DNE. Uses <eq?> for comparisons.
 (vector-member <vector> <obj>) ; returns index of position, or #f if DNE. Uses <equal?> for comparisons.
 
-(vector-sort <binary-predicate?> <vector>)
-(vector-sorted? <binary-predicate?> <vector>)
-
 (vector? <obj>)
-(vector-empty? <vector>)
 ```
 
 
@@ -347,12 +315,8 @@
 
 (hashmap-key? <hashmap> <obj>)
 
-(hashmap-ref <hashmap> <key>)          ; equivalent to: (<hashmap> <key>)
 (hashmap-set! <hashmap> <key> <value>) ; returns whether replaced another entry
 (hashmap-delete! <hashmap> <key>)      ; returns whether deleted an entry
-
-(hashmap-length <hashmap>)
-(hashmap-empty? <hashmap>)
 
 (hashmap-merge <hashmap> ...)
 (hashmap-merge! <hashmap> <merged-hashmap> ...)
@@ -370,16 +334,7 @@
 
 (string <str-or-char> ...)
 
-(string-length <str>)
 (string-java-length <str>)
-(string-empty? <str>)
-
-(string-reverse <str>)
-
-(string-append <str> ...)
-
-(string-ref <str> <index-num>)
-(substring <str> <index-num> <optional-length-num>)  ; length defaults to end of string
 
 (string-upcase <str>)
 (string-downcase <str>)
@@ -410,6 +365,102 @@
 (string-ci>=? <str> <str> ...)
 
 (stringf <format-string> <arg> ...)
+```
+
+
+------------------------
+## Associative Collections:
+* Includes: Strings, Lists, Vectors, Hashmaps
+* Denoted by `<ac>`
+```scheme
+(associative-collection? <obj>)
+(ac? <obj>)
+
+(head <ac>)
+(tail <ac>)
+
+(empty? <ac>)
+(length <ac>)
+(length+ <ac>) ; returns #f for dotted lists instead of throwing an error
+
+(fold <callable> <seed> <ac> ...)
+
+(map <callable> <ac> ...)
+(for-each <callable> <ac> ...)
+(filter <predicate?> <ac>)
+
+(count <predicate?> <ac>)
+(remove <predicate?> <ac>)
+
+(val <ac> <key>) ; "ref"
+
+(key <predicate?> <ac>) ; returns key of left-most value satisfying <predicate?>
+
+(append <ac> ...)
+
+(delete <ac> <key>) ; return copy of <ac> w/o <key>
+
+(conj <key> <val> <ac>) ; return version of <ac> with <val> associated to <key>
+
+(any? <predicate?> <ac> ...)
+(every? <predicate?> <ac> ...)
+
+(take <ac> <length>)
+(drop <ac> <length>)
+
+(ac->list <ac>)
+(ac->string <ac>)
+(ac->vector <ac>)
+(ac->hashmap <ac>)
+
+(union <elt=?> <ac> ...)
+(intersection <elt=?> <ac> ...)
+(difference <elt=?> <ac> ...)
+(symmetric-difference <elt=?> <ac> ...)
+```
+
+
+------------------------
+## Ordered Collections:
+* Includes: Strings, Lists, Vectors
+* Denoted by `<oc>`
+```scheme
+(ordered-collection? <obj>)
+(oc? <obj>)
+
+(conj <val> <oc>) ; add <val> as efficiently as possible to <oc>. Makes no guarentee about position.
+
+(init <oc>)
+(last <oc>)
+
+(slice <oc> <start-index> <optional-length-or-end-predicate>)
+
+(reverse <oc>)
+
+(remove-first <predicate?> <oc>)
+(remove-last <predicate?> <oc>)
+
+(skip <predicate?> <oc>)       ; get the 1st item in <oc> that fails <predicate?>
+(skip-right <predicate?> <oc>) ; get the last item in <oc> that fails <predicate?>
+
+(fold-right <callable> <seed> <oc> ...) ; only ordered collections have the concept of "right-to-left"
+
+(key-right <predicate?> <oc>) ; returns key of right-most value satisfying <predicate?>
+
+(drop-right <oc> <length>)
+(drop-while <predicate?> <oc>)
+(drop-right-while <predicate?> <oc>)
+
+(take-right <oc> <length>)
+(take-while <predicate?> <oc>)
+(take-right-while <predicate?> <oc>)
+
+(sort <binary-predicate?> <oc>)
+(sorted? <binary-predicate?> <oc>)
+
+(merge <predicate?> <oc> <oc>)
+
+(delete-neighbor-duplicates <elt=?> <oc>)
 ```
 
 

@@ -586,7 +586,7 @@ public class Pair extends Datum implements OrderedCollection {
   // append
   //////////////////////////////////////
 
-  private static Datum binaryAppend(Datum p1, Datum p2) {
+  public static Datum binaryAppend(Datum p1, Datum p2) {
     if(!(p1 instanceof Pair)) return p2;
     Pair p = (Pair)p1;
     return new Pair(p.car,binaryAppend(p.cdr,p2));
