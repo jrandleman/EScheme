@@ -1,6 +1,3 @@
-
-
-
 ;; UNIT TEST FOR AC ALGO PRIMS ON LISTS
 (define-syntax profile-call 
   (lambda (call)

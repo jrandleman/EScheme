@@ -2,17 +2,100 @@
 
 ## MORE
 
-
-[ ] MAKE SURE ALL "Stream" & "File" & "Reader" & "Writer" INSTANCES ARE PROPERLY CLOSED IN JAVA
-    * MAKE SURE MOVE AS MANY "CLOSE" OPERATIONS AS POSSIBLE PRIOR THROWING ERRORS FOR FILES!
-
-
-
-
 ====================================================================================
 ====================================================================================
 ====================================================================================
 ====================================================================================
+
+
+
+[ ] => LOOK INTO HOW PYTHON HANDLES MODULES:
+       * https://docs.python.org/3/tutorial/modules.html
+       * https://docs.python.org/3/tutorial/classes.html#tut-scopes
+    => "NAMESPACE OBJECTS" ?
+
+
+
+
+
+
+--
+
+Walk Module Ideas:
+  => Modules as extending meta-objects?
+     => OR just as a thin wrapper around a hashmap like a meta-object, but w/o the notion of `<super>` or implemented interfaces (doesn't make sense in this context).
+
+     => NOTE: MAY WANT TO CHANGE <MetaObject> TO _NOT_ IMPLEMENT THE <get> ETC. FCNS, THEN HAVE ANOTHER ABSTRACT CLASS FOR OBJECTS THAT EXTENDS IT IN ORDER TO PROVIDE SUCH AS A BASE FOR CLASSES/INTERFACES/OBJECTS/ETC.
+        => REASON: CURRENT <MetaObject> DOES BINDING WITH <self> TO METHODS, SOMETHING WE ___DO_NOT_WANT___ FOR OUR MODULES TO DO (POINTLESS + EXPENSIVE)
+
+    => NOTE: Consider having <MACRO_REGISTRY> from <Compiler.java> be module-specific too?
+
+  => No "global env", only "current module"
+     => Instead of global env being thread-independant, have "current-module" be a thread-dependant variable (in case a child thread imports)
+  => Should have a global set of "imported modules"
+     => Each module can only be imported once, future imports from the same module reference objects created during the evaluation of the module in its first import
+  => `(load "filename.scm")` then is equivalent to `(import :* :from "filename.scm")`
+  => CAN ALSO DO: `(import "filename.scm")` THEN REFERENCE ANY OBJECT W/IN IT VIA `filename.obj` ?
+
+     => NOTE: PRIOR FINALIZING ON THE BELOW SYNTAX/ITS EFFECTS, CONSIDER EXPERIMENTING W/ PYTHON TO SEE HOW IT HANDLES LOCALIZATION!
+              [ ] => ALTHOUUUUUUUUGH WHO SAYS ONLY PYTHON IS RIGHT? MAYBE ALSO SUPPORT THE ORIGINAL SYNTAX (BELOW) BY BEING INSPIRED BY JAVA?
+              [ ] => Python seems to only allow importing modules, even with dots: can't do `import mod.function`
+                     Then would only need to support the following syntax:
+                      `(import <module-name>)`
+                      `(import <module-name> :as <module-alias-name>)`
+              [ ] => ALSO WANT TO CONSIDER DIRECTORY SUPPORT? SOMETHING LIKE JAVA'S PACKAGE SYSTEM?
+                     [ ] => NAMSPACES TO HELP WITH THIS? TOP-LEVEL NAMSPACE DESIGNATIONS?
+                            `(namspace types.numbers.exact)`
+                            `(package types.numbers.exact)`
+                            #!package types.numbers.exact
+
+     => General Syntax Ideas:
+        `(import <module-name>)`
+        `(import <module-name> :as <module-name-alias>)`
+        `(import <module-name>.<obj1>)`
+        `(import <module-name>.<obj1> :as <obj1-name>)`
+        `(import <obj1> <obj2> ... :from <module-name>)`
+        `(import <obj1> <obj2> ... :from <module-name> :as <obj1-name> <obj2-name> ...)`
+
+        [ ] => BEWARE WITH "import as" SINCE CAN'T JUST REDEFINE/BIND-DEFINE IN THE LOCAL MODULE SINCE `set!`ING THAT REDEFINED SYMBOL WOULDN'T AUTO CHANGE THE MODULE'S SYMBOL TOO!
+               [ ] => ISSUE WITH DOING A "READER MACRO SWAP" SINCE:
+                      ```scheme
+                      (import mod.obj :as alias)
+                      (display 'alias) ; => reader macro would make this print <mod.obj> (invalid)
+                                       ; => hence need to track MORE metadata with symbols? a "anchored <ObjectAccessChain> instance?"
+                      ```
+               [ ] => ORRRR do we even really care about this? should we enable setting/defining via the alias? or could we just have the README define the action of aliasing an imported object as binding that imported object to a locally defined variable? hence CAN still set/define such, but only by doing it on the explicit object chain (note this is potentially even benficial for clarity's sake, given how serious of a change to the runtime such an action can cause)
+                      [ ] => HENCE `(import mod.obj)` IS EQUIVALENT TO `(let ((gs (gensym))) (eval `(begin (import mod :as ,gs) (define obj ,(symbol-append gs '. 'obj)))))`
+
+  => Since every file is hence module, there's no need for a `module` special form.
+  => Allow module introspection?
+     => Could be getting this for free by just having modules extend the "meta-object" class, else implement module-specific features.
+  => Then maybe need restrictions on escm file naming conventions?
+     => ESCM file names must also be valid ESCM variable names to work as a module properly (no spaces, parenthesis/brackets/braces, periods, etc.)
+     => Automatically have the extension of the file removed when defining the module name 
+        => e.g. "filename.scm" as a module is referred to as `filename`
+  => Support importing serialized files
+
+--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 "module" statement processed (MUST be @ top of the file) signifies we are exporting new symbols to the set of "public" symbols.
@@ -106,6 +189,28 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 
 
 
+[ ] MAKE SURE ALL "Stream" & "File" & "Reader" & "Writer" INSTANCES ARE PROPERLY CLOSED IN JAVA
+    * MAKE SURE MOVE AS MANY "CLOSE" OPERATIONS AS POSSIBLE PRIOR THROWING ERRORS FOR FILES!
+
+
+
+
+
+
+
+
+
+
+- CONSIDER CHANGING SYNTAX FOR READER SHORTHAND LAMBDAS FROM `\` TO `#`: `#(* %1 2)`
+
+
+
+
+
+
+
+
+
 
 
 
@@ -117,6 +222,7 @@ PROBLEM: How can we intermix the notion of serialization and modules?
     => ENTERS IN A `debug>` MENU (similar to `help`)
        => ENABLE SAFE QUERYING OF ENVIRONMENT VALUES
        => IF GIVEN `<optional-string-descriptor>`, PRINT A PREAMBLE TO THE `debug>` PROMPT TO SAY `debug> BREAKPOINT REACHED: <optional-string-descriptor>`
+          - ALSO INCLUDE THE FILE/LINE/COL DATA STORED FROM THE `<breakpoint>` SYMBOL IN THE `debug>` PREAMBLE
 
        * MAYBE EFFECTIVELY LAUNCH A REPL IN THE CURRENT ENVIRONMENT THAT, ONCE QUIT OUT OF VIA `#eof`, RESUMES EXECUTION OF THE CURRENT ESCM SESSION FROM WHERE PAUSED
          => NOTE THAT USERS MAY ENTER `(exit)` IN THE BREAKPOINT MENU TO TERMINATE ALL OF ESCM'S EXECUTION
@@ -156,7 +262,10 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 
 
 
-
+====================================================================================
+====================================================================================
+====================================================================================
+====================================================================================
 
 - RUNTIME TYPING ___!!! THIS WOULD WARRANT A VERSION UPGRADE TO `8.0` !!!___
   
@@ -234,7 +343,10 @@ PROBLEM: How can we intermix the notion of serialization and modules?
             :oc ; :ordered-collection
             ```
 
-
+====================================================================================
+====================================================================================
+====================================================================================
+====================================================================================
 
 
 

@@ -48,7 +48,7 @@
   "example": null
 }, {
   "name": "boolean",
-  "aliases": ["bool"],
+  "aliases": ["bool", "#t", "#f"],
   "signatures": null,
   "description": "The boolean type. #t is true and #f is false. Any non-false value is truthy.\nTypically returned by predicate actions that end in '?'.",
   "example": null
