@@ -3,6 +3,8 @@
 
 ;; => IMPORTANT: MUST _NEVER_ STORE A CONTINUATION UPON INITIAL INTERPRETATION BY
 ;;               THE VM: CAN _ONLY_ DEFINE SPECIAL FORMS, PROCEDURES, & VARIABLES
+;;               * This has to do with how we evaluate the stdlib prior receiving 
+;;                 user code.
 
 ;; => IMPORTANT: IN ORDER FOR CHANGES IN THIS FILE TO AFFECT THE ESCHEME RUNTIME,
 ;;               1 OF 2 ACTIONS MUST BE TAKEN:
