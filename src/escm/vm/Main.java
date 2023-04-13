@@ -126,7 +126,7 @@ public class Main {
     sb.append("    __\\      {   '-.|.'--~'`}\"    _/` \\      A |------------------/ /=====================\\ \\------------------| I\n");
     sb.append("    \\    .=\"` }.-~\"'u'- '-..'  __/\\__, \\     N |-----------------/ /=======================\\ \\-----------------| E\n");
     sb.append("   _/  .\"    {  -'.~('-_,.'\\_,/ \\_ , \\_ \\\n");
-    sb.append("  /  .\"    _/'`--; ;  `  ;        \\. ,\\_ \\              Copyright (c) Jordan Candide Randleman 2021-2022\n");
+    sb.append("  /  .\"    _/'`--; ;  `  ;        \\. ,\\_ \\              Copyright (c) Jordan Candide Randleman 2021-2023\n");
     sb.append(String.format(" /..=\"  _/'      `-..__-'           \\. ,\\ \\                       Eerina's Scheme: Version %.1f\n",SystemPrimitives.VERSION));
     sb.append("|;____/'                              \\.,`\\`                  Type (help) for Help, (exit) to Exit\n");
     sb.append("                                        \\.,\\\n");
