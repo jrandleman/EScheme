@@ -337,10 +337,10 @@ public class NumberPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // mod-expt
-  public static class ModExpt implements Primitive {
+  // expt-mod
+  public static class ExptMod implements Primitive {
     public java.lang.String escmName() {
-      return "mod-expt";
+      return "expt-mod";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
