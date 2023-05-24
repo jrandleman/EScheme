@@ -23,7 +23,7 @@
   - `bash`:
     1. Copy the `alias='...'` output by the installer.
     2. Add it to your `~/.bashrc` (and/or `~/.bash_aliases`) file.
-    3. Run: `. ~/.bashrc` (and/or `~/.bash_aliases`)
+    3. Run: `. ~/.bashrc` (and/or `. ~/.bash_aliases`)
   - `zsh`:
     1. Copy the `alias='...'` output by the installer.
     2. Add it to your `~/.zshrc` file.
