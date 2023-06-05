@@ -197,8 +197,8 @@
   ;     (set! expanded-clauses
   ;       (cons 
   ;         (cons 
-  ;           (append req-params (sublist opt-param-names 0 n)) 
-  ;           (append (sublist param-defs n) body))
+  ;           (append req-params (slice opt-param-names 0 n)) 
+  ;           (append (slice param-defs n) body))
   ;         expanded-clauses))
   ;     (set! n (- n 1))))
 
@@ -249,7 +249,7 @@
       (push body)
       (push n)
       (push param-defs)
-      (push sublist)
+      (push slice)
       (call -3)
       (push)
       (push append)
@@ -258,7 +258,7 @@
       (push n)
       (push 0)
       (push opt-param-names)
-      (push sublist)
+      (push slice)
       (call -4)
       (push)
       (push req-params)
