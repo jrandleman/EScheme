@@ -101,9 +101,9 @@ public class Main {
     sb.append("                     |\\ '.`-.`-,\n");
     sb.append("                      \\`'-:  `; \\\n");
     sb.append("                       `-._'.  \\ \\\n");
-    sb.append("                      ,_.-=`,`.`` ~,\n");
-    sb.append("                       '--,. `    _ \\\n");
-    sb.append("                          /  ___ (O),\\\n");
+    sb.append("                      ,_.-=`,`.`` ~,      WEET\n");
+    sb.append("                       '--,. `    _ \\     WOOT!\n");
+    sb.append("                          /  ___ (O),\\   /\n");
     sb.append("                         |  /X22\\  /_ \\\n");
     sb.append("                         |  \\XXI/  \\_\\|\n");
     sb.append("                         |`'.     .(\n");
