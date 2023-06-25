@@ -19,7 +19,7 @@ import escm.vm.runtime.GlobalState;
 public class NumberPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // +
-  public static class Plus implements Primitive {
+  public static class Plus extends Primitive {
     public java.lang.String escmName() {
       return "+";
     }
@@ -39,7 +39,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // -
-  public static class Minus implements Primitive {
+  public static class Minus extends Primitive {
     public java.lang.String escmName() {
       return "-";
     }
@@ -67,7 +67,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // *
-  public static class Multiply implements Primitive {
+  public static class Multiply extends Primitive {
     public java.lang.String escmName() {
       return "*";
     }
@@ -87,7 +87,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // /
-  public static class Divide implements Primitive {
+  public static class Divide extends Primitive {
     public java.lang.String escmName() {
       return "/";
     }
@@ -113,7 +113,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // =
-  public static class Equals implements Primitive {
+  public static class Equals extends Primitive {
     public java.lang.String escmName() {
       return "=";
     }
@@ -137,7 +137,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // <
-  public static class LessThan implements Primitive {
+  public static class LessThan extends Primitive {
     public java.lang.String escmName() {
       return "<";
     }
@@ -163,7 +163,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // >
-  public static class GreaterThan implements Primitive {
+  public static class GreaterThan extends Primitive {
     public java.lang.String escmName() {
       return ">";
     }
@@ -189,7 +189,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // <=
-  public static class LessThanOrEqualTo implements Primitive {
+  public static class LessThanOrEqualTo extends Primitive {
     public java.lang.String escmName() {
       return "<=";
     }
@@ -215,7 +215,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // >=
-  public static class GreaterThanOrEqualTo implements Primitive {
+  public static class GreaterThanOrEqualTo extends Primitive {
     public java.lang.String escmName() {
       return ">=";
     }
@@ -241,7 +241,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // expt
-  public static class Expt implements Primitive {
+  public static class Expt extends Primitive {
     public java.lang.String escmName() {
       return "expt";
     }
@@ -265,7 +265,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // exp
-  public static class Exp implements Primitive {
+  public static class Exp extends Primitive {
     public java.lang.String escmName() {
       return "exp";
     }
@@ -282,7 +282,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // log
-  public static class Log implements Primitive {
+  public static class Log extends Primitive {
     public java.lang.String escmName() {
       return "log";
     }
@@ -304,7 +304,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // sqrt
-  public static class Sqrt implements Primitive {
+  public static class Sqrt extends Primitive {
     public java.lang.String escmName() {
       return "sqrt";
     }
@@ -321,7 +321,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // abs
-  public static class Abs implements Primitive {
+  public static class Abs extends Primitive {
     public java.lang.String escmName() {
       return "abs";
     }
@@ -338,7 +338,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // expt-mod
-  public static class ExptMod implements Primitive {
+  public static class ExptMod extends Primitive {
     public java.lang.String escmName() {
       return "expt-mod";
     }
@@ -362,7 +362,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // min
-  public static class Min implements Primitive {
+  public static class Min extends Primitive {
     public java.lang.String escmName() {
       return "min";
     }
@@ -383,7 +383,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // max
-  public static class Max implements Primitive {
+  public static class Max extends Primitive {
     public java.lang.String escmName() {
       return "max";
     }
@@ -404,7 +404,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // quotient
-  public static class Quotient implements Primitive {
+  public static class Quotient extends Primitive {
     public java.lang.String escmName() {
       return "quotient";
     }
@@ -424,7 +424,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // remainder
-  public static class Remainder implements Primitive {
+  public static class Remainder extends Primitive {
     public java.lang.String escmName() {
       return "remainder";
     }
@@ -444,7 +444,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // modulo
-  public static class Modulo implements Primitive {
+  public static class Modulo extends Primitive {
     public java.lang.String escmName() {
       return "modulo";
     }
@@ -464,7 +464,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // divrem
-  public static class Divrem implements Primitive {
+  public static class Divrem extends Primitive {
     public java.lang.String escmName() {
       return "divrem";
     }
@@ -485,7 +485,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // modf
-  public static class Modf implements Primitive {
+  public static class Modf extends Primitive {
     public java.lang.String escmName() {
       return "modf";
     }
@@ -503,7 +503,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // gcd
-  public static class Gcd implements Primitive {
+  public static class Gcd extends Primitive {
     public java.lang.String escmName() {
       return "gcd";
     }
@@ -523,7 +523,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // lcm
-  public static class Lcm implements Primitive {
+  public static class Lcm extends Primitive {
     public java.lang.String escmName() {
       return "lcm";
     }
@@ -543,7 +543,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // round
-  public static class Round implements Primitive {
+  public static class Round extends Primitive {
     public java.lang.String escmName() {
       return "round";
     }
@@ -560,7 +560,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // floor
-  public static class Floor implements Primitive {
+  public static class Floor extends Primitive {
     public java.lang.String escmName() {
       return "floor";
     }
@@ -577,7 +577,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // ceil
-  public static class Ceiling implements Primitive {
+  public static class Ceiling extends Primitive {
     public java.lang.String escmName() {
       return "ceil";
     }
@@ -594,7 +594,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // truncate
-  public static class Truncate implements Primitive {
+  public static class Truncate extends Primitive {
     public java.lang.String escmName() {
       return "truncate";
     }
@@ -611,7 +611,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // number?
-  public static class IsNumber implements Primitive {
+  public static class IsNumber extends Primitive {
     public java.lang.String escmName() {
       return "number?";
     }
@@ -625,7 +625,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // complex?
-  public static class IsComplex implements Primitive {
+  public static class IsComplex extends Primitive {
     public java.lang.String escmName() {
       return "complex?";
     }
@@ -639,7 +639,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // real?
-  public static class IsReal implements Primitive {
+  public static class IsReal extends Primitive {
     public java.lang.String escmName() {
       return "real?";
     }
@@ -653,7 +653,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // inexact?
-  public static class IsInexact implements Primitive {
+  public static class IsInexact extends Primitive {
     public java.lang.String escmName() {
       return "inexact?";
     }
@@ -667,7 +667,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // exact?
-  public static class IsExact implements Primitive {
+  public static class IsExact extends Primitive {
     public java.lang.String escmName() {
       return "exact?";
     }
@@ -681,7 +681,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // integer?
-  public static class IsInteger implements Primitive {
+  public static class IsInteger extends Primitive {
     public java.lang.String escmName() {
       return "integer?";
     }
@@ -696,7 +696,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // finite?
-  public static class IsFinite implements Primitive {
+  public static class IsFinite extends Primitive {
     public java.lang.String escmName() {
       return "finite?";
     }
@@ -711,7 +711,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // infinite?
-  public static class IsInfinite implements Primitive {
+  public static class IsInfinite extends Primitive {
     public java.lang.String escmName() {
       return "infinite?";
     }
@@ -726,7 +726,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // nan?
-  public static class IsNaN implements Primitive {
+  public static class IsNaN extends Primitive {
     public java.lang.String escmName() {
       return "nan?";
     }
@@ -741,7 +741,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // odd?
-  public static class IsOdd implements Primitive {
+  public static class IsOdd extends Primitive {
     public java.lang.String escmName() {
       return "odd?";
     }
@@ -758,7 +758,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // even?
-  public static class IsEven implements Primitive {
+  public static class IsEven extends Primitive {
     public java.lang.String escmName() {
       return "even?";
     }
@@ -775,7 +775,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // positive?
-  public static class IsPositive implements Primitive {
+  public static class IsPositive extends Primitive {
     public java.lang.String escmName() {
       return "positive?";
     }
@@ -792,7 +792,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // negative?
-  public static class IsNegative implements Primitive {
+  public static class IsNegative extends Primitive {
     public java.lang.String escmName() {
       return "negative?";
     }
@@ -809,7 +809,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // zero?
-  public static class IsZero implements Primitive {
+  public static class IsZero extends Primitive {
     public java.lang.String escmName() {
       return "zero?";
     }
@@ -826,7 +826,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // sin
-  public static class Sin implements Primitive {
+  public static class Sin extends Primitive {
     public java.lang.String escmName() {
       return "sin";
     }
@@ -843,7 +843,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // cos
-  public static class Cos implements Primitive {
+  public static class Cos extends Primitive {
     public java.lang.String escmName() {
       return "cos";
     }
@@ -860,7 +860,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // tan
-  public static class Tan implements Primitive {
+  public static class Tan extends Primitive {
     public java.lang.String escmName() {
       return "tan";
     }
@@ -877,7 +877,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // asin
-  public static class Asin implements Primitive {
+  public static class Asin extends Primitive {
     public java.lang.String escmName() {
       return "asin";
     }
@@ -894,7 +894,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // acos
-  public static class Acos implements Primitive {
+  public static class Acos extends Primitive {
     public java.lang.String escmName() {
       return "acos";
     }
@@ -911,7 +911,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // atan
-  public static class Atan implements Primitive {
+  public static class Atan extends Primitive {
     public java.lang.String escmName() {
       return "atan";
     }
@@ -935,7 +935,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // sinh
-  public static class Sinh implements Primitive {
+  public static class Sinh extends Primitive {
     public java.lang.String escmName() {
       return "sinh";
     }
@@ -952,7 +952,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // cosh
-  public static class Cosh implements Primitive {
+  public static class Cosh extends Primitive {
     public java.lang.String escmName() {
       return "cosh";
     }
@@ -969,7 +969,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // tanh
-  public static class Tanh implements Primitive {
+  public static class Tanh extends Primitive {
     public java.lang.String escmName() {
       return "tanh";
     }
@@ -986,7 +986,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // asinh
-  public static class Asinh implements Primitive {
+  public static class Asinh extends Primitive {
     public java.lang.String escmName() {
       return "asinh";
     }
@@ -1003,7 +1003,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // acosh
-  public static class Acosh implements Primitive {
+  public static class Acosh extends Primitive {
     public java.lang.String escmName() {
       return "acosh";
     }
@@ -1020,7 +1020,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // atanh
-  public static class Atanh implements Primitive {
+  public static class Atanh extends Primitive {
     public java.lang.String escmName() {
       return "atanh";
     }
@@ -1037,7 +1037,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // npr
-  public static class Npr implements Primitive {
+  public static class Npr extends Primitive {
     public java.lang.String escmName() {
       return "npr";
     }
@@ -1075,7 +1075,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // ncr
-  public static class Ncr implements Primitive {
+  public static class Ncr extends Primitive {
     public java.lang.String escmName() {
       return "ncr";
     }
@@ -1096,7 +1096,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // random
-  public static class Random implements Primitive {
+  public static class Random extends Primitive {
     public java.lang.String escmName() {
       return "random";
     }
@@ -1110,7 +1110,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // make-rectangular
-  public static class MakeRectangular implements Primitive {
+  public static class MakeRectangular extends Primitive {
     public java.lang.String escmName() {
       return "make-rectangular";
     }
@@ -1130,7 +1130,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // make-polar
-  public static class MakePolar implements Primitive {
+  public static class MakePolar extends Primitive {
     public java.lang.String escmName() {
       return "make-polar";
     }
@@ -1150,7 +1150,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // real-part
-  public static class RealPart implements Primitive {
+  public static class RealPart extends Primitive {
     public java.lang.String escmName() {
       return "real-part";
     }
@@ -1167,7 +1167,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // imag-part
-  public static class ImagPart implements Primitive {
+  public static class ImagPart extends Primitive {
     public java.lang.String escmName() {
       return "imag-part";
     }
@@ -1185,7 +1185,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // magnitude
-  public static class Magnitude implements Primitive {
+  public static class Magnitude extends Primitive {
     public java.lang.String escmName() {
       return "magnitude";
     }
@@ -1202,7 +1202,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // angle
-  public static class Angle implements Primitive {
+  public static class Angle extends Primitive {
     public java.lang.String escmName() {
       return "angle";
     }
@@ -1220,7 +1220,7 @@ public class NumberPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // conjugate
-  public static class Conjugate implements Primitive {
+  public static class Conjugate extends Primitive {
     public java.lang.String escmName() {
       return "conjugate";
     }

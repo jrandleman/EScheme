@@ -20,7 +20,7 @@ import escm.vm.type.PrimitiveCallable;
 public class PortPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // open-input-file
-  public static class OpenInputFile implements Primitive {
+  public static class OpenInputFile extends Primitive {
     public java.lang.String escmName() {
       return "open-input-file";
     }
@@ -35,7 +35,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // open-output-file
-  public static class OpenOutputFile implements Primitive {
+  public static class OpenOutputFile extends Primitive {
     public java.lang.String escmName() {
       return "open-output-file";
     }
@@ -52,7 +52,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // open-output-file+
-  public static class OpenOutputFilePlus implements Primitive {
+  public static class OpenOutputFilePlus extends Primitive {
     public java.lang.String escmName() {
       return "open-output-file+";
     }
@@ -67,7 +67,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // close-port!
-  public static class ClosePortBang implements Primitive {
+  public static class ClosePortBang extends Primitive {
     public java.lang.String escmName() {
       return "close-port!";
     }
@@ -83,7 +83,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // port-path
-  public static class PortPath implements Primitive {
+  public static class PortPath extends Primitive {
     public java.lang.String escmName() {
       return "port-path";
     }
@@ -98,7 +98,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // port-position
-  public static class PortPosition implements Primitive {
+  public static class PortPosition extends Primitive {
     public java.lang.String escmName() {
       return "port-position";
     }
@@ -114,7 +114,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // port?
-  public static class PortP implements Primitive {
+  public static class PortP extends Primitive {
     public java.lang.String escmName() {
       return "port?";
     }
@@ -129,7 +129,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // input-port?
-  public static class InputPortP implements Primitive {
+  public static class InputPortP extends Primitive {
     public java.lang.String escmName() {
       return "input-port?";
     }
@@ -144,7 +144,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // output-port?
-  public static class OutputPortP implements Primitive {
+  public static class OutputPortP extends Primitive {
     public java.lang.String escmName() {
       return "output-port?";
     }
@@ -159,7 +159,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // temp-port?
-  public static class TempPortP implements Primitive {
+  public static class TempPortP extends Primitive {
     public java.lang.String escmName() {
       return "temp-port?";
     }
@@ -174,7 +174,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // open-port?
-  public static class OpenPortP implements Primitive {
+  public static class OpenPortP extends Primitive {
     public java.lang.String escmName() {
       return "open-port?";
     }
@@ -189,7 +189,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // closed-port?
-  public static class ClosedPortP implements Primitive {
+  public static class ClosedPortP extends Primitive {
     public java.lang.String escmName() {
       return "closed-port?";
     }
@@ -204,7 +204,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // current-input-port
-  public static class CurrentInputPort implements Primitive {
+  public static class CurrentInputPort extends Primitive {
     public java.lang.String escmName() {
       return "current-input-port";
     }
@@ -219,7 +219,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // current-output-port
-  public static class CurrentOutputPort implements Primitive {
+  public static class CurrentOutputPort extends Primitive {
     public java.lang.String escmName() {
       return "current-output-port";
     }
@@ -234,7 +234,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // call-with-input-file
-  public static class CallWithInputFile implements PrimitiveCallable {
+  public static class CallWithInputFile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "call-with-input-file";
     }
@@ -261,7 +261,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // call-with-output-file
-  public static class CallWithOutputFile implements PrimitiveCallable {
+  public static class CallWithOutputFile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "call-with-output-file";
     }
@@ -292,7 +292,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // call-with-output-file+
-  public static class CallWithOutputFilePlus implements PrimitiveCallable {
+  public static class CallWithOutputFilePlus extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "call-with-output-file+";
     }
@@ -305,7 +305,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // with-input-from-file
-  public static class WithInputFromFile implements PrimitiveCallable {
+  public static class WithInputFromFile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "with-input-from-file";
     }
@@ -335,7 +335,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // with-output-to-file
-  public static class WithOutputToFile implements PrimitiveCallable {
+  public static class WithOutputToFile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "with-output-to-file";
     }
@@ -369,7 +369,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // with-output-to-file+
-  public static class WithOutputToFilePlus implements PrimitiveCallable {
+  public static class WithOutputToFilePlus extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "with-output-to-file+";
     }
@@ -382,7 +382,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // peek-port
-  public static class ResetInputPortBang implements Primitive {
+  public static class ResetInputPortBang extends Primitive {
     public java.lang.String escmName() {
       return "peek-port";
     }

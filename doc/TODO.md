@@ -17,9 +17,121 @@
 
 
 
+.
+=====
+# CURRENT DIRECTIVES: 
+
+[X] GO THRU ALL INSTANCES OF CREATED `Primitive` OR `PrimitiveCallable` OBJECTS TO MK SURE THEY ALWAYS GET THEIR `definitionEnvironment` SET TO A NON-NULL VALUE!
+
+[ ] UPLOAD PROGRESS TO GITHUB
+[ ] TRY HAVING MACROS BE TRACKED IN ENVIORNMENTS AS REGULAR VARIABLES!
+[ ] UPDATE DOCUMENTATION ON MACROS/VARIABLES SAME NAMESPACE IN (`help` + FILES IN `/doc/`) WITH PROGRESS
+[ ] UPLOAD PROGRESS TO GITHUB
+[ ] TRY HAVING MACROS BE TRACKED IN ENVIORNMENTS AS REGULAR VARIABLES!
+[ ] IMPLEMENT MODULES
+[ ] MENTION THAT `dosync` OPERATES RELATIVE TO MODULES (EACH MODULE GETS ITS OWN NEW UNDERLYING LOCK USED BY `dosync` IN THAT MODULE'S CONTEXT)
+[ ] UPDATE DOCUMENTATION (`help` + FILES IN `/doc/`) WITH PROGRESS
+[ ] DELETE OLD NOTES IN THIS "TODO" FILE
+[ ] TACKLE "AFTER MODULE TODOS"
+[ ] UPDATE DOCUMENTATION (`help` + FILES IN `/doc/`) WITH PROGRESS
+=====
+
+
 
 
 --
+
+ISSUE: NEED TO TRACK MACROS SEPERATELY IN SEPERATE MACROS
+  => HENCE CAN'T JUST TRACK THEM ALL GLOBALLY
+  => GIVE THE COMPILER THE HASHMAP TO STORE MACROS IN??
+     -> THEN MANAGE THAT HASHMAPS RELATIONSHIP TO OTHER HASHMAPS SEPERATELY??
+     -> HAVE A WAY TO REFER TO MACROS IN OTHER MODULES
+        * NOTE THAT `(import <mod>.<sym> :as <alias>)` SHOULD WORK ON BOTH VARIABLES && MACROS!
+        * WILL LIKELY INVOLVE SENDING ENV PTRS TO THE `Compiler.run` FCN TOO, IN ORDER TO HAVE MACROS EXPAND RELATIVE TO MODULES
+        * ___NOTE___: THIS CHANGE WILL LIKELY CHANGE A FEW VARIABLES FROM BEING STORED IN `GlobalState` TO BE STAORED A THREAD-LOCAL VARIABLE IN THE CURRENT THREAD!
+          - E.G. `loadedOnceFiles`
+==============
+
+NEED TO CONSIDER IMPORTING SEMANTICS FOR FILE EXTENSIONS: SHOULD THEY BE IGNORED? 
+  => E.G. YOU'D IMPORT "file.scm" AND "file.escm" AS BOTH `(import file)`
+==============
+
+ORR ONLY HAVE MODULE LOGIC BE IMPLEMENTED BY `escm-import` JAVA PRIMITIVE THAT IMPLEMENTS THE `import` LOGIC!
+  => E.G. DON'T BOTHER TRYING TO CREATE A MODULE FOR THE CURRENT FILE. SIMPLY HAVE LOADING THE ESCM JAVA/ESCM PRIMITIVES DO SO IN ANOTHER SEPERATE ENV VARIABLE THAT ACTS AS THE "NEXT" PTR TO THE ENVIRONMENT OF THE MAIN FILE BEING EVAL'D (OR THE "REPL"). 
+  => HENCE MODULES ARE ___ONLY___ CREATED BY USING `import`: THE IMPORTED FILE IS SYNCHRONOUSLY EVALUATED IN A SEPERATE GLOBAL ENV VARIABLE WHO'S NEXT PTR IS THE ENV VARIABLE WITH ALL OF THE ESCM PRIMITIVES DEFINED
+  => THEN DEFINE THAT MODULE AS A VARIABLE IN THE "importing" FILE !!!
+     => this ought to avoid the need for a "stack" of modules in the current thread, or any BS like that
+.
+==============
+
+NEED SOME META-MODULE TO CONTAIN THE DEFNS OF PRIMITIVES FROM `stdlib.scm` SO THAT MODULES IMPORTED INTO THEIR OWN CONTEXT STILL HAVE ACCESS TO PRIMITIVE VARIABLES
+==============
+
+SEE IPHONE PIC
+==============
+
+WHAT IF `(import <module>.<symbol>)` DEFINED A READER MACRO `<symbol>` THAT EXPANDED TO `<module>.<symbol>` 
+  => (THEN `(import <module>.<symbol> :as <symbol2>)`) WOULD DEFN A READER MACRO `<symbol2>` FOR `<module>.<symbol>`
+
+  ISSUES FROM SUCH:
+    1) `<module>` WOULD THEN ALSO BE DEFINED AS A VARIABLE WITHIN THE CURRENT SCOPE
+       => MAYBE THIS IS OK IFF WE EXPLAIN SUCH IN THE DOCUMENTATION AS EXPECTED BEHAVIOR?
+    2) QUOTING `'<symbol>` WOULD PRINT AS `'<module>.<symbol>`
+    3) ==== THIS MAY NOT ACTUALLY WORK W/O COMPLICATIONS ==== IMAGINE A FILE LOADING A MODULE WITH AN ALIAS, THEN IMPORTING THAT FILE INTO ANOTHER FILE THAT WANTS TO REFER TOT HE ALIAS 
+       =>  ***** HENCE WOULD HAVE TO MERGE READER MACROS? *****
+
+NOTE: MAYBE HAVE `(import <module>.<symbol>)` YIELD `(begin (import <module>) (def <symbol> <module>.<symbol>))`
+  THIS IS ONLY AN ISSUE IF SAY WE HAVE TO SHARE STATE BETWEEN MODULES ACROSS SEVERAL FILES
+  => suppose module "m" with global variable "i". file "f1" imports "m" and increments "i". file "f2" imports "m" and prints i (gets the unincremented version)
+==============
+
+NEED TO PREVENT ISSUES W/ CIRUCLAR IMPORTS (SHOULD BE HANDLED BY THE DEFAULT `import` MACRO, E.G. DON'T HAVE A SEPERATE `import-once` ALT): REFER TO CURRENT SOLUTIONS FOR CIRCULAR LOADS
+==============
+
+ALSO SUPPORT IMPORTING SERIALIZED FILES (REFER TO HOW `load`  OPERATES)
+==============
+
+OR JUST DEFINE `(import <module>.<sym>)` IN THE DOCUMENTATION TO BIND SUCH TO `<sym>` IN THE CURRENT MODULE
+  => NOTE: WE'D LIKE TO SUPPORT `(import folder.innerFolder.module)` & `(import folder.innerFolder.module.obj)` SYNTAX TOO
+     * ISSUE: how to determine if the last symbol in the dot-chain is supposed to be a module getting entirely imported or if its an object within a module (which would be the 2nd-to-last symbol in the dot-chain)
+       - SOLN: if 2nd to last symbol is a folder & last symbol is a file, import as a module
+               - else: treat as if 2nd to last symbol is a file & last symbol is an entity to bind as its own name in the current module
+==============
+
+
+.
+=====
+# TODOS AFTER IMPLEMENTING MODULES: 
+
+[ ] CONSIDER A READER MACRO `#imported` THAT EVALS TO `#t` OR `#f` DEPENDING ON WHETHER THE CURRENT MACRO IS BEING IMPORTED OR NOT!
+    => DETERMINE HOW TO HANDLE THIS WHEN `load`ING FILES THOUGH!
+
+[ ] CHANGE `loadedOnceFiles` TO BE A VARIABLE STORED IN THE CURRENT ENVIRONMENT: `*escm-loaded-once-files*`
+
+[ ] MENTION IN README/HELP THAT META-THREAD ENVIORNMENTS ARE ___NOT___ MODULE-SPECIFIC!
+
+[ ] SEEK & ALIMINATE ALL REFERENCES TO `tdwf`
+    => REMENANT FROM OLD TESTING
+
+[ ] CHANGE DOCUMENTATION IN `help`/README/ETC. (SEE ALL OTHER DOCS) TO MENTION THAT MACROS + VARIABLES ARE IN THE SAME NAMESPACE, AND THAT MACROS ARE VARIABLES IN A MODULE JUST LIKE ANY RUN-TIME VALUE
+    => ONLY DO THIS AFTER CHANGING MACROS TO BE BOUND INSIDE OF THE GLOBAL ENVIRONMENT PASSED AS AN ARG TO THE COMPILER, RATHER THAN BEING IN A SEPERATE REGISTRY
+
+[ ] TEST WITH SERIALIZED AND INTERPRETED VERSIONS OF THE STDLIB (DETERMINED BY INSTALLATION)
+
+[ ] REMEMBER TO UPDATE `modules.md` IN `doc` PRIOR COMMITTING TO GITHUB TOO!
+    => CONSIDER ALSO MVING `test.scm` INTO SOMEWHERE ELSE BESIDE `EScheme` TOO ... SHOULDN'T BE HAVING THAT ON THE GITHUB
+
+[ ] AFTER MODULES ARE COMPLETED, ACCOUNT FOR SUCH IN ALL `help` DOCUMENTATION (E.G. ADJUST REFERENCES TO "THE GLOBAL SCOPE" TO ACCOUNT FOR MODULES)
+
+[ ] CONSIDER CMD-LINE ARGUMENTS `--import <folder>.<filename>` `-i <folder>.<filename>` TO ACT LIKE `load` BUT AS AN IMPORTED MODULE
+
+[ ] CHANGE THE ESCM VERSION TO BE `9` AFTER SOLVING MODULES!
+=====
+
+
+
+
+
 
 Walk Module Ideas:
   => Modules as extending meta-objects?
@@ -186,6 +298,100 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 
 
 
+[ ] IMPROVE ASCII ART AGAIN (specifically wording under the intro credit)!
+
+
+
+
+
+
+
+
+[ ] INVESTIGATE `pprint`ING ISSUE WHERE ` ` GETS PRINTED BY THE BELOW CODE WHEN RUN IN SUBLIME TEXT:
+
+    ```scheme
+    (pprint '(define (escm-quasiquote->quote lst level)
+      (define (iter lst)
+        (define hd (if (not (atom? lst)) (car lst)))
+              ; finished parsing expression (proper list)
+        (cond ((null? lst) (quote ()))
+              ; quasiquote vector
+              ((vector? lst)
+                (list (list (quote list->vector) (escm-quasiquote->quote (vector->list lst) level))))
+              ; quasiquote hashmap
+              ((hashmap? lst)
+                (list (list (quote list->hashmap) (escm-quasiquote->quote (hashmap->list lst) level))))
+              ; finished parsing expression (dotted list)
+              ((atom? lst)
+                (list (list (quote quote) lst)))
+              ; unquote rest of list
+              ((escm-quasiquote-tagged-list? lst (quote unquote))
+                (if (= level 0)
+                    (list (cadr lst))
+                    (list (list (quote list) (quote (quote unquote)) (escm-quasiquote->quote (cadr lst) (- level 1)))))) ; *there*: recursively parse, in nested quasiquote
+              ; quasiquote vector
+              ((vector? hd)
+                (cons (list (quote list) (list (quote list->vector) (escm-quasiquote->quote (vector->list hd) level)))
+                      (iter (cdr lst))))
+              ; quasiquote hashmap
+              ((hashmap? hd)
+                (cons (list (quote list) (list (quote list->hashmap) (escm-quasiquote->quote (hashmap->list hd) level)))
+                      (iter (cdr lst))))
+              ; quote atom
+              ((atom? hd)
+                (cons (list (quote list) (list (quote quote) hd))
+                      (iter (cdr lst))))
+              ; unquote datum
+              ((escm-quasiquote-tagged-list? hd (quote unquote))
+                (if (= level 0)
+                    (cons (list (quote list) (cadr hd))
+                          (iter (cdr lst)))
+                    (cons (list (quote list) (escm-quasiquote->quote hd level)) ; recursively parse, in nested quasiquote (level will be decremented *there*)
+                          (iter (cdr lst)))))
+              ; unquote & signal should splice element
+              ((escm-quasiquote-tagged-list? hd (quote unquote-splicing))
+                (if (= level 0)
+                    (cons (cadr hd) ; evaluate datum & append to the expression
+                          (iter (cdr lst)))
+                    (cons (list (quote list) (escm-quasiquote->quote hd (- level 1))) ; recursively parse, in nested quasiquote
+                          (iter (cdr lst)))))
+              ; nested quasiquote
+              ((escm-quasiquote-tagged-list? hd (quote quasiquote))
+                (cons (list (quote list) (escm-quasiquote->quote hd (+ level 1))) ; recursively parse, in nested quasiquote
+                      (iter (cdr lst))))
+              ; quasiquote expression
+              (else
+                (cons (list (quote list) (escm-quasiquote->quote hd level))
+                      (iter (cdr lst))))))
+      (cons (quote append) (iter lst))))
+    (newline)
+    ```
+
+
+
+
+
+
+
+
+
+[ ] CONSIDER SUPPORTING THE CONCEPT OF THE `.escm-paths` FILE:
+  => THIS FILE WOULD HOLD A LIST OF PATHS TO CHECK IF THE DEFAULT `load`/`import` behavior can't find the file
+     * EFFECTIVELY LIKE THE `$PATH` ENV VARIABLE, BUT IT IS ONLY USED BY ESCM
+     * SHOULD ALSO WORK FOR OTHER FILE READING OPTIONS (LIKE `file-read`, `read`, ETC.)
+  => ALSO INCLUDES ADDING IN ALL OF THE CMD-LINE AND FUNCTION PRIMITIVE SUPPORT REQUIRED IN ORDER TO MODIFY SUCH
+     * `$ escm --add-path <path>` | `$ escm -ap <path>` // every argument afterwards would be used to create the path, and would immediately kill the process after adding the path (like how `help` kills the process after printing its relevant information)
+     * `$ escm --list-paths` | `$ escm -lp`
+     * `$ escm --remove-path <path>` | `$ escm -rp <path>`
+     * NOTE: WOULD WANT TO ADD ALL OF THESE COMMANDS TO THE `help` MENU && `README.md` !!!
+
+
+
+
+
+
+
+
 
 
 
@@ -202,6 +408,7 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 
 
 - CONSIDER CHANGING SYNTAX FOR READER SHORTHAND LAMBDAS FROM `\` TO `#`: `#(* %1 2)`
+  * would make this more ide-friendly for existing scheme pkgs
 
 
 
@@ -418,7 +625,6 @@ PROBLEM: How can we intermix the notion of serialization and modules?
 
 
 - ADD IN MORE DIVERSE/COMPLEX SAMPLE FILES TO THE `doc/example` DIRECTORY
-
 
 
 

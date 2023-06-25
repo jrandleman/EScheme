@@ -15,7 +15,7 @@ import escm.vm.type.Primitive;
 public class HashmapPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // hashmap
-  public static class Hashmap implements Primitive {
+  public static class Hashmap extends Primitive {
     public java.lang.String escmName() {
       return "hashmap";
     }
@@ -34,7 +34,7 @@ public class HashmapPrimitives {
   
   ////////////////////////////////////////////////////////////////////////////
   // hashmap-keys
-  public static class HashmapKeys implements Primitive {
+  public static class HashmapKeys extends Primitive {
     public java.lang.String escmName() {
       return "hashmap-keys";
     }
@@ -49,7 +49,7 @@ public class HashmapPrimitives {
   
   ////////////////////////////////////////////////////////////////////////////
   // hashmap-values
-  public static class HashmapValues implements Primitive {
+  public static class HashmapValues extends Primitive {
     public java.lang.String escmName() {
       return "hashmap-values";
     }
@@ -64,7 +64,7 @@ public class HashmapPrimitives {
   
   ////////////////////////////////////////////////////////////////////////////
   // hashmap-key?
-  public static class IsHashmapKey implements Primitive {
+  public static class IsHashmapKey extends Primitive {
     public java.lang.String escmName() {
       return "hashmap-key?";
     }
@@ -82,7 +82,7 @@ public class HashmapPrimitives {
   
   ////////////////////////////////////////////////////////////////////////////
   // hashmap-set!
-  public static class HashmapSetBang implements Primitive {
+  public static class HashmapSetBang extends Primitive {
     public java.lang.String escmName() {
       return "hashmap-set!";
     }
@@ -100,7 +100,7 @@ public class HashmapPrimitives {
   
   ////////////////////////////////////////////////////////////////////////////
   // hashmap-delete!
-  public static class HashmapDeleteBang implements Primitive {
+  public static class HashmapDeleteBang extends Primitive {
     public java.lang.String escmName() {
       return "hashmap-delete!";
     }
@@ -118,7 +118,7 @@ public class HashmapPrimitives {
   
   ////////////////////////////////////////////////////////////////////////////
   // hashmap-merge
-  public static class HashmapMerge implements Primitive {
+  public static class HashmapMerge extends Primitive {
     public java.lang.String escmName() {
       return "hashmap-merge";
     }
@@ -139,7 +139,7 @@ public class HashmapPrimitives {
   
   ////////////////////////////////////////////////////////////////////////////
   // hashmap-merge!
-  public static class HashmapMergeBang implements Primitive {
+  public static class HashmapMergeBang extends Primitive {
     public java.lang.String escmName() {
       return "hashmap-merge!";
     }
@@ -165,7 +165,7 @@ public class HashmapPrimitives {
   
   ////////////////////////////////////////////////////////////////////////////
   // hashmap?
-  public static class IsHashmap implements Primitive {
+  public static class IsHashmap extends Primitive {
     public java.lang.String escmName() {
       return "hashmap?";
     }
@@ -180,7 +180,7 @@ public class HashmapPrimitives {
   
   ////////////////////////////////////////////////////////////////////////////
   // hashcode
-  public static class Hashcode implements Primitive {
+  public static class Hashcode extends Primitive {
     public java.lang.String escmName() {
       return "hashcode";
     }

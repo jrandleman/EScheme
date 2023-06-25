@@ -13,7 +13,7 @@ import escm.vm.type.Primitive;
 public class SymbolPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // symbol-append
-  public static class SymbolAppend implements Primitive {
+  public static class SymbolAppend extends Primitive {
     public java.lang.String escmName() {
       return "symbol-append";
     }
@@ -34,7 +34,7 @@ public class SymbolPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // symbol?
-  public static class IsSymbol implements Primitive {
+  public static class IsSymbol extends Primitive {
     public java.lang.String escmName() {
       return "symbol?";
     }

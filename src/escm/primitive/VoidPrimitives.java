@@ -13,7 +13,7 @@ import escm.vm.type.Primitive;
 public class VoidPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // void?
-  public static class IsVoid implements Primitive {
+  public static class IsVoid extends Primitive {
     public java.lang.String escmName() {
       return "void?";
     }

@@ -18,7 +18,7 @@ import escm.vm.type.PrimitiveCallable;
 public class AssociativeCollectionPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // associative-collection?
-  public static class IsAssociativeCollection implements Primitive {
+  public static class IsAssociativeCollection extends Primitive {
     public java.lang.String escmName() {
       return "associative-collection?";
     }
@@ -33,7 +33,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // ac?
-  public static class IsAC implements Primitive {
+  public static class IsAC extends Primitive {
     public java.lang.String escmName() {
       return "ac?";
     }
@@ -48,7 +48,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // head
-  public static class Head implements Primitive {
+  public static class Head extends Primitive {
     public java.lang.String escmName() {
       return "head";
     }
@@ -63,7 +63,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // tail
-  public static class Tail implements Primitive {
+  public static class Tail extends Primitive {
     public java.lang.String escmName() {
       return "tail";
     }
@@ -78,7 +78,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // empty?
-  public static class EmptyP implements Primitive {
+  public static class EmptyP extends Primitive {
     public java.lang.String escmName() {
       return "empty?";
     }
@@ -93,7 +93,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // length
-  public static class Length implements Primitive {
+  public static class Length extends Primitive {
     public java.lang.String escmName() {
       return "length";
     }
@@ -111,7 +111,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // length+
-  public static class LengthPlus implements Primitive {
+  public static class LengthPlus extends Primitive {
     public java.lang.String escmName() {
       return "length+";
     }
@@ -128,7 +128,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // fold
-  public static class Fold implements PrimitiveCallable {
+  public static class Fold extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "fold";
     }
@@ -151,7 +151,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // map
-  public static class Map implements PrimitiveCallable {
+  public static class Map extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "map";
     }
@@ -170,7 +170,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // for-each
-  public static class ForEach implements PrimitiveCallable {
+  public static class ForEach extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "for-each";
     }
@@ -189,7 +189,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // filter
-  public static class Filter implements PrimitiveCallable {
+  public static class Filter extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "filter";
     }
@@ -208,7 +208,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // count
-  public static class Count implements PrimitiveCallable {
+  public static class Count extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "count";
     }
@@ -227,7 +227,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // remove
-  public static class Remove implements PrimitiveCallable {
+  public static class Remove extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "remove";
     }
@@ -246,7 +246,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // val
-  public static class Val implements Primitive {
+  public static class Val extends Primitive {
     public java.lang.String escmName() {
       return "val";
     }
@@ -263,7 +263,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // key
-  public static class Key implements PrimitiveCallable {
+  public static class Key extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "key";
     }
@@ -282,7 +282,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // append
-  public static class Append implements Primitive {
+  public static class Append extends Primitive {
     public java.lang.String escmName() {
       return "append";
     }
@@ -297,7 +297,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // delete
-  public static class Delete implements Primitive {
+  public static class Delete extends Primitive {
     public java.lang.String escmName() {
       return "delete";
     }
@@ -314,7 +314,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // conj
-  public static class Conj implements Primitive {
+  public static class Conj extends Primitive {
     public java.lang.String escmName() {
       return "conj";
     }
@@ -331,7 +331,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // take
-  public static class Take implements Primitive {
+  public static class Take extends Primitive {
     public java.lang.String escmName() {
       return "take";
     }
@@ -350,7 +350,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // drop
-  public static class Drop implements Primitive {
+  public static class Drop extends Primitive {
     public java.lang.String escmName() {
       return "drop";
     }
@@ -369,7 +369,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // any?
-  public static class AnyP implements PrimitiveCallable {
+  public static class AnyP extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "any?";
     }
@@ -397,7 +397,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // every?
-  public static class EveryP implements PrimitiveCallable {
+  public static class EveryP extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "every?";
     }
@@ -425,7 +425,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // ac->string
-  public static class ACToString implements Primitive {
+  public static class ACToString extends Primitive {
     public java.lang.String escmName() {
       return "ac->string";
     }
@@ -440,7 +440,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // ac->list
-  public static class ACToList implements Primitive {
+  public static class ACToList extends Primitive {
     public java.lang.String escmName() {
       return "ac->list";
     }
@@ -455,7 +455,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // ac->vector
-  public static class ACToVector implements Primitive {
+  public static class ACToVector extends Primitive {
     public java.lang.String escmName() {
       return "ac->vector";
     }
@@ -470,7 +470,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // ac->hashmap
-  public static class ACToHashmap implements Primitive {
+  public static class ACToHashmap extends Primitive {
     public java.lang.String escmName() {
       return "ac->hashmap";
     }
@@ -485,7 +485,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // union
-  public static class Union implements PrimitiveCallable {
+  public static class Union extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "union";
     }
@@ -505,7 +505,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // intersection
-  public static class Intersection implements PrimitiveCallable {
+  public static class Intersection extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "intersection";
     }
@@ -525,7 +525,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // difference
-  public static class Difference implements PrimitiveCallable {
+  public static class Difference extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "difference";
     }
@@ -545,7 +545,7 @@ public class AssociativeCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // symmetric-difference
-  public static class SymmetricDifference implements PrimitiveCallable {
+  public static class SymmetricDifference extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "symmetric-difference";
     }

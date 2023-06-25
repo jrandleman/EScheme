@@ -30,7 +30,7 @@ import escm.vm.type.Primitive;
 import escm.vm.runtime.installerGenerated.EscmPath;
 
 public class HelpPrimitive {
-  public static class Help implements Primitive {
+  public static class Help extends Primitive {
     //////////////////////////////////////////////////////////////////////////
     // Constants
     private static final int MAXIMUM_SUGGESTED_SEARCH_ALTERNATIVES = 25;

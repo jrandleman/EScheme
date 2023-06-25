@@ -21,7 +21,7 @@ import escm.vm.type.AssociativeCollection;
 public class VectorPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // vector
-  public static class Vector implements Primitive {
+  public static class Vector extends Primitive {
     public java.lang.String escmName() {
       return "vector";
     }
@@ -34,7 +34,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // make-vector
-  public static class MakeVector implements Primitive {
+  public static class MakeVector extends Primitive {
     public java.lang.String escmName() {
       return "make-vector";
     }
@@ -53,7 +53,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-set!
-  public static class VectorSetBang implements Primitive {
+  public static class VectorSetBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-set!";
     }
@@ -76,7 +76,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-fill!
-  public static class VectorFillBang implements Primitive {
+  public static class VectorFillBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-fill!";
     }
@@ -92,7 +92,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-grow!
-  public static class VectorGrowBang implements Primitive {
+  public static class VectorGrowBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-grow!";
     }
@@ -115,7 +115,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-insert!
-  public static class VectorInsertBang implements Primitive {
+  public static class VectorInsertBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-insert!";
     }
@@ -138,7 +138,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-delete!
-  public static class VectorDeleteBang implements Primitive {
+  public static class VectorDeleteBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-delete!";
     }
@@ -159,7 +159,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-push!
-  public static class VectorPushBang implements Primitive {
+  public static class VectorPushBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-push!";
     }
@@ -179,7 +179,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-push-front!
-  public static class VectorPushFrontBang implements Primitive {
+  public static class VectorPushFrontBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-push-front!";
     }
@@ -199,7 +199,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-pop!
-  public static class VectorPopBang implements Primitive {
+  public static class VectorPopBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-pop!";
     }
@@ -214,7 +214,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-pop-front!
-  public static class VectorPopFrontBang implements Primitive {
+  public static class VectorPopFrontBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-pop-front!";
     }
@@ -229,7 +229,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-append!
-  public static class VectorAppendBang implements Primitive {
+  public static class VectorAppendBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-append!";
     }
@@ -255,7 +255,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-unfold
-  public static class VectorUnfold implements PrimitiveCallable {
+  public static class VectorUnfold extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "vector-unfold";
     }
@@ -278,7 +278,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-unfold-right
-  public static class VectorUnfoldRight implements PrimitiveCallable {
+  public static class VectorUnfoldRight extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "vector-unfold-right";
     }
@@ -301,7 +301,7 @@ public class VectorPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-memq
-  public static class VectorMemq implements PrimitiveCallable {
+  public static class VectorMemq extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "vector-memq";
     }
@@ -313,14 +313,14 @@ public class VectorPrimitives {
       Datum o = parameters.get(1);
       if(!(v instanceof escm.type.Vector))
         throw new Exceptionf("'(vector-memq <vector> <obj>) 1st arg isn't a vector: %s", Exceptionf.profileArgs(parameters));
-      return ((escm.type.Vector)v).indexOf(ListPrimitives.Memq.getGlobalEqpProcedure(),o,continuation);
+      return ((escm.type.Vector)v).indexOf(ListPrimitives.Memq.getEqpProcedure(this.definitionEnvironment),o,continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // vector-member
-  public static class VectorMember implements PrimitiveCallable {
+  public static class VectorMember extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "vector-member";
     }
@@ -332,14 +332,14 @@ public class VectorPrimitives {
       Datum o = parameters.get(1);
       if(!(v instanceof escm.type.Vector))
         throw new Exceptionf("'(vector-member <vector> <obj>) 1st arg isn't a vector: %s", Exceptionf.profileArgs(parameters));
-      return ((escm.type.Vector)v).indexOf(ListPrimitives.Member.getGlobalEqualpProcedure(),o,continuation);
+      return ((escm.type.Vector)v).indexOf(ListPrimitives.Member.getEqualpProcedure(this.definitionEnvironment),o,continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // vector?
-  public static class IsVector implements Primitive {
+  public static class IsVector extends Primitive {
     public java.lang.String escmName() {
       return "vector?";
     }

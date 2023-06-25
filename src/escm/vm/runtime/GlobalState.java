@@ -53,28 +53,25 @@ public class GlobalState {
   public static Environment metaThreadDynamicEnvironment = new Environment();
 
   ////////////////////////////////////////////////////////////////////////////
-  // Representing the Global Environment
-  // => Initialized via <initialize> below
-  public static Environment globalEnvironment = new Environment();
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Initialize the global environment
-  public static void initializeCoreJavaState() throws Exception {
-    globalEnvironment.define(new Symbol("*argv*"),getArgv());
-    globalEnvironment.define(new Symbol("*file-separator*"),new escm.type.String(File.separator));
-    globalEnvironment.define(new Symbol("*path-separator*"),new escm.type.String(File.pathSeparator));
-    globalEnvironment.define(new Symbol("*os-name*"),new escm.type.String(System.getProperty("os.name")));
-    globalEnvironment.define(new Symbol("*os-version*"),new escm.type.String(System.getProperty("os.version")));
-    globalEnvironment.define(new Symbol("*os-architecture*"),new escm.type.String(System.getProperty("os.arch")));
-    globalEnvironment.define(new Symbol("*escm-path*"),new escm.type.String(EscmPath.VALUE));
-    globalEnvironment.define(new Symbol("*escm-execution-command*"),new escm.type.String(" "+JvmPathPrefix.VALUE+"java -classpath "+EscmPath.VALUE+File.separator+"bin Main "));
-    globalEnvironment.define(new Symbol("*min-radix*"),new Exact(Number.MIN_RADIX));
-    globalEnvironment.define(new Symbol("*max-radix*"),new Exact(Number.MAX_RADIX));
-    JavaStdLibLoader.load();
+  // Get the default environment (only has EScheme's core primitives defined)
+  public static void loadJavaPrimitives(Environment definitionEnvironment) throws Exception {
+    definitionEnvironment.define(new Symbol("*argv*"),getArgv());
+    definitionEnvironment.define(new Symbol("*file-separator*"),new escm.type.String(File.separator));
+    definitionEnvironment.define(new Symbol("*path-separator*"),new escm.type.String(File.pathSeparator));
+    definitionEnvironment.define(new Symbol("*os-name*"),new escm.type.String(System.getProperty("os.name")));
+    definitionEnvironment.define(new Symbol("*os-version*"),new escm.type.String(System.getProperty("os.version")));
+    definitionEnvironment.define(new Symbol("*os-architecture*"),new escm.type.String(System.getProperty("os.arch")));
+    definitionEnvironment.define(new Symbol("*escm-path*"),new escm.type.String(EscmPath.VALUE));
+    definitionEnvironment.define(new Symbol("*escm-execution-command*"),new escm.type.String(" "+JvmPathPrefix.VALUE+"java -classpath "+EscmPath.VALUE+File.separator+"bin Main "));
+    definitionEnvironment.define(new Symbol("*min-radix*"),new Exact(Number.MIN_RADIX));
+    definitionEnvironment.define(new Symbol("*max-radix*"),new Exact(Number.MAX_RADIX));
+    JavaStdLibLoader.load(definitionEnvironment);
   }
 
-  public static void initialize() throws Exception {
-    initializeCoreJavaState();
-    EscmStdLibLoader.load();
+  public static Environment getDefaultEnvironment() throws Exception {
+    Environment definitionEnvironment = new Environment();
+    loadJavaPrimitives(definitionEnvironment);
+    EscmStdLibLoader.load(definitionEnvironment);
+    return definitionEnvironment;
   }
 };

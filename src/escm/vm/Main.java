@@ -42,7 +42,7 @@ public class Main {
   ////////////////////////////////////////////////////////////////////////////
   // Evaluate an escm expression in the given environment
   public static void eval(Environment env, Datum d, Trampoline.Continuation continuation) throws Exception {
-    Trampoline.resolve(Compiler.run(d,(compiled) -> () -> {
+    Trampoline.resolve(Compiler.run(d,env,(compiled) -> () -> {
       return Interpreter.run(new ExecutionState(env,Assembler.run(compiled)),continuation);
     }));
   }
@@ -140,7 +140,7 @@ public class Main {
   }
 
 
-  private static void launchRepl(ParsedCommandLine parsedCmdLine) throws Exception {
+  private static void launchRepl(ParsedCommandLine parsedCmdLine, Environment globalEnvironment) throws Exception {
     // Note that we DON'T set whether we're in the REPL here, as such risks
     //   causing a read/write race condition should a script loaded by "-l" 
     //   spawn a thread!
@@ -155,7 +155,7 @@ public class Main {
     };
     while(true) {
       try {
-        eval(GlobalState.globalEnvironment,readFullExpression(),printContinuation);
+        eval(globalEnvironment,readFullExpression(),printContinuation);
         EscmCallStack.clear(); // residue frames may reside after call/cc nonsense
       } catch(Throwable t) {
         reportTopLevelError(t);
@@ -168,9 +168,9 @@ public class Main {
   // Implementing our File Interpreter
   private static void launchScript(ParsedCommandLine parsedCmdLine) throws Exception {
     // Initialize the runtime, load the file, & launch REPL if found "-l" prior the filename
-    GlobalState.initialize();
+    Environment globalEnvironment = GlobalState.getDefaultEnvironment();
     Trampoline.Continuation replIfReplingContinuation = (value) -> () -> {
-      if(parsedCmdLine.loadingIntoREPL) launchRepl(parsedCmdLine);
+      if(parsedCmdLine.loadingIntoREPL) launchRepl(parsedCmdLine,globalEnvironment);
       return Trampoline.LAST_BOUNCE_SIGNAL;
     };
     // Note that we set whether we're in the REPL here, as setting in <launchRepl>
@@ -179,17 +179,18 @@ public class Main {
     if(parsedCmdLine.loadingIntoREPL) GlobalState.inREPL = true; // trigger exit message to be printed
     if(FilePrimitives.IsFileP.logic(Path.of(parsedCmdLine.scriptName)) == false)
       throw new Exceptionf("\"--load\": \"%s\" isn't a file!\n  %s", parsedCmdLine.scriptName, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
-    Trampoline.resolve(SystemPrimitives.Load.logic("load",parsedCmdLine.scriptName,replIfReplingContinuation));
+    Trampoline.resolve(SystemPrimitives.Load.logic("load",parsedCmdLine.scriptName,globalEnvironment,replIfReplingContinuation));
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Implementing the <stdlib.scm> Serializer
   private static void serializeStdLib() throws Exception {
-    GlobalState.initializeCoreJavaState();
+    Environment globalEnvironment = new Environment();
+    GlobalState.loadJavaPrimitives(globalEnvironment);
     String escmStdlibPath = EscmPath.VALUE+File.separator+"src"+File.separator+"stdlib.scm";
     String serStdlibPath = EscmPath.VALUE+File.separator+"bin"+File.separator+"stdlib.ser";
-    Trampoline.resolve(SerializationPrimitives.Serialize.logic(escmStdlibPath,serStdlibPath,(ignore) -> () -> Trampoline.LAST_BOUNCE_SIGNAL));
+    Trampoline.resolve(SerializationPrimitives.Serialize.logic(escmStdlibPath,serStdlibPath,globalEnvironment,(ignore) -> () -> Trampoline.LAST_BOUNCE_SIGNAL));
   }
 
 
@@ -267,9 +268,9 @@ public class Main {
           if(parsedCmdLine.serializingStdLib == true) {
             serializeStdLib();
           } else if(parsedCmdLine.scriptName == null) {
-            GlobalState.initialize();
+            Environment globalEnvironment = GlobalState.getDefaultEnvironment();
             GlobalState.inREPL = true; // trigger exit message to be printed
-            launchRepl(parsedCmdLine);
+            launchRepl(parsedCmdLine,globalEnvironment);
           } else {
             launchScript(parsedCmdLine);
           }

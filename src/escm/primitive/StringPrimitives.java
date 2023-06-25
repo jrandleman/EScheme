@@ -21,7 +21,7 @@ import escm.vm.type.AssociativeCollection;
 public class StringPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // string
-  public static class String implements Primitive {
+  public static class String extends Primitive {
     public java.lang.String escmName() {
       return "string";
     }
@@ -36,7 +36,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-java-length
-  public static class StringJavaLength implements Primitive {
+  public static class StringJavaLength extends Primitive {
     public java.lang.String escmName() {
       return "string-java-length";
     }
@@ -51,7 +51,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-upcase
-  public static class StringUpcase implements Primitive {
+  public static class StringUpcase extends Primitive {
     public java.lang.String escmName() {
       return "string-upcase";
     }
@@ -66,7 +66,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-downcase
-  public static class StringDowncase implements Primitive {
+  public static class StringDowncase extends Primitive {
     public java.lang.String escmName() {
       return "string-downcase";
     }
@@ -81,7 +81,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-escape
-  public static class StringEscape implements Primitive {
+  public static class StringEscape extends Primitive {
     public java.lang.String escmName() {
       return "string-escape";
     }
@@ -96,7 +96,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-java-escape
-  public static class StringJavaEscape implements Primitive {
+  public static class StringJavaEscape extends Primitive {
     public java.lang.String escmName() {
       return "string-java-escape";
     }
@@ -111,7 +111,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-unescape
-  public static class StringUnescape implements Primitive {
+  public static class StringUnescape extends Primitive {
     public java.lang.String escmName() {
       return "string-unescape";
     }
@@ -126,7 +126,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-replace
-  public static class StringReplace implements Primitive {
+  public static class StringReplace extends Primitive {
     public java.lang.String escmName() {
       return "string-replace";
     }
@@ -145,7 +145,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-trim
-  public static class StringTrim implements Primitive {
+  public static class StringTrim extends Primitive {
     public java.lang.String escmName() {
       return "string-trim";
     }
@@ -160,7 +160,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-contains
-  public static class StringContains implements Primitive {
+  public static class StringContains extends Primitive {
     public java.lang.String escmName() {
       return "string-contains";
     }
@@ -177,7 +177,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-contains-right
-  public static class StringContainsRight implements Primitive {
+  public static class StringContainsRight extends Primitive {
     public java.lang.String escmName() {
       return "string-contains-right";
     }
@@ -194,7 +194,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-join
-  public static class StringJoin implements Primitive {
+  public static class StringJoin extends Primitive {
     public java.lang.String escmName() {
       return "string-join";
     }
@@ -231,7 +231,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-split
-  public static class StringSplit implements Primitive {
+  public static class StringSplit extends Primitive {
     public java.lang.String escmName() {
       return "string-split";
     }
@@ -277,7 +277,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-unfold
-  public static class StringUnfold implements PrimitiveCallable {
+  public static class StringUnfold extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "string-unfold";
     }
@@ -300,7 +300,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-unfold-right
-  public static class StringUnfoldRight implements PrimitiveCallable {
+  public static class StringUnfoldRight extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "string-unfold-right";
     }
@@ -323,7 +323,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string=?
-  public static class StringEquals implements Primitive {
+  public static class StringEquals extends Primitive {
     public java.lang.String escmName() {
       return "string=?";
     }
@@ -350,7 +350,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string<?
-  public static class StringLessThan implements Primitive {
+  public static class StringLessThan extends Primitive {
     public java.lang.String escmName() {
       return "string<?";
     }
@@ -377,7 +377,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string>?
-  public static class StringGreaterThan implements Primitive {
+  public static class StringGreaterThan extends Primitive {
     public java.lang.String escmName() {
       return "string>?";
     }
@@ -404,7 +404,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string<=?
-  public static class StringLessThanOrEqualTo implements Primitive {
+  public static class StringLessThanOrEqualTo extends Primitive {
     public java.lang.String escmName() {
       return "string<=?";
     }
@@ -431,7 +431,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string>=?
-  public static class StringGreaterThanOrEqualTo implements Primitive {
+  public static class StringGreaterThanOrEqualTo extends Primitive {
     public java.lang.String escmName() {
       return "string>=?";
     }
@@ -458,7 +458,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-ci=?
-  public static class StringCiEquals implements Primitive {
+  public static class StringCiEquals extends Primitive {
     public java.lang.String escmName() {
       return "string-ci=?";
     }
@@ -485,7 +485,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-ci<?
-  public static class StringCiLessThan implements Primitive {
+  public static class StringCiLessThan extends Primitive {
     public java.lang.String escmName() {
       return "string-ci<?";
     }
@@ -512,7 +512,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-ci>?
-  public static class StringCiGreaterThan implements Primitive {
+  public static class StringCiGreaterThan extends Primitive {
     public java.lang.String escmName() {
       return "string-ci>?";
     }
@@ -539,7 +539,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-ci<=?
-  public static class StringCiLessThanOrEqualTo implements Primitive {
+  public static class StringCiLessThanOrEqualTo extends Primitive {
     public java.lang.String escmName() {
       return "string-ci<=?";
     }
@@ -566,7 +566,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string-ci>=?
-  public static class StringCiGreaterThanOrEqualTo implements Primitive {
+  public static class StringCiGreaterThanOrEqualTo extends Primitive {
     public java.lang.String escmName() {
       return "string-ci>=?";
     }
@@ -593,7 +593,7 @@ public class StringPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string?
-  public static class IsString implements Primitive {
+  public static class IsString extends Primitive {
     public java.lang.String escmName() {
       return "string?";
     }

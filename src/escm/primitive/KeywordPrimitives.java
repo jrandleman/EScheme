@@ -13,7 +13,7 @@ import escm.vm.type.Primitive;
 public class KeywordPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // keyword-append
-  public static class KeywordAppend implements Primitive {
+  public static class KeywordAppend extends Primitive {
     public java.lang.String escmName() {
       return "keyword-append";
     }
@@ -34,7 +34,7 @@ public class KeywordPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // keyword?
-  public static class IsKeyword implements Primitive {
+  public static class IsKeyword extends Primitive {
     public java.lang.String escmName() {
       return "keyword?";
     }

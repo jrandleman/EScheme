@@ -12,7 +12,7 @@ import escm.vm.type.Primitive;
 public class EqualityPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // eq?
-  public static class IsEq implements Primitive {
+  public static class IsEq extends Primitive {
     public java.lang.String escmName() {
       return "eq?";
     }
@@ -30,7 +30,7 @@ public class EqualityPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // equal?
-  public static class IsEqual implements Primitive {
+  public static class IsEqual extends Primitive {
     public java.lang.String escmName() {
       return "equal?";
     }

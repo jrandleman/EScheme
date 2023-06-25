@@ -12,7 +12,7 @@ import escm.vm.type.Primitive;
 public class BooleanPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // boolean?
-  public static class IsBoolean implements Primitive {
+  public static class IsBoolean extends Primitive {
     public java.lang.String escmName() {
       return "boolean?";
     }
@@ -27,7 +27,7 @@ public class BooleanPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // not
-  public static class Not implements Primitive {
+  public static class Not extends Primitive {
     public java.lang.String escmName() {
       return "not";
     }

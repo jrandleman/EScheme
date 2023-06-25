@@ -19,7 +19,7 @@ import escm.vm.util.SourceInformation;
 public class FilePrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // file-read
-  public static class FileRead implements Primitive {
+  public static class FileRead extends Primitive {
     public java.lang.String escmName() {
       return "file-read";
     }
@@ -75,7 +75,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // file-read-string
-  public static class FileReadString implements Primitive {
+  public static class FileReadString extends Primitive {
     public java.lang.String escmName() {
       return "file-read-string";
     }
@@ -90,7 +90,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // file-write
-  public static class FileWrite implements Primitive {
+  public static class FileWrite extends Primitive {
     public java.lang.String escmName() {
       return "file-write";
     }
@@ -122,7 +122,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // file-write+
-  public static class FileWritePlus implements Primitive {
+  public static class FileWritePlus extends Primitive {
     public java.lang.String escmName() {
       return "file-write+";
     }
@@ -138,7 +138,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // file-display
-  public static class FileDisplay implements Primitive {
+  public static class FileDisplay extends Primitive {
     public java.lang.String escmName() {
       return "file-display";
     }
@@ -154,7 +154,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // file-display+
-  public static class FileDisplayPlus implements Primitive {
+  public static class FileDisplayPlus extends Primitive {
     public java.lang.String escmName() {
       return "file-display+";
     }
@@ -170,7 +170,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // file-pretty-print
-  public static class FilePprint implements Primitive {
+  public static class FilePprint extends Primitive {
     public java.lang.String escmName() {
       return "file-pretty-print";
     }
@@ -186,7 +186,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // file-pretty-print+
-  public static class FilePprintPlus implements Primitive {
+  public static class FilePprintPlus extends Primitive {
     public java.lang.String escmName() {
       return "file-pretty-print+";
     }
@@ -202,7 +202,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // path?
-  public static class IsPathP implements Primitive {
+  public static class IsPathP extends Primitive {
     public java.lang.String escmName() {
       return "path?";
     }
@@ -221,7 +221,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // directory?
-  public static class IsDirectoryP implements Primitive {
+  public static class IsDirectoryP extends Primitive {
     public java.lang.String escmName() {
       return "directory?";
     }
@@ -240,7 +240,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // file?
-  public static class IsFileP implements Primitive {
+  public static class IsFileP extends Primitive {
     public java.lang.String escmName() {
       return "file?";
     }
@@ -259,7 +259,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // file-delete!
-  public static class FileDeleteBang implements Primitive {
+  public static class FileDeleteBang extends Primitive {
     public java.lang.String escmName() {
       return "file-delete!";
     }
@@ -279,7 +279,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // directory-delete!
-  public static class DirectoryDeleteBang implements Primitive {
+  public static class DirectoryDeleteBang extends Primitive {
     public java.lang.String escmName() {
       return "directory-delete!";
     }
@@ -299,7 +299,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // directory-recursive-delete!
-  public static class DirectoryRecursiveDeleteBang implements Primitive {
+  public static class DirectoryRecursiveDeleteBang extends Primitive {
     public java.lang.String escmName() {
       return "directory-recursive-delete!";
     }
@@ -331,7 +331,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // path-delete!
-  public static class PathDeleteBang implements Primitive {
+  public static class PathDeleteBang extends Primitive {
     public java.lang.String escmName() {
       return "path-delete!";
     }
@@ -351,7 +351,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // path-recursive-delete!
-  public static class PathRecursiveDeleteBang implements Primitive {
+  public static class PathRecursiveDeleteBang extends Primitive {
     public java.lang.String escmName() {
       return "path-recursive-delete!";
     }
@@ -375,7 +375,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // directory-entries
-  public static class DirectoryEntries implements Primitive {
+  public static class DirectoryEntries extends Primitive {
     public java.lang.String escmName() {
       return "directory-entries";
     }
@@ -399,7 +399,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // directory-entries*
-  public static class DirectoryEntriesStar implements Primitive {
+  public static class DirectoryEntriesStar extends Primitive {
     public java.lang.String escmName() {
       return "directory-entries*";
     }
@@ -426,7 +426,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // current-directory
-  public static class CurrentDirectory implements Primitive {
+  public static class CurrentDirectory extends Primitive {
     public java.lang.String escmName() {
       return "current-directory";
     }
@@ -445,7 +445,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // path-parent
-  public static class PathParent implements Primitive {
+  public static class PathParent extends Primitive {
     public java.lang.String escmName() {
       return "path-parent";
     }
@@ -473,7 +473,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // path-file
-  public static class PathFile implements Primitive {
+  public static class PathFile extends Primitive {
     public java.lang.String escmName() {
       return "path-file";
     }
@@ -490,7 +490,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // make-directory
-  public static class MakeDirectory implements Primitive {
+  public static class MakeDirectory extends Primitive {
     public java.lang.String escmName() {
       return "make-directory";
     }
@@ -505,7 +505,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // make-directory!
-  public static class MakeDirectoryBang implements Primitive {
+  public static class MakeDirectoryBang extends Primitive {
     public java.lang.String escmName() {
       return "make-directory!";
     }
@@ -520,7 +520,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // absolute-path
-  public static class AbsolutePath implements Primitive {
+  public static class AbsolutePath extends Primitive {
     public java.lang.String escmName() {
       return "absolute-path";
     }
@@ -547,7 +547,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // absolute-path?
-  public static class IsAbsolutePath implements Primitive {
+  public static class IsAbsolutePath extends Primitive {
     public java.lang.String escmName() {
       return "absolute-path?";
     }
@@ -579,7 +579,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // file-extension
-  public static class FileExtension implements Primitive {
+  public static class FileExtension extends Primitive {
     public java.lang.String escmName() {
       return "file-extension";
     }
@@ -605,7 +605,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // file-has-extension?
-  public static class FileHasExtensionP implements Primitive {
+  public static class FileHasExtensionP extends Primitive {
     public java.lang.String escmName() {
       return "file-has-extension?";
     }
@@ -628,7 +628,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // swap-file-extension
-  public static class SwapFileExtension implements Primitive {
+  public static class SwapFileExtension extends Primitive {
     public java.lang.String escmName() {
       return "swap-file-extension";
     }
@@ -656,7 +656,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // remove-file-extension
-  public static class RemoveFileExtension implements Primitive {
+  public static class RemoveFileExtension extends Primitive {
     public java.lang.String escmName() {
       return "remove-file-extension";
     }
@@ -680,7 +680,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // file-size
-  public static class FileSize implements Primitive {
+  public static class FileSize extends Primitive {
     public java.lang.String escmName() {
       return "file-size";
     }
@@ -695,7 +695,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // move-file
-  public static class MoveFile implements Primitive {
+  public static class MoveFile extends Primitive {
     public java.lang.String escmName() {
       return "move-file";
     }
@@ -717,7 +717,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // move-file!
-  public static class MoveFileBang implements Primitive {
+  public static class MoveFileBang extends Primitive {
     public java.lang.String escmName() {
       return "move-file!";
     }
@@ -746,7 +746,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // copy-file
-  public static class CopyFile implements Primitive {
+  public static class CopyFile extends Primitive {
     public java.lang.String escmName() {
       return "copy-file";
     }
@@ -768,7 +768,7 @@ public class FilePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // copy-file!
-  public static class CopyFileBang implements Primitive {
+  public static class CopyFileBang extends Primitive {
     public java.lang.String escmName() {
       return "copy-file!";
     }

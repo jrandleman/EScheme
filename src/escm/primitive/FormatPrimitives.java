@@ -22,7 +22,7 @@ import escm.vm.type.Primitive;
 public class FormatPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // stringf
-  public static class Stringf implements Primitive {
+  public static class Stringf extends Primitive {
     public java.lang.String escmName() {
       return "stringf";
     }

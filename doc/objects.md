@@ -1,7 +1,7 @@
 <!-- objects.md -->
 
 # Object Orientation in EScheme
-### Describe's escm's OO system!
+### Describes escm's OO system!
 
 
 ## Object System Overview

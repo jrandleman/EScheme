@@ -21,7 +21,7 @@ import escm.vm.type.AssociativeCollection;
 public class FunctionalPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // id
-  public static class Id implements Primitive {
+  public static class Id extends Primitive {
     public java.lang.String escmName() {
       return "id";
     }
@@ -36,7 +36,7 @@ public class FunctionalPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // procedure?
-  public static class IsProcedure implements Primitive {
+  public static class IsProcedure extends Primitive {
     public java.lang.String escmName() {
       return "procedure?";
     }
@@ -51,7 +51,7 @@ public class FunctionalPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // callable?
-  public static class IsCallable implements Primitive {
+  public static class IsCallable extends Primitive {
     public java.lang.String escmName() {
       return "callable?";
     }
@@ -68,7 +68,7 @@ public class FunctionalPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // compose
-  public static class Compose implements Primitive {
+  public static class Compose extends Primitive {
     public java.lang.String escmName() {
       return "compose";
     }
@@ -109,7 +109,7 @@ public class FunctionalPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // bind
-  public static class Bind implements Primitive {
+  public static class Bind extends Primitive {
     public java.lang.String escmName() {
       return "bind";
     }

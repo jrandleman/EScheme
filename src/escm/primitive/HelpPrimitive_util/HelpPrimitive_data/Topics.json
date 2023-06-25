@@ -1,6 +1,6 @@
 [{
   "name": "object-oriented-programming",
-  "aliases": ["oop"],
+  "aliases": ["oop","oo"],
   "signatures": null,
   "description": "EScheme has a totally optional object system. See the <class> 'help' entry\nfor more nitty-gritty usage details, and <meta-object> for type details.\n\nAt a high-level, EScheme supports classes and interfaces. Like Java, there's\nsingle inheritance for classes and multiple inheritance for interfaces.\n\nReflection is done via OO primitives, often prefixed with 'oo-'.\n\nDot-notation for property access is supported even at the bytecode level,\nhence (define obj.property) is a valid instruction!\n\nAgain, check out <class>'s 'help' entry for more usage details :)",
   "example": null

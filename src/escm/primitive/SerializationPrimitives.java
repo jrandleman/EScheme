@@ -23,6 +23,7 @@ import escm.vm.Assembler;
 import escm.vm.Interpreter;
 import escm.vm.util.Instruction;
 import escm.vm.util.ExecutionState;
+import escm.vm.util.Environment;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
 import escm.vm.runtime.GlobalState;
@@ -67,7 +68,7 @@ public class SerializationPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // serialized?
-  public static class IsSerializedP implements Primitive {
+  public static class IsSerializedP extends Primitive {
     public java.lang.String escmName() {
       return "serialized?";
     }
@@ -107,22 +108,22 @@ public class SerializationPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // serialize
-  public static class Serialize implements PrimitiveCallable {
+  public static class Serialize extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "serialize";
     }
 
-    private static Trampoline.Bounce getDeserializedEscmInstructions(InstructionsList list, int i, int n, ArrayList<Datum> escmExprs, Trampoline.Continuation continuation) throws Exception { 
+    private static Trampoline.Bounce getDeserializedEscmInstructions(InstructionsList list, int i, int n, ArrayList<Datum> escmExprs, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception { 
       if(i >= n) {
         if(list == null) return continuation.run(new InstructionSet());
         return continuation.run(new InstructionSet(list.mergeInReverse()));
       }
-      return Compiler.run(escmExprs.get(i),(compiledExpr) -> () -> {
+      return Compiler.run(escmExprs.get(i),definitionEnvironment,(compiledExpr) -> () -> {
         ArrayList<Instruction> compiledAsm = Assembler.run(compiledExpr);
-        return Interpreter.run(new ExecutionState(GlobalState.globalEnvironment,compiledAsm),(evalResult) -> () -> {
+        return Interpreter.run(new ExecutionState(definitionEnvironment,compiledAsm),(evalResult) -> () -> {
           if(evalResult instanceof Eof)
             return continuation.run(new InstructionSet((new InstructionsList(compiledAsm,list)).mergeInReverse()));
-          return getDeserializedEscmInstructions(new InstructionsList(compiledAsm,list),i+1,n,escmExprs,continuation);
+          return getDeserializedEscmInstructions(new InstructionsList(compiledAsm,list),i+1,n,escmExprs,definitionEnvironment,continuation);
         });
       });
     }
@@ -136,13 +137,13 @@ public class SerializationPrimitives {
       fileOut.close();
     }
 
-    public static Trampoline.Bounce logic(String escmPathStr, String serializePath, Trampoline.Continuation continuation) throws Exception {
+    public static Trampoline.Bounce logic(String escmPathStr, String serializePath, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
       Path escmPath = Path.of(escmPathStr);
       if(FilePrimitives.IsFileP.logic(escmPath) == false)
         throw new Exceptionf("'(serialize <escm-file-path> <serialized-file-path>) 1st arg \"%s\" isn't a file!", escmPathStr);
       String escmContents = Files.readString(escmPath);
       ArrayList<Datum> escmExprs = FilePrimitives.FileRead.readBufferAsArrayList(escmPathStr,escmContents);
-      return getDeserializedEscmInstructions(null,0,escmExprs.size(),escmExprs,(instructionSet) -> () -> {
+      return getDeserializedEscmInstructions(null,0,escmExprs.size(),escmExprs,definitionEnvironment,(instructionSet) -> () -> {
         if(!(instructionSet instanceof InstructionSet))
           throw new Exceptionf("'(serialize <escm-file-path> <serialized-file-path>) compiling \"%s\" didn't yield an instruction set!", escmPathStr);
         ArrayList<Instruction> instructions = ((InstructionSet)instructionSet).value();
@@ -154,7 +155,7 @@ public class SerializationPrimitives {
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String) || !(parameters.get(1) instanceof escm.type.String)) 
         throw new Exceptionf("'(serialize <escm-file-path> <serialized-file-path>) didn't receive 2 strings: %s", Exceptionf.profileArgs(parameters));
-      return logic(((escm.type.String)parameters.get(0)).value(), ((escm.type.String)parameters.get(1)).value(), continuation);
+      return logic(((escm.type.String)parameters.get(0)).value(), ((escm.type.String)parameters.get(1)).value(), this.definitionEnvironment, continuation);
     }
   }
 
@@ -181,9 +182,9 @@ public class SerializationPrimitives {
   }
 
   // @PRECONDITION: IsSerializedP.logic(serializePath)
-  public static Trampoline.Bounce loadSerializedFile(String primitiveName, String serializePath, Trampoline.Continuation continuation) throws Exception {
+  public static Trampoline.Bounce loadSerializedFile(String primitiveName, String serializePath, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
     ArrayList<Instruction> instructions = getDeserializedEscmInstructions(primitiveName,serializePath);
-    return Interpreter.run(new ExecutionState(GlobalState.globalEnvironment,instructions),(evalResult) -> () -> {
+    return Interpreter.run(new ExecutionState(definitionEnvironment,instructions),(evalResult) -> () -> {
       if(evalResult instanceof Eof) return continuation.run(Void.VALUE);
       return continuation.run(evalResult);
     });

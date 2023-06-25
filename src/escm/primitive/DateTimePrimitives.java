@@ -15,7 +15,7 @@ import escm.vm.type.Primitive;
 public class DateTimePrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // current-time
-  public static class CurrentTime implements Primitive {
+  public static class CurrentTime extends Primitive {
     public java.lang.String escmName() {
       return "current-time";
     }
@@ -34,7 +34,7 @@ public class DateTimePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // current-date
-  public static class CurrentDate implements Primitive {
+  public static class CurrentDate extends Primitive {
     public java.lang.String escmName() {
       return "current-date";
     }
@@ -52,7 +52,7 @@ public class DateTimePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // epoch-time
-  public static class EpochTime implements Primitive {
+  public static class EpochTime extends Primitive {
     public java.lang.String escmName() {
       return "epoch-time";
     }
@@ -67,7 +67,7 @@ public class DateTimePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // time-zone
-  public static class TimeZone implements Primitive {
+  public static class TimeZone extends Primitive {
     public java.lang.String escmName() {
       return "time-zone";
     }
@@ -82,7 +82,7 @@ public class DateTimePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // day
-  public static class Day implements Primitive {
+  public static class Day extends Primitive {
     public java.lang.String escmName() {
       return "day";
     }
@@ -114,7 +114,7 @@ public class DateTimePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // month
-  public static class Month implements Primitive {
+  public static class Month extends Primitive {
     public java.lang.String escmName() {
       return "month";
     }
@@ -158,7 +158,7 @@ public class DateTimePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // year
-  public static class Year implements Primitive {
+  public static class Year extends Primitive {
     public java.lang.String escmName() {
       return "year";
     }

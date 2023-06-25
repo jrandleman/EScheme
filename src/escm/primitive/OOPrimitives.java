@@ -28,7 +28,7 @@ import escm.vm.util.ObjectAccessChain;
 public class OOPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // escm-oo-class
-  public static class EscmOoClass implements Primitive {
+  public static class EscmOoClass extends Primitive {
     public java.lang.String escmName() {
       return "escm-oo-class";
     }
@@ -121,7 +121,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // escm-oo-interface
-  public static class EscmOoInterface implements Primitive {
+  public static class EscmOoInterface extends Primitive {
     public java.lang.String escmName() {
       return "escm-oo-interface";
     }
@@ -189,7 +189,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // meta-object?
-  public static class IsMetaObject implements Primitive {
+  public static class IsMetaObject extends Primitive {
     public java.lang.String escmName() {
       return "meta-object?";
     }
@@ -205,7 +205,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // interface?
-  public static class IsInterface implements Primitive {
+  public static class IsInterface extends Primitive {
     public java.lang.String escmName() {
       return "interface?";
     }
@@ -221,7 +221,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // class?
-  public static class IsClass implements Primitive {
+  public static class IsClass extends Primitive {
     public java.lang.String escmName() {
       return "class?";
     }
@@ -237,7 +237,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // object?
-  public static class IsObject implements Primitive {
+  public static class IsObject extends Primitive {
     public java.lang.String escmName() {
       return "object?";
     }
@@ -253,7 +253,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // functor?
-  public static class IsFunctor implements Primitive {
+  public static class IsFunctor extends Primitive {
     public java.lang.String escmName() {
       return "functor?";
     }
@@ -270,7 +270,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // oo-is?
-  public static class OoIs implements Primitive {
+  public static class OoIs extends Primitive {
     public java.lang.String escmName() {
       return "oo-is?";
     }
@@ -298,7 +298,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // oo-has?
-  public static class OoHas implements Primitive {
+  public static class OoHas extends Primitive {
     public java.lang.String escmName() {
       return "oo-has?";
     }
@@ -339,7 +339,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // oo-get
-  public static class OoGet implements Primitive {
+  public static class OoGet extends Primitive {
     public java.lang.String escmName() {
       return "oo-get";
     }
@@ -379,7 +379,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // oo-set!
-  public static class OoSetBang implements Primitive {
+  public static class OoSetBang extends Primitive {
     public java.lang.String escmName() {
       return "oo-set!";
     }
@@ -425,7 +425,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // oo-define
-  public static class OoDefine implements Primitive {
+  public static class OoDefine extends Primitive {
     public java.lang.String escmName() {
       return "oo-define";
     }
@@ -468,7 +468,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // oo-super
-  public static class OoSuper implements Primitive {
+  public static class OoSuper extends Primitive {
     public java.lang.String escmName() {
       return "oo-super";
     }
@@ -489,7 +489,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // oo-interfaces
-  public static class OoInterfaces implements Primitive {
+  public static class OoInterfaces extends Primitive {
     public java.lang.String escmName() {
       return "oo-interfaces";
     }
@@ -512,7 +512,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // oo-properties
-  public static class OoProperties implements Primitive {
+  public static class OoProperties extends Primitive {
     public java.lang.String escmName() {
       return "oo-properties";
     }
@@ -588,7 +588,7 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // escm-oo-super!
-  public static class EscmOoSuperBang implements PrimitiveCallable {
+  public static class EscmOoSuperBang extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "escm-oo-super!";
     }

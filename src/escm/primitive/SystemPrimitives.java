@@ -48,7 +48,7 @@ public class SystemPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // exit
-  public static class Exit implements Primitive {
+  public static class Exit extends Primitive {
     public java.lang.String escmName() {
       return "exit";
     }
@@ -75,12 +75,12 @@ public class SystemPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // load
-  public static class Load implements PrimitiveCallable {
+  public static class Load extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "load";
     }
 
-    private static Trampoline.Bounce evalEachExpression(ArrayList<Datum> exprs, int i, Stack<Pair<String,SourceInformation>> originalCallStack, Trampoline.Continuation continuation) throws Exception {
+    public static Trampoline.Bounce evalEachExpression(ArrayList<Datum> exprs, int i, Stack<Pair<String,SourceInformation>> originalCallStack, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
       int n = exprs.size();
       if(i >= n) return continuation.run(Void.VALUE);
       Trampoline.Continuation nextContinuation;
@@ -90,40 +90,40 @@ public class SystemPrimitives {
         nextContinuation = (value) -> () -> {
           EscmCallStack.restore(originalCallStack); // residue frames may reside after call/cc nonsense
           if(value instanceof escm.type.port.Eof) return continuation.run(Void.VALUE);
-          return evalEachExpression(exprs,i+1,originalCallStack,continuation);
+          return evalEachExpression(exprs,i+1,originalCallStack,definitionEnvironment,continuation);
         };
       }
-      return escm.vm.Compiler.run(exprs.get(i),(compiled) -> () -> {
-        return escm.vm.Interpreter.run(new ExecutionState(GlobalState.globalEnvironment,escm.vm.Assembler.run(compiled)),nextContinuation);
+      return escm.vm.Compiler.run(exprs.get(i),definitionEnvironment,(compiled) -> () -> {
+        return escm.vm.Interpreter.run(new ExecutionState(definitionEnvironment,escm.vm.Assembler.run(compiled)),nextContinuation);
       });
     }
 
-    public static Trampoline.Bounce loadESchemeFile(String primitiveName, String filename, Trampoline.Continuation continuation) throws Exception {
+    public static Trampoline.Bounce loadESchemeFile(String primitiveName, String filename, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
       String buffer = FilePrimitives.FileRead.slurpFile(filename,primitiveName);
       ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(filename,buffer);
-      return evalEachExpression(exprs,0,EscmCallStack.copy(),continuation);
+      return evalEachExpression(exprs,0,EscmCallStack.copy(),definitionEnvironment,continuation);
     }
 
-    public static Trampoline.Bounce logic(String primitiveName, String filename, Trampoline.Continuation continuation) throws Exception {
+    public static Trampoline.Bounce logic(String primitiveName, String filename, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
       LoadOnce.registerLoadedFile(filename);
       if(SerializationPrimitives.IsSerializedP.logic(filename) == true) {
-        return SerializationPrimitives.loadSerializedFile(primitiveName,filename,continuation);
+        return SerializationPrimitives.loadSerializedFile(primitiveName,filename,definitionEnvironment,continuation);
       } else {
-        return loadESchemeFile(primitiveName,filename,continuation);
+        return loadESchemeFile(primitiveName,filename,definitionEnvironment,continuation);
       }
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(load <filename>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return logic("load",((escm.type.String)parameters.get(0)).value(),continuation);
+      return logic("load",((escm.type.String)parameters.get(0)).value(),this.definitionEnvironment,continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // load-from
-  public static class LoadFrom implements PrimitiveCallable {
+  public static class LoadFrom extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "load-from";
     }
@@ -145,14 +145,14 @@ public class SystemPrimitives {
       if(!(file instanceof escm.type.String))
         throw new Exceptionf("'(load-from <directory> <filename>) 2nd arg isn't a string: %s", Exceptionf.profileArgs(parameters));
       String filePath = getPath(((escm.type.String)directory).value(),((escm.type.String)file).value());
-      return Load.logic("load-from",filePath,continuation);
+      return Load.logic("load-from",filePath,this.definitionEnvironment,continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // load-once
-  public static class LoadOnce implements PrimitiveCallable {
+  public static class LoadOnce extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "load-once";
     }
@@ -169,7 +169,7 @@ public class SystemPrimitives {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(load-once <filename>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
       String filePath = FilePrimitives.AbsolutePath.logic(((escm.type.String)parameters.get(0)).value());
-      if(notLoadedYet(filePath)) return Load.logic("load-once",filePath,continuation);
+      if(notLoadedYet(filePath)) return Load.logic("load-once",filePath,this.definitionEnvironment,continuation);
       return continuation.run(Void.VALUE);
     }
   }
@@ -177,7 +177,7 @@ public class SystemPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // load-once-from
-  public static class LoadOnceFrom implements PrimitiveCallable {
+  public static class LoadOnceFrom extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "load-once-from";
     }
@@ -192,7 +192,7 @@ public class SystemPrimitives {
       if(!(file instanceof escm.type.String))
         throw new Exceptionf("'(load-once-from <directory> <filename>) 2nd arg isn't a string: %s", Exceptionf.profileArgs(parameters));
       String filePath = LoadFrom.getPath(((escm.type.String)directory).value(),((escm.type.String)file).value());
-      if(LoadOnce.notLoadedYet(filePath)) return Load.logic("load-once-from",filePath,continuation);
+      if(LoadOnce.notLoadedYet(filePath)) return Load.logic("load-once-from",filePath,this.definitionEnvironment,continuation);
       return continuation.run(Void.VALUE);
     }
   }
@@ -200,7 +200,7 @@ public class SystemPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // system
-  public static class ExecuteCommand implements Primitive {
+  public static class ExecuteCommand extends Primitive {
     public java.lang.String escmName() {
       return "system";
     }

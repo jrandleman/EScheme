@@ -1,5 +1,10 @@
 // Author: Jordan Randleman - Installer - MUST BE RUN WITHIN THE `EScheme/installer` DIRECTORY!
-//   => Command-Line Options: -v, --verbose (print status updates)
+//   => Command-Line Options: 
+//        -v, --verbose           (print status updates)
+//        -i, --interpret-stdlib  (don't serialize <../src/stdlib.scm>)
+//        -j, --java-bin-path     (set the path to our JVM's <bin> directory)
+//        -h, --help              (show these command-line options)
+
 
 /* Purpose:
 
@@ -237,16 +242,16 @@ public class Installer {
       escmStdlibLoader.append("import escm.primitive.FilePrimitives;\n");
       escmStdlibLoader.append("import escm.primitive.SystemPrimitives;\n");
       escmStdlibLoader.append("import escm.vm.util.SourceInformation;\n");
-      escmStdlibLoader.append("import escm.vm.runtime.GlobalState;\n");
+      escmStdlibLoader.append("import escm.vm.util.Environment;\n");
       escmStdlibLoader.append("\n");
       escmStdlibLoader.append("public class EscmStdLibLoader {\n");
-      escmStdlibLoader.append("  public static void load() throws Exception {\n");
+      escmStdlibLoader.append("  public static void load(Environment definitionEnvironment) throws Exception {\n");
       escmStdlibLoader.append("    String escmCode = Files.readString(Path.of(\""+stdlibPath+"\"));\n");
-      escmStdlibLoader.append("    // Note that we know our stdlib don't store any continuations using call/cc \n");
+      escmStdlibLoader.append("    // Note that we know our stdlib don't store any continuations using call/cc\n");
       escmStdlibLoader.append("    //   upon loading, so we can afford evaluating it with a dummy continuation.\n");
       escmStdlibLoader.append("    Trampoline.Continuation terminalContinuation = (ignored) -> () -> Trampoline.LAST_BOUNCE_SIGNAL;\n");
       escmStdlibLoader.append("    ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(\""+stdlibPath+"\",escmCode);\n");
-      escmStdlibLoader.append("    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(GlobalState.globalEnvironment,exprs,0,new Stack<Pair<String,SourceInformation>>(),terminalContinuation));\n");
+      escmStdlibLoader.append("    Trampoline.resolve(SystemPrimitives.Load.evalEachExpression(exprs,0,new Stack<Pair<String,SourceInformation>>(),definitionEnvironment,terminalContinuation));\n");
       escmStdlibLoader.append("  }\n");
       escmStdlibLoader.append("}\n");
       escmStdlibLoader.append("\n");
@@ -259,10 +264,11 @@ public class Installer {
       escmStdlibLoader.append("package escm.vm.runtime.installerGenerated;\n");
       escmStdlibLoader.append("import escm.primitive.SerializationPrimitives;\n");
       escmStdlibLoader.append("import escm.util.Trampoline;\n");
+      escmStdlibLoader.append("import escm.vm.util.Environment;\n");
       escmStdlibLoader.append("\n");
       escmStdlibLoader.append("public class EscmStdLibLoader {\n");
-      escmStdlibLoader.append("  public static void load() throws Exception {\n");
-      escmStdlibLoader.append("    Trampoline.resolve(SerializationPrimitives.loadSerializedFile(\"load\",\""+stdlibPath+"\",(ignored) -> () -> Trampoline.LAST_BOUNCE_SIGNAL));\n");
+      escmStdlibLoader.append("  public static void load(Environment definitionEnvironment) throws Exception {\n");
+      escmStdlibLoader.append("    Trampoline.resolve(SerializationPrimitives.loadSerializedFile(\"load\",\""+stdlibPath+"\",definitionEnvironment,(ignored) -> () -> Trampoline.LAST_BOUNCE_SIGNAL));\n");
       escmStdlibLoader.append("  }\n");
       escmStdlibLoader.append("}\n");
       escmStdlibLoader.append("\n");
@@ -324,7 +330,7 @@ public class Installer {
     javaStdlibLoader.append("import escm.type.Symbol;\n");
     javaStdlibLoader.append("import escm.vm.type.Primitive;\n");
     javaStdlibLoader.append("import escm.vm.type.PrimitiveCallable;\n");
-    javaStdlibLoader.append("import escm.vm.runtime.GlobalState;\n");
+    javaStdlibLoader.append("import escm.vm.util.Environment;\n");
     for(String imprt : imports) {
       javaStdlibLoader.append(imprt+"\n");
     }
@@ -340,7 +346,7 @@ public class Installer {
     javaStdlibLoader.append("  }\n");
     javaStdlibLoader.append("\n");
     javaStdlibLoader.append("\n");
-    javaStdlibLoader.append("  private static void definePrimitivesFromInnerClassesInClass(String className) {\n");
+    javaStdlibLoader.append("  private static void definePrimitivesFromInnerClassesInClass(String className, Environment definitionEnvironment) {\n");
     javaStdlibLoader.append("    // Get the outer Class\n");
     javaStdlibLoader.append("    Class<?> outerClass = null;\n");
     javaStdlibLoader.append("    try {\n");
@@ -366,9 +372,13 @@ public class Installer {
     javaStdlibLoader.append("            Object o = ctor.newInstance();\n");
     javaStdlibLoader.append("            String escmName = getPrimitiveName(o);\n");
     javaStdlibLoader.append("            if(o instanceof Primitive) {\n");
-    javaStdlibLoader.append("              GlobalState.globalEnvironment.define(new Symbol(escmName),(Primitive)o);\n");
+    javaStdlibLoader.append("              Primitive p = (Primitive)o;\n");
+    javaStdlibLoader.append("              p.definitionEnvironment = definitionEnvironment;\n");
+    javaStdlibLoader.append("              definitionEnvironment.define(new Symbol(escmName),p);\n");
     javaStdlibLoader.append("            } else { // o instanceof PrimitiveCallable\n");
-    javaStdlibLoader.append("              GlobalState.globalEnvironment.define(new Symbol(escmName),(PrimitiveCallable)o);\n");
+    javaStdlibLoader.append("              PrimitiveCallable p = (PrimitiveCallable)o;\n");
+    javaStdlibLoader.append("              p.definitionEnvironment = definitionEnvironment;\n");
+    javaStdlibLoader.append("              definitionEnvironment.define(new Symbol(escmName),p);\n");
     javaStdlibLoader.append("            }\n");
     javaStdlibLoader.append("          } catch(Exception e) {\n");
     javaStdlibLoader.append("            System.err.printf(\"ESCM JAVA-STDLIB-LOADER ERROR: Can't invoke nullary Ctor for inner class \\\"%s\\\" in class \\\"%s\\\": %s\\n\", innerClass.getName(), className, e);\n");
@@ -381,9 +391,9 @@ public class Installer {
     javaStdlibLoader.append("  }\n");
     javaStdlibLoader.append("\n");
     javaStdlibLoader.append("\n");
-    javaStdlibLoader.append("  public static void load() {\n");
+    javaStdlibLoader.append("  public static void load(Environment definitionEnvironment) {\n");
     for(String prmFileName : prmFileNames) {
-      javaStdlibLoader.append("    definePrimitivesFromInnerClassesInClass(\"escm.primitive."+prmFileName+"\");\n");
+      javaStdlibLoader.append("    definePrimitivesFromInnerClassesInClass(\"escm.primitive."+prmFileName+"\",definitionEnvironment);\n");
     }
     javaStdlibLoader.append("  }\n");
     javaStdlibLoader.append("}\n");

@@ -22,7 +22,7 @@ import escm.vm.runtime.GlobalState;
 public class ConcurrentPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // thread
-  public static class Thread implements Primitive {
+  public static class Thread extends Primitive {
     public java.lang.String escmName() {
       return "thread";
     }
@@ -53,7 +53,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread?
-  public static class IsThread implements Primitive {
+  public static class IsThread extends Primitive {
     public java.lang.String escmName() {
       return "thread?";
     }
@@ -68,7 +68,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-name
-  public static class ThreadName implements Primitive {
+  public static class ThreadName extends Primitive {
     public java.lang.String escmName() {
       return "thread-name";
     }
@@ -83,7 +83,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-id
-  public static class ThreadId implements Primitive {
+  public static class ThreadId extends Primitive {
     public java.lang.String escmName() {
       return "thread-id";
     }
@@ -98,7 +98,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-runnable
-  public static class ThreadRunnable implements Primitive {
+  public static class ThreadRunnable extends Primitive {
     public java.lang.String escmName() {
       return "thread-runnable";
     }
@@ -113,7 +113,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-status
-  public static class ThreadStatus implements Primitive {
+  public static class ThreadStatus extends Primitive {
     public java.lang.String escmName() {
       return "thread-status";
     }
@@ -128,7 +128,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-yield
-  public static class ThreadYield implements Primitive {
+  public static class ThreadYield extends Primitive {
     public java.lang.String escmName() {
       return "thread-yield";
     }
@@ -144,7 +144,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-set-daemon!
-  public static class ThreadSetDaemonBang implements Primitive {
+  public static class ThreadSetDaemonBang extends Primitive {
     public java.lang.String escmName() {
       return "thread-set-daemon!";
     }
@@ -160,7 +160,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-daemon?
-  public static class ThreadIsDaemon implements Primitive {
+  public static class ThreadIsDaemon extends Primitive {
     public java.lang.String escmName() {
       return "thread-daemon?";
     }
@@ -175,7 +175,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-priority
-  public static class ThreadPriority implements Primitive {
+  public static class ThreadPriority extends Primitive {
     public java.lang.String escmName() {
       return "thread-priority";
     }
@@ -190,7 +190,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-set-priority!
-  public static class ThreadSetPriorityBang implements Primitive {
+  public static class ThreadSetPriorityBang extends Primitive {
     public java.lang.String escmName() {
       return "thread-set-priority!";
     }
@@ -206,7 +206,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-start!
-  public static class ThreadStartBang implements Primitive {
+  public static class ThreadStartBang extends Primitive {
     public java.lang.String escmName() {
       return "thread-start!";
     }
@@ -230,7 +230,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-join!
-  public static class ThreadJoinBang implements Primitive {
+  public static class ThreadJoinBang extends Primitive {
     public java.lang.String escmName() {
       return "thread-join!";
     }
@@ -261,7 +261,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-interrupted?
-  public static class ThreadIsInterrupted implements Primitive {
+  public static class ThreadIsInterrupted extends Primitive {
     public java.lang.String escmName() {
       return "thread-interrupted?";
     }
@@ -276,7 +276,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-interrupt!
-  public static class ThreadInterruptBang implements Primitive {
+  public static class ThreadInterruptBang extends Primitive {
     public java.lang.String escmName() {
       return "thread-interrupt!";
     }
@@ -292,7 +292,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // interrupted?!
-  public static class IsInterruptedBang implements Primitive {
+  public static class IsInterruptedBang extends Primitive {
     public java.lang.String escmName() {
       return "interrupted?!";
     }
@@ -307,7 +307,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // sleep
-  public static class Sleep implements Primitive {
+  public static class Sleep extends Primitive {
     public java.lang.String escmName() {
       return "sleep";
     }
@@ -322,7 +322,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // current-thread
-  public static class CurrentThread implements Primitive {
+  public static class CurrentThread extends Primitive {
     public java.lang.String escmName() {
       return "current-thread";
     }
@@ -337,7 +337,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // parallel
-  public static class Parallel implements Primitive {
+  public static class Parallel extends Primitive {
     public java.lang.String escmName() {
       return "parallel";
     }
@@ -359,7 +359,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-define'
-  public static class ThreadDefineApostrophe implements Primitive {
+  public static class ThreadDefineApostrophe extends Primitive {
     public java.lang.String escmName() {
       return "thread-define'";
     }
@@ -390,7 +390,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-set!'
-  public static class ThreadSetBangApostrophe implements Primitive {
+  public static class ThreadSetBangApostrophe extends Primitive {
     public java.lang.String escmName() {
       return "thread-set!'";
     }
@@ -425,7 +425,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-get'
-  public static class ThreadGetApostrophe implements Primitive {
+  public static class ThreadGetApostrophe extends Primitive {
     public java.lang.String escmName() {
       return "thread-get'";
     }
@@ -459,7 +459,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-defined?'
-  public static class ThreadIsDefinedApostrophe implements Primitive {
+  public static class ThreadIsDefinedApostrophe extends Primitive {
     public java.lang.String escmName() {
       return "thread-defined?'";
     }
@@ -489,7 +489,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // thread-dynamic-environment
-  public static class ThreadDynamicEnvironment implements Primitive {
+  public static class ThreadDynamicEnvironment extends Primitive {
     public java.lang.String escmName() {
       return "thread-dynamic-environment";
     }
@@ -513,7 +513,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // mutex
-  public static class Mutex implements Primitive {
+  public static class Mutex extends Primitive {
     public java.lang.String escmName() {
       return "mutex";
     }
@@ -536,7 +536,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // mutex?
-  public static class IsMutex implements Primitive {
+  public static class IsMutex extends Primitive {
     public java.lang.String escmName() {
       return "mutex?";
     }
@@ -551,7 +551,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // mutex-name
-  public static class MutexName implements Primitive {
+  public static class MutexName extends Primitive {
     public java.lang.String escmName() {
       return "mutex-name";
     }
@@ -568,7 +568,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // mutex-specific
-  public static class MutexSpecific implements Primitive {
+  public static class MutexSpecific extends Primitive {
     public java.lang.String escmName() {
       return "mutex-specific";
     }
@@ -582,7 +582,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // mutex-set-specific!
-  public static class MutexSetSpecificBang implements Primitive {
+  public static class MutexSetSpecificBang extends Primitive {
     public java.lang.String escmName() {
       return "mutex-set-specific!";
     }
@@ -597,7 +597,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // mutex-lock!
-  public static class MutexLockBang implements Primitive {
+  public static class MutexLockBang extends Primitive {
     public java.lang.String escmName() {
       return "mutex-lock!";
     }
@@ -623,7 +623,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // mutex-unlock!
-  public static class MutexUnlockBang implements Primitive {
+  public static class MutexUnlockBang extends Primitive {
     public java.lang.String escmName() {
       return "mutex-unlock!";
     }
@@ -638,7 +638,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // mutex-locked?
-  public static class MutexIsLocked implements Primitive {
+  public static class MutexIsLocked extends Primitive {
     public java.lang.String escmName() {
       return "mutex-locked?";
     }
@@ -653,7 +653,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // mutex-queue-length
-  public static class MutexQueueLength implements Primitive {
+  public static class MutexQueueLength extends Primitive {
     public java.lang.String escmName() {
       return "mutex-queue-length";
     }
@@ -668,7 +668,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // mutex-queued?
-  public static class MutexIsQueued implements Primitive {
+  public static class MutexIsQueued extends Primitive {
     public java.lang.String escmName() {
       return "mutex-queued?";
     }
@@ -683,7 +683,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // mutex-hold-count
-  public static class MutexHoldCount implements Primitive {
+  public static class MutexHoldCount extends Primitive {
     public java.lang.String escmName() {
       return "mutex-hold-count";
     }
@@ -698,7 +698,7 @@ public class ConcurrentPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // mutex-held?
-  public static class MutexIsHeld implements Primitive {
+  public static class MutexIsHeld extends Primitive {
     public java.lang.String escmName() {
       return "mutex-held?";
     }

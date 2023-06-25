@@ -18,7 +18,7 @@ import escm.vm.type.PrimitiveCallable;
 public class OrderedCollectionPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // ordered-collection?
-  public static class IsOrderedCollection implements Primitive {
+  public static class IsOrderedCollection extends Primitive {
     public java.lang.String escmName() {
       return "ordered-collection?";
     }
@@ -33,7 +33,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // oc?
-  public static class IsOC implements Primitive {
+  public static class IsOC extends Primitive {
     public java.lang.String escmName() {
       return "oc?";
     }
@@ -48,7 +48,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // conj
-  public static class Conj implements Primitive {
+  public static class Conj extends Primitive {
     public java.lang.String escmName() {
       return "conj";
     }
@@ -63,7 +63,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // init
-  public static class Init implements Primitive {
+  public static class Init extends Primitive {
     public java.lang.String escmName() {
       return "init";
     }
@@ -78,7 +78,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // last
-  public static class Last implements Primitive {
+  public static class Last extends Primitive {
     public java.lang.String escmName() {
       return "last";
     }
@@ -93,7 +93,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // slice
-  public static class Slice implements PrimitiveCallable {
+  public static class Slice extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "slice";
     }
@@ -121,7 +121,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // reverse
-  public static class Reverse implements Primitive {
+  public static class Reverse extends Primitive {
     public java.lang.String escmName() {
       return "reverse";
     }
@@ -136,7 +136,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // remove-first
-  public static class RemoveFirst implements PrimitiveCallable {
+  public static class RemoveFirst extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "remove-first";
     }
@@ -151,7 +151,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // remove-last
-  public static class RemoveLast implements PrimitiveCallable {
+  public static class RemoveLast extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "remove-last";
     }
@@ -166,7 +166,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // skip
-  public static class Skip implements PrimitiveCallable {
+  public static class Skip extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "skip";
     }
@@ -181,7 +181,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // skip-right
-  public static class SkipRight implements PrimitiveCallable {
+  public static class SkipRight extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "skip-right";
     }
@@ -196,7 +196,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // fold-right
-  public static class FoldRight implements PrimitiveCallable {
+  public static class FoldRight extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "fold-right";
     }
@@ -216,7 +216,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // key-right
-  public static class KeyRight implements PrimitiveCallable {
+  public static class KeyRight extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "key-right";
     }
@@ -231,7 +231,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // drop-right
-  public static class DropRight implements Primitive {
+  public static class DropRight extends Primitive {
     public java.lang.String escmName() {
       return "drop-right";
     }
@@ -246,7 +246,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // drop-while
-  public static class DropWhile implements PrimitiveCallable {
+  public static class DropWhile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "drop-while";
     }
@@ -261,7 +261,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // drop-right-while
-  public static class DropRightWhile implements PrimitiveCallable {
+  public static class DropRightWhile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "drop-right-while";
     }
@@ -276,7 +276,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // take-right
-  public static class TakeRight implements Primitive {
+  public static class TakeRight extends Primitive {
     public java.lang.String escmName() {
       return "take-right";
     }
@@ -291,7 +291,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // take-while
-  public static class TakeWhile implements PrimitiveCallable {
+  public static class TakeWhile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "take-while";
     }
@@ -306,7 +306,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // take-right-while
-  public static class TakeRightWhile implements PrimitiveCallable {
+  public static class TakeRightWhile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "take-right-while";
     }
@@ -321,7 +321,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // sort
-  public static class Sort implements PrimitiveCallable {
+  public static class Sort extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "sort";
     }
@@ -336,7 +336,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // sorted?
-  public static class IsSorted implements PrimitiveCallable {
+  public static class IsSorted extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "sorted?";
     }
@@ -351,7 +351,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // merge
-  public static class Merge implements PrimitiveCallable {
+  public static class Merge extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "merge";
     }
@@ -368,7 +368,7 @@ public class OrderedCollectionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // delete-neighbor-duplicates
-  public static class DeleteNeighborDuplicates implements PrimitiveCallable {
+  public static class DeleteNeighborDuplicates extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "delete-neighbor-duplicates";
     }

@@ -15,7 +15,7 @@ import escm.vm.type.Primitive;
 public class TypeCoercionPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // string->number
-  public static class StringToNumber implements Primitive {
+  public static class StringToNumber extends Primitive {
     public java.lang.String escmName() {
       return "string->number";
     }
@@ -50,7 +50,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // number->string
-  public static class NumberToString implements Primitive {
+  public static class NumberToString extends Primitive {
     public java.lang.String escmName() {
       return "number->string";
     }
@@ -85,7 +85,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // keyword->symbol
-  public static class KeywordToSymbol implements Primitive {
+  public static class KeywordToSymbol extends Primitive {
     public java.lang.String escmName() {
       return "keyword->symbol";
     }
@@ -100,7 +100,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // symbol->keyword
-  public static class SymbolToKeyword implements Primitive {
+  public static class SymbolToKeyword extends Primitive {
     public java.lang.String escmName() {
       return "symbol->keyword";
     }
@@ -115,7 +115,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string->symbol
-  public static class StringToSymbol implements Primitive {
+  public static class StringToSymbol extends Primitive {
     public java.lang.String escmName() {
       return "string->symbol";
     }
@@ -130,7 +130,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // symbol->string
-  public static class SymbolToString implements Primitive {
+  public static class SymbolToString extends Primitive {
     public java.lang.String escmName() {
       return "symbol->string";
     }
@@ -145,7 +145,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string->keyword
-  public static class StringToKeyword implements Primitive {
+  public static class StringToKeyword extends Primitive {
     public java.lang.String escmName() {
       return "string->keyword";
     }
@@ -160,7 +160,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // keyword->string
-  public static class KeywordToString implements Primitive {
+  public static class KeywordToString extends Primitive {
     public java.lang.String escmName() {
       return "keyword->string";
     }
@@ -175,7 +175,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // write-to-string
-  public static class WriteToString implements Primitive {
+  public static class WriteToString extends Primitive {
     public java.lang.String escmName() {
       return "write-to-string";
     }
@@ -190,7 +190,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // display-to-string
-  public static class DisplayToString implements Primitive {
+  public static class DisplayToString extends Primitive {
     public java.lang.String escmName() {
       return "display-to-string";
     }
@@ -205,7 +205,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // pretty-print-to-string
-  public static class PrettyPrintToString implements Primitive {
+  public static class PrettyPrintToString extends Primitive {
     public java.lang.String escmName() {
       return "pretty-print-to-string";
     }
@@ -220,7 +220,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector->list
-  public static class VectorToList implements Primitive {
+  public static class VectorToList extends Primitive {
     public java.lang.String escmName() {
       return "vector->list";
     }
@@ -235,7 +235,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // list->vector
-  public static class ListToVector implements Primitive {
+  public static class ListToVector extends Primitive {
     public java.lang.String escmName() {
       return "list->vector";
     }
@@ -260,7 +260,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // hashmap->list
-  public static class HashmapToList implements Primitive {
+  public static class HashmapToList extends Primitive {
     public java.lang.String escmName() {
       return "hashmap->list";
     }
@@ -275,7 +275,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // hashmap->vector
-  public static class HashmapToVector implements Primitive {
+  public static class HashmapToVector extends Primitive {
     public java.lang.String escmName() {
       return "hashmap->vector";
     }
@@ -290,7 +290,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // list->hashmap
-  public static class ListToHashmap implements Primitive {
+  public static class ListToHashmap extends Primitive {
     public java.lang.String escmName() {
       return "list->hashmap";
     }
@@ -318,7 +318,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector->hashmap
-  public static class VectorToHashmap implements Primitive {
+  public static class VectorToHashmap extends Primitive {
     public java.lang.String escmName() {
       return "vector->hashmap";
     }
@@ -336,7 +336,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char->integer
-  public static class CharToInteger implements Primitive {
+  public static class CharToInteger extends Primitive {
     public java.lang.String escmName() {
       return "char->integer";
     }
@@ -351,7 +351,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // integer->char
-  public static class IntegerToChar implements Primitive {
+  public static class IntegerToChar extends Primitive {
     public java.lang.String escmName() {
       return "integer->char";
     }
@@ -369,7 +369,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // list->string
-  public static class ListToString implements Primitive {
+  public static class ListToString extends Primitive {
     public java.lang.String escmName() {
       return "list->string";
     }
@@ -397,7 +397,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string->list
-  public static class StringToList implements Primitive {
+  public static class StringToList extends Primitive {
     public java.lang.String escmName() {
       return "string->list";
     }
@@ -421,7 +421,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // vector->string
-  public static class VectorToString implements Primitive {
+  public static class VectorToString extends Primitive {
     public java.lang.String escmName() {
       return "vector->string";
     }
@@ -436,7 +436,7 @@ public class TypeCoercionPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // string->vector
-  public static class StringToVector implements Primitive {
+  public static class StringToVector extends Primitive {
     public java.lang.String escmName() {
       return "string->vector";
     }

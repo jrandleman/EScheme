@@ -19,6 +19,7 @@ import escm.util.Trampoline;
 import escm.primitive.MetaPrimitives;
 import escm.vm.type.Callable;
 import escm.vm.type.OrderedCollection;
+import escm.vm.util.Environment;
 
 public class Compiler {
   ////////////////////////////////////////////////////////////////////////////
@@ -59,18 +60,18 @@ public class Compiler {
 
   ////////////////////////////////////////////////////////////////////////////
   // Compiling Vector Literals (must evaluate their contents)
-  private static Trampoline.Bounce generateVectorCallInstructions(Datum v, int count, Trampoline.Continuation continuation) throws Exception {
+  private static Trampoline.Bounce generateVectorCallInstructions(Datum v, int count, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
     if(v instanceof Nil) return continuation.run(Pair.List(Pair.List(PUSH,VECTOR),Pair.List(CALL,new Exact(-count))));
     Pair vPair = (Pair)v;
     Datum hd = vPair.car();
     if(!(hd instanceof Pair) && !(hd instanceof Vector) && !(hd instanceof Hashmap)) {
-      return () -> generateVectorCallInstructions(vPair.cdr(),count+1,(applicationInstructions) -> {
+      return () -> generateVectorCallInstructions(vPair.cdr(),count+1,definitionEnvironment,(applicationInstructions) -> {
         return continuation.run(new Pair(Pair.List(PUSH,hd),applicationInstructions));
       });
     } else {
-      return () -> run(hd,(valueInstructions) -> () -> {
+      return () -> run(hd,definitionEnvironment,(valueInstructions) -> () -> {
         Datum instructions = Pair.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
-        return generateVectorCallInstructions(vPair.cdr(),count+1,(applicationInstructions) -> {
+        return generateVectorCallInstructions(vPair.cdr(),count+1,definitionEnvironment,(applicationInstructions) -> {
           return continuation.run(Pair.binaryAppend(instructions,applicationInstructions));
         });
       });
@@ -78,25 +79,25 @@ public class Compiler {
   }
 
 
-  private static Trampoline.Bounce compileVectorLiteral(Vector v, Trampoline.Continuation continuation) throws Exception {
-    return generateVectorCallInstructions((Datum)((OrderedCollection)v.toList()).reverse(),1,continuation);
+  private static Trampoline.Bounce compileVectorLiteral(Vector v, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
+    return generateVectorCallInstructions((Datum)((OrderedCollection)v.toList()).reverse(),1,definitionEnvironment,continuation);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Compiling Hashmap Literals (must evaluate their contents)
-  private static Trampoline.Bounce generateHashmapCallInstructions(Datum h, int count, Trampoline.Continuation continuation) throws Exception {
+  private static Trampoline.Bounce generateHashmapCallInstructions(Datum h, int count, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
     if(h instanceof Nil) return continuation.run(Pair.List(Pair.List(PUSH,HASHMAP),Pair.List(CALL,new Exact(-count))));
-    Pair vPair = (Pair)h;
-    Datum hd = vPair.car();
+    Pair hPair = (Pair)h;
+    Datum hd = hPair.car();
     if(!(hd instanceof Pair) && !(hd instanceof Vector) && !(hd instanceof Hashmap)) {
-      return () -> generateHashmapCallInstructions(vPair.cdr(),count+1,(applicationInstructions) -> {
+      return () -> generateHashmapCallInstructions(hPair.cdr(),count+1,definitionEnvironment,(applicationInstructions) -> {
         return continuation.run(new Pair(Pair.List(PUSH,hd),applicationInstructions));
       });
     } else {
-      return () -> run(hd,(valueInstructions) -> () -> {
+      return () -> run(hd,definitionEnvironment,(valueInstructions) -> () -> {
         Datum instructions = Pair.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
-        return generateHashmapCallInstructions(vPair.cdr(),count+1,(applicationInstructions) -> {
+        return generateHashmapCallInstructions(hPair.cdr(),count+1,definitionEnvironment,(applicationInstructions) -> {
           return continuation.run(Pair.binaryAppend(instructions,applicationInstructions));
         });
       });
@@ -104,25 +105,25 @@ public class Compiler {
   }
 
 
-  private static Trampoline.Bounce compileHashmapLiteral(Hashmap h, Trampoline.Continuation continuation) throws Exception {
-    return generateHashmapCallInstructions((Datum)((OrderedCollection)h.toList()).reverse(),1,continuation);
+  private static Trampoline.Bounce compileHashmapLiteral(Hashmap h, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
+    return generateHashmapCallInstructions((Datum)((OrderedCollection)h.toList()).reverse(),1,definitionEnvironment,continuation);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Compiling Applications
-  private static Trampoline.Bounce compileProcedureApplication(Datum app, int count, Trampoline.Continuation continuation) throws Exception {
+  private static Trampoline.Bounce compileProcedureApplication(Datum app, int count, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
     if(!(app instanceof Pair)) return continuation.run(Pair.List(Pair.List(CALL,new Exact(-count))));
     Pair appPair = (Pair)app;
     Datum hd = appPair.car();
     if(!(hd instanceof Pair) && !(hd instanceof Vector) && !(hd instanceof Hashmap)) {
-      return () -> compileProcedureApplication(appPair.cdr(),count+1,(applicationInstructions) -> {
+      return () -> compileProcedureApplication(appPair.cdr(),count+1,definitionEnvironment,(applicationInstructions) -> {
         return continuation.run(new Pair(Pair.List(PUSH,hd),applicationInstructions));
       });
     } else {
-      return () -> run(hd,(valueInstructions) -> () -> {
+      return () -> run(hd,definitionEnvironment,(valueInstructions) -> () -> {
         Datum instructions = Pair.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
-        return compileProcedureApplication(appPair.cdr(),count+1,(applicationInstructions) -> {
+        return compileProcedureApplication(appPair.cdr(),count+1,definitionEnvironment,(applicationInstructions) -> {
           return continuation.run(Pair.binaryAppend(instructions,applicationInstructions));
         });
       });
@@ -130,37 +131,45 @@ public class Compiler {
   }
 
 
-  private static Trampoline.Bounce compileApplication(Pair d, Trampoline.Continuation continuation) throws Exception {
-    // Expand Macro
-    if(d.car() instanceof Symbol && MACRO_REGISTRY.containsKey(((Symbol)d.car()).value())) {
-      Symbol macroName = (Symbol)d.car();
-      Callable macroCallable = MACRO_REGISTRY.get(macroName.value());
-      ArrayList<Datum> args = MetaPrimitives.Apply.convertListToArrayList(d.cdr());
-      if(macroCallable instanceof Procedure && macroName.hasSourceInformation()) {
-        return ((Procedure)macroCallable).loadWithInvocationSource(macroName.source()).callWith(args,(expandedExpr) -> () -> run(expandedExpr,continuation));
-      } else {
-        return macroCallable.callWith(args,(expandedExpr) -> () -> run(expandedExpr,continuation));
-      }
-    // Compile procedure application
+  private static Trampoline.Bounce compileMacroApplication(Pair macroExpr, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
+    Symbol macroName = (Symbol)macroExpr.car();
+    Callable macroCallable = MACRO_REGISTRY.get(macroName.value());
+    ArrayList<Datum> args = MetaPrimitives.Apply.convertListToArrayList(macroExpr.cdr());
+    if(macroCallable instanceof Procedure && macroName.hasSourceInformation()) {
+      return ((Procedure)macroCallable).loadWithInvocationSource(macroName.source()).callWith(args,(expandedExpr) -> () -> run(expandedExpr,definitionEnvironment,continuation));
     } else {
-      // Reverse the application expression to use the faster negative <call> argument @ runtime
-      return compileProcedureApplication((Datum)d.reverse(),0,continuation);
+      return macroCallable.callWith(args,(expandedExpr) -> () -> run(expandedExpr,definitionEnvironment,continuation));
+    }
+  }
+
+
+  private static boolean isMacroApplication(Datum head) throws Exception {
+    return head instanceof Symbol && MACRO_REGISTRY.containsKey(((Symbol)head).value());
+  }
+
+
+  private static Trampoline.Bounce compileApplication(Pair d, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
+    if(isMacroApplication(d.car())) {
+      return compileMacroApplication(d,definitionEnvironment,continuation);
+    } else {
+      // Reverse the procedure application expression to use the faster negative <call> argument @ runtime
+      return compileProcedureApplication((Datum)d.reverse(),0,definitionEnvironment,continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Core compilation dispatch
-  public static Trampoline.Bounce run(Datum d, Trampoline.Continuation continuation) throws Exception {
+  public static Trampoline.Bounce run(Datum d, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
     if(d instanceof Vector) 
-      return compileVectorLiteral((Vector)d,continuation);
+      return compileVectorLiteral((Vector)d,definitionEnvironment,continuation);
     if(d instanceof Hashmap) 
-      return compileHashmapLiteral((Hashmap)d,continuation);
+      return compileHashmapLiteral((Hashmap)d,definitionEnvironment,continuation);
     if(!(d instanceof Pair)) 
       return compileAtomicLiteral(d,continuation);
     Pair expr = (Pair)d;
     if(isTaggedList(expr,"bytecode")) 
       return compileEscmBytecode(expr,continuation);
-    return compileApplication(expr,continuation);
+    return compileApplication(expr,definitionEnvironment,continuation);
   }
 }

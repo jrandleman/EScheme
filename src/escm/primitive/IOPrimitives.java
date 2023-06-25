@@ -23,7 +23,7 @@ import escm.vm.runtime.GlobalState;
 public class IOPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // pretty-print
-  public static class PrettyPrint implements Primitive {
+  public static class PrettyPrint extends Primitive {
     public java.lang.String escmName() {
       return "pretty-print";
     }
@@ -52,7 +52,7 @@ public class IOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // write
-  public static class Write implements Primitive {
+  public static class Write extends Primitive {
     public java.lang.String escmName() {
       return "write";
     }
@@ -81,7 +81,7 @@ public class IOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // display
-  public static class Display implements Primitive {
+  public static class Display extends Primitive {
     public java.lang.String escmName() {
       return "display";
     }
@@ -121,7 +121,7 @@ public class IOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // newline
-  public static class Newline implements Primitive {
+  public static class Newline extends Primitive {
     public java.lang.String escmName() {
       return "newline";
     }
@@ -147,7 +147,7 @@ public class IOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // pretty-printf
-  public static class PrettyPrintf implements Primitive {
+  public static class PrettyPrintf extends Primitive {
     public java.lang.String escmName() {
       return "pretty-printf";
     }
@@ -190,7 +190,7 @@ public class IOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // writef
-  public static class Writef implements Primitive {
+  public static class Writef extends Primitive {
     public java.lang.String escmName() {
       return "writef";
     }
@@ -226,7 +226,7 @@ public class IOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // displayf
-  public static class Displayf implements Primitive {
+  public static class Displayf extends Primitive {
     public java.lang.String escmName() {
       return "displayf";
     }
@@ -268,7 +268,7 @@ public class IOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // read
-  public static class Read implements Primitive {
+  public static class Read extends Primitive {
     public java.lang.String escmName() {
       return "read";
     }
@@ -294,7 +294,7 @@ public class IOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // read-string
-  public static class ReadString implements Primitive {
+  public static class ReadString extends Primitive {
     public java.lang.String escmName() {
       return "read-string";
     }
@@ -321,7 +321,7 @@ public class IOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // read-line
-  public static class ReadLine implements Primitive {
+  public static class ReadLine extends Primitive {
     public java.lang.String escmName() {
       return "read-line";
     }
@@ -347,7 +347,7 @@ public class IOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // read-char
-  public static class ReadChar implements Primitive {
+  public static class ReadChar extends Primitive {
     public java.lang.String escmName() {
       return "read-char";
     }
@@ -373,7 +373,7 @@ public class IOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // read-chars
-  public static class ReadChars implements Primitive {
+  public static class ReadChars extends Primitive {
     public java.lang.String escmName() {
       return "read-chars";
     }
@@ -404,7 +404,7 @@ public class IOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // eof?
-  public static class IsEof implements Primitive {
+  public static class IsEof extends Primitive {
     public java.lang.String escmName() {
       return "eof?";
     }

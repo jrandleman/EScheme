@@ -28,7 +28,7 @@ import escm.vm.runtime.EscmThread;
 public class UtilityPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // typeof
-  public static class Typeof implements Primitive {
+  public static class Typeof extends Primitive {
     public java.lang.String escmName() {
       return "typeof";
     }
@@ -43,7 +43,7 @@ public class UtilityPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // error
-  public static class Error implements Primitive {
+  public static class Error extends Primitive {
     public java.lang.String escmName() {
       return "error";
     }
@@ -66,7 +66,7 @@ public class UtilityPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // errorf
-  public static class Errorf implements Primitive {
+  public static class Errorf extends Primitive {
     public java.lang.String escmName() {
       return "errorf";
     }
@@ -90,7 +90,7 @@ public class UtilityPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // copy
-  public static class Copy implements Primitive {
+  public static class Copy extends Primitive {
     public java.lang.String escmName() {
       return "copy";
     }
@@ -105,7 +105,7 @@ public class UtilityPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // force
-  public static class Force implements PrimitiveCallable {
+  public static class Force extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "force";
     }
@@ -120,7 +120,7 @@ public class UtilityPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // call-with-current-continuation
-  public static class CallWithCurrentContinuation implements PrimitiveCallable {
+  public static class CallWithCurrentContinuation extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "call-with-current-continuation";
     }
@@ -167,7 +167,7 @@ public class UtilityPrimitives {
   // dynamic-wind
   //   See the below for an implementation of <dynamic-wind> w/ r4rs call/cc:
   //     https://groups.csail.mit.edu/mac/ftpdir/scheme-mail/HTML/rrrs-1992/msg00194.html
-  public static class DynamicWind implements PrimitiveCallable {
+  public static class DynamicWind extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "dynamic-wind";
     }
@@ -234,7 +234,7 @@ public class UtilityPrimitives {
   //   See the below for an implementation of <values> & <call-with-values>:
   //     https://www.scheme.com/tspl4/control.html#./control:h8
   //       => Scroll right to the end of the section for the implementation!
-  public static class Values implements Primitive {
+  public static class Values extends Primitive {
     public java.lang.String escmName() {
       return "values";
     }
@@ -261,7 +261,7 @@ public class UtilityPrimitives {
   //   See the below for an implementation of <values> & <call-with-values>:
   //     https://www.scheme.com/tspl4/control.html#./control:h8
   //       => Scroll right to the end of the section for the implementation!
-  public static class CallWithValues implements PrimitiveCallable {
+  public static class CallWithValues extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "call-with-values";
     }
@@ -295,7 +295,7 @@ public class UtilityPrimitives {
   // with-exception-handler
   //   See the below for an implementation of <with-exception-handler>, <raise>, & <guard>:
   //     https://srfi.schemers.org/srfi-34/srfi-34.html
-  public static class WithExceptionHandler implements PrimitiveCallable {
+  public static class WithExceptionHandler extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "with-exception-handler";
     }
@@ -337,7 +337,7 @@ public class UtilityPrimitives {
   // raise
   //   See the below for an implementation of <with-exception-handler>, <raise>, & <guard>:
   //     https://srfi.schemers.org/srfi-34/srfi-34.html
-  public static class Raise implements PrimitiveCallable {
+  public static class Raise extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "raise";
     }
@@ -369,7 +369,7 @@ public class UtilityPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // time
-  public static class Time implements PrimitiveCallable {
+  public static class Time extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "time";
     }

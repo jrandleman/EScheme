@@ -17,12 +17,11 @@ import escm.vm.type.Callable;
 import escm.vm.util.ExecutionState;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
-import escm.vm.runtime.GlobalState;
 
 public class MetaPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // apply
-  public static class Apply implements PrimitiveCallable {
+  public static class Apply extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "apply";
     }
@@ -54,7 +53,7 @@ public class MetaPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // compile
-  public static class Compile implements PrimitiveCallable {
+  public static class Compile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "compile";
     }
@@ -62,14 +61,14 @@ public class MetaPrimitives {
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(compile <escm-code-as-data>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      return Compiler.run(parameters.get(0),continuation);
+      return Compiler.run(parameters.get(0),this.definitionEnvironment,continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // eval-bytecode
-  public static class EvalBytecode implements PrimitiveCallable {
+  public static class EvalBytecode extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "eval-bytecode";
     }
@@ -77,14 +76,14 @@ public class MetaPrimitives {
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(eval-bytecode <escm-bytecode-as-data>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      return Interpreter.run(new ExecutionState(GlobalState.globalEnvironment,Assembler.run(parameters.get(0))),continuation);
+      return Interpreter.run(new ExecutionState(this.definitionEnvironment,Assembler.run(parameters.get(0))),continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // eval
-  public static class Eval implements PrimitiveCallable {
+  public static class Eval extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "eval";
     }
@@ -93,8 +92,8 @@ public class MetaPrimitives {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(eval <escm-code-as-data>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
       Datum data = parameters.get(0);
-      return Compiler.run(data,(compiled) -> () -> {
-        return Interpreter.run(new ExecutionState(GlobalState.globalEnvironment,Assembler.run(compiled)),continuation);
+      return Compiler.run(data,this.definitionEnvironment,(compiled) -> () -> {
+        return Interpreter.run(new ExecutionState(this.definitionEnvironment,Assembler.run(compiled)),continuation);
       });
     }
   }
@@ -102,7 +101,7 @@ public class MetaPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // gensym
-  public static class Gensym implements Primitive {
+  public static class Gensym extends Primitive {
     public java.lang.String escmName() {
       return "gensym";
     }
@@ -121,7 +120,7 @@ public class MetaPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // escm-define-syntax
-  public static class EscmDefineSyntax implements Primitive {
+  public static class EscmDefineSyntax extends Primitive {
     public java.lang.String escmName() {
       return "escm-define-syntax";
     }
@@ -144,7 +143,7 @@ public class MetaPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // expand-syntax
-  public static class ExpandSyntax implements PrimitiveCallable {
+  public static class ExpandSyntax extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "expand-syntax";
     }
@@ -167,7 +166,7 @@ public class MetaPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // delete-syntax!
-  public static class DeleteSyntaxBang implements Primitive {
+  public static class DeleteSyntaxBang extends Primitive {
     public java.lang.String escmName() {
       return "delete-syntax!";
     }
@@ -182,7 +181,7 @@ public class MetaPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // syntax?
-  public static class IsSyntax implements Primitive {
+  public static class IsSyntax extends Primitive {
     public java.lang.String escmName() {
       return "syntax?";
     }

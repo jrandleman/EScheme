@@ -14,7 +14,7 @@ import escm.vm.type.Primitive;
 public class CharacterPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // char?
-  public static class IsChar implements Primitive {
+  public static class IsChar extends Primitive {
     public java.lang.String escmName() {
       return "char?";
     }
@@ -29,7 +29,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-alphabetic?
-  public static class IsCharAlphabetic implements Primitive {
+  public static class IsCharAlphabetic extends Primitive {
     public java.lang.String escmName() {
       return "char-alphabetic?";
     }
@@ -44,7 +44,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-numeric?
-  public static class IsCharNumeric implements Primitive {
+  public static class IsCharNumeric extends Primitive {
     public java.lang.String escmName() {
       return "char-numeric?";
     }
@@ -59,7 +59,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-whitespace?
-  public static class IsCharWhitespace implements Primitive {
+  public static class IsCharWhitespace extends Primitive {
     public java.lang.String escmName() {
       return "char-whitespace?";
     }
@@ -74,7 +74,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-upper-case?
-  public static class IsCharUpperCase implements Primitive {
+  public static class IsCharUpperCase extends Primitive {
     public java.lang.String escmName() {
       return "char-upper-case?";
     }
@@ -89,7 +89,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-lower-case?
-  public static class IsCharLowerCase implements Primitive {
+  public static class IsCharLowerCase extends Primitive {
     public java.lang.String escmName() {
       return "char-lower-case?";
     }
@@ -104,7 +104,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-alphanumeric?
-  public static class IsCharAlphanumeric implements Primitive {
+  public static class IsCharAlphanumeric extends Primitive {
     public java.lang.String escmName() {
       return "char-alphanumeric?";
     }
@@ -120,7 +120,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-control?
-  public static class IsCharControl implements Primitive {
+  public static class IsCharControl extends Primitive {
     public java.lang.String escmName() {
       return "char-control?";
     }
@@ -135,7 +135,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-punctuation?
-  public static class IsCharPunctuation implements Primitive {
+  public static class IsCharPunctuation extends Primitive {
     public java.lang.String escmName() {
       return "char-punctuation?";
     }
@@ -150,7 +150,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-graph?
-  public static class IsCharGraph implements Primitive {
+  public static class IsCharGraph extends Primitive {
     public java.lang.String escmName() {
       return "char-graph?";
     }
@@ -166,7 +166,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-print?
-  public static class IsCharPrint implements Primitive {
+  public static class IsCharPrint extends Primitive {
     public java.lang.String escmName() {
       return "char-print?";
     }
@@ -182,7 +182,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-xdigit?
-  public static class IsCharXdigit implements Primitive {
+  public static class IsCharXdigit extends Primitive {
     public java.lang.String escmName() {
       return "char-xdigit?";
     }
@@ -198,7 +198,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-upcase
-  public static class CharUpcase implements Primitive {
+  public static class CharUpcase extends Primitive {
     public java.lang.String escmName() {
       return "char-upcase";
     }
@@ -213,7 +213,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-downcase
-  public static class CharDowncase implements Primitive {
+  public static class CharDowncase extends Primitive {
     public java.lang.String escmName() {
       return "char-downcase";
     }
@@ -228,7 +228,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char=?
-  public static class IsCharEqual implements Primitive {
+  public static class IsCharEqual extends Primitive {
     public java.lang.String escmName() {
       return "char=?";
     }
@@ -250,7 +250,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char<?
-  public static class IsCharLessThan implements Primitive {
+  public static class IsCharLessThan extends Primitive {
     public java.lang.String escmName() {
       return "char<?";
     }
@@ -274,7 +274,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char>?
-  public static class IsCharGreaterThan implements Primitive {
+  public static class IsCharGreaterThan extends Primitive {
     public java.lang.String escmName() {
       return "char>?";
     }
@@ -298,7 +298,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char<=?
-  public static class IsCharLessThanOrEqual implements Primitive {
+  public static class IsCharLessThanOrEqual extends Primitive {
     public java.lang.String escmName() {
       return "char<=?";
     }
@@ -322,7 +322,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char>=?
-  public static class IsCharGreaterThanOrEqual implements Primitive {
+  public static class IsCharGreaterThanOrEqual extends Primitive {
     public java.lang.String escmName() {
       return "char>=?";
     }
@@ -346,7 +346,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-ci=?
-  public static class IsCharEqualCI implements Primitive {
+  public static class IsCharEqualCI extends Primitive {
     public java.lang.String escmName() {
       return "char-ci=?";
     }
@@ -368,7 +368,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-ci<?
-  public static class IsCharLessThanCI implements Primitive {
+  public static class IsCharLessThanCI extends Primitive {
     public java.lang.String escmName() {
       return "char-ci<?";
     }
@@ -392,7 +392,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-ci>?
-  public static class IsCharGreaterThanCI implements Primitive {
+  public static class IsCharGreaterThanCI extends Primitive {
     public java.lang.String escmName() {
       return "char-ci>?";
     }
@@ -416,7 +416,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-ci<=?
-  public static class IsCharLessThanOrEqualCI implements Primitive {
+  public static class IsCharLessThanOrEqualCI extends Primitive {
     public java.lang.String escmName() {
       return "char-ci<=?";
     }
@@ -440,7 +440,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-ci>=?
-  public static class IsCharGreaterThanOrEqualCI implements Primitive {
+  public static class IsCharGreaterThanOrEqualCI extends Primitive {
     public java.lang.String escmName() {
       return "char-ci>=?";
     }
@@ -464,7 +464,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-pair?
-  public static class IsCharPair implements Primitive {
+  public static class IsCharPair extends Primitive {
     public java.lang.String escmName() {
       return "char-pair?";
     }
@@ -479,7 +479,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // java-char?
-  public static class IsJavaChar implements Primitive {
+  public static class IsJavaChar extends Primitive {
     public java.lang.String escmName() {
       return "java-char?";
     }
@@ -494,7 +494,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // ascii-char?
-  public static class IsAsciiChar implements Primitive {
+  public static class IsAsciiChar extends Primitive {
     public java.lang.String escmName() {
       return "ascii-char?";
     }
@@ -509,7 +509,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-count
-  public static class CharCount implements Primitive {
+  public static class CharCount extends Primitive {
     public java.lang.String escmName() {
       return "char-count";
     }
@@ -524,7 +524,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-digit
-  public static class CharDigit implements Primitive {
+  public static class CharDigit extends Primitive {
     public java.lang.String escmName() {
       return "char-digit";
     }
@@ -549,7 +549,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-for-digit
-  public static class CharForDigit implements Primitive {
+  public static class CharForDigit extends Primitive {
     public java.lang.String escmName() {
       return "char-for-digit";
     }
@@ -574,7 +574,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-name
-  public static class CharName implements Primitive {
+  public static class CharName extends Primitive {
     public java.lang.String escmName() {
       return "char-name";
     }
@@ -591,7 +591,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-defined?
-  public static class IsCharDefined implements Primitive {
+  public static class IsCharDefined extends Primitive {
     public java.lang.String escmName() {
       return "char-defined?";
     }
@@ -606,7 +606,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-high?
-  public static class IsCharHigh implements Primitive {
+  public static class IsCharHigh extends Primitive {
     public java.lang.String escmName() {
       return "char-high?";
     }
@@ -622,7 +622,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-low?
-  public static class IsCharLow implements Primitive {
+  public static class IsCharLow extends Primitive {
     public java.lang.String escmName() {
       return "char-low?";
     }
@@ -638,7 +638,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-high
-  public static class CharHigh implements Primitive {
+  public static class CharHigh extends Primitive {
     public java.lang.String escmName() {
       return "char-high";
     }
@@ -655,7 +655,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-low
-  public static class CharLow implements Primitive {
+  public static class CharLow extends Primitive {
     public java.lang.String escmName() {
       return "char-low";
     }
@@ -672,7 +672,7 @@ public class CharacterPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // char-codepoint
-  public static class CharCodepoint implements Primitive {
+  public static class CharCodepoint extends Primitive {
     public java.lang.String escmName() {
       return "char-codepoint";
     }
