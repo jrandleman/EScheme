@@ -17,6 +17,12 @@
   "description": "Super type of objects, classes, and interfaces.\nRefers to any entity that supports dot-notation to access a property.",
   "example": null
 }, {
+  "name": "syntax",
+  "aliases": null,
+  "signatures": null,
+  "description": "The value that macros evaluate to when passed as a procedure argument.\nThe only value that yields true with <syntax?>, and can be applied to\na list of quoted macros arguments via <apply> like any other procedure.",
+  "example": null
+}, {
   "name": "number",
   "aliases": ["num"],
   "signatures": null,

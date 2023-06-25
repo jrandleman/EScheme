@@ -56,7 +56,7 @@
   "name": "defined?",
   "aliases": ["def?"],
   "signatures": ["(defined? <variable-name>)"],
-  "description": "Checks if <variable-name> is defined in the current environment.\nAliased by <def?>. Note that <variable-name> may be an object\nproperty chain too, hence (defined? obj.prop) is valid syntax!\n\nNote that this only works for variables, use the <syntax?> procedure for macros.",
+  "description": "Checks if <variable-name> is defined in the current environment.\nAliased by <def?>. Note that <variable-name> may be an object\nproperty chain too, hence (defined? obj.prop) is valid syntax!",
   "example": null
 }, {
   "name": "defn",

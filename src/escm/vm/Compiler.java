@@ -14,6 +14,7 @@ import escm.type.Hashmap;
 import escm.type.Symbol;
 import escm.type.Nil;
 import escm.type.procedure.Procedure;
+import escm.type.procedure.SyntaxProcedure;
 import escm.type.number.Exact;
 import escm.util.Trampoline;
 import escm.primitive.MetaPrimitives;
@@ -30,11 +31,6 @@ public class Compiler {
 
   private static final Symbol VECTOR = new Symbol("vector");
   private static final Symbol HASHMAP = new Symbol("hashmap");
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Static Thread-Safe Macro Registry
-  public static final ConcurrentHashMap<String,Callable> MACRO_REGISTRY = new ConcurrentHashMap<String,Callable>();
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -131,26 +127,27 @@ public class Compiler {
   }
 
 
-  private static Trampoline.Bounce compileMacroApplication(Pair macroExpr, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
-    Symbol macroName = (Symbol)macroExpr.car();
-    Callable macroCallable = MACRO_REGISTRY.get(macroName.value());
-    ArrayList<Datum> args = MetaPrimitives.Apply.convertListToArrayList(macroExpr.cdr());
-    if(macroCallable instanceof Procedure && macroName.hasSourceInformation()) {
-      return ((Procedure)macroCallable).loadWithInvocationSource(macroName.source()).callWith(args,(expandedExpr) -> () -> run(expandedExpr,definitionEnvironment,continuation));
+  private static Trampoline.Bounce compileMacroApplication(Symbol name, SyntaxProcedure macro, Datum macroArgs, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
+    ArrayList<Datum> args = MetaPrimitives.Apply.convertListToArrayList(macroArgs);
+    if(name.hasSourceInformation()) {
+      return macro.loadWithInvocationSource(name.source()).callWith(args,(expandedExpr) -> () -> run(expandedExpr,definitionEnvironment,continuation));
     } else {
-      return macroCallable.callWith(args,(expandedExpr) -> () -> run(expandedExpr,definitionEnvironment,continuation));
+      return macro.callWith(args,(expandedExpr) -> () -> run(expandedExpr,definitionEnvironment,continuation));
     }
   }
 
 
-  private static boolean isMacroApplication(Datum head) throws Exception {
-    return head instanceof Symbol && MACRO_REGISTRY.containsKey(((Symbol)head).value());
+  private static SyntaxProcedure isMacroApplication(Environment definitionEnvironment, Datum head) {
+    if(!(head instanceof Symbol)) return null;
+    return MetaPrimitives.IsSyntax.logic(definitionEnvironment,(Symbol)head);
   }
 
 
   private static Trampoline.Bounce compileApplication(Pair d, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
-    if(isMacroApplication(d.car())) {
-      return compileMacroApplication(d,definitionEnvironment,continuation);
+    Datum car = d.car();
+    SyntaxProcedure macro = isMacroApplication(definitionEnvironment,car);
+    if(macro != null) {
+      return compileMacroApplication((Symbol)car,macro,d.cdr(),definitionEnvironment,continuation);
     } else {
       // Reverse the procedure application expression to use the faster negative <call> argument @ runtime
       return compileProcedureApplication((Datum)d.reverse(),0,definitionEnvironment,continuation);

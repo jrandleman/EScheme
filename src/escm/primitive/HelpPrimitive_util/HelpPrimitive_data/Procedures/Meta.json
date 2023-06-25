@@ -31,19 +31,13 @@
 }, {
   "name": "syntax?",
   "aliases": null,
-  "signatures": ["(syntax? <macro-name-symbol>)"],
-  "description": "Returns whether <macro-name-symbol> is a valid macro name.",
+  "signatures": ["(syntax? <obj>)"],
+  "description": "Returns whether <obj> is a syntax object. Syntax objects are created when\nmacros are evaluated as a procedure argument.",
   "example": null
 }, {
   "name": "expand-syntax",
   "aliases": null,
   "signatures": ["(expand-syntax <quoted-macro-expression>)"],
   "description": "Returns the expansion of <quoted-macro-expression> by executing its macro.",
-  "example": null
-}, {
-  "name": "delete-syntax!",
-  "aliases": null,
-  "signatures": ["(delete-syntax! <macro-name-symbol>)"],
-  "description": "Remove <macro-name-symbol> from the compiler's macro registry.\nReturns whether succeeded in removal. Used for macro localization.",
   "example": null
 }]

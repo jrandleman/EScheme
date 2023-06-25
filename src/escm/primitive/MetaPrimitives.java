@@ -6,7 +6,9 @@ package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Pair;
+import escm.type.Nil;
 import escm.type.Symbol;
+import escm.type.procedure.SyntaxProcedure;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.UniqueSymbol;
@@ -15,6 +17,7 @@ import escm.vm.Assembler;
 import escm.vm.Interpreter;
 import escm.vm.type.Callable;
 import escm.vm.util.ExecutionState;
+import escm.vm.util.Environment;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
 
@@ -119,6 +122,32 @@ public class MetaPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // syntax?
+  public static class IsSyntax extends Primitive {
+    public java.lang.String escmName() {
+      return "syntax?";
+    }
+
+    public static SyntaxProcedure logic(Environment definitionEnvironment, Symbol name) {
+      try {
+        if(!definitionEnvironment.has(name)) return null;
+        Datum value = definitionEnvironment.get(name);
+        if(value instanceof SyntaxProcedure) return (SyntaxProcedure)value;
+        return null;
+      } catch(Exception e) {
+        return null;
+      }
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1)
+        throw new Exceptionf("'(syntax? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return escm.type.bool.Boolean.valueOf(parameters.get(0) instanceof SyntaxProcedure);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // escm-define-syntax
   public static class EscmDefineSyntax extends Primitive {
     public java.lang.String escmName() {
@@ -134,8 +163,8 @@ public class MetaPrimitives {
       Datum value = parameters.get(1);
       if(!(value instanceof Callable))
         throw new Exceptionf("'(escmn-define-syntax <symbol> <callable>) 2nd arg %s isn't a callable: %s", value.profile(), Exceptionf.profileArgs(parameters));
-      String macroName = ((Symbol)name).value();
-      Compiler.MACRO_REGISTRY.put(macroName,(Callable)value.loadWithName(macroName));
+      Symbol nameSumbol = (Symbol)name;
+      this.definitionEnvironment.define(nameSumbol,new SyntaxProcedure(nameSumbol.value(),(Callable)value));
       return escm.type.Void.VALUE;
     }
   }
@@ -155,41 +184,12 @@ public class MetaPrimitives {
       if(!(macroExpr instanceof Pair) || !(((Pair)macroExpr).car() instanceof Symbol))
         throw new Exceptionf("'(expand-syntax <quoted-macro-expression>) given arg isn't a macro expression: %s", Exceptionf.profileArgs(parameters));
       Pair macroExprList = (Pair)macroExpr;
-      String macroName = ((Symbol)macroExprList.car()).value();
-      if(!Compiler.MACRO_REGISTRY.containsKey(macroName))
+      Symbol macroName = (Symbol)macroExprList.car();
+      SyntaxProcedure macro = IsSyntax.logic(this.definitionEnvironment,macroName);
+      if(macro == null)
         throw new Exceptionf("'(expand-syntax <quoted-macro-expression>) given arg isn't a macro expression: %s", Exceptionf.profileArgs(parameters));
       ArrayList<Datum> macroArgs = MetaPrimitives.Apply.convertListToArrayList(macroExprList.cdr());
-      return Compiler.MACRO_REGISTRY.get(macroName).callWith(macroArgs,(expandedExpr) -> () -> continuation.run(expandedExpr));
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // delete-syntax!
-  public static class DeleteSyntaxBang extends Primitive {
-    public java.lang.String escmName() {
-      return "delete-syntax!";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol))
-        throw new Exceptionf("'(delete-syntax! <macro-name>) didn't receive exactly 1 symbol: %s", Exceptionf.profileArgs(parameters));
-      return escm.type.bool.Boolean.valueOf(Compiler.MACRO_REGISTRY.remove(((Symbol)parameters.get(0)).value()) != null);
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // syntax?
-  public static class IsSyntax extends Primitive {
-    public java.lang.String escmName() {
-      return "syntax?";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol))
-        throw new Exceptionf("'(syntax? <macro-name>) didn't receive exactly 1 symbol: %s", Exceptionf.profileArgs(parameters));
-      return escm.type.bool.Boolean.valueOf(Compiler.MACRO_REGISTRY.containsKey(((Symbol)parameters.get(0)).value()));
+      return macro.callWith(macroArgs,continuation);
     }
   }
 }

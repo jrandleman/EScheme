@@ -114,7 +114,7 @@ syntax. These include: `define`, `set!`, `load`, `call`, `push`, & `return`.
 
 (set! <symbol>) ; set! <symbol> to CVR [sets CVR to <void>]
 
-(defined? <symbol>) ; determine if <symbol> is defined as a variable [sets CVR to the boolean result] (use the <syntax?> procedure for macros)
+(defined? <symbol>) ; determine if <symbol> is defined as a variable [sets CVR to the boolean result]
 
 (ifn <integer>) ; if CVR is NOT truthy, jump <integer> instructions [sets CVR to <void>]
 

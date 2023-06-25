@@ -645,9 +645,8 @@
 
 (gensym <optional-name-symbol>) ; optional arg improves readability when printing generated symbols
 
-(syntax? <macro-name-symbol>)
-(expand-syntax <quoted-macro-expression>)
-(delete-syntax! <macro-name-symbol>)
+(syntax? <obj>) ; (syntax? if)
+(expand-syntax <quoted-macro-expression>) ; (expand-syntax '(if 1 2 3))
 ```
 
 
