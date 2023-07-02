@@ -36,7 +36,7 @@ public class Main {
     "  2. -h, --help                       | Print this information\n"+
     "  3. -q, --quiet                      | Launch the REPL without ASCII art\n"+
     "  4. -l, --load <script> <arg1> ...   | Load <script> with <arg> ... as *argv* into the REPL\n"+
-    "  5. -i, --import <script> <arg1> ... | Import <script> with <arg> ... as *argv* into the REPL\n"+
+    "  5. -i, --import <module> <arg1> ... | Import <module> with <arg> ... as *argv* into the REPL\n"+
     "  6. <script> <arg1> ...              | Interpret <script> with <arg> ... as *argv*\n"+
     "  7. [no arguments]                   | Launch the REPL\n";
 

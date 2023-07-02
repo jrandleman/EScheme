@@ -174,7 +174,7 @@ public class Pair extends Datum implements OrderedCollection {
   ////////////////////////////////////////////////////////////////////////////
   // Pretty-Printing (adapted from my Heist-Scheme C++ pretty-printer)
   private static final int PRETTY_PRINT_COLUMN_WIDTH = 80;
-  
+
 
   // Proper list predicate
   private static boolean isProperList(Datum d) {
@@ -208,6 +208,13 @@ public class Pair extends Datum implements OrderedCollection {
       is_exp = true;
       exp = e;
     }
+  }
+
+
+  // Add leading non-0 characters from <chars> to <buffer>
+  private static void add_chars_to_buffer(StringBuilder buffer, char[] chars) {
+    for(int i = 0; i < chars.length && chars[i] != 0; ++i) 
+      buffer.append(chars[i]);
   }
 
 
@@ -271,7 +278,7 @@ public class Pair extends Datum implements OrderedCollection {
     for(int col_length = 2*depth, i = 0, n = list_as_strs.size(); i < n; ++i) {
       if(i > 0 && list_as_strs.get(i).output_len + col_length > PRETTY_PRINT_COLUMN_WIDTH) {
         buffer.append('\n');
-        buffer.append(tabs);
+        add_chars_to_buffer(buffer,tabs);
         col_length = 2*depth;
       }
       col_length += list_as_strs.get(i).output_len + 1; // +1 accounts for spaces
@@ -326,7 +333,7 @@ public class Pair extends Datum implements OrderedCollection {
     if(i < n) buffer.append('\n');
     // Print body of the list
     for(; i < n; ++i) {
-      buffer.append(tabs);
+      add_chars_to_buffer(buffer,tabs);
       if(list_as_strs.get(i).is_exp) {
         pretty_print_pprint_data(list_as_strs.get(i).exp,list_as_strs.get(i).output_len,depth+1,buffer);
       } else {
