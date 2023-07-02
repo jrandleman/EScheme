@@ -48,7 +48,7 @@
    * Launch the REPL without ASCII art
 4. `-l <script> <arg1> ...`, `--load <script> <arg1> ...`
    * Load `<script>` with `<arg> ...` as `*argv*` into the REPL
-5. `-i <module> <arg1> ...`, `--import <script> <arg1> ...`
+5. `-i <module> <arg1> ...`, `--import <module> <arg1> ...`
    * Import `<module>` with `<arg> ...` as `*argv*` into the REPL
 6. `<script> <arg1> ...`
    * Interpret `<script>` with `<arg> ...` as `*argv*`
