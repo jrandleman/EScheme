@@ -44,13 +44,13 @@
   "name": "values",
   "aliases": null,
   "signatures": ["(values <obj> ...)"],
-  "description": "Packs \"obj\" into a \"value object\" list.\nUsed in conjunction with <call-with-values>.",
+  "description": "Packs \"obj\" into a \"value object\" list.\nUsed in conjunction with <call-with-values>.\nSee the <let-values> macro for a simplfied syntax to bind <value> expressions.",
   "example": ";; Returns '(james . bond)\n(call-with-values\n  (lambda () (values 'bond 'james))\n  (lambda (x y) (cons y x)))"
 }, {
   "name": "call-with-values",
   "aliases": null,
   "signatures": ["(call-with-values <thunk-producer> <callable-consumer>)"],
-  "description": "Applies the \"values object\" returned by <thunk-producer>\nas args to <callable-consumer>.\nUsed in conjunction with <values>.",
+  "description": "Applies the \"values object\" returned by <thunk-producer>\nas args to <callable-consumer>.\nUsed in conjunction with <values>.\nSee the <let-values> macro for a simplfied syntax to bind <value> expressions.",
   "example": ";; Returns '(james . bond)\n(call-with-values\n  (lambda () (values 'bond 'james))\n  (lambda (x y) (cons y x)))"
 }, {
   "name": "with-exception-handler",

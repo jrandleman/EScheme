@@ -3,25 +3,11 @@
 ## MORE
 
 
+
+
 [ ] CONSIDER CHANGING IT SO THAT LOADING THE ESCHEME STDLIB ALSO TAKES IN A CONTINUATION
     [ ] SEE MODULE LOADING PRIMITIVE TOO!
     [ ] ADJUST COMMENT AT TOP OF `stdlib.scm` ACCORDINGLY!
-
-
-
-
-
-
-[ ] CONSIDER IMPLEMENTING `(let-values (((var1 var2 ...) <expression producing return from 'values'>) ...) <body> ...)` SPECIAL FORM
-    [ ] ADD TO `help` AND IN THE DESCRIPTION FOR `values`/`call-with-values` IN `help` TOO
-```scheme
-(def (f x)
-  (values x (* x 2) (* x 3)))
-
-(let-values (((a11 b11 c11) (f 11)) ((a12 b12 c12) (f 12)))
-  (displayf "%a %a %a\n" a11 b11 c11)
-  (displayf "%a %a %a\n" a12 b12 c12))
-```
 
 
 

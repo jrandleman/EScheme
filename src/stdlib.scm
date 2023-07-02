@@ -92,6 +92,8 @@
 ;   - import
 ;   - reload
 ;   - from
+;
+;   - let-values
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Implementing QUOTE: (quote <obj>)
@@ -1359,3 +1361,17 @@
               (list 'define alias (symbol-append hidden-module-name '. obj)))
             (car fields) 
             (cdr fields)))))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing LET-VALUES: 
+;; (let-values (((<var> ...) <'values'-expression>) ...) <body> ...)
+(define-syntax let-values
+  (lambda (bindings . body)
+    (if (null? bindings)
+        (cons 'begin body)
+        `(call-with-values
+          (lambda () ,(cadar bindings))
+          (lambda ,(caar bindings)
+            (let-values ,(cdr bindings)
+              ,@body))))))

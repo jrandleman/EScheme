@@ -280,4 +280,10 @@
   "signatures": ["(parameter? <name>)"],
   "description": "Determine if <name> is a parameter variable. See the <define-parameter>\n'help' entry to learn more about what parameter variables are.",
   "example": null
+}, {
+  "name": "let-values",
+  "aliases": null,
+  "signatures": ["(let-values (((<var> ...) <'values'-expression>) ...) <body> ...)"],
+  "description": "Wrapper to locally bind results of expressions that yield a <values> object.\nExpands to nested <call-with-values> expressions.\n\nSee the <values> and <call-with-values> 'help' entries for more information\nand examples on using <values> expressions.",
+  "example": null
 }]
