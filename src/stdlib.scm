@@ -1370,8 +1370,9 @@
   (lambda (bindings . body)
     (if (null? bindings)
         (cons 'begin body)
-        `(call-with-values
-          (lambda () ,(cadar bindings))
-          (lambda ,(caar bindings)
-            (let-values ,(cdr bindings)
-              ,@body))))))
+        (list 'call-with-values
+          (list 'lambda '() (cadar bindings))
+          (list 'lambda (caar bindings)
+            (cons 'let-values 
+              (cons (cdr bindings) 
+                    body)))))))
