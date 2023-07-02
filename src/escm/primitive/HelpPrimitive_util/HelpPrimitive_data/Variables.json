@@ -50,13 +50,19 @@
   "name": "*escm-execution-command*",
   "aliases": ["escm-execution-command", "escm-exec-command", "escm-exec-cmd", "escm-execution-cmd", "*escm-exec-command*", "*escm-exec-cmd*", "*escm-execution-cmd*"],
   "signatures": null,
-  "description": "Execution command to run EScheme on the host machine. For example,\nthe below would run \"script.scm\" in a seperate process:\n  (system (string-append *escm-execution-command* \"script.scm\"))",
+  "description": "Execution command to run EScheme on the host machine. For example,\nthe below would run \"script.scm\" in a seperate process:\n  (system (append *escm-execution-command* \"script.scm\"))",
   "example": null
 }, {
   "name": "*dosync-lock*",
   "aliases": null,
   "signatures": null,
-  "description": "Mutex lock used by <dosync>.",
+  "description": "Mutex lock used by <dosync>. Defined as a parameter, hence maintains the same\nstate across modules.",
+  "example": null
+}, {
+  "name": "*dosync-module-lock*",
+  "aliases": null,
+  "signatures": null,
+  "description": "Mutex lock used by <dosync-module>. Defined as a global variable, hence has\nunique state per module.",
   "example": null
 }, {
   "name": "*generator-complete*",
@@ -68,12 +74,24 @@
   "name": "*min-radix*",
   "aliases": null,
   "signatures": null,
-  "description": "Variable that denotes the smallest radix supported by\n<string->number> and <number->string>. Generally 2.\nAlso check out <*max-radix*>!",
+  "description": "Variable denoting the smallest radix supported by\n<string->number> and <number->string>. Generally 2.\nAlso check out <*max-radix*>!",
   "example": null
 }, {
   "name": "*max-radix*",
   "aliases": null,
   "signatures": null,
-  "description": "Variable that denotes the largest radix supported by\n<string->number> and <number->string>. Generally 36.\nAlso check out <*min-radix*>!",
+  "description": "Variable denoting the largest radix supported by\n<string->number> and <number->string>. Generally 36.\nAlso check out <*min-radix*>!",
+  "example": null
+}, {
+  "name": "*import*",
+  "aliases": null,
+  "signatures": null,
+  "description": "Variable denoting whether the current file was loaded via <import> or not.\nCan combine with <unless> to mimic Python's \"if __name__=='__main__':\" pattern:\n\n  (unless *import*\n    <execute-main-escheme-code-here> ...)",
+  "example": null
+}, {
+  "name": "*load-once-files*",
+  "aliases": null,
+  "signatures": null,
+  "description": "Hashmap that stores the set of files already loaded by the current module.\nUsed by <load-once>.",
   "example": null
 }]

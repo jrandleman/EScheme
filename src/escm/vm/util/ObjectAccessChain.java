@@ -14,10 +14,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import escm.type.Datum;
 import escm.type.Symbol;
-import escm.type.oo.MetaObject;
+import escm.type.oo.Dottable;
 import escm.type.procedure.Procedure;
 import escm.util.Exceptionf;
 import escm.vm.util.ExecutionState;
+import escm.vm.util.Environment;
 
 public class ObjectAccessChain extends Datum {
   ////////////////////////////////////////////////////////////////////////////
@@ -160,7 +161,7 @@ public class ObjectAccessChain extends Datum {
   // Define a new value in the object property chain
   public void define(ExecutionState state, Datum newPropValue) throws Exception {
     Datum result = state.env.get(value.get(0));
-    if(!(result instanceof MetaObject)) {
+    if(!(result instanceof Dottable)) {
       if(value.get(0).hasSourceInformation()) {
         throw new Exceptionf("ObjectAccessChain: <define> foremost item \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(0), result.profile(), value, value.get(0).source());
       } else {
@@ -168,8 +169,8 @@ public class ObjectAccessChain extends Datum {
       }
     }
     for(int i = 1, n = value.size()-1; i < n; ++i) {
-      result = ((MetaObject)result).get(value.get(i));
-      if(!(result instanceof MetaObject)) {
+      result = ((Dottable)result).get(value.get(i));
+      if(!(result instanceof Dottable)) {
         if(value.get(i).hasSourceInformation()) {
           throw new Exceptionf("ObjectAccessChain: <define> property \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(i), result.profile(), value, value.get(i).source());
         } else {
@@ -177,7 +178,7 @@ public class ObjectAccessChain extends Datum {
         }
       }
     }
-    ((MetaObject)result).define(value.get(value.size()-1),newPropValue);
+    ((Dottable)result).define(value.get(value.size()-1),newPropValue);
   }
 
 
@@ -185,7 +186,7 @@ public class ObjectAccessChain extends Datum {
   // Set an existing value in the object property chain
   public void set(ExecutionState state, Datum newPropValue) throws Exception {
     Datum result = state.env.get(value.get(0));
-    if(!(result instanceof MetaObject)) {
+    if(!(result instanceof Dottable)) {
       if(value.get(0).hasSourceInformation()) {
         throw new Exceptionf("ObjectAccessChain: <set!> foremost item \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(0), result.profile(), value, value.get(0).source());
       } else {
@@ -193,8 +194,8 @@ public class ObjectAccessChain extends Datum {
       }
     }
     for(int i = 1, n = value.size()-1; i < n; ++i) {
-      result = ((MetaObject)result).get(value.get(i));
-      if(!(result instanceof MetaObject)) {
+      result = ((Dottable)result).get(value.get(i));
+      if(!(result instanceof Dottable)) {
         if(value.get(i).hasSourceInformation()) {
           throw new Exceptionf("ObjectAccessChain: <set!> property \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(i), result.profile(), value, value.get(i).source());
         } else {
@@ -202,7 +203,7 @@ public class ObjectAccessChain extends Datum {
         }
       }
     }
-    ((MetaObject)result).set(value.get(value.size()-1),newPropValue);
+    ((Dottable)result).set(value.get(value.size()-1),newPropValue);
   }
 
 
@@ -210,7 +211,7 @@ public class ObjectAccessChain extends Datum {
   // Check if an object property chain is valid
   public boolean has(ExecutionState state) throws Exception {
     Datum result = state.env.get(value.get(0));
-    if(!(result instanceof MetaObject)) {
+    if(!(result instanceof Dottable)) {
       if(value.get(0).hasSourceInformation()) {
         throw new Exceptionf("ObjectAccessChain: <has?> foremost item \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(0), result.profile(), value, value.get(0).source());
       } else {
@@ -218,8 +219,8 @@ public class ObjectAccessChain extends Datum {
       }
     }
     for(int i = 1, n = value.size()-1; i < n; ++i) {
-      result = ((MetaObject)result).get(value.get(i));
-      if(!(result instanceof MetaObject)) {
+      result = ((Dottable)result).get(value.get(i));
+      if(!(result instanceof Dottable)) {
         if(value.get(i).hasSourceInformation()) {
           throw new Exceptionf("ObjectAccessChain: <has?> property \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(i), result.profile(), value, value.get(i).source());
         } else {
@@ -227,15 +228,15 @@ public class ObjectAccessChain extends Datum {
         }
       }
     }
-    return ((MetaObject)result).has(value.get(value.size()-1));
+    return ((Dottable)result).has(value.get(value.size()-1));
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter (effectively "get")
-  public Datum loadWithState(ExecutionState state) throws Exception {
-    Datum result = state.env.get(value.get(0));
-    if(!(result instanceof MetaObject)) {
+  public Datum loadWithState(Environment env) throws Exception {
+    Datum result = env.get(value.get(0));
+    if(!(result instanceof Dottable)) {
       if(value.get(0).hasSourceInformation()) {
         throw new Exceptionf("ObjectAccessChain: <get> foremost item \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(0), result.profile(), value, value.get(0).source());
       } else {
@@ -244,8 +245,8 @@ public class ObjectAccessChain extends Datum {
     }
     for(int i = 1, n = value.size(); i < n; ++i) {
       Symbol prop = value.get(i);
-      result = ((MetaObject)result).get(prop);
-      if(i+1 < n && !(result instanceof MetaObject)) {
+      result = ((Dottable)result).get(prop);
+      if(i+1 < n && !(result instanceof Dottable)) {
         if(prop.hasSourceInformation()) {
           throw new Exceptionf("ObjectAccessChain: <get> property \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", prop, result.profile(), value, prop.source());
         } else {
@@ -256,6 +257,10 @@ public class ObjectAccessChain extends Datum {
       }
     }
     return result;
+  }
+
+  public Datum loadWithState(ExecutionState state) throws Exception {
+    return loadWithState(state.env);
   }
 
 

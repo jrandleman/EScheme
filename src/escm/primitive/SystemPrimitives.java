@@ -7,10 +7,16 @@ import java.util.ArrayList;
 import java.util.Stack;
 import java.util.Calendar;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import escm.type.Datum;
 import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.type.Void;
+import escm.type.Symbol;
+import escm.type.Hashmap;
+import escm.type.bool.Boolean;
+import escm.type.oo.EscmModule;
 import escm.util.Pair;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
@@ -21,13 +27,15 @@ import escm.vm.util.Environment;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
 import escm.vm.util.SourceInformation;
+import escm.vm.util.ObjectAccessChain;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.EscmCallStack;
+import escm.vm.runtime.installerGenerated.EscmPath;
 
 public class SystemPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // Get the EScheme version number
-  public static final double VERSION = 8.0;
+  public static final double VERSION = 9.0;
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -80,6 +88,19 @@ public class SystemPrimitives {
       return "load";
     }
 
+    public static String addStringPaths(String path1, String path2) {
+      int n = path1.length();
+      if(n == 0) return path2;
+      if(path1.charAt(n-1) == File.separatorChar) return path1+path2;
+      return path1+File.separator+path2;
+    }
+
+    public static String getPath(String dir, String file) {
+      int n = dir.length();
+      if(n == 0 || FilePrimitives.IsAbsolutePath.logic(file)) return file;
+      return addStringPaths(dir,file);
+    }
+
     public static Trampoline.Bounce evalEachExpression(ArrayList<Datum> exprs, int i, Stack<Pair<String,SourceInformation>> originalCallStack, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
       int n = exprs.size();
       if(i >= n) return continuation.run(Void.VALUE);
@@ -98,54 +119,40 @@ public class SystemPrimitives {
       });
     }
 
-    public static Trampoline.Bounce loadESchemeFile(String primitiveName, String filename, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
-      String buffer = FilePrimitives.FileRead.slurpFile(filename,primitiveName);
-      ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(filename,buffer);
-      return evalEachExpression(exprs,0,EscmCallStack.copy(),definitionEnvironment,continuation);
-    }
-
-    public static Trampoline.Bounce logic(String primitiveName, String filename, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
-      LoadOnce.registerLoadedFile(filename);
+    private static Trampoline.Bounce loadESchemeFile(String primitiveName, String filename, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
       if(SerializationPrimitives.IsSerializedP.logic(filename) == true) {
         return SerializationPrimitives.loadSerializedFile(primitiveName,filename,definitionEnvironment,continuation);
       } else {
-        return loadESchemeFile(primitiveName,filename,definitionEnvironment,continuation);
+        String buffer = FilePrimitives.FileRead.slurpFile(filename,primitiveName);
+        ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(filename,buffer);
+        return evalEachExpression(exprs,0,EscmCallStack.copy(),definitionEnvironment,continuation);
       }
     }
 
-    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
-        throw new Exceptionf("'(load <filename>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return logic("load",((escm.type.String)parameters.get(0)).value(),this.definitionEnvironment,continuation);
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // load-from
-  public static class LoadFrom extends PrimitiveCallable {
-    public java.lang.String escmName() {
-      return "load-from";
-    }
-
-    public static String getPath(String dir, String file) {
-      int n = dir.length();
-      if(FilePrimitives.IsAbsolutePath.logic(file) || n == 0) return file;
-      if(dir.charAt(n-1) == File.separatorChar) return dir + file;
-      return dir + File.separator + file;
+    public static Trampoline.Bounce logic(String primitiveName, String filename, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
+      filename = FilePrimitives.AbsolutePath.logic(filename);
+      LoadOnce.registerLoadedFile(definitionEnvironment,filename);
+      return loadESchemeFile(primitiveName,filename,definitionEnvironment,continuation);
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() != 2) 
-        throw new Exceptionf("'(load-from <directory> <filename>) didn't receive exactly 2 strings: %s", Exceptionf.profileArgs(parameters));
-      Datum directory = parameters.get(0);
-      Datum file = parameters.get(1);
-      if(!(directory instanceof escm.type.String))
-        throw new Exceptionf("'(load-from <directory> <filename>) 1st arg isn't a string: %s", Exceptionf.profileArgs(parameters));
-      if(!(file instanceof escm.type.String))
-        throw new Exceptionf("'(load-from <directory> <filename>) 2nd arg isn't a string: %s", Exceptionf.profileArgs(parameters));
-      String filePath = getPath(((escm.type.String)directory).value(),((escm.type.String)file).value());
-      return Load.logic("load-from",filePath,this.definitionEnvironment,continuation);
+      int n = parameters.size();
+      String directory = "", filename = "";
+      if(n < 1 || n > 2)
+        throw new Exceptionf("'(load <optional-directory> <filename>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      if(n == 1) {
+        if(!(parameters.get(0) instanceof escm.type.String)) 
+          throw new Exceptionf("'(load <optional-directory> <filename>) <filename> isn't a string: %s", Exceptionf.profileArgs(parameters));
+        filename = ((escm.type.String)parameters.get(0)).value();
+      } else {
+        if(!(parameters.get(0) instanceof escm.type.String)) 
+          throw new Exceptionf("'(load <optional-directory> <filename>) <directory> isn't a string: %s", Exceptionf.profileArgs(parameters));
+        if(!(parameters.get(1) instanceof escm.type.String)) 
+          throw new Exceptionf("'(load <optional-directory> <filename>) <filename> isn't a string: %s", Exceptionf.profileArgs(parameters));
+        directory = ((escm.type.String)parameters.get(0)).value();
+        filename = ((escm.type.String)parameters.get(1)).value();
+      }
+      return logic("load",getPath(directory,filename),this.definitionEnvironment,continuation);
     }
   }
 
@@ -157,42 +164,40 @@ public class SystemPrimitives {
       return "load-once";
     }
 
-    public static void registerLoadedFile(String filePath) {
-      GlobalState.loadedOnceFiles.put(filePath,0);
+    private static Symbol loadOnceFiles = new Symbol("*load-once-files*");
+
+    public static void registerLoadedFile(Environment definitionEnvironment, String filePath) throws Exception {
+      Datum fileMap = definitionEnvironment.get(loadOnceFiles);
+      if(fileMap instanceof Hashmap) {
+        ((Hashmap)fileMap).set(new escm.type.String(filePath),Boolean.FALSE);
+      }
     }
 
-    public static boolean notLoadedYet(String filePath) {
-      return GlobalState.loadedOnceFiles.containsKey(filePath) == false;
-    }
-
-    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
-        throw new Exceptionf("'(load-once <filename>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      String filePath = FilePrimitives.AbsolutePath.logic(((escm.type.String)parameters.get(0)).value());
-      if(notLoadedYet(filePath)) return Load.logic("load-once",filePath,this.definitionEnvironment,continuation);
-      return continuation.run(Void.VALUE);
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // load-once-from
-  public static class LoadOnceFrom extends PrimitiveCallable {
-    public java.lang.String escmName() {
-      return "load-once-from";
+    public static boolean notLoadedYet(Environment definitionEnvironment, String filePath) throws Exception {
+      Datum fileMap = definitionEnvironment.get(loadOnceFiles);
+      return !(fileMap instanceof Hashmap) || !((Hashmap)fileMap).hasKey(new escm.type.String(filePath));
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() != 2) 
-        throw new Exceptionf("'(load-once-from <directory> <filename>) didn't receive exactly 2 strings: %s", Exceptionf.profileArgs(parameters));
-      Datum directory = parameters.get(0);
-      Datum file = parameters.get(1);
-      if(!(directory instanceof escm.type.String))
-        throw new Exceptionf("'(load-once-from <directory> <filename>) 1st arg isn't a string: %s", Exceptionf.profileArgs(parameters));
-      if(!(file instanceof escm.type.String))
-        throw new Exceptionf("'(load-once-from <directory> <filename>) 2nd arg isn't a string: %s", Exceptionf.profileArgs(parameters));
-      String filePath = LoadFrom.getPath(((escm.type.String)directory).value(),((escm.type.String)file).value());
-      if(LoadOnce.notLoadedYet(filePath)) return Load.logic("load-once-from",filePath,this.definitionEnvironment,continuation);
+      int n = parameters.size();
+      String directory = "", filename = "";
+      if(n < 1 || n > 2)
+        throw new Exceptionf("'(load <optional-directory> <filename>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      if(n == 1) {
+        if(!(parameters.get(0) instanceof escm.type.String)) 
+          throw new Exceptionf("'(load <optional-directory> <filename>) <filename> isn't a string: %s", Exceptionf.profileArgs(parameters));
+        filename = ((escm.type.String)parameters.get(0)).value();
+      } else {
+        if(!(parameters.get(0) instanceof escm.type.String)) 
+          throw new Exceptionf("'(load <optional-directory> <filename>) <directory> isn't a string: %s", Exceptionf.profileArgs(parameters));
+        if(!(parameters.get(1) instanceof escm.type.String)) 
+          throw new Exceptionf("'(load <optional-directory> <filename>) <filename> isn't a string: %s", Exceptionf.profileArgs(parameters));
+        directory = ((escm.type.String)parameters.get(0)).value();
+        filename = ((escm.type.String)parameters.get(1)).value();
+      }
+      String filePath = Load.getPath(directory,filename);
+      if(notLoadedYet(this.definitionEnvironment,filePath)) 
+        return Load.logic("load-once",filePath,this.definitionEnvironment,continuation);
       return continuation.run(Void.VALUE);
     }
   }
@@ -252,6 +257,242 @@ public class SystemPrimitives {
         result = ExecuteSystemCommand.run(cmd,envArray,dir);
       }
       return escm.type.Pair.List(new escm.type.String(result.out),new escm.type.String(result.err),new Exact(result.exit));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // escm-get-module-name
+  public static class EscmGetModuleName extends Primitive {
+    public java.lang.String escmName() {
+      return "escm-get-module-name";
+    }
+
+    public static Symbol logic(Symbol modulePath) throws Exception {
+      if(ObjectAccessChain.is(modulePath)) {
+        ArrayList<Symbol> path = ObjectAccessChain.parse(modulePath);
+        return path.get(path.size()-1);
+      } 
+      return modulePath;
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol)) 
+        throw new Exceptionf("'(escm-get-module-name <module-path-symbol>) didn't receive exactly 1 symbol: %s", Exceptionf.profileArgs(parameters));
+      return logic((Symbol)parameters.get(0));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // escm-load-module
+  public static class EscmLoadModule extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "escm-load-module";
+    }
+
+    public static Path addPaths(Path path1, Path path2) {
+      String s1 = path1.toString(), s2 = path2.toString();
+      int n = s1.length();
+      if(n == 0) return path2;
+      if(s1.charAt(n-1) == File.separatorChar) return Path.of(s1+s2);
+      return Path.of(s1+File.separator+s2);
+    }
+
+    private static ArrayList<Symbol> getModulePathSymbols(Symbol modulePath) throws Exception {
+      if(ObjectAccessChain.is(modulePath)) return ObjectAccessChain.parse(modulePath);
+      ArrayList<Symbol> path = new ArrayList<Symbol>();
+      path.add(modulePath);
+      return path;
+    }
+
+    private static String createModuleDirectoryString(ArrayList<Symbol> modulePath) {
+      StringBuilder path = new StringBuilder(File.separator);
+      for(int i = 0, n = modulePath.size()-1; i < n; ++i) {
+        path.append(modulePath.get(i).value());
+        path.append(File.separator);
+      }
+      return path.toString();
+    }
+
+    private static String extractFileWithoutExtension(String fileName) throws Exception {
+      int idx = fileName.lastIndexOf('.');
+      if(idx == -1) return fileName;
+      return fileName.substring(0,idx);
+    }
+
+    private static String getModuleFileName(Path moduleDirectory, String moduleName) throws Exception {
+      for(File entry : (new File(moduleDirectory.toString())).listFiles()) {
+        String filename = entry.toPath().getFileName().toString();
+        if(filename.length() != 0 && filename.charAt(0) != '.' && extractFileWithoutExtension(filename).equals(moduleName)) {
+          return filename;
+        }
+      }
+      return null;
+    }
+
+    private static String getModuleAbsoluteFilePath(String moduleName, ArrayList<Symbol> modulePath, String filePath, ArrayList<Datum> parameters) throws Exception {
+      Path moduleDirectoryPath = Path.of(createModuleDirectoryString(modulePath));
+      Path moduleAbsolutePath = Path.of(FilePrimitives.AbsolutePath.logic(filePath));
+      while(moduleAbsolutePath != null) {
+        Path p = addPaths(moduleAbsolutePath,moduleDirectoryPath);
+        if(Files.isDirectory(p)) {
+          moduleAbsolutePath = p;
+          break;
+        }
+        moduleAbsolutePath = moduleAbsolutePath.getParent();
+      }
+      if(moduleAbsolutePath == null)
+        throw new Exceptionf("'(escm-load-module <optional-filepath-string> <module-path-symbol>) module path doesn't exist: %s", Exceptionf.profileArgs(parameters));
+      String moduleFileName = getModuleFileName(moduleAbsolutePath,moduleName);
+      if(moduleFileName == null)
+        throw new Exceptionf("'(escm-load-module <optional-filepath-string> <module-path-symbol>) module path doesn't exist: %s", Exceptionf.profileArgs(parameters));
+      return Load.addStringPaths(moduleAbsolutePath.toString(),moduleFileName);
+    }
+
+    private static Environment getModuleEnvironment() throws Exception {
+      Environment moduleEnvironment = GlobalState.getJavaPrimitiveEnvironment();
+      // Note that we manually interpret our EScheme `stdlib.scm` every time, even if the serialized version
+      // is available. For some reason, while serialization decreases boot time (as expected), it can nearly 
+      // double import time.
+      String escmCode = Files.readString(Path.of(EscmPath.VALUE+File.separator+"src"+File.separator+"stdlib.scm"));
+      // Further note that we know our stdlib don't store any continuations using call/cc
+      //   upon loading, so we can afford evaluating it with a dummy continuation.
+      Trampoline.Continuation terminalContinuation = (ignored) -> () -> Trampoline.LAST_BOUNCE_SIGNAL;
+      ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(EscmPath.VALUE+File.separator+"src"+File.separator+"stdlib.scm",escmCode);
+      Trampoline.resolve(Load.evalEachExpression(exprs,0,new Stack<Pair<String,SourceInformation>>(),moduleEnvironment,terminalContinuation));
+      moduleEnvironment.define(new Symbol("*import*"),Boolean.TRUE); // set <FALSE> in <GlobalState>
+      return moduleEnvironment;
+    }
+
+    public static Trampoline.Bounce logic(String primitiveName, boolean forcedImport, String moduleName, String absoluteFilePath, Trampoline.Continuation continuation) throws Exception {
+      if(forcedImport == false && GlobalState.importedModules.containsKey(absoluteFilePath))
+        return continuation.run(GlobalState.importedModules.get(absoluteFilePath));
+      Environment moduleEnvironment = getModuleEnvironment();
+      EscmModule module = new EscmModule(moduleName,absoluteFilePath,moduleEnvironment);
+      GlobalState.importedModules.put(absoluteFilePath,module);
+      return Load.loadESchemeFile(primitiveName,absoluteFilePath,moduleEnvironment,(ignore) -> () -> {
+        return continuation.run(module);
+      });
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      int n = parameters.size();
+      if(n < 1 || n > 2) 
+        throw new Exceptionf("'(escm-load-module <optional-filepath-string> <module-path-symbol>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      Symbol moduleName = null;
+      String filePath = ""; // defaults to the current working directory!
+      if(n == 1) {
+        if(!(parameters.get(0) instanceof Symbol)) 
+          throw new Exceptionf("'(escm-load-module <optional-filepath-string> <module-path-symbol>) <module-path> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
+        moduleName = (Symbol)parameters.get(0);
+        if(moduleName.hasSourceInformation()) {
+          filePath = moduleName.source().fileName(); // import relative to the location of the importer's file (if available)
+        }
+      } else {
+        if(!(parameters.get(0) instanceof escm.type.String)) 
+          throw new Exceptionf("'(escm-load-module <optional-filepath-string> <module-path-symbol>) <filepath> isn't a string: %s", Exceptionf.profileArgs(parameters));
+        if(!(parameters.get(1) instanceof Symbol)) 
+          throw new Exceptionf("'(escm-load-module <optional-filepath-string> <module-path-symbol>) <module-path> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
+        filePath = ((escm.type.String)parameters.get(0)).value();
+        moduleName = (Symbol)parameters.get(1);
+      }
+      ArrayList<Symbol> symbolicPath = getModulePathSymbols(moduleName);
+      String moduleStringName = symbolicPath.get(symbolicPath.size()-1).value();
+      String absoluteFilePath = getModuleAbsoluteFilePath(moduleStringName,symbolicPath,filePath,parameters);
+      return logic("escm-load-module",false,moduleStringName,absoluteFilePath,continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // escm-reload-module
+  public static class EscmReloadModule extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "escm-reload-module";
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof EscmModule)) 
+        throw new Exceptionf("'(escm-reload-module <module>) didn't receive exactly 1 module: %s", Exceptionf.profileArgs(parameters));
+      EscmModule module = (EscmModule)parameters.get(0);
+      return EscmLoadModule.logic("escm-reload-module",true,module.name(),module.absoluteFilePath(),continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // module?
+  public static class IsModuleP extends Primitive {
+    public java.lang.String escmName() {
+      return "module?";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1) 
+        throw new Exceptionf("'(module? <obj>) didn't receive 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(parameters.get(0) instanceof EscmModule);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // module-source
+  public static class ModuleSource extends Primitive {
+    public java.lang.String escmName() {
+      return "module-source";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof EscmModule)) 
+        throw new Exceptionf("'(module-source <module>) didn't receive exactly 1 module: %s", Exceptionf.profileArgs(parameters));
+      return new escm.type.String(((EscmModule)parameters.get(0)).absoluteFilePath());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // module-bindings
+  public static class ModuleBindings extends Primitive {
+    public java.lang.String escmName() {
+      return "module-bindings";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof EscmModule)) 
+        throw new Exceptionf("'(module-bindings <module>) didn't receive exactly 1 module: %s", Exceptionf.profileArgs(parameters));
+      return ((EscmModule)parameters.get(0)).bindingsAsList();
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // escm-define-parameter
+  public static class EscmDefineParameter extends Primitive {
+    public java.lang.String escmName() {
+      return "escm-define-parameter";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2 || !(parameters.get(0) instanceof Symbol)) 
+        throw new Exceptionf("'(escm-define-parameter <symbol> <obj>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      GlobalState.parameterEnvironment.define((Symbol)parameters.get(0),parameters.get(1));
+      return Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // escm-parameter?
+  public static class EscmIsParameterP extends Primitive {
+    public java.lang.String escmName() {
+      return "escm-parameter?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol)) 
+        throw new Exceptionf("'(escm-parameter? <symbol>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(GlobalState.parameterEnvironment.has((Symbol)parameters.get(0)));
     }
   }
 }

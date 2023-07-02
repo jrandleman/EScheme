@@ -39,6 +39,13 @@ public class Environment implements Serializable {
     return alist;
   }
 
+  public Datum bindingsAsList() {
+    Datum alist = Nil.VALUE;
+    for(ConcurrentHashMap.Entry<String,Datum> binding : bindings.entrySet())
+      alist = new Pair(new Symbol(binding.getKey()),alist);
+    return alist;
+  }
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructors

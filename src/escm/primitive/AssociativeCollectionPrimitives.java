@@ -5,6 +5,7 @@
 package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
+import escm.type.Pair;
 import escm.type.bool.Boolean;
 import escm.type.number.Exact;
 import escm.type.number.Real;
@@ -102,7 +103,7 @@ public class AssociativeCollectionPrimitives {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
         throw new Exceptionf("'(length <associative-collection>) expects exactly 1 <ac>: %s", Exceptionf.profileArgs(parameters));
       Datum d = parameters.get(0);
-      if(escm.type.Pair.isDottedList(d))
+      if(Pair.isDottedList(d))
         throw new Exceptionf("'(length <associative-collection>) expects exactly 1 <ac>: %s", Exceptionf.profileArgs(parameters));
       return new Exact(((AssociativeCollection)d).length());
     }
@@ -120,7 +121,7 @@ public class AssociativeCollectionPrimitives {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
         throw new Exceptionf("'(length+ <associative-collection>) expects exactly 1 <ac>: %s", Exceptionf.profileArgs(parameters));
       Datum d = parameters.get(0);
-      if(escm.type.Pair.isDottedList(d)) return Boolean.FALSE;
+      if(Pair.isDottedList(d)) return Boolean.FALSE;
       return new Exact(((AssociativeCollection)parameters.get(0)).length());
     }
   }
@@ -288,9 +289,24 @@ public class AssociativeCollectionPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() == 0) return escm.type.Nil.VALUE;
-      AssociativeCollection[] acs = AssociativeCollection.parseParameters("(append <associative-collection> ...)",parameters,0);
-      return (Datum)acs[0].AppendArray(acs);
+      int n = parameters.size();
+      if(n == 0) return escm.type.Nil.VALUE;
+      if(n == 1) return parameters.get(0);
+      if(!(parameters.get(n-1) instanceof AssociativeCollection)) {
+        Datum dotValue = parameters.get(n-1);
+        parameters.remove(n-1);
+        AssociativeCollection[] acs = AssociativeCollection.parseParameters("(append <associative-collection> ...)",parameters,0);
+        Datum result = (Datum)acs[0].AppendArray(acs);
+        if(Pair.isList(result)) 
+          return Pair.binaryAppend(result,dotValue);
+        // Intentionally trigger an error here, can only append a non-<ac> to a list.
+        parameters.add(dotValue);
+        AssociativeCollection.parseParameters("(append <associative-collection> ...)",parameters,0);
+        return (Datum)acs[0].AppendArray(acs);
+      } else {
+        AssociativeCollection[] acs = AssociativeCollection.parseParameters("(append <associative-collection> ...)",parameters,0);
+        return (Datum)acs[0].AppendArray(acs);
+      }
     }
   }
 

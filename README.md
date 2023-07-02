@@ -48,9 +48,11 @@
    * Launch the REPL without ASCII art
 4. `-l <script> <arg1> ...`, `--load <script> <arg1> ...`
    * Load `<script>` with `<arg> ...` as `*argv*` into the REPL
-5. `<script> <arg1> ...`
+5. `-i <script> <arg1> ...`, `--import <script> <arg1> ...`
+   * Import `<script>` with `<arg> ...` as `*argv*` into the REPL
+6. `<script> <arg1> ...`
    * Interpret `<script>` with `<arg> ...` as `*argv*`
-6. \[no arguments\]
+7. \[no arguments\]
    * Launch the REPL
 
 
@@ -124,7 +126,8 @@
 12. Object System (classes, interfaces, and objects!)
 13. Multithreading Support (threads and reentrant locks!)
 14. Multi-arity and optional-parameter support via `fn`!
-15. Generic algorithmic primitives for associative & ordered collections!
+15. Proper module system for file-specific variables & macros!
+16. Generic algorithmic primitives for associative & ordered collections!
     * Associative collections: strings, lists, vectors, hashmaps
     * Ordered collections: strings, lists, vectors
-16. No `eqv?`: only `eq?` and `equal?`
+17. No `eqv?`: only `eq?` and `equal?`

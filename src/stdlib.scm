@@ -6,8 +6,8 @@
 ;;               * This has to do with how we evaluate the stdlib prior receiving 
 ;;                 user code.
 
-;; => IMPORTANT: IN ORDER FOR CHANGES IN THIS FILE TO AFFECT THE ESCHEME RUNTIME,
-;;               1 OF 2 ACTIONS MUST BE TAKEN:
+;; => IMPORTANT: IN ORDER FOR CHANGES IN THIS FILE TO AFFECT THE ESCHEME RUNTIME
+;;               (IF IT WAS SERIALIZED), 1 OF 2 ACTIONS MUST BE TAKEN:
 ;;                 1) RUN ESCHEME 1NC WITH THE --serialize-stdlib COMMAND-LINE FLAG
 ;;                    ___OR___
 ;;                 2) REINSTALL ESCHEME VIA "installer/Installer.java"
@@ -34,13 +34,20 @@
 ;   - let*
 ;   - letrec
 ;   - letrec*
+;   - unless
 ;   - while
 ;   - do
+;
+;   - define-parameter
+;   - parameter?
+;
 ;   - -<>
 ;   - curry
 ;
 ;   - *dosync-lock*
+;   - *dosync-module-lock*
 ;   - dosync
+;   - dosync-module
 ;   - dosync-with
 ;
 ;   - guard
@@ -81,6 +88,10 @@
 ;   - interface
 ;   - define-interface
 ;   - super! ; MUST BE CALLED AS THE FIRST LINE IN CONSTRUCTORS TO AVOID UNDEFINED BEHAVIOR
+;
+;   - import
+;   - reload
+;   - from
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Implementing QUOTE: (quote <obj>)
@@ -458,22 +469,7 @@
                   vals)))
             (list (list (quote define) (car bindings))))))))
 
-(define-syntax def
-  (lambda (bindings . vals)
-    (cons 
-      (quote bytecode)
-      (if (symbol? bindings)
-          (append
-            (compile (car vals))
-            (list (list (quote define) bindings)))
-          (append 
-            (compile
-              (cons 
-                (quote lambda)
-                (cons 
-                  (cdr bindings)
-                  vals)))
-            (list (list (quote define) (car bindings))))))))
+(define def define)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -482,9 +478,7 @@
   (lambda (var)
     (list (quote bytecode) (list (quote defined?) var))))
 
-(define-syntax def?
-  (lambda (var)
-    (list (quote bytecode) (list (quote defined?) var))))
+(define def? defined?)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -695,19 +689,30 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing UNLESS: (unless <condition> <body> ...)
+(define-syntax unless
+  (lambda (condition . body)
+    (list 'if condition
+         #void
+         (cons 'begin body))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Implementing WHILE: (while (<condition> <return-expr> ...) <body> ...)
 (define-syntax while
   (lambda (condition-returns . body)
     (define compiled-condition (compile (car condition-returns)))
     (define compiled-body (apply append (map compile body)))
     (define compiled-returns (apply append (map compile (cdr condition-returns))))
-    `(bytecode 
-      ,@compiled-condition
-      (ifn ,(+ (length compiled-body) 2))
-      ,@compiled-body
-      (jump ,(- 0 (length compiled-condition) (length compiled-body) 1))
-      (load #void)
-      ,@compiled-returns)))
+    (append
+      (cons 'bytecode compiled-condition)
+      (append
+        (cons (list 'ifn (+ (length compiled-body) 2)) compiled-body)
+        (append 
+          (list
+            (list 'jump (- 0 (length compiled-condition) (length compiled-body) 1))
+            (list 'load #void))
+          compiled-returns)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -719,7 +724,7 @@
     (define vars (map car var-bindings))
     (define vals (map cadr var-bindings))
     (define updates 
-      (map (lambda (e) `(set! ,(car e) ,(caddr e)))
+      (map (lambda (e) (list 'set! (car e) (caddr e)))
            (filter (lambda (e) (= (length e) 3)) var-bindings)))
     (define break-cond
       (if (pair? break-returns)
@@ -730,12 +735,28 @@
           (cdr break-returns)
           (quote ())))
     (define loop-procedure-name (gensym 'do-loop-name))
-    `(letrec ((,loop-procedure-name 
-                (lambda ,vars
-                  (if ,break-cond
-                      (begin ,@return-exprs)
-                      (begin ,@body ,@updates (,loop-procedure-name ,@vars))))))
-              (,loop-procedure-name ,@vals))))
+    (list 'letrec (list (list loop-procedure-name 
+                (list 'lambda vars
+                  (list 'if break-cond
+                      (cons 'begin return-exprs)
+                      (append (cons 'begin body) updates (list (cons loop-procedure-name vars)))))))
+              (cons loop-procedure-name vals))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing DEFINE-PARAMETER: 
+;; (define-parameter <symbol> <obj>)
+(define-syntax define-parameter
+  (lambda (sym val)
+    (list 'escm-define-parameter (list 'quote sym) val)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing PARAMETER?: 
+;; (parameter? <symbol>)
+(define-syntax parameter?
+  (lambda (sym )
+    (list 'escm-parameter? (list 'quote sym))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -758,31 +779,44 @@
   (lambda (params . body)
     (define curried-lambdas (gensym 'curry-lambdas))
     (cond ((null? params) 
-            `(lambda () ,@body))
+            (cons 'lambda (cons '() body)))
           ((null? (cdr params))
-            `(lambda (x . xs)
-              (fold (lambda (f a) (f a)) 
-                    (lambda ,params ,@body)
-                    (cons x xs))))
+            (list 'lambda '(x . xs)
+              (list 'fold '(lambda (f a) (f a)) 
+                    (cons 'lambda (cons params body))
+                    '(cons x xs))))
           (else
-            `(let ((,curried-lambdas 
-              (lambda (,(car params)) (curry ,(cdr params) ,@body))))
-                (lambda (x . xs)
-                  (fold (lambda (f a) (f a)) 
-                        ,curried-lambdas
-                        (cons x xs))))))))
+            (list 'let (list (list curried-lambdas 
+              (list 'lambda (list (car params)) (cons 'curry (cons (cdr params) body)))))
+                (list 'lambda '(x . xs)
+                  (list 'fold '(lambda (f a) (f a)) 
+                        curried-lambdas
+                        '(cons x xs))))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Implementing DOSYNC
-(define *dosync-lock* (mutex "*dosync-lock*"))
+(if (not (parameter? *dosync-lock*)) 
+    (define-parameter *dosync-lock* (mutex "*dosync-lock*")))
 
 (define-syntax dosync
   (lambda (. exprs)
-    `(dynamic-wind
-      (lambda () (mutex-lock! *dosync-lock*))
-      (lambda () ,@exprs)
-      (lambda () (mutex-unlock! *dosync-lock*)))))
+    (list 'dynamic-wind
+      '(lambda () (mutex-lock! *dosync-lock*))
+      (cons 'lambda (cons '() exprs))
+      '(lambda () (mutex-unlock! *dosync-lock*)))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing DOSYNC-MODULE
+(define *dosync-module-lock* (mutex "*dosync-module-lock*"))
+
+(define-syntax dosync-module
+  (lambda (. exprs)
+    (list 'dynamic-wind
+      '(lambda () (mutex-lock! *dosync-module-lock*))
+      (cons 'lambda (cons '() exprs))
+      '(lambda () (mutex-unlock! *dosync-module-lock*)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -790,12 +824,12 @@
 (define-syntax dosync-with 
   (lambda (lock-expr . exprs)
     (define lock (gensym 'dosync-with-lock))
-    `(begin
-      (define ,lock ,lock-expr) ; cache the lock!
-      (dynamic-wind
-        (lambda () (mutex-lock! ,lock))
-        (lambda () ,@exprs)
-        (lambda () (mutex-unlock! ,lock))))))
+    (list 'begin
+      (list 'define lock lock-expr) ; cache the lock!
+      (list 'dynamic-wind
+        (list 'lambda '() (list 'mutex-lock! lock))
+        (cons 'lambda (cons '() exprs))
+        (list 'lambda '() (list 'mutex-unlock! lock))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -810,10 +844,10 @@
   (define results (cdar expr))
   (define clauses (cdr expr))
   (define temp (gensym 'guard-temp))
-  `(let ((,temp ,test))
-    (if ,temp
-        ,(if (null? results) temp (cons 'begin results))
-        ,(if (null? clauses) reraise (cons 'escm-guard-aux (cons reraise clauses))))))
+  (list 'let (list (list temp test))
+    (list 'if temp
+        (if (null? results) temp (cons 'begin results))
+        (if (null? clauses) reraise (cons 'escm-guard-aux (cons reraise clauses))))))
 
 (define-syntax escm-guard-aux
   (lambda (reraise . exprs)
@@ -829,23 +863,24 @@
     (define condition (gensym 'guard-condition))
     (define handler-k (gensym 'guard-handler-k))
     (define args (gensym 'guard-args))
-    `((call-with-current-continuation
-       (lambda (,guard-k)
-         (with-exception-handler
-          (lambda (,condition)
-            ((call-with-current-continuation
-               (lambda (,handler-k)
-                 (,guard-k
-                  (lambda ()
-                    (let ((,var ,condition)) ; clauses may SET! var
-                      (escm-guard-aux 
-                        (,handler-k (lambda () (raise ,condition))) 
-                        ,@clauses))))))))
-          (lambda ()
-            (call-with-values
-             (lambda () ,@exprs)
-             (lambda ,args
-               (,guard-k (lambda () (apply values ,args))))))))))))
+    (list (list 'call-with-current-continuation
+       (list 'lambda (list guard-k)
+         (list 'with-exception-handler
+          (list 'lambda (list condition)
+            (list (list 'call-with-current-continuation
+               (list 'lambda (list handler-k)
+                 (list guard-k
+                  (list 'lambda '()
+                    (list 'let (list (list var condition)) ; clauses may SET! var
+                      (cons 'escm-guard-aux 
+                        (cons 
+                          (list handler-k (list 'lambda '() (list 'raise condition))) 
+                          clauses)))))))))
+          (list 'lambda '()
+            (list 'call-with-values
+             (cons 'lambda (cons '() exprs))
+             (list 'lambda args
+               (list guard-k (list 'lambda '() (list 'apply 'values args))))))))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -865,23 +900,23 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; THREADING Dynamic Environment Macros
 (define-syntax thread-define
-  (fn ((var val) `(thread-define' ',var ,val))
-      ((thread var val) `(thread-define' ,thread ',var ,val))))
+  (fn ((var val) (list 'thread-define' (list 'quote var) val))
+      ((thread var val) (list 'thread-define' thread (list 'quote var) val))))
 
 
 (define-syntax thread-set!
-  (fn ((var val) `(thread-set!' ',var ,val))
-      ((thread var val) `(thread-set!' ,thread ',var ,val))))
+  (fn ((var val) (list 'thread-set!' (list 'quote var) val))
+      ((thread var val) (list 'thread-set!' thread (list 'quote var) val))))
 
 
 (define-syntax thread-get
-  (fn ((var) `(thread-get' ',var))
-      ((thread var) `(thread-get' ,thread ',var))))
+  (fn ((var) (list 'thread-get' (list 'quote var)))
+      ((thread var) (list 'thread-get' thread (list 'quote var)))))
 
 
 (define-syntax thread-defined?
-  (fn ((var) `(thread-defined?' ',var))
-      ((thread var) `(thread-defined?' ,thread ',var))))
+  (fn ((var) (list 'thread-defined?' (list 'quote var)))
+      ((thread var) (list 'thread-defined?' thread (list 'quote var)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1002,41 +1037,41 @@
 (define-syntax yield 
   (fn (()
         (define k (gensym 'yield-k))
-        `(set! escm-generator-escape 
-          (call/cc 
-            (lambda (,k)
-              (escm-generator-escape 
-                (cons 
-                  (cons 'escm-generator #void)
-                  (lambda () 
-                    (call/cc (lambda (escm-generator-escape) (,k escm-generator-escape))))))))))
+        (list 'set! 'escm-generator-escape 
+          (list 'call/cc 
+            (list 'lambda (list k)
+              (list 'escm-generator-escape 
+                (list 'cons 
+                  (list 'cons ''escm-generator #void)
+                  (list 'lambda '() 
+                    (list 'call/cc (list 'lambda '(escm-generator-escape) (list k 'escm-generator-escape))))))))))
       ((yielded)
         (define k (gensym 'yield-k))
-        `(set! escm-generator-escape 
-          (call/cc 
-            (lambda (,k)
-              (escm-generator-escape 
-                (cons 
-                  (cons 'escm-generator ,yielded)
-                  (lambda () 
-                    (call/cc (lambda (escm-generator-escape) (,k escm-generator-escape))))))))))))
+        (list 'set! 'escm-generator-escape 
+          (list 'call/cc 
+            (list 'lambda (list k)
+              (list 'escm-generator-escape 
+                (list 'cons 
+                  (list 'cons ''escm-generator yielded)
+                  (list 'lambda '() 
+                    (list 'call/cc (list 'lambda '(escm-generator-escape) (list k 'escm-generator-escape))))))))))))
 
 (define-syntax define-generator 
   (lambda (bindings . body)
     (define generator-object (gensym 'define-generator-object))
-    `(define ,bindings
-      (define ,generator-object
-        (cons
-          (cons 'escm-generator #f)
-          (lambda ()
-            (call/cc (lambda (escm-generator-escape) ,@body)))))
-      (lambda ()
-        (if (escm-generator? ,generator-object)
-            (begin 
-              (set! ,generator-object ((cdr ,generator-object)))
-              (if (escm-generator? ,generator-object)
-                  (cdar ,generator-object)
-                  ,generator-object))
+    (list 'define bindings
+      (list 'define generator-object
+        (list 'cons
+          (list 'cons ''escm-generator #f)
+          (list 'lambda '()
+            (list 'call/cc (cons 'lambda (cons '(escm-generator-escape) body))))))
+      (list 'lambda '()
+        (list 'if (list 'escm-generator? generator-object)
+            (list 'begin 
+              (list 'set! generator-object (list (list 'cdr generator-object)))
+              (list 'if (list 'escm-generator? generator-object)
+                  (list 'cdar generator-object)
+                  generator-object))
             *generator-complete*)))))
 
 (define (complete-all-generators! . generator-objects)
@@ -1107,9 +1142,11 @@
 
 ; Given an inlined method property (stripped of :static), returns it expanded as a lambda property
 (define (escm-oo-class-expand-inlined-method inlined-method-property)
-  `(,(caar inlined-method-property) 
-    (lambda ,(cdar inlined-method-property) 
-      ,@(cdr inlined-method-property))))
+  (list (caar inlined-method-property) 
+    (cons 'lambda 
+      (cons
+        (cdar inlined-method-property) 
+        (cdr inlined-method-property)))))
 
 ; Given a list of properties stripped of :static, convert all inlined methods to lambdas
 (define (escm-oo-class-expand-property-inlined-methods properties)
@@ -1183,9 +1220,9 @@
 (define-syntax define-class
   (lambda (name . class-components)
     (define obj (gensym (symbol-append name '? '-obj)))
-    `(begin
-      (define (,(symbol-append name '?) ,obj) (and (object? ,obj) (oo-is? ,obj ,name))) ; predicate generation!
-      (define ,name (class ,@class-components)))))
+    (list 'begin
+      (list 'define (list (symbol-append name '?) obj) (list 'and (list 'object? obj) (list 'oo-is? obj name))) ; predicate generation!
+      (list 'define name (cons 'class class-components)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1235,9 +1272,9 @@
 (define-syntax define-interface
   (lambda (name . interface-components)
     (define obj (gensym (symbol-append name '? '-obj)))
-    `(begin
-      (define (,(symbol-append name '?) ,obj) (and (object? ,obj) (oo-is? ,obj ,name))) ; predicate generation!
-      (define ,name (interface ,@interface-components)))))
+    (list 'begin
+      (list 'define (list (symbol-append name '?) obj) (list 'and (list 'object? obj) (list 'oo-is? obj name))) ; predicate generation!
+      (list 'define name (cons 'interface interface-components)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1252,3 +1289,73 @@
 (define-syntax super!
   (lambda params
     (cons 'set! (cons 'super (list (cons 'escm-oo-super! (cons 'self params)))))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing IMPORT: 
+;;   (import <module-path-symbol>)
+;;   (import <module-path-symbol> :as <module-alias-symbol>)
+;;   (import <filepath-string> <module-path-symbol>)
+;;   (import <filepath-string> <module-path-symbol> :as <module-alias-symbol>)
+(define-syntax import
+  (fn ((module-path)
+        (list 'define (escm-get-module-name module-path) (list 'escm-load-module (list 'quote module-path))))
+      ((filepath-string module-path)
+        (list 'define (escm-get-module-name module-path) (list 'escm-load-module filepath-string (list 'quote module-path))))
+      ((module-path as-keyword module-alias)
+        (list 'define module-alias (list 'escm-load-module (list 'quote module-path))))
+      ((filepath-string module-path as-keyword module-alias)
+        (list 'define module-alias (list 'escm-load-module filepath-string (list 'quote module-path))))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing RELOAD: 
+;;   (reload <module-alias-symbol>)
+(define-syntax reload
+  (lambda (module-alias-symbol)
+    (list 'set! module-alias-symbol (list 'escm-reload-module module-alias-symbol))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing FROM: 
+;; (from <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ...)
+;; (from <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ... :as <alias1-symbol> <alias2-symbol> ...)
+;; (from <filepath-string> <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ...)
+;; (from <filepath-string> <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ... :as <alias1-symbol> <alias2-symbol> ...)
+(define (escm-from-parse-arguments a b c xs)
+  (if (string? a)
+      (list a b xs)
+      (list #f a (cons c xs))))
+
+(define (escm-from-get-objects-and-aliases xs)
+  (let ((objs '()) (aliases '()) (prior-as? #t))
+    (for-each
+      (lambda (x)
+        (cond ((eq? x :as) (set! prior-as? #f))
+              (prior-as? (set! objs (cons x objs)))
+              (else (set! aliases (cons x aliases)))))
+      xs)
+    (if (null? aliases)
+        (cons objs objs)
+        (cons objs aliases))))
+
+(define-syntax from
+  (lambda (a b c . xs)
+    (define args (escm-from-parse-arguments a b c xs))
+    (let ((filepath-string (car args)) (module-path (cadr args)) (objs-and-aliases (caddr args)))
+      (define fields (escm-from-get-objects-and-aliases objs-and-aliases))
+      (define hidden-module-name (gensym))
+      (cons 'begin
+        (cons
+          (list 
+            'define 
+            hidden-module-name 
+            (cons 'escm-load-module 
+              (if filepath-string 
+                  (list filepath-string (list 'quote module-path)) 
+                  (list (list 'quote module-path)))))
+          (map 
+            (lambda (obj alias)
+              (list 'define alias (symbol-append hidden-module-name '. obj)))
+            (car fields) 
+            (cdr fields)))))))

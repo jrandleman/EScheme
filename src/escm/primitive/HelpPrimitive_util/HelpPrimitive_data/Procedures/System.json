@@ -7,26 +7,32 @@
 }, {
   "name": "load",
   "aliases": null,
-  "signatures": ["(load <filename-str>)"],
-  "description": "Reads and evaluates <filename-str>'s EScheme contents in the global environment.\nWorks for both regular & <serialize>d EScheme files.\nNote that <load-from> should be used if <filename-str> is a relative path.\n\nNote that <load-once> and/or <load-once-from> should be preferred to prevent\ncyclic loading.",
-  "example": null
-}, {
-  "name": "load-from",
-  "aliases": null,
-  "signatures": ["(load-from <directory-str> <filename-str>)"],
-  "description": "Loads the <filename-str> in <directory-str> as EScheme code in the global\nenvironment. Works for both regular & <serialize>d EScheme files. Use:\n\n  (load-from #path <filename-str>)\n\nas a portable alternative to (load <filename-str>) if <filename-str> is a\nrelative path, since <load> only operates relative to (current-directory).\n\nNote that <load-once> and/or <load-once-from> should be preferred to prevent\ncyclic loading.",
+  "signatures": ["(load <filename-str>)", "(load <directory-str> <filename-str>)"],
+  "description": "Reads and evaluates <filename-str>'s EScheme contents in the global environment.\nWorks for both regular & <serialize>d EScheme files.\nIf given <directory-str>, loads <filename-str> from <directory-str>. Use:\n\n  (load #path <filename-str>)\n\nas a portable alternative to (load <filename-str>) if <filename-str> is a\nrelative path, since <load> only operates relative to (current-directory).\n\nNote that <load-once> should be preferred to prevent cyclic loading.\n",
   "example": null
 }, {
   "name": "load-once",
   "aliases": null,
-  "signatures": ["(load-once <filename-str>)"],
-  "description": "Reads and evaluates <filename-str>'s EScheme contents in the global environment.\nWorks for both regular & <serialize>d EScheme files.\nFuture calls to <load-once> with <filename-str> do nothing.\nNote that <load-from-once> should be used if <filename-str> is a relative path.",
+  "signatures": ["(load-once <filename-str>)", "(load-once <directory-str> <filename-str>)"],
+  "description": "Works exactly like <load>, but only loads unloaded files. Use:\n\n  (load-once #path <filename-str>)\n\nas a portable alternative to (load-once <filename-str>) if <filename-str> is a\nrelative path, since <load-once> only operates relative to (current-directory).",
   "example": null
 }, {
-  "name": "load-once-from",
+  "name": "module?",
   "aliases": null,
-  "signatures": ["(load-once-from <directory-str> <filename-str>)"],
-  "description": "Loads the <filename-str> in <directory-str> as EScheme code in the global\nenvironment. Works for both regular & <serialize>d EScheme files.\nFuture calls to <load-once-from> with <filename-str> do nothing.\nUse:\n\n  (load-once-from #path <filename-str>)\n\nas a portable alternative to (load-once <filename-str>) if <filename-str> is a\nrelative path, since <load-once> only operates relative to (current-directory).",
+  "signatures": ["(module? <obj>)"],
+  "description": "Returns whether <obj> is a module object.",
+  "example": null
+}, {
+  "name": "module-source",
+  "aliases": null,
+  "signatures": ["(module-source <module>)"],
+  "description": "Returns the absolute file path of <module>'s original location.",
+  "example": null
+}, {
+  "name": "module-bindings",
+  "aliases": null,
+  "signatures": ["(module-bindings <module>)"],
+  "description": "Returns a list of the symbols defined in <module>.\nBe warned: every module has its own copy of the standard library defined too!",
   "example": null
 }, {
   "name": "system",

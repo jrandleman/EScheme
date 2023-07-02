@@ -28,12 +28,17 @@
 *escm-path*
 *escm-execution-command*
 
-*dosync-lock*
+*dosync-lock* ; parameter
+*dosync-module-lock* ; global variable
 
 *generator-complete*
 
 *min-radix*
 *max-radix*
+
+*import*
+
+*load-once-files*
 ```
 
 
@@ -151,11 +156,12 @@
 ```scheme
 (exit <optional-integer-exit-code>)
 
-(load <filename-str>) ; this (& all other <load> variants) work on both regular & <serialize>d EScheme files.
-(load-from <directory-str> <filename-str>) ; preferred for portability, esp. where <directory-str> is <#path>
+(load <optional-directory-str> <filename-str>) ; this (& all other <load> variants) work on both regular & <serialize>d EScheme files.
+(load-once <optional-directory-str> <filename-str>) ; prevents cyclic loading
 
-(load-once <filename-str>)                      ; prevents cyclic loading
-(load-once-from <directory-str> <filename-str>) ; prevents cyclic loading & is preferred for portability
+(module? <obj>)
+(module-source <module>) ; <module>'s absolute file path location
+(module-bindings <module>) ; list of <module>'s defined variable symbols (beware that all modules have all the stdlib!)
 
 (system <command-str> <optional-env-var-str-list> <optional-directory-str>)
 ```

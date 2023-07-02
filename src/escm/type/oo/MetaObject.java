@@ -29,7 +29,7 @@ import escm.type.procedure.MethodProcedure;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.SourceInformation;
 
-public abstract class MetaObject extends Datum {
+public abstract class MetaObject extends Dottable {
   ////////////////////////////////////////////////////////////////////////////
   // Super Object Abstraction
   public abstract MetaObject getSuper();
@@ -248,13 +248,6 @@ public abstract class MetaObject extends Datum {
   public abstract String write();
 
   public abstract String pprint();
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Loading-into-memory semantics for the VM's interpreter
-  public MetaObject loadWithState(ExecutionState state) {
-    return this;
-  }
 
 
   ////////////////////////////////////////////////////////////////////////////

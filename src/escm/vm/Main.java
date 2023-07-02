@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import escm.type.Datum;
+import escm.type.Symbol;
 import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
 import escm.util.Pair;
@@ -31,12 +32,13 @@ public class Main {
   // Command-line flag options
   public static final String COMMAND_LINE_FLAGS = 
     "Command-line flags may be used to modify EScheme's behavior:\n"+
-    "  1. -v, --version                  | Print EScheme version information\n"+
-    "  2. -h, --help                     | Print this information\n"+
-    "  3. -q, --quiet                    | Launch the REPL without ASCII art\n"+
-    "  4. -l, --load <script> <arg1> ... | Load <script> with <arg> ... as *argv* into the REPL\n"+
-    "  5. <script> <arg1> ...            | Interpret <script> with <arg> ... as *argv*\n"+
-    "  6. [no arguments]                 | Launch the REPL\n";
+    "  1. -v, --version                    | Print EScheme version information\n"+
+    "  2. -h, --help                       | Print this information\n"+
+    "  3. -q, --quiet                      | Launch the REPL without ASCII art\n"+
+    "  4. -l, --load <script> <arg1> ...   | Load <script> with <arg> ... as *argv* into the REPL\n"+
+    "  5. -i, --import <script> <arg1> ... | Import <script> with <arg> ... as *argv* into the REPL\n"+
+    "  6. <script> <arg1> ...              | Interpret <script> with <arg> ... as *argv*\n"+
+    "  7. [no arguments]                   | Launch the REPL\n";
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -166,7 +168,7 @@ public class Main {
 
   ////////////////////////////////////////////////////////////////////////////
   // Implementing our File Interpreter
-  private static void launchScript(ParsedCommandLine parsedCmdLine) throws Exception {
+  private static void loadScript(ParsedCommandLine parsedCmdLine) throws Exception {
     // Initialize the runtime, load the file, & launch REPL if found "-l" prior the filename
     Environment globalEnvironment = GlobalState.getDefaultEnvironment();
     Trampoline.Continuation replIfReplingContinuation = (value) -> () -> {
@@ -183,11 +185,34 @@ public class Main {
   }
 
 
+  private static void importScript(ParsedCommandLine parsedCmdLine) throws Exception {
+    GlobalState.inREPL = true; // trigger exit message to be printed
+    Environment globalEnvironment = GlobalState.getDefaultEnvironment();
+    Symbol modulePath = new Symbol(parsedCmdLine.scriptName);
+    Symbol moduleName = SystemPrimitives.EscmGetModuleName.logic(modulePath);
+    ArrayList<Datum> args = new ArrayList<Datum>();
+    args.add(modulePath);
+    Trampoline.resolve((new SystemPrimitives.EscmLoadModule()).callWith(args,(module) -> () -> {
+      globalEnvironment.define(moduleName,module);
+      launchRepl(parsedCmdLine,globalEnvironment);
+      return Trampoline.LAST_BOUNCE_SIGNAL;
+    }));
+  }
+
+
+  private static void launchScript(ParsedCommandLine parsedCmdLine) throws Exception {
+    if(parsedCmdLine.importingIntoREPL) {
+      importScript(parsedCmdLine);
+    } else {
+      loadScript(parsedCmdLine);
+    }
+  }
+
+
   ////////////////////////////////////////////////////////////////////////////
   // Implementing the <stdlib.scm> Serializer
   private static void serializeStdLib() throws Exception {
-    Environment globalEnvironment = new Environment();
-    GlobalState.loadJavaPrimitives(globalEnvironment);
+    Environment globalEnvironment = GlobalState.getJavaPrimitiveEnvironment();
     String escmStdlibPath = EscmPath.VALUE+File.separator+"src"+File.separator+"stdlib.scm";
     String serStdlibPath = EscmPath.VALUE+File.separator+"bin"+File.separator+"stdlib.ser";
     Trampoline.resolve(SerializationPrimitives.Serialize.logic(escmStdlibPath,serStdlibPath,globalEnvironment,(ignore) -> () -> Trampoline.LAST_BOUNCE_SIGNAL));
@@ -200,6 +225,7 @@ public class Main {
     public boolean serializingStdLib = false; // --serialize-stdlib
     public boolean launchingQuiet    = false; // -q --quiet
     public boolean loadingIntoREPL   = false; // -l --load
+    public boolean importingIntoREPL = false; // -i --import
     public String scriptName         = null;  // <null> denotes no script
   }
 
@@ -239,6 +265,17 @@ public class Main {
           parsed.loadingIntoREPL = true;
           if(i+1 == args.length) {
             System.err.printf("ESCM ERROR: No filename given to load into the REPL with \"%s\"!\n", args[i]);
+            System.err.print(COMMAND_LINE_FLAGS);
+            System.exit(1);
+          }
+          parsed.scriptName = args[i+1];
+          setArgv(i+1,args);
+          return parsed;
+        }
+        case "-i": case "--import": {
+          parsed.importingIntoREPL = true;
+          if(i+1 == args.length) {
+            System.err.printf("ESCM ERROR: No filename given to import into the REPL with \"%s\"!\n", args[i]);
             System.err.print(COMMAND_LINE_FLAGS);
             System.exit(1);
           }

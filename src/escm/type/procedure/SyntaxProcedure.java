@@ -62,6 +62,13 @@ public class SyntaxProcedure extends Procedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Type
+  public java.lang.String type() {
+    return "syntax";
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public java.lang.String display() {
     if(name.equals(DEFAULT_NAME)) return "#<syntax>";
