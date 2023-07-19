@@ -1,6 +1,5 @@
 ;; Author: Jordan Randleman -- main.scm
 ;; => Defines EScheme's Stdlib Testing Suite Dispatcher
-;; => Pass any command-line arg to enable verbose mode
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TEST SUIT PROCESSING HELPERS
