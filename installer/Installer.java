@@ -1,15 +1,14 @@
 // Author: Jordan Randleman - Installer - MUST BE RUN WITHIN THE `EScheme/installer` DIRECTORY!
 //   => Command-Line Options: 
+//        -h, --help              (show these command-line options)
 //        -v, --verbose           (print status updates)
 //        -u, --unit-tests        (run EScheme's unit test suite after compilation)
 //        -i, --interpret-stdlib  (don't serialize <../src/stdlib.scm>)
 //        -j, --java-bin-path     (set the path to our JVM's <bin> directory)
-//        -h, --help              (show these command-line options)
 
 
-/* Purpose:
-
-  Compiles/Installs the EScheme runtime. This is done by accomplishing several tasks:
+/*
+  Purpose: Compiles/Installs the EScheme runtime. This is done by accomplishing several tasks:
     
     1. Generate a file to store the path to our EScheme implementation.
 
@@ -26,8 +25,11 @@
 
     6. Serialize the EScheme Standard Library "src/stdlib.scm" by executing "escm --serialize-stdlib"
 
-    7. Output the <alias> string to stdout, for easy copying into "~/.zshrc" or "~/.bashrc"
+    7. Execute EScheme unit test suite (if requested)
+
+    8. Output the <alias> string to stdout, for easy copying into "~/.zshrc" or "~/.bashrc"
 */
+
 
 import java.nio.file.Path;
 import java.nio.file.Files;
@@ -44,6 +46,14 @@ public class Installer {
   private static boolean INTERPRET_STDLIB = false;
   private static boolean EXECUTE_UNIT_TESTS = false;
   private static String JAVA_BIN_PATH = null;
+
+
+  public static final String COMMAND_LINE_FLAGS = 
+    "  1. -h, --help                 | Print this information\n"+
+    "  2. -v, --verbose              | Print out installation progress messages\n"+
+    "  3. -u, --unit-tests           | Run EScheme's unit test suite after compilation\n"+
+    "  4. -i, --interpret-stdlib     | Don't serialize <../src/stdlib.scm>\n"+
+    "  5. -j, --java-bin-path <path> | Set the path to our JVM's <bin> directory\n";
 
 
   private static void parseCommandLine(String[] args) {
@@ -72,14 +82,13 @@ public class Installer {
         }
         case "-h": case "--help": {
           System.out.println("Supported Command-Line Flags Include:");
-          System.out.println("  1. -h, --help                 | Print this information");
-          System.out.println("  2. -v, --verbose              | Print out installation progress messages");
-          System.out.println("  3. -i, --interpret-stdlib     | Don't serialize <../src/stdlib.scm>");
-          System.out.println("  4. -j, --java-bin-path <path> | Set the path to our JVM's <bin> directory");
+          System.out.print(COMMAND_LINE_FLAGS);
+          System.out.flush();
           System.exit(0);
         }
         default: {
-          System.err.printf("> [ FATAL ] ESCM INSTALLER ERROR: Invalid command-line argument \"%s\"!\n  >> Use \"-v\" or \"--verbose\" to print extra messages!\n", args[i]);
+          System.err.printf("> [ FATAL ] ESCM INSTALLER ERROR: Invalid command-line argument \"%s\"! Use:\n", args[i]);
+          System.err.print(COMMAND_LINE_FLAGS);
           System.exit(1);
         }
       }
