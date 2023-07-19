@@ -45,7 +45,23 @@
 //   - boolean isNegative()
 //   - boolean isZero()
 //
-//   - Real atan(Real n)
+//   - Inexact sin()
+//   - Inexact cos()
+//   - Inexact tan()
+//
+//   - Number asin()
+//   - Number acos()
+//   - Inexact atan()
+//
+//   - Inexact sinh()
+//   - Inexact cosh()
+//   - Inexact tanh()
+//
+//   - Inexact asinh()
+//   - Number acosh()
+//   - Number atanh()
+//
+//   - Inexact atan(Real n)
 
 package escm.type.number;
 
@@ -88,14 +104,21 @@ public abstract class Real extends Number {
   
   public abstract Real[] divrem(Real n); // [quotient, remainder]
 
-  public abstract Real numerator() throws Exception;   // NaN, Infinity, -Infinity
-  public abstract Real denominator() throws Exception; // NaN, Infinity, -Infinity
+  public abstract Exact numerator() throws Exception;   // NaN, Infinity, -Infinity
+  public abstract Exact denominator() throws Exception; // NaN, Infinity, -Infinity
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Modf 
-  // @return: [integral, fractional]
+  // @return: [integral, 0.fractional]
   public abstract Real[] modf();
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Fractional 
+  // @return: [integral, fractional]
+  public abstract Exact integral() throws Exception;
+  public abstract Exact fractional() throws Exception;
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -128,5 +151,21 @@ public abstract class Real extends Number {
 
   ////////////////////////////////////////////////////////////////////////////
   // Trigonometry
+  public abstract Real sin();
+  public abstract Real cos();
+  public abstract Real tan();
+
+  public abstract Number asin();
+  public abstract Number acos();
+  public abstract Real atan();
+
+  public abstract Real sinh();
+  public abstract Real cosh();
+  public abstract Real tanh();
+
+  public abstract Real asinh();
+  public abstract Number acosh();
+  public abstract Number atanh();
+
   public abstract Real atan(Real n);
 }

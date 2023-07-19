@@ -17,6 +17,52 @@ public class Inexact extends Real {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Escm Inexact Multiplication
+  // => In Java, 0*Inf = 0*-Inf = 0*NaN = NaN
+  // => However, this behavior is problematic in EScheme. Complex numbers
+  //    mean that multiplications by 0.0 can creep in from all over the place,
+  //    and hence we end up with random NaNs everywhere. 
+  // => As such, EScheme defines 0.0*N=0.0 for all Inexact <N>. 
+  //    * Note that, while violating IEEE 754 (defines Java's behavior), it both:
+  //        (a) does not violate math itself, since 0*inf is undefined.
+  //        (b) follows in Chez-Scheme's footsteps: an excellent implementation.
+  //      Both of these points, combined with the fact that I (JCR) find it more
+  //      intuitive and useful to preserve scalar values where we can, explains
+  //      why EScheme multiplies 0s the way it does.
+  public static double doubleMultiply(double a, double b) {
+    if(a == 0.0 || b == 0.0) return 0.0;
+    return a*b;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Escm Inexact Exponentiation
+  // => Ensures complex numbers are created as needed
+  static final Inexact ZERO = new Inexact(0.0);
+  static final Inexact ONE = new Inexact(1.0);
+
+  private static boolean powYieldsComplex(double base, double pow) {
+    return base < 0.0 && Double.isFinite(pow) && Math.round(pow) != pow;    
+  }
+
+  // n^0 = 1
+  // 0^+n = 1
+  // 0^-n = Infinity
+  // [+-]1^[+-]Infinity = 1
+  public static Number doublePow(double base, double pow) {
+    if(pow == 0.0) return ONE;
+    if(base == 0.0) {
+      if(pow < 0.0) return POSITIVE_INFINITY;
+      return ZERO;
+    }
+    if(Math.abs(base) == 1.0 && Double.isInfinite(pow)) return ONE;
+    if(powYieldsComplex(base,pow))
+      return (new Complex(new Inexact(base))).expt(new Inexact(pow));
+    return new Inexact(Math.pow(base,pow));
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Private Value Field
   private double value = 0.0;
 
@@ -91,8 +137,11 @@ public class Inexact extends Real {
 
   ////////////////////////////////////////////////////////////////////////////
   // Expt-modulo: this^n mod m
-  public Inexact exptMod(Real p, Real m) {
-    return (new Inexact(Math.pow(value,p.doubleValue()))).modulo(m);
+  public Real exptMod(Real p, Real m) throws Exception {
+    Number expt = doublePow(value,p.doubleValue());
+    if(expt instanceof Complex)
+      throw new Exceptionf("Invalid Complex expt-mod result: base=%s, power=%s, mod=%s", display(), p.display(), m.display());
+    return ((Real)expt).modulo(m);
   }
 
 
@@ -116,7 +165,7 @@ public class Inexact extends Real {
 
   public Number mul(Number n) {
     if(n instanceof Real) {
-      return new Inexact(value * ((Real)n).doubleValue());
+      return new Inexact(doubleMultiply(value,((Real)n).doubleValue()));
     } else {
       return (new Complex(value)).mul(n);
     }
@@ -130,25 +179,26 @@ public class Inexact extends Real {
     }
   }
 
-
   public Number expt(Number n) {
-    if(n instanceof Complex || value < 0.0) 
+    if(n instanceof Complex) 
       return (new Complex(value)).expt(n);
-    return new Inexact(Math.pow(value,((Real)n).doubleValue()));
+    return doublePow(value,((Real)n).doubleValue());
   }
 
   public Inexact exp() {
     return new Inexact(Math.exp(value));
   }
 
-  public Inexact log() {
+  public Number log() {
+    if(value < 0.0) 
+      return (new Complex(this)).log();
     return new Inexact(Math.log(value));
   }
 
   public Number sqrt() {
-    if(value < 0.0)
-      return new Complex(new Inexact(),new Inexact(Math.sqrt(-value)));
-    return new Inexact(Math.sqrt(value));
+    if(value < 0.0) 
+      return (new Complex(new Inexact(),(Real)doublePow(-value,0.5))).unifyComponentExactness();
+    return doublePow(value,0.5);
   }
 
   public Inexact abs() {
@@ -165,45 +215,36 @@ public class Inexact extends Real {
   }
 
   public Inexact remainder(Real n) {
+    if(n.isZero()) return NAN;
     double rhs = n.doubleValue();
     double quo = value / rhs;
-    if(quo < 0) return new Inexact(value - Math.ceil(quo) * rhs);
-    return new Inexact(value - Math.floor(quo) * rhs);
+    if(quo < 0) return new Inexact(value - doubleMultiply(Math.ceil(quo),rhs));
+    return new Inexact(value - doubleMultiply(Math.floor(quo),rhs));
   }
 
   public Inexact[] divrem(Real n) {
-    double rhs = n.doubleValue();
-    double quo = value / rhs;
-    if(quo < 0) return new Inexact[]{new Inexact(value / rhs), new Inexact(value - Math.ceil(quo) * rhs)};
-    return new Inexact[]{new Inexact(value / rhs), new Inexact(value - Math.floor(quo) * rhs)};
+    return new Inexact[]{quotient(n),remainder(n)};
   }
 
-  // Credit for this Algorithm (modE) goes to Daan Leijen of the University of Utrecht. 
-  // Proof (see page 5):
-  // "https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf"
+  // Credit for this Algorithm (modF) goes to Daan Leijen of the University of Utrecht. 
+  // Proof (see page 5): https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
   public Inexact modulo(Real n) {
-    double rhs = n.doubleValue();
-    double r = value % rhs;
-    if(r < 0.0) {
-      if(value > 0.0) {
-        r += value;
-      } {
-        r -= value;
-      }
-    }
+    double d = n.doubleValue();
+    double r = value % d;
+    if((r > 0 && d < 0) || (r < 0 && d > 0)) r += d;
     return new Inexact(r);
   }
 
-  public Inexact numerator() throws Exception { // NaN, Infinity, -Infinity
+  public Exact numerator() throws Exception { // NaN, Infinity, -Infinity
     if(Double.isFinite(value) == false)
       throw new Exceptionf("<Inexact>: can't get <numerator> of %f", value);
-    return (new Inexact(value)).numerator();
+    return toExact().numerator();
   }
 
-  public Inexact denominator() throws Exception { // NaN, Infinity, -Infinity
+  public Exact denominator() throws Exception { // NaN, Infinity, -Infinity
     if(Double.isFinite(value) == false)
       throw new Exceptionf("<Inexact>: can't get <denominator> of %f", value);
-    return (new Inexact(value)).denominator();
+    return toExact().denominator();
   }
 
 
@@ -211,8 +252,29 @@ public class Inexact extends Real {
   // Modf 
   // @return: [integral, fractional]
   public Real[] modf() {
+    if(Double.isInfinite(value)) return new Real[]{this,ZERO};
     double fractional = value % 1;
     return new Real[]{new Inexact(value-fractional),new Inexact(fractional)};
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Integral & Fractional 
+  // @return: integral
+  public Exact integral() throws Exception {
+    if(Double.isFinite(value) == false)
+      throw new Exceptionf("<Inexact>: can't get <integral> of %f", value);
+    double fractional = value % 1;
+    return new Exact(value-fractional);
+  }
+
+  // @return: fractional (as an integer)
+  public Exact fractional() throws Exception {
+    if(Double.isFinite(value) == false)
+      throw new Exceptionf("<Inexact>: can't get <fractional> of %f", value);
+    double fractional = value % 1;
+    while(fractional % 1 != 0.0) fractional = doubleMultiply(fractional,10.0);
+    return new Exact(fractional);
   }
 
 
@@ -221,7 +283,7 @@ public class Inexact extends Real {
   private void guarenteeGivenIntegers(String opName, double b) throws Exception {
     if(Math.round(value) != value) 
       throw new Exceptionf("Can't perform (%s %f %f) with non-integer %f", opName, value, b, value);
-    if(Math.round(b) != value) 
+    if(Math.round(b) != b) 
       throw new Exceptionf("Can't perform (%s %f %f) with non-integer %f", opName, value, b, b);
     if(value < 0.0) 
       throw new Exceptionf("Can't perform (%s %f %f) with negative %f", opName, value, b, value);
@@ -234,6 +296,8 @@ public class Inexact extends Real {
     double b = r.doubleValue();
     guarenteeGivenIntegers("gcd",b);
     double a = value;
+    if(a == 0.0) return new Inexact(b);
+    if(b == 0.0) return new Inexact(a);
     while(a != b) {
       if(a > b) {
         a -= b;
@@ -251,6 +315,7 @@ public class Inexact extends Real {
     double originalA = value;
     double originalB = b;
     double a = value;
+    if(a == 0.0 || b == 0.0) return ZERO;
     while(a != b) {
       if(a > b) {
         a -= b;
@@ -258,7 +323,7 @@ public class Inexact extends Real {
         b -= a;
       }
     }
-    return new Inexact((originalA * originalB) / a);
+    return new Inexact(doubleMultiply(originalA,originalB)/a);
   }
 
 
@@ -270,19 +335,23 @@ public class Inexact extends Real {
   }
 
 
-  public Inexact round() {
+  public Real round() {
+    if(!Double.isFinite(value)) return this;
     return new Inexact(Math.round(value));
   }
 
-  public Inexact floor() {
+  public Real floor() {
+    if(!Double.isFinite(value)) return this;
     return new Inexact(Math.floor(value));
   }
 
-  public Inexact ceil() {
+  public Real ceil() {
+    if(!Double.isFinite(value)) return this;
     return new Inexact(Math.ceil(value));
   }
 
-  public Inexact trunc() {
+  public Real trunc() {
+    if(!Double.isFinite(value)) return this;
     return new Inexact(truncate(value));
   }
 
@@ -341,19 +410,23 @@ public class Inexact extends Real {
   }
 
 
-  public Inexact asin() {
-    return new Inexact(Math.asin(value));
+  public Number asin() {
+    double result = Math.asin(value);
+    if(!Double.isNaN(result)) return new Inexact(result);
+    return (new Complex(this,ZERO)).asin();
   }
 
-  public Inexact acos() {
-    return new Inexact(Math.acos(value));
+  public Number acos() {
+    double result = Math.acos(value);
+    if(!Double.isNaN(result)) return new Inexact(result);
+    return (new Complex(this,ZERO)).acos();
   }
 
   public Inexact atan() {
     return new Inexact(Math.atan(value));
   }
 
-  public Real atan(Real n) {
+  public Inexact atan(Real n) {
     return new Inexact(Math.atan2(value,n.doubleValue()));
   }
 
@@ -372,15 +445,19 @@ public class Inexact extends Real {
 
 
   public Inexact asinh() {
-    return new Inexact(Math.log(value + Math.sqrt(Math.pow(value,2) + 1)));
+    return new Inexact(Math.log(value+Math.sqrt(Math.pow(value,2)+1)));
   }
 
-  public Inexact acosh() {
-    return new Inexact(Math.log(value + Math.sqrt(Math.pow(value,2) - 1)));
+  public Number acosh() {
+    double result = Math.log(value+Math.sqrt(Math.pow(value,2)-1));
+    if(!Double.isNaN(result)) return new Inexact(result);
+    return (new Complex(this,ZERO)).acosh();
   }
 
-  public Inexact atanh() {
-    return new Inexact(0.5 * Math.log((1 + value) / (1 - value)));
+  public Number atanh() {
+    double result = doubleMultiply(0.5,Math.log((1+value)/(1-value)));
+    if(!Double.isNaN(result)) return new Inexact(result);
+    return (new Complex(this,ZERO)).atanh();
   }
 
 
@@ -392,6 +469,17 @@ public class Inexact extends Real {
 
   public boolean isInexact() {
     return true;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Exactness Conversion
+  public Exact toExact() throws Exception {
+    return new Exact(this);
+  }
+
+  public Inexact toInexact() throws Exception {
+    return this;
   }
 
 

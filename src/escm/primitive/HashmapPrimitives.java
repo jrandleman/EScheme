@@ -81,6 +81,24 @@ public class HashmapPrimitives {
 
   
   ////////////////////////////////////////////////////////////////////////////
+  // hashmap-val?
+  public static class IsHashmapVal extends Primitive {
+    public java.lang.String escmName() {
+      return "hashmap-val?";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2)
+        throw new Exceptionf("'(hashmap-val? <hashmap> <obj>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum h = parameters.get(0);
+      if(!(h instanceof escm.type.Hashmap))
+        throw new Exceptionf("'(hashmap-val? <hashmap> <obj>) 1st arg %s isn't a hashmap: %s", h.profile(), Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(((escm.type.Hashmap)h).hasVal(parameters.get(1)));
+    }
+  }
+
+  
+  ////////////////////////////////////////////////////////////////////////////
   // hashmap-set!
   public static class HashmapSetBang extends Primitive {
     public java.lang.String escmName() {

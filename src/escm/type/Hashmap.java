@@ -11,6 +11,7 @@
 //      - Datum values() // returns a list
 //
 //      - boolean hasKey()
+//      - boolean hasVal()
 //
 //      - Datum get(Datum key)
 //      - boolean set(Datum key, Datum val) // returns whether replaced a prior value
@@ -90,6 +91,10 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   // Containment
   public boolean hasKey(Datum key) {
     return value.containsKey(key);
+  }
+
+  public boolean hasVal(Datum val) {
+    return value.containsValue(val);
   }
 
 

@@ -336,7 +336,7 @@ public class SystemPrimitives {
       Path moduleAbsolutePath = Path.of(FilePrimitives.AbsolutePath.logic(filePath));
       while(moduleAbsolutePath != null) {
         Path p = addPaths(moduleAbsolutePath,moduleDirectoryPath);
-        if(Files.isDirectory(p)) {
+        if(FilePrimitives.IsDirectoryP.logic(p)) {
           moduleAbsolutePath = p;
           break;
         }

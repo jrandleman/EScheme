@@ -30,7 +30,7 @@ public class Exact extends Real {
       double fractional = n%1;
       // Cast doubles to a big integer (don't care about losing their fractional components here)
       BigInteger bigMultiplier = BigDecimal.valueOf(multiplier).toBigInteger();
-      BigInteger bigMultipliedFractional = BigDecimal.valueOf(fractional*multiplier).toBigInteger();
+      BigInteger bigMultipliedFractional = BigDecimal.valueOf(Inexact.doubleMultiply(fractional,multiplier)).toBigInteger();
       BigInteger bigIntegral = BigDecimal.valueOf(n-fractional).toBigInteger();
       // Reduce the resulting fraction to its simplest form
       BigInteger numerator = bigIntegral.multiply(bigMultiplier).add(bigMultipliedFractional);
@@ -161,15 +161,11 @@ public class Exact extends Real {
   ////////////////////////////////////////////////////////////////////////////
   // Expt-modulo: this^n mod m
   public Real exptMod(Real p, Real m) throws Exception {
-    if(p.isNegative())
-      throw new Exceptionf("Can't expt-mod base=%d, mod=%d, with negative power=%s", display(), m.display(), p.display());
-    if(!m.isPositive())
-      throw new Exceptionf("Can't expt-mod base=%d, power=%d, with non-positive mod=%s", display(), p.display(), m.display());
-    if(isInteger() && p instanceof Exact && p.isInteger() && m instanceof Exact && m.isInteger())
+    if(!p.isNegative() && m.isPositive() && isInteger() && p instanceof Exact && p.isInteger() && m instanceof Exact && m.isInteger())
       return new Exact(num.modPow(((Exact)p).num,((Exact)m).num),BigInteger.ONE);
     Number n = expt(p);
     if(n instanceof Complex)
-      throw new Exceptionf("Invalid Complex expt-mod result: base=%d, power=%d, mod=%s", display(), p.display(), m.display());
+      throw new Exceptionf("Invalid Complex expt-mod result: base=%s, power=%s, mod=%s", display(), p.display(), m.display());
     return ((Real)n).modulo(m);
   }
 
@@ -192,7 +188,10 @@ public class Exact extends Real {
 
   ////////////////////////////////////////////////////////////////////////////
   // Arithmetic
-  static final BigInteger TWO = BigInteger.ONE.add(BigInteger.ONE);
+  static final Exact ZERO = new Exact(BigInteger.ZERO,BigInteger.ONE);
+  static final Exact ONE = new Exact(BigInteger.ONE,BigInteger.ONE);
+  static final Exact HALF = new Exact(BigInteger.ONE,BigInteger.ONE.add(BigInteger.ONE));
+  static final BigInteger BIGINT_TWO = BigInteger.ONE.add(BigInteger.ONE);
 
 
   public Number add(Number n) {
@@ -227,7 +226,7 @@ public class Exact extends Real {
     if(n instanceof Complex) {
       return (new Complex(this)).mul(n);
     } else if(n instanceof Inexact) {
-      return new Inexact(doubleValue()*((Inexact)n).doubleValue());
+      return new Inexact(Inexact.doubleMultiply(doubleValue(),((Inexact)n).doubleValue()));
     } else {
       Exact e = (Exact)n;
       if(isInteger() && e.isInteger()) 
@@ -249,14 +248,37 @@ public class Exact extends Real {
     }
   }
 
+  private boolean powYieldsComplex(Real pow) {
+    return isNegative() && pow.isFinite() && !pow.isInteger();
+  }
 
+  // n^0 = 1
+  // 0^+n = 1
+  // 0^-n = Infinity
+  // [+-]1^[+-]Infinity = 1
   public Number expt(Number n) {
-    if(n instanceof Complex)
+    boolean nIsReal = n instanceof Real;
+    if(nIsReal && ((Real)n).isZero()) {
+      if(n instanceof Exact) return ONE;
+      return Inexact.ONE;
+    }
+    if(isZero()) {
+      if(nIsReal) {
+        if(((Real)n).isNegative()) return Inexact.POSITIVE_INFINITY;
+        if(n instanceof Exact) return ZERO;
+        return Inexact.ZERO;
+      }
+      return ZERO;
+    }
+    if(abs().eqs(ONE) && nIsReal && ((Real)n).isInfinite()) return ONE;
+    if(n instanceof Complex) return (new Complex(this)).expt(n);
+    Real real_n = (Real)n; // guarenteed success since !(n instanceof Complex)
+    if(powYieldsComplex(real_n))
       return (new Complex(this)).expt(n);
-    if(isNegative())
-      return (new Complex(new Exact(),(Real)negate().expt(n))).unifyComponentExactness();
+    if(real_n.isNegative())
+      return ONE.div(expt(real_n.negate()));
     if(n instanceof Inexact) {
-      return new Inexact(Math.pow(doubleValue(),((Inexact)n).doubleValue()));
+      return Inexact.doublePow(doubleValue(),((Inexact)n).doubleValue());
     } else { // if(n instanceof Exact)
       Exact power = (Exact)n;
       if(power.isInteger()) {
@@ -279,8 +301,9 @@ public class Exact extends Real {
         }
       } else {
         double powerValue = power.doubleValue();
-        Inexact numResult = new Inexact(Math.pow(num.doubleValue(),powerValue));
-        double numResultDouble = numResult.doubleValue();
+        Number numResult = Inexact.doublePow(num.doubleValue(),powerValue);
+        if(numResult instanceof Complex) return numResult;
+        double numResultDouble = ((Real)numResult).doubleValue();
         if(isInteger()) {
           if(Math.round(numResultDouble) == numResultDouble) {
             return new Exact(BigDecimal.valueOf(numResultDouble).toBigInteger(),BigInteger.ONE);
@@ -288,8 +311,9 @@ public class Exact extends Real {
             return numResult;
           }
         } else {
-          Inexact denResult = new Inexact(Math.pow(den.doubleValue(),powerValue));
-          double denResultDouble = denResult.doubleValue();
+          Number denResult = Inexact.doublePow(den.doubleValue(),powerValue);
+          if(denResult instanceof Complex) return numResult.div(denResult);
+          double denResultDouble = ((Real)denResult).doubleValue();
           if(Math.round(numResultDouble) == numResultDouble && Math.round(denResultDouble) == denResultDouble) {
             return new Exact(BigDecimal.valueOf(numResultDouble).toBigInteger(),BigDecimal.valueOf(denResultDouble).toBigInteger());
           } else {
@@ -304,12 +328,16 @@ public class Exact extends Real {
     return new Inexact(Math.exp(doubleValue()));
   }
 
-  public Inexact log() {
+  public Number log() {
+    if(isNegative())
+      return (new Complex(this)).log();
     return new Inexact(Math.log(doubleValue()));
   }
 
   public Number sqrt() {
-    return expt(new Exact(BigInteger.ONE,TWO));
+    if(isNegative()) 
+      return (new Complex(new Exact(),(Real)negate().sqrt())).unifyComponentExactness();
+    return expt(HALF);
   }
 
   public Exact abs() {
@@ -320,7 +348,7 @@ public class Exact extends Real {
   ////////////////////////////////////////////////////////////////////////////
   // Division Details (recall: dividend = divisor × quotient + remainder)
   public Real quotient(Real n) {
-    if(n.isZero()) new Inexact(doubleValue()/0.0);
+    if(n.isZero()) return new Inexact(doubleValue()/0.0);
     try {
       if(isInteger() && n instanceof Exact && n.isInteger())
         return new Exact(num.divide(((Exact)n).num),BigInteger.ONE);
@@ -337,7 +365,7 @@ public class Exact extends Real {
   }
 
   public Real remainder(Real n) {
-    if(n.isZero()) new Inexact(doubleValue()/0.0);
+    if(n.isZero()) return Inexact.NAN;
     try {
       if(isInteger() && n instanceof Exact && n.isInteger())
         return new Exact(num.remainder(((Exact)n).num),BigInteger.ONE);
@@ -350,8 +378,7 @@ public class Exact extends Real {
   }
 
   public Real[] divrem(Real n) {
-    if(n.isZero()) new Inexact(doubleValue()/0.0);
-    if(isInteger() && n instanceof Exact && n.isInteger()) {
+    if(!n.isZero() && isInteger() && n instanceof Exact && n.isInteger()) {
       BigInteger[] results = num.divideAndRemainder(((Exact)n).num);
       return new Exact[]{new Exact(results[0],BigInteger.ONE),new Exact(results[1],BigInteger.ONE)};
     } else {
@@ -359,15 +386,15 @@ public class Exact extends Real {
     }
   }
 
+  // Credit for this Algorithm (modF) goes to Daan Leijen of the University of Utrecht. 
+  // Proof (see page 5): https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
   public Real modulo(Real n) throws Exception {
-    if(n instanceof Inexact)
+    if(n instanceof Inexact || !isInteger() || !n.isInteger())
       return (new Inexact(doubleValue())).modulo(n);
-    Exact e = (Exact)n;
-    if(!isInteger() || !e.isInteger())
-      throw new Exceptionf("Can't perform MODULO of non integers %s & %s", display(), e.display());
-    if(!e.isPositive())
-      throw new Exceptionf("Can't perform MODULO with non-positive mod %", e.display());
-    return new Exact(num.mod(e.num),BigInteger.ONE);
+    Exact d = (Exact)n;
+    Real r = remainder(n);
+    if((r.isPositive() && d.isNegative()) || (r.isNegative() && d.isPositive())) r = (Real)r.add(d);
+    return r;
   }
 
   public Exact numerator() {
@@ -383,9 +410,20 @@ public class Exact extends Real {
   // Modf 
   // @return: [integral, fractional]
   public Real[] modf() {
-    double value = doubleValue();
-    double fractional = value % 1;
-    return new Real[]{new Inexact(value-fractional),new Inexact(fractional)};
+    return (new Inexact(doubleValue())).modf();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Integral & Fractional 
+  // @return: integral
+  public Exact integral() throws Exception {
+    return (new Inexact(doubleValue())).integral();
+  }
+
+  // @return: fractional (as an integer)
+  public Exact fractional() throws Exception {
+    return (new Inexact(doubleValue())).fractional();
   }
 
 
@@ -429,24 +467,24 @@ public class Exact extends Real {
 
   ////////////////////////////////////////////////////////////////////////////
   // Approximations
-  public Exact round() throws Exception {
+  public Real round() throws Exception {
     if(den.equals(BigInteger.ONE)) return this;
-    return new Exact(Math.round(doubleValue()));
+    return (new Inexact(doubleValue())).round();
   }
 
-  public Exact floor() throws Exception {
+  public Real floor() throws Exception {
     if(den.equals(BigInteger.ONE)) return this;
-    return new Exact(Math.floor(doubleValue()));
+    return (new Inexact(doubleValue())).floor();
   }
 
-  public Exact ceil() throws Exception {
+  public Real ceil() throws Exception {
     if(den.equals(BigInteger.ONE)) return this;
-    return new Exact(Math.ceil(doubleValue()));
+    return (new Inexact(doubleValue())).ceil();
   }
 
-  public Exact trunc() throws Exception {
+  public Real trunc() throws Exception {
     if(den.equals(BigInteger.ONE)) return this;
-    return new Exact(Inexact.truncate(doubleValue()));
+    return (new Inexact(doubleValue())).trunc();
   }
 
 
@@ -470,14 +508,14 @@ public class Exact extends Real {
 
   public boolean isOdd() {
     try {
-      if(den.equals(BigInteger.ONE)) return num.abs().remainder(TWO).equals(BigInteger.ONE);
+      if(den.equals(BigInteger.ONE)) return num.abs().remainder(BIGINT_TWO).equals(BigInteger.ONE);
     } catch(Exception e) {}
     return false;
   }
 
   public boolean isEven() {
     try {
-      if(den.equals(BigInteger.ONE)) return num.remainder(TWO).equals(BigInteger.ZERO);
+      if(den.equals(BigInteger.ONE)) return num.remainder(BIGINT_TWO).equals(BigInteger.ZERO);
     } catch(Exception e) {}
     return false;
   }
@@ -498,61 +536,58 @@ public class Exact extends Real {
   ////////////////////////////////////////////////////////////////////////////
   // Trigonometry
   public Inexact sin() {
-    return new Inexact(Math.sin(doubleValue()));
+    return (new Inexact(doubleValue())).sin();
   }
 
   public Inexact cos() {
-    return new Inexact(Math.cos(doubleValue()));
+    return (new Inexact(doubleValue())).cos();
   }
 
   public Inexact tan() {
-    return new Inexact(Math.tan(doubleValue()));
+    return (new Inexact(doubleValue())).tan();
   }
 
 
-  public Inexact asin() {
-    return new Inexact(Math.asin(doubleValue()));
+  public Number asin() {
+    return (new Inexact(doubleValue())).asin();
   }
 
-  public Inexact acos() {
-    return new Inexact(Math.acos(doubleValue()));
+  public Number acos() {
+    return (new Inexact(doubleValue())).acos();
   }
 
   public Inexact atan() {
-    return new Inexact(Math.atan(doubleValue()));
+    return (new Inexact(doubleValue())).atan();
   }
 
-  public Real atan(Real n) {
-    return new Inexact(Math.atan2(doubleValue(),n.doubleValue()));
+  public Inexact atan(Real n) {
+    return (new Inexact(doubleValue())).atan(n);
   }
 
 
   public Inexact sinh() {
-    return new Inexact(Math.sinh(doubleValue()));
+    return (new Inexact(doubleValue())).sinh();
   }
 
   public Inexact cosh() {
-    return new Inexact(Math.cosh(doubleValue()));
+    return (new Inexact(doubleValue())).cosh();
   }
 
   public Inexact tanh() {
-    return new Inexact(Math.tanh(doubleValue()));
+    return (new Inexact(doubleValue())).tanh();
   }
 
 
   public Inexact asinh() {
-    double val = doubleValue();
-    return new Inexact(Math.log(val + Math.sqrt(Math.pow(val,2) + 1)));
+    return (new Inexact(doubleValue())).asinh();
   }
 
-  public Inexact acosh() {
-    double val = doubleValue();
-    return new Inexact(Math.log(val + Math.sqrt(Math.pow(val,2) - 1)));
+  public Number acosh() {
+    return (new Inexact(doubleValue())).acosh();
   }
 
-  public Inexact atanh() {
-    double val = doubleValue();
-    return new Inexact(0.5 * Math.log((1 + val) / (1 - val)));
+  public Number atanh() {
+    return (new Inexact(doubleValue())).atanh();
   }
 
 
@@ -564,6 +599,17 @@ public class Exact extends Real {
 
   public boolean isInexact() {
     return false;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Exactness Conversion
+  public Exact toExact() throws Exception {
+    return this;
+  }
+
+  public Inexact toInexact() throws Exception {
+    return new Inexact(this);
   }
 
 

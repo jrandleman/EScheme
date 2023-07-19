@@ -21,7 +21,15 @@ public class SyntaxProcedure extends Procedure {
   // Constructor
   public SyntaxProcedure(java.lang.String name, Callable macro) {
     this.name = name;
-    this.macro = macro;
+    if(macro instanceof Datum) {
+      try {
+        this.macro = (Callable)((Datum)macro).loadWithName(this.name);
+      } catch (Exception e) { // catching the unlikely but possible (Callable) cast exception
+        this.macro = macro;
+      }
+    } else {
+      this.macro = macro;
+    }
   }
 
 
@@ -43,7 +51,15 @@ public class SyntaxProcedure extends Procedure {
 
   public SyntaxProcedure loadWithName(java.lang.String name) {
     if(!this.name.equals(Procedure.DEFAULT_NAME)) return this;
-    return new SyntaxProcedure(name,invocationSource,macro);
+    if(macro instanceof Datum) {
+      try {
+        return new SyntaxProcedure(name,invocationSource,(Callable)((Datum)macro).loadWithName(name));
+      } catch(Exception e) { // catching the unlikely but possible (Callable) cast exception
+        return new SyntaxProcedure(name,invocationSource,macro);
+      }
+    } else {
+      return new SyntaxProcedure(name,invocationSource,macro);
+    }
   }
 
 

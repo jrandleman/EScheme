@@ -157,6 +157,7 @@ public class InputPort extends Port {
   public synchronized Integer peek() throws Exception {
     try {
       int high = pr.read();
+      if(high == -1) return null;
       char highChar = (char)high;
       if(java.lang.Character.isHighSurrogate(highChar) == false) {
         pr.unread(high);
@@ -263,7 +264,7 @@ public class InputPort extends Port {
       String s = sb.toString();
       updatePortPosition(s);
       if(c != -1) updatePortPosition('\n');
-      if(c == -1) return null;
+      if(s.length() == 0 && c == -1) return null;
       return s;
     } catch(Exception e) {
       throw new Exceptionf("Can't read line from port \"%s\": %s", name, e);

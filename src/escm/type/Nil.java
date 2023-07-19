@@ -202,14 +202,12 @@ public class Nil extends Datum implements OrderedCollection {
   //////////////////////////////////////
 
   public AssociativeCollection drop(int length) throws Exception {
-    if(length == 0) return Nil.VALUE;
-    throw new Exceptionf("NIL [DROP]: can't drop %d items from NIL of length 0!", length);
+    return Nil.VALUE;
   }
 
 
   public AssociativeCollection take(int length) throws Exception {
-    if(length == 0) return Nil.VALUE;
-    throw new Exceptionf("NIL [TAKE]: can't take %d items from NIL of length 0!", length);
+    return Nil.VALUE;
   }
 
   //////////////////////////////////////

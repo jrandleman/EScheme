@@ -36,6 +36,9 @@
 *min-radix*
 *max-radix*
 
+*min-priority*
+*max-priority*
+
 *import*
 
 *load-once-files*
@@ -64,12 +67,18 @@
 
 (expt-mod <base-real> <power-real> <mod-real>)
 
+(numerator <real>)
+(denominator <real>)
+
 (quotient <real1> <real2>)
 (remainder <real1> <real2>)
 (modulo <real1> <real2>)
 (divrem <real1> <real2>)
 
 (modf <real1> <real2>)
+
+(integral <inexact>)
+(fractional <inexact>)
 
 (gcd <integer1> <integer2>)
 (lcm <integer1> <integer2>)
@@ -81,6 +90,9 @@
 
 (min <real> ...)
 (max <real> ...)
+
+(exact->inexact <number>)
+(inexact->exact <number>)
 
 (number? <obj>)
 (complex? <obj>)
@@ -327,6 +339,7 @@
 (hashmap-values <hashmap>)
 
 (hashmap-key? <hashmap> <obj>)
+(hashmap-val? <hashmap> <obj>)
 
 (hashmap-set! <hashmap> <key> <value>) ; returns whether replaced another entry
 (hashmap-delete! <hashmap> <key>)      ; returns whether deleted an entry

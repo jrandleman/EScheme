@@ -50,13 +50,13 @@
   "name": "*",
   "aliases": null,
   "signatures": ["(* <num> <num> ...)"],
-  "description": "Returns the product of \"<num> <num> ...\".",
+  "description": "Returns the product of \"<num> <num> ...\".\nNote that EScheme defines (* <n> 0) to be 0 for all numeric <n>.",
   "example": null
 }, {
   "name": "expt",
   "aliases": null,
   "signatures": ["(expt <num> <num> ...)"],
-  "description": "Returns the exponentiation of \"<num> <num> ...\".\nRemember that exponentiation is right-associative!",
+  "description": "Returns the exponentiation of \"<num> <num> ...\".\nRemember that exponentiation is right-associative!\n\nNote that EScheme defines the following to be true for all numeric <n>:\n  (expt <n> 0) ; 1\n  (expt 0 <positive-n>) ; 0\n  (expt 0 <negative-n>) ; Infinity\n  (expt 1 <infinite-n>) ; (expt -1 <infinite-n>) ; 1",
   "example": null
 }, {
   "name": "exp",
@@ -89,16 +89,28 @@
   "description": "Efficiently performs (modulo (expt <base-real> <power-real>) <mod-real>).",
   "example": null
 }, {
+  "name": "numerator",
+  "aliases": null,
+  "signatures": ["(numerator <real>)"],
+  "description": "Returns the numerator of <real> as an exact number.\nSee <denominator>.",
+  "example": null
+}, {
+  "name": "denominator",
+  "aliases": null,
+  "signatures": ["(denominator <real>)"],
+  "description": "Returns the denominator of <real> as an exact number.\nSee <numerator>.",
+  "example": null
+}, {
   "name": "quotient",
   "aliases": null,
   "signatures": ["(quotient <real1> <real2>)"],
-  "description": "Returns the quotient of (/ <real1> <real2>).",
+  "description": "Returns the quotient of (/ <real1> <real2>).\nSee <remainder>.",
   "example": null
 }, {
   "name": "remainder",
   "aliases": null,
   "signatures": ["(remainder <real1> <real2>)"],
-  "description": "Returns the remainder of (/ <real1> <real2>).",
+  "description": "Returns the remainder of (/ <real1> <real2>).\nSee <quotient>.",
   "example": null
 }, {
   "name": "modulo",
@@ -118,6 +130,18 @@
   "signatures": ["(modf <real>)"],
   "description": "Returns a pair: the integral & factional components of <real> as an inexact.",
   "example": null
+}, {
+  "name": "integral",
+  "aliases": null,
+  "signatures": ["(integral <real>)"],
+  "description": "Get the integral exact value of <real> as an inexact.",
+  "example": "(integral 0.5) ; 0\n(integral 5.2) ; 5\n(integral NaN) ; ERROR\n(integral Infinity) ; ERROR"
+}, {
+  "name": "fractional",
+  "aliases": null,
+  "signatures": ["(fractional <real>)"],
+  "description": "Get the fractional exact value of <real> as an inexact.",
+  "example": "(fractional 5.0) ; 0\n(fractional 5.2) ; 2\n(fractional NaN) ; ERROR\n(fractional Infinity) ; ERROR"
 }, {
   "name": "gcd",
   "aliases": null,
@@ -165,6 +189,18 @@
   "aliases": null,
   "signatures": ["(max <real> ...)"],
   "description": "Returns the max value of \"<real> ...\".",
+  "example": null
+}, {
+  "name": "exact->inexact",
+  "aliases": null,
+  "signatures": ["(exact->inexact <number>)"],
+  "description": "Coerces <number> to be inexact.",
+  "example": null
+}, {
+  "name": "inexact->exact",
+  "aliases": null,
+  "signatures": ["(inexact->exact <number>)"],
+  "description": "Coerces <number> to be exact.",
   "example": null
 }, {
   "name": "number?",
@@ -272,13 +308,13 @@
   "name": "asin",
   "aliases": null,
   "signatures": ["(asin <num>)"],
-  "description": "Returns the asin of <num>.",
+  "description": "Returns the asin of <num>.\nNote that asin yields a complex number if <num> exceeds its domain.",
   "example": null
 }, {
   "name": "acos",
   "aliases": null,
   "signatures": ["(acos <num>)"],
-  "description": "Returns the acos of <num>.",
+  "description": "Returns the acos of <num>.\nNote that acos yields a complex number if <num> exceeds its domain.",
   "example": null
 }, {
   "name": "atan",
@@ -314,13 +350,13 @@
   "name": "acosh",
   "aliases": null,
   "signatures": ["(acosh <num>)"],
-  "description": "Returns the acosh of <num>.",
+  "description": "Returns the acosh of <num>.\nNote that acosh yields a complex number if <num> exceeds its domain.",
   "example": null
 }, {
   "name": "atanh",
   "aliases": null,
   "signatures": ["(atanh <num>)"],
-  "description": "Returns the atanh of <num>.",
+  "description": "Returns the atanh of <num>.\nNote that atanh yields a complex number if <num> exceeds its domain.",
   "example": null
 }, {
   "name": "npr",

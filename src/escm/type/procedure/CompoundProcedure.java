@@ -188,9 +188,4 @@ public class CompoundProcedure extends Procedure {
       return Interpreter.run(new ExecutionState(extendedEnvironment,state.compileTime.bodyList.get(clauseNumber)),popContinuation);
     };
   }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Backdoors
-
 }

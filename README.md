@@ -5,7 +5,7 @@
 ------------------------------------------------------------------------------
 ## Installing and Running EScheme:
 ### Dependencies:
-* EScheme depends on [Java](https://adoptium.net) and [`git`](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git). Make sure they're both installed first!
+* EScheme depends on [Java](https://adoptium.net). Make sure it's installed first!
   - Note that EScheme supports both Java 11 and 17 (LTS releases)!
 
 ### Installation:

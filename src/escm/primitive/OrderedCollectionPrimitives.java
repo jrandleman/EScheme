@@ -47,21 +47,6 @@ public class OrderedCollectionPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // conj
-  public static class Conj extends Primitive {
-    public java.lang.String escmName() {
-      return "conj";
-    }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 2 || !(parameters.get(1) instanceof OrderedCollection)) 
-        throw new Exceptionf("'(conj <value> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
-      return (Datum)((OrderedCollection)parameters.get(1)).conj(parameters.get(0));
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // init
   public static class Init extends Primitive {
     public java.lang.String escmName() {
@@ -100,11 +85,11 @@ public class OrderedCollectionPrimitives {
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() < 2 || parameters.size() > 3) 
-        throw new Exceptionf("'(slice <ordered-collection> <start-index> <end-predicate-or-length>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(slice <ordered-collection> <start-index> <optional-end-predicate-or-length>) invalid args: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof OrderedCollection))
-        throw new Exceptionf("'(slice <ordered-collection> <start-index> <end-predicate-or-length>) 1st arg isn't an <oc>: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(slice <ordered-collection> <start-index> <optional-end-predicate-or-length>) 1st arg isn't an <oc>: %s", Exceptionf.profileArgs(parameters));
       if(!ListPrimitives.isValidSize(parameters.get(1)))
-        throw new Exceptionf("'(slice <ordered-collection> <start-index> <end-predicate-or-length>) 2nd arg isn't an index: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(slice <ordered-collection> <start-index> <optional-end-predicate-or-length>) 2nd arg isn't an index: %s", Exceptionf.profileArgs(parameters));
       if(parameters.size() == 2) {
         return continuation.run((Datum)((OrderedCollection)parameters.get(0)).slice(((Real)parameters.get(1)).intValue()));
       }
@@ -114,7 +99,7 @@ public class OrderedCollectionPrimitives {
       if(parameters.get(2) instanceof Callable) {
         return ((OrderedCollection)parameters.get(0)).slice(((Real)parameters.get(1)).intValue(),(Callable)parameters.get(2),continuation);
       }
-      throw new Exceptionf("'(slice <ordered-collection> <start-index> <end-predicate-or-length>) invalid 3rd arg: %s", Exceptionf.profileArgs(parameters));
+      throw new Exceptionf("'(slice <ordered-collection> <start-index> <optional-end-predicate-or-length>) invalid 3rd arg: %s", Exceptionf.profileArgs(parameters));
     }
   }
 

@@ -16,7 +16,7 @@ public class ExecutionState {
   public ArrayList<Instruction> instructions;
   public Stack<Datum> stack;
   public Datum cvr; // current value register
-  public int cii; // current instruction index
+  public int cii;   // current instruction index
 
 
   ////////////////////////////////////////////////////////////////////////////

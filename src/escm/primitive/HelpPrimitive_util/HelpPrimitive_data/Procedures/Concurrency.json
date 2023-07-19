@@ -44,31 +44,31 @@
   "name": "thread-set-daemon!",
   "aliases": null,
   "signatures": ["(thread-set-daemon! <thread> <boolean-status>)"],
-  "description": "Sets <thread> to be a daemon thread or not, based on <boolean-status>.",
+  "description": "Tries to set <thread> to be a JVM daemon thread or not, based on\n<boolean-status>. Returns whether succeeded.",
   "example": null
 }, {
   "name": "thread-daemon?",
   "aliases": null,
   "signatures": ["(thread-daemon? <thread>)"],
-  "description": "Returns whether <thread> is a daemon thread.",
+  "description": "Returns whether <thread> is a JVM daemon thread.",
   "example": null
 }, {
   "name": "thread-priority",
   "aliases": null,
   "signatures": ["(thread-priority <thread>)"],
-  "description": "Returns <thread>'s priority. 1 is the min priority and 10 is the max.",
+  "description": "Returns <thread>'s priority. See <*min-priority*> and <*max-priority*>.",
   "example": null
 }, {
   "name": "thread-set-priority!",
   "aliases": null,
   "signatures": ["(thread-set-priority! <thread> <int-priority>)"],
-  "description": "Sets <thread>'s priority to be <int-priority>.\n1 is the min priority and 10 is the max.",
+  "description": "Tries to set <thread>'s priority to be <int-priority>.\nSee <*min-priority*> and <*max-priority*>.\nReturns whether succeeded.",
   "example": null
 }, {
   "name": "thread-start!",
   "aliases": null,
   "signatures": ["(thread-start! <thread> ...)"],
-  "description": "Starts \"<thread> ...\" and invokes their callable thunk runnables.",
+  "description": "Starts \"<thread> ...\" and invokes their callable thunk runnables.\nReturns a list of threads that failed to start (e.g. already started).",
   "example": null
 }, {
   "name": "thread-join!",
@@ -86,7 +86,7 @@
   "name": "thread-interrupt!",
   "aliases": null,
   "signatures": ["(thread-interrupt! <thread>)"],
-  "description": "Interrupts <thread>.",
+  "description": "Tries to interrupt <thread>, and returns whether succeeded.",
   "example": null
 }, {
   "name": "interrupted?!",

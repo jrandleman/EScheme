@@ -51,13 +51,20 @@ public class OutputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Static STDIN field
-  private OutputPort(int ignore) {
-    writer = new OutputStreamWriter(System.out);
-    name = "System.out";
+  private OutputPort(int outOrErr) {
+    if(outOrErr == 0) {
+      writer = new OutputStreamWriter(System.out);
+      name = "System.out";
+    } else {
+      writer = new OutputStreamWriter(System.err);
+      name = "System.err";
+    }
   }
 
 
   public static final OutputPort STDOUT = new OutputPort(0);
+
+  public static final OutputPort STDERR = new OutputPort(1);
 
 
   ////////////////////////////////////////////////////////////////////////////

@@ -48,16 +48,13 @@ public class Complex extends Number {
 
   ////////////////////////////////////////////////////////////////////////////
   // Private Static Constants
-  private static final Exact ZERO = new Exact();
-  private static final Exact ONE  = new Exact(1);
-  private static final Exact TWO  = new Exact(2);
-  private static final Exact HALF = new Exact(BigInteger.ONE,Exact.TWO);
+  private static final Exact EXACT_TWO = new Exact(2);
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Private Value Fields
-  private Real real = ZERO;
-  private Real imag = ZERO;
+  private Real real = Exact.ZERO;
+  private Real imag = Exact.ZERO;
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -74,7 +71,7 @@ public class Complex extends Number {
 
   public Complex(double n) {
     real = new Inexact(n);
-    imag = new Inexact(0.0);
+    imag = new Inexact();
   }
 
   public Complex(Exact n) {
@@ -83,7 +80,7 @@ public class Complex extends Number {
 
   public Complex(Inexact n) {
     real = n;
-    imag = new Inexact(0.0);
+    imag = new Inexact();
   }
 
 
@@ -104,7 +101,7 @@ public class Complex extends Number {
   }
 
   public Real magnitude() {
-    return (Real)real.expt(TWO).add(imag.expt(TWO)).sqrt();
+    return (Real)real.mul(real).add(imag.mul(imag)).sqrt();
   }
 
   public Real angle() {
@@ -190,8 +187,8 @@ public class Complex extends Number {
       return (new Complex((Real)real.mul(n),(Real)imag.mul(n))).unifyComponentExactness();
     }
   }
-
   // (a+bi)/(c+di) = [(ac+bd)/(cc+dd)]+[(bc-ad)/(cc+dd)]i
+  // (a+bi)/(c+0i) = (a/c)+(b/c)i
   public Number div(Number n) {
     if(n instanceof Complex) {
       Complex c = (Complex)n;
@@ -200,49 +197,79 @@ public class Complex extends Number {
       Real resultImag = (Real)imag.mul(c.real).sub(real.mul(c.imag)).div(denom);
       return (new Complex(resultReal,resultImag)).unifyComponentExactness();
     } else {
-      Real denom = (Real)n.mul(n);
-      return (new Complex((Real)real.mul(n).div(denom),(Real)imag.mul(n).div(denom))).unifyComponentExactness();
+      return (new Complex((Real)real.div(n),(Real)imag.div(n))).unifyComponentExactness();
     }
   }
 
-
-  // w**z = [cos(d*ln(r)+c*theta) + isin(d*ln(r)+c*theta)] * (r^c) * exp(-d * theta)
-  // => w = rL(theta), z = c+di
+  // w**z = exp(z*log(w))
+  // From: https://math.stackexchange.com/questions/476968/complex-power-of-a-complex-number
+  // n^0 = 1
+  // 0^+n = 1
+  // 0^-n = Infinity
+  // [+-]1^[+-]Infinity = 1
   public Number expt(Number n) {
-    Real r = magnitude();
-    Real t = angle();
-    Real c = null;
-    Real d = null;
-    if(n instanceof Complex) {
-      Complex rhs = (Complex)n;
-      c = rhs.real;
-      d = rhs.imag;
-    } else {
-      c = (Real)n;
-      if(n instanceof Inexact) {
-        d = new Inexact();
-      } else {
-        d = ZERO;
-      }
+    boolean nIsReal = n instanceof Real;
+    if(nIsReal && ((Real)n).isZero()) {
+      if (n instanceof Exact) return Exact.ONE;
+      return Inexact.ONE;
     }
-    Real trigArg = (Real)d.mul(r.log()).add(c.mul(t));
-    return (new Complex((Real)trigArg.cos(),(Real)trigArg.sin())).unifyComponentExactness().mul(r.expt(c).mul(d.negate().mul(t).exp()));
+    if(real.isZero() && imag.isZero()) {
+      if(nIsReal) {
+        if(((Real)n).isNegative()) return Inexact.POSITIVE_INFINITY;
+        if(n instanceof Exact) return Exact.ZERO;
+        return Inexact.ZERO;
+      }
+      if(real instanceof Exact) return Exact.ZERO;
+      return Inexact.ZERO;
+    }
+    Real absReal = real.abs();
+    if(absReal.eqs(Inexact.ONE) && imag.isZero() && nIsReal && ((Real)n).isInfinite()) return absReal;
+    return n.mul(log()).exp();
   }
 
+  // e^(a+bi) = (e^a)*(cos(b)+sin(b)i)
+  // From: https://math.stackexchange.com/questions/142610/expressing-ez-where-z-abi-in-polar-form
   public Number exp() {
-    return (new Complex(Math.exp(1.0))).expt(this);
+    return real.exp().mul((new Complex(imag.cos(),imag.sin())).unifyComponentExactness());
   }
 
-  // ln(z) = (1/2)ln(a^2 + b^2) + atan2(b,a)i
-  // => z = a+bi
+  // ln(z) = ln(r)+(theta)i
+  // => z = rL(theta)
+  // From: https://en.wikipedia.org/wiki/Complex_logarithm
   public Number log() {
-    Real newReal = (Real)HALF.mul(real.expt(TWO).add(imag.expt(TWO)).log());
-    Real newImag = (Real)imag.atan(real);
-    return (new Complex(newReal,newImag)).unifyComponentExactness();
+    return (new Complex((Real)magnitude().log(),angle())).unifyComponentExactness();
   }
 
+  private static boolean isPositiveInfinity(Real n) {
+    return n.isInfinite() && n.isPositive();
+  }
+
+  private static boolean isNegativeInfinity(Real n) {
+    return n.isInfinite() && n.isNegative();
+  }
+
+  private static Number complexSqrtAdd(Real a, Real b) {
+    if(isPositiveInfinity(a) && isNegativeInfinity(b)) return Exact.ZERO;
+    if(isNegativeInfinity(a) && isPositiveInfinity(b)) return Exact.ZERO;
+    return a.add(b);
+  }
+
+  private static Number complexSqrtSub(Real a, Real b) {
+    if(isPositiveInfinity(a) && isPositiveInfinity(b)) return Exact.ZERO;
+    if(isNegativeInfinity(a) && isNegativeInfinity(b)) return Exact.ZERO;
+    return a.sub(b);
+  }
+
+  // sqrt(z) = sqrt((mag(z)+a)/2)+(b/abs(b))*sqrt((mag(z)-a)/2)i
+  // => z = a+bi
+  // From: https://www.cuemath.com/algebra/square-root-of-complex-number/
   public Number sqrt() {
-    return expt(HALF);
+    if(real.isInfinite() && imag.isInfinite()) return Inexact.NAN;
+    Real mag = magnitude();
+    Real sqrtReal = (Real)complexSqrtAdd(mag,real).div(EXACT_TWO).sqrt();
+    Real sqrtImag = (Real)complexSqrtSub(mag,real).div(EXACT_TWO).sqrt();
+    if(imag.isNegative()) sqrtImag = sqrtImag.negate();
+    return (new Complex(sqrtReal,sqrtImag)).unifyComponentExactness();
   }
 
 
@@ -253,24 +280,24 @@ public class Complex extends Number {
     return (new Complex((Real)real.sin().mul(imag.cosh()),(Real)real.cos().mul(imag.sinh()))).unifyComponentExactness();
   }
   
-  // cos(a+bi) = cos(a)cosh(b) + sin(a)sinh(b)i
+  // cos(a+bi) = cos(a)cosh(b) - sin(a)sinh(b)i
   public Number cos() {
-    return (new Complex((Real)real.cos().mul(imag.cosh()),(Real)real.sin().mul(imag.sinh()))).unifyComponentExactness();
+    return (new Complex((Real)real.cos().mul(imag.cosh()),((Real)real.sin().mul(imag.sinh())).negate())).unifyComponentExactness();
   }
   
   // tan(a+bi) = [sin(2a) + sinh(2b)i] / [cos(2a) + cosh(2b)]
   public Number tan() {
-    Real realX2 = (Real)real.mul(TWO);
-    Real imagX2 = (Real)imag.mul(TWO);
+    Real realX2 = (Real)real.mul(EXACT_TWO);
+    Real imagX2 = (Real)imag.mul(EXACT_TWO);
     return (new Complex((Real)realX2.sin(),(Real)imagX2.sinh())).unifyComponentExactness().div(realX2.cos().add(imagX2.cosh()));
   }
 
 
   // asin(z) = -i * ln(sqrt(1-z^2) + (z*i))
-  private static final Complex NEGATIVE_I = new Complex(ZERO,ONE.negate());
-  private static final Complex POSITIVE_I = new Complex(ZERO,ONE);
+  private static final Complex NEGATIVE_I = new Complex(Exact.ZERO,Exact.ONE.negate());
+  private static final Complex POSITIVE_I = new Complex(Exact.ZERO,Exact.ONE);
   public Number asin() {
-    return NEGATIVE_I.mul(ONE.sub(expt(TWO)).sqrt().add(mul(POSITIVE_I)).log());
+    return NEGATIVE_I.mul(Exact.ONE.sub(mul(this)).sqrt().add(mul(POSITIVE_I)).log());
   }
   
   // acos(z) = (1/2)pi - asin(z)
@@ -280,7 +307,7 @@ public class Complex extends Number {
   }
   
   // atan(z) = (1/(2i))ln((i-z)/(i+z))
-  private static final Number INVERSE_2PI = ONE.div(new Complex(ZERO,TWO));
+  private static final Number INVERSE_2PI = Exact.ONE.div(new Complex(Exact.ZERO,EXACT_TWO));
   public Number atan() {
     return INVERSE_2PI.mul(POSITIVE_I.sub(this).div(POSITIVE_I.add(this)).log());
   }
@@ -298,25 +325,25 @@ public class Complex extends Number {
   
   // tanh(a+bi) = [sinh(2a) + sin(2b)i] / [cosh(2a) + cos(2b)]
   public Number tanh() {
-    Real realX2 = (Real)real.mul(TWO);
-    Real imagX2 = (Real)imag.mul(TWO);
+    Real realX2 = (Real)real.mul(EXACT_TWO);
+    Real imagX2 = (Real)imag.mul(EXACT_TWO);
     return (new Complex((Real)realX2.sinh(),(Real)imagX2.sin())).unifyComponentExactness().div(realX2.cosh().add(imagX2.cos()));
   }
 
 
   // asinh(z) = ln(z + sqrt(z^2 + 1))
   public Number asinh() {
-    return add(expt(TWO).add(ONE).sqrt()).log();
+    return mul(this).add(Exact.ONE).sqrt().add(this).log();
   }
   
   // acosh(z) = ln(z + sqrt(z + 1) * sqrt(z - 1))
   public Number acosh() {
-    return add(add(ONE).sqrt().mul(sub(ONE).sqrt())).log();
+    return add(add(Exact.ONE).sqrt().mul(sub(Exact.ONE).sqrt())).log();
   }
   
   // atanh(z) = (1/2) * ln((1+z)/(1-z))
   public Number atanh() {
-    return HALF.mul(add(ONE).div(ONE.sub(this)).log());
+    return Exact.HALF.mul(add(Exact.ONE).div(Exact.ONE.sub(this)).log());
   }
 
 
@@ -328,6 +355,17 @@ public class Complex extends Number {
 
   public boolean isInexact() {
     return real instanceof Inexact;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Exactness Conversion
+  public Number toExact() throws Exception {
+    return asExact();
+  }
+
+  public Number toInexact() throws Exception {
+    return asInexact();
   }
   
 

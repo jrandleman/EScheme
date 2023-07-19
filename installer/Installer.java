@@ -1,6 +1,7 @@
 // Author: Jordan Randleman - Installer - MUST BE RUN WITHIN THE `EScheme/installer` DIRECTORY!
 //   => Command-Line Options: 
 //        -v, --verbose           (print status updates)
+//        -u, --unit-tests        (run EScheme's unit test suite after compilation)
 //        -i, --interpret-stdlib  (don't serialize <../src/stdlib.scm>)
 //        -j, --java-bin-path     (set the path to our JVM's <bin> directory)
 //        -h, --help              (show these command-line options)
@@ -28,7 +29,6 @@
     7. Output the <alias> string to stdout, for easy copying into "~/.zshrc" or "~/.bashrc"
 */
 
-import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.io.BufferedReader;
@@ -42,6 +42,7 @@ public class Installer {
   // Command-Line Parsing Setting Satus
   private static boolean VERBOSE_MODE = false;
   private static boolean INTERPRET_STDLIB = false;
+  private static boolean EXECUTE_UNIT_TESTS = false;
   private static String JAVA_BIN_PATH = null;
 
 
@@ -55,6 +56,10 @@ public class Installer {
         }
         case "-i": case "--interpret-stdlib": {
           INTERPRET_STDLIB = true;
+          break;
+        }
+        case "-u": case "--unit-tests": {
+          EXECUTE_UNIT_TESTS = true;
           break;
         }
         case "-j": case "--java-bin-path": {
@@ -99,25 +104,32 @@ public class Installer {
   };
 
 
-  private static String getInputStreamLines(InputStream ins) throws Exception {
+  private static String getInputStreamLines(InputStream ins, boolean reportLive) throws Exception {
     String line = null;
     StringBuilder buffer = new StringBuilder();
     BufferedReader in = new BufferedReader(new InputStreamReader(ins));
-    while((line = in.readLine()) != null) buffer.append('\n'+line);
+    while((line = in.readLine()) != null) {
+      if(reportLive) {
+        System.out.print("  ");
+        System.out.println(line);
+        System.out.flush();
+      }
+      buffer.append('\n'+line);
+    }
     if(buffer.length() == 0) return "";
     return buffer.substring(1);
   }
 
 
-  private static ExecuteCommandResult executeCommand(String command) throws Exception {
+  private static ExecuteCommandResult executeCommand(String command, boolean reportLive) throws Exception {
     if(VERBOSE_MODE) {
       System.out.println("> Executing Command:");
       System.out.println("  \"" + command + "\"");
     }
     Process pro = Runtime.getRuntime().exec(command);
     ExecuteCommandResult res = new ExecuteCommandResult();
-    res.out = getInputStreamLines(pro.getInputStream());
-    res.err = getInputStreamLines(pro.getErrorStream());
+    res.out = getInputStreamLines(pro.getInputStream(),reportLive);
+    res.err = getInputStreamLines(pro.getErrorStream(),false);
     pro.waitFor();
     res.exit = pro.exitValue();
     return res;
@@ -127,7 +139,7 @@ public class Installer {
   ////////////////////////////////////////////////////////////////////////////
   // Retrieve EScheme Directory
   private static String getEscmDirectory() {
-    String cwd = Paths.get("").toAbsolutePath().toString();
+    String cwd = Path.of("").toAbsolutePath().toString();
     return cwd.substring(0,cwd.lastIndexOf(File.separator));
   }
 
@@ -139,7 +151,7 @@ public class Installer {
                                        File.separator+"vm"+File.separator+"runtime"+
                                        File.separator+"installerGenerated";
     try {
-      Path generatedFilesPath = Paths.get(generatedFilesDir);
+      Path generatedFilesPath = Path.of(generatedFilesDir);
       if(Files.exists(generatedFilesPath) == true) {
         for(File entry : (new File(generatedFilesDir)).listFiles()) entry.delete();
         Files.deleteIfExists(generatedFilesPath);
@@ -421,20 +433,44 @@ public class Installer {
 
   ////////////////////////////////////////////////////////////////////////////
   // Compile EScheme
+  private static void recursivelyDeleteDirectory(Path dir) throws Exception {
+    if(Files.exists(dir) && Files.isDirectory(dir)) {
+      for(File entry : (new File(dir.toString())).listFiles()) {
+        Path entryPath = entry.toPath();
+        if(Files.isDirectory(entryPath)) {
+          recursivelyDeleteDirectory(entryPath);
+        } else {
+          entry.delete();
+        }
+      }
+      Files.deleteIfExists(dir);
+    }
+  }
+
+  private static void deleteBinIfExists(String binPath) {
+    try {
+      recursivelyDeleteDirectory(Path.of(binPath));
+    } catch(Exception e) {
+      System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Can't clear directory to store bin files: "+binPath);
+      System.err.println("  error: "+e);
+      System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
+      System.exit(1);
+    }
+  }
+
   private static void compileEScheme(String escmDir) {
     String compileCmd = decorateJvmCmdPath("javac")+" -source 11 -target 11 -d "+escmDir+File.separator+"bin -classpath "+escmDir+File.separator+"src "+escmDir+File.separator+"src"+File.separator+"Main.java";
+    deleteBinIfExists(escmDir+File.separator+"bin");
     try {
-      ExecuteCommandResult res = executeCommand(compileCmd);
+      ExecuteCommandResult res = executeCommand(compileCmd,false);
       if(res.exit != 0) {
         System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Can't compile: "+escmDir+File.separator+"src"+File.separator+"Main.java");
         System.err.println("  exit: " + String.valueOf(res.exit));
         System.err.println("  error: " + res.err);
         System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
         System.exit(1);
-      } else if(res.err.length() > 0) {
-        if(VERBOSE_MODE) {
-          System.err.printf("> [ NON FATAL ] EScheme Installer SRC Compilation Warning(s) :\n  %s\n", res.err.replaceAll("\n","\n  "));
-        }
+      } else if(res.err.length() > 0 && VERBOSE_MODE) {
+        System.err.printf("> [ NON FATAL ] EScheme Installer SRC Compilation Warning(s) :\n  %s\n", res.err.replaceAll("\n","\n  "));
       }
     } catch(Exception e) {
       System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Can't compile: "+escmDir+File.separator+"src"+File.separator+"Main.java");
@@ -450,20 +486,42 @@ public class Installer {
   private static void serializeESchemeStdLib(String escmDir) {
     String serializeCmd = decorateJvmCmdPath("java")+" -classpath "+escmDir+File.separator+"bin Main --serialize-stdlib";
     try {
-      ExecuteCommandResult res = executeCommand(serializeCmd);
+      ExecuteCommandResult res = executeCommand(serializeCmd,false);
       if(res.exit != 0) {
         System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Can't serialize the EScheme Standard Library!");
         System.err.println("  exit: " + String.valueOf(res.exit));
         System.err.println("  error: " + res.err);
         System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
         System.exit(1);
-      } else if(res.err.length() > 0) {
-        if(VERBOSE_MODE) {
-          System.err.printf("> [ NON FATAL ] EScheme Installer STDLIB Serialization Warning(s) :\n  %s\n", res.err.replaceAll("\n","\n  "));
-        }
+      } else if(res.err.length() > 0 && VERBOSE_MODE) {
+        System.err.printf("> [ NON FATAL ] EScheme Installer STDLIB Serialization Warning(s) :\n  %s\n", res.err.replaceAll("\n","\n  "));
       }
     } catch(Exception e) {
       System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Can't serialize the EScheme Standard Library!");
+      System.err.println("  error: " + e);
+      System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
+      System.exit(1);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Execute EScheme's Unit Test Suite
+  private static void executeUnitTests(String escmDir) {
+    String unitTestCmd = decorateJvmCmdPath("java")+" -classpath "+escmDir+File.separator+"bin Main --unit-tests";
+    try {
+      ExecuteCommandResult res = executeCommand(unitTestCmd,true);
+      if(res.exit != 0) {
+        System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Error Executing EScheme Unit Tests!");
+        System.err.println("  exit: " + String.valueOf(res.exit));
+        System.err.println("  error: " + res.err);
+        System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
+        System.exit(1);
+      } else if(res.err.length() > 0 && VERBOSE_MODE) {
+        System.err.printf("> [ NON FATAL ] EScheme Installer EScheme Unit Test Warning(s) :\n  %s\n", res.err.replaceAll("\n","\n  "));
+      }
+    } catch(Exception e) {
+      System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Error Executing EScheme Unit Tests!");
       System.err.println("  error: " + e);
       System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
@@ -491,6 +549,7 @@ public class Installer {
     generateJavaStdlibLoader(escmDir,generatedFilesDir);
     compileEScheme(escmDir);
     if(INTERPRET_STDLIB == false) serializeESchemeStdLib(escmDir);
+    if(EXECUTE_UNIT_TESTS == true) executeUnitTests(escmDir);
     printEscmShellAliasString(escmDir);
     System.out.println("> Successfully installed EScheme! Happy Hacking :)");
   }

@@ -220,9 +220,19 @@ public class Main {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Implementing the Unit Test Executor
+  private static void executeUnitTests() throws Exception {
+    ParsedCommandLine parsed = new ParsedCommandLine();
+    parsed.scriptName = EscmPath.VALUE+File.separator+"src"+File.separator+"test"+File.separator+"main.scm";
+    loadScript(parsed);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Parse the command-line
   private static class ParsedCommandLine {
     public boolean serializingStdLib = false; // --serialize-stdlib
+    public boolean executeUnitTests  = false; // --unit-tests
     public boolean launchingQuiet    = false; // -q --quiet
     public boolean loadingIntoREPL   = false; // -l --load
     public boolean importingIntoREPL = false; // -i --import
@@ -245,6 +255,10 @@ public class Main {
       switch(args[i]) {
         case "--serialize-stdlib": {
           parsed.serializingStdLib = true;
+          return parsed;
+        }
+        case "--unit-tests": {
+          parsed.executeUnitTests = true;
           return parsed;
         }
         case "-v": case "--version": {
@@ -304,6 +318,8 @@ public class Main {
         try {
           if(parsedCmdLine.serializingStdLib == true) {
             serializeStdLib();
+          } else if(parsedCmdLine.executeUnitTests == true) {
+            executeUnitTests();
           } else if(parsedCmdLine.scriptName == null) {
             Environment globalEnvironment = GlobalState.getDefaultEnvironment();
             GlobalState.inREPL = true; // trigger exit message to be printed
@@ -313,6 +329,7 @@ public class Main {
           }
         } catch(Throwable t) {
           reportTopLevelError(t);
+          System.exit(1);
         }
         return cont.run(escm.type.Void.VALUE);
       }

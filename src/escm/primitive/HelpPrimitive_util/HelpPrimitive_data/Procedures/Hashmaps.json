@@ -23,6 +23,12 @@
   "description": "Returns whether <obj> is a key in <hashmap>.",
   "example": null
 }, {
+  "name": "hashmap-val?",
+  "aliases": null,
+  "signatures": ["(hashmap-val? <hashmap> <obj>)"],
+  "description": "Returns whether <obj> is a value in <hashmap>.",
+  "example": null
+}, {
   "name": "hashmap-set!",
   "aliases": null,
   "signatures": ["(hashmap-set! <hashmap> <key> <value>)"],

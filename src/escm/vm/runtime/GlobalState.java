@@ -73,6 +73,8 @@ public class GlobalState {
     definitionEnvironment.define(new Symbol("*escm-execution-command*"),new escm.type.String(" "+JvmPathPrefix.VALUE+"java -classpath "+EscmPath.VALUE+File.separator+"bin Main "));
     definitionEnvironment.define(new Symbol("*min-radix*"),new Exact(Number.MIN_RADIX));
     definitionEnvironment.define(new Symbol("*max-radix*"),new Exact(Number.MAX_RADIX));
+    definitionEnvironment.define(new Symbol("*min-priority*"),new Exact(Thread.MIN_PRIORITY));
+    definitionEnvironment.define(new Symbol("*max-priority*"),new Exact(Thread.MAX_PRIORITY));
     definitionEnvironment.define(new Symbol("*import*"),Boolean.FALSE); // set <TRUE> in <SystemPrimitives>
     definitionEnvironment.define(new Symbol("*load-once-files*"),new Hashmap());
     JavaStdLibLoader.load(definitionEnvironment);

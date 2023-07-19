@@ -22,8 +22,12 @@ how EScheme evaluates modules.
 
 Each module has its own isolated global environment, and has automatic access
 to EScheme's standard library. Note that this means that operations that depend
-on global variables (`dosync` and `load-once`) are hence only able to operate on
+on global variables (e.g. `load-once`) are hence only able to operate on
 a module-relative basis.
+
+* Note that `dosync` notably works across modules, since its internal lock was 
+  created via `define-parameter`. Use `dosync-module` for module-relative locking 
+  behavior.
 
 Both variables and macros can be access from a module by using EScheme's
 dot-notation: for example, to access variable `PersonClass` from module `Mod`,

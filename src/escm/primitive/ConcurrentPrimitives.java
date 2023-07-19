@@ -8,6 +8,8 @@ import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.Void;
+import escm.type.Pair;
+import escm.type.Nil;
 import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.util.Exceptionf;
@@ -152,8 +154,7 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.concurrent.Thread) || !(parameters.get(1) instanceof Boolean))
         throw new Exceptionf("'(thread-set-daemon! <thread> <status>) didn't receive exactly 1 thread & 1 boolean: %s", Exceptionf.profileArgs(parameters));
-      ((escm.type.concurrent.Thread)parameters.get(0)).setDaemon(parameters.get(1).isTruthy());
-      return Void.VALUE;
+      return Boolean.valueOf(((escm.type.concurrent.Thread)parameters.get(0)).setDaemon(parameters.get(1).isTruthy()));
     }
   }
 
@@ -198,8 +199,15 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.concurrent.Thread) || !(parameters.get(1) instanceof Real) || !((Real)parameters.get(1)).isInteger())
         throw new Exceptionf("'(thread-set-priority! <thread> <priority>) didn't receive exactly 1 thread & 1 integer: %s", Exceptionf.profileArgs(parameters));
-      ((escm.type.concurrent.Thread)parameters.get(0)).setPriority(((Real)parameters.get(1)).intValue());
-      return Void.VALUE;
+      int priority = ((Real)parameters.get(1)).intValue();
+      if(priority < escm.type.concurrent.Thread.MIN_PRIORITY || priority > escm.type.concurrent.Thread.MAX_PRIORITY) {
+        throw new Exceptionf("'(thread-set-priority! <thread> <priority>) <priority> %d beyond system bounds [%d,%d]: %s", 
+          priority,
+          escm.type.concurrent.Thread.MIN_PRIORITY,
+          escm.type.concurrent.Thread.MAX_PRIORITY,
+          Exceptionf.profileArgs(parameters));
+      }
+      return Boolean.valueOf(((escm.type.concurrent.Thread)parameters.get(0)).setPriority(priority));
     }
   }
 
@@ -220,10 +228,11 @@ public class ConcurrentPrimitives {
           throw new Exceptionf("'(thread-start! <thread> ...) invalid non-thread %s given: %s", d.profile(), Exceptionf.profileArgs(parameters));
         threads.add((escm.type.concurrent.Thread)d);
       }
+      Datum failedThreads = Nil.VALUE;
       for(escm.type.concurrent.Thread thread : threads) {
-        thread.start();
+        if(thread.start() == false) failedThreads = new Pair(thread,failedThreads);
       }
-      return Void.VALUE;
+      return failedThreads;
     }
   }
 
@@ -284,8 +293,7 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-interrupt! <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      ((escm.type.concurrent.Thread)parameters.get(0)).interrupt();
-      return Void.VALUE;
+      return Boolean.valueOf(((escm.type.concurrent.Thread)parameters.get(0)).interrupt());
     }
   }
 

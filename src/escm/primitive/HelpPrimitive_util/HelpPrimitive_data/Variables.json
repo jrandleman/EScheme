@@ -83,6 +83,18 @@
   "description": "Variable denoting the largest radix supported by\n<string->number> and <number->string>. Generally 36.\nAlso check out <*min-radix*>!",
   "example": null
 }, {
+  "name": "*min-priority*",
+  "aliases": null,
+  "signatures": null,
+  "description": "Variable denoting the smallest thread-priority supported by\n<thread-set-priority!>. Also check out <*max-priority*>!",
+  "example": null
+}, {
+  "name": "*max-priority*",
+  "aliases": null,
+  "signatures": null,
+  "description": "Variable denoting the largest thread-priority supported by\n<thread-set-priority!>. Also check out <*min-priority*>!",
+  "example": null
+}, {
   "name": "*import*",
   "aliases": null,
   "signatures": null,

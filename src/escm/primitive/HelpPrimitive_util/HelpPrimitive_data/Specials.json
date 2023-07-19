@@ -164,7 +164,7 @@
   "name": "dosync-module",
   "aliases": null,
   "signatures": ["(dosync-module <expr> ...)"],
-  "description": "Execute \"<expr> ...\" with a mutex lock around it as a critical section.\nLocks/Unlocks the lock via <dynamic-wind> to ensure that random\ncontinuations don't prevent us from unlocking the lock.\n\n  NOTE: Locks the *dosync-module-lock* global mutex variable (unique state\n        across modules).",
+  "description": "Execute \"<expr> ...\" with a mutex lock around it as a critical section.\nLocks/Unlocks the lock via <dynamic-wind> to ensure that random continuations\ndon't prevent us from unlocking the lock.\n\n  NOTE: Locks the *dosync-module-lock* global mutex variable (unique state\n        per module).",
   "example": null
 }, {
   "name": "dosync-with",

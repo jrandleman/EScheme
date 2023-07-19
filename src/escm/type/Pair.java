@@ -651,7 +651,8 @@ public class Pair extends Datum implements OrderedCollection {
   //////////////////////////////////////
 
   public AssociativeCollection drop(int amount) throws Exception {
-    if(amount < 0 || amount > length)
+    if(amount >= length) return Nil.VALUE;
+    if(amount < 0)
       throw new Exceptionf("PAIR [DROP]: invalid drop amount %d for list %s", length, profile());
     Datum p = this;
     while(amount > 0 && p instanceof Pair) {
@@ -672,7 +673,7 @@ public class Pair extends Datum implements OrderedCollection {
   }
 
   public AssociativeCollection take(int amount) throws Exception {
-    if(amount < 0 || amount > length)
+    if(amount < 0)
       throw new Exceptionf("PAIR [TAKE]: invalid take amount %d for list %s", length, profile());
     return (AssociativeCollection)takeRecur(amount,(Datum)this);
   }

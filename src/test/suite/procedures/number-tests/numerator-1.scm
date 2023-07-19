@@ -1,0 +1,17 @@
+(load "/Users/jordanrandleman/Desktop/EScheme/src/test/suite/procedures/../../lib.scm")
+(nut = (numerator 0) '0)
+(nut = (numerator 0.0) '0.0)
+:nop
+:nop
+(nut = (numerator 1) '1)
+(nut = (numerator 4) '4)
+(nut = (numerator -1) '-1)
+(nut = (numerator -4) '-4)
+(nut = (numerator 1.0) '1.0)
+(nut = (numerator 4.0) '4.0)
+(nut = (numerator -1.0) '-1.0)
+(nut = (numerator -4.0) '-4.0)
+(nut = (numerator 1/2) '1)
+(nut = (numerator 1/8) '1)
+(nut = (numerator -1/2) '-1)
+(nut = (numerator -1/8) '-1)

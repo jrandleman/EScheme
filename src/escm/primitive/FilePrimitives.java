@@ -208,7 +208,11 @@ public class FilePrimitives {
     }
 
     public static boolean logic(Path p) {
-      return Files.exists(p);
+      try {
+        return Files.exists(p);
+      } catch (Exception e) {
+        return false;
+      }
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -227,7 +231,11 @@ public class FilePrimitives {
     }
 
     public static boolean logic(Path p) {
-      return Files.isDirectory(p);
+      try {
+        return Files.isDirectory(p);
+      } catch(Exception e) {
+        return false;
+      }
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -246,7 +254,11 @@ public class FilePrimitives {
     }
 
     public static boolean logic(Path p) {
-      return Files.exists(p) == true && Files.isDirectory(p) == false;
+      try {
+        return Files.exists(p) == true && Files.isDirectory(p) == false;
+      } catch (Exception e) {
+        return false;
+      }
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -264,9 +276,12 @@ public class FilePrimitives {
       return "file-delete!";
     }
 
-    public static boolean logic(Path p) throws Exception {
-      if(!IsFileP.logic(p)) return false;
-      return Files.deleteIfExists(p);
+    public static boolean logic(Path p) {
+      try {
+        return IsFileP.logic(p) && Files.deleteIfExists(p);
+      } catch (Exception e) {
+        return false;
+      }
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -284,9 +299,13 @@ public class FilePrimitives {
       return "directory-delete!";
     }
 
-    public static boolean logic(Path p) throws Exception {
+    public static boolean logic(Path p) {
       if(!IsDirectoryP.logic(p)) return false;
-      return Files.deleteIfExists(p);
+      try {
+        return Files.deleteIfExists(p);
+      } catch(Exception e) {
+        return false;
+      }
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -311,14 +330,21 @@ public class FilePrimitives {
         if(IsDirectoryP.logic(p)) {
           succeeded = succeeded && deleteDirectoryContents(p);
         }
-        succeeded = succeeded && Files.deleteIfExists(p);
+        try {
+          succeeded = succeeded && Files.deleteIfExists(p);
+        } catch (Exception e) {
+          return false;
+        }
       }
       return succeeded;
     }
 
-    public static boolean logic(Path p) throws Exception {
-      if(!IsDirectoryP.logic(p)) return false;
-      return deleteDirectoryContents(p) && Files.deleteIfExists(p);
+    public static boolean logic(Path p) {
+      try {
+        return IsDirectoryP.logic(p) && deleteDirectoryContents(p) && Files.deleteIfExists(p);
+      } catch (Exception e) {
+        return false;
+      }
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -336,9 +362,12 @@ public class FilePrimitives {
       return "path-delete!";
     }
 
-    public static boolean logic(Path p) throws Exception {
-      if(Files.exists(p)) return Files.deleteIfExists(p);
-      return false;
+    public static boolean logic(Path p) {
+      try {
+        return Files.exists(p) && Files.deleteIfExists(p);
+      } catch (Exception e) {
+        return false;
+      }
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -356,13 +385,17 @@ public class FilePrimitives {
       return "path-recursive-delete!";
     }
 
-    public static boolean logic(Path p) throws Exception {
-      if(IsDirectoryP.logic(p)) {
-        return DirectoryRecursiveDeleteBang.logic(p);
-      } else if(IsFileP.logic(p)) {
-        return Files.deleteIfExists(p);
+    public static boolean logic(Path p) {
+      try {
+        if(IsDirectoryP.logic(p)) {
+          return DirectoryRecursiveDeleteBang.logic(p);
+        } else if(IsFileP.logic(p)) {
+          return Files.deleteIfExists(p);
+        }
+        return false;
+      } catch(Exception e) {
+        return false;
       }
-      return false;
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -688,7 +721,11 @@ public class FilePrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(file-size <file-path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      return new escm.type.number.Exact(Files.size(Path.of(((escm.type.String)parameters.get(0)).value())));
+      try {
+        return new escm.type.number.Exact(Files.size(Path.of(((escm.type.String)parameters.get(0)).value())));
+      } catch (Exception e) {
+        throw new Exceptionf("'(file-size <file-path-string>) couldn't get file size: %s", Exceptionf.profileArgs(parameters));
+      }
     }
   }
 
@@ -709,7 +746,11 @@ public class FilePrimitives {
       Datum newPathDatum = parameters.get(1);
       if(!(newPathDatum instanceof escm.type.String))
         throw new Exceptionf("'(move-file <old-path-string> <new-path-string>) new-path isn't a string: %s", Exceptionf.profileArgs(parameters));
-      Files.move(Path.of(((escm.type.String)oldPathDatum).value()),Path.of(((escm.type.String)newPathDatum).value()));
+      try {
+        Files.move(Path.of(((escm.type.String)oldPathDatum).value()),Path.of(((escm.type.String)newPathDatum).value()));
+      } catch (Exception e) {
+        throw new Exceptionf("'(move-file <old-path-string> <new-path-string>) couldn't move path: %s", Exceptionf.profileArgs(parameters));
+      }
       return escm.type.Void.VALUE;
     }
   }
@@ -733,12 +774,16 @@ public class FilePrimitives {
         throw new Exceptionf("'(move-file! <old-path-string> <new-path-string>) new-path isn't a string: %s", Exceptionf.profileArgs(parameters));
       // Create intermediate directories as needed
       String newPathString = ((escm.type.String)newPathDatum).value();
-      Path directoriesToCreate = Path.of(newPathString).getParent();
-      if(directoriesToCreate != null) {
+      Path directoriesToCreate = Path.of(AbsolutePath.logic(newPathString)).getParent();
+      if(directoriesToCreate != null && !IsDirectoryP.logic(directoriesToCreate)) {
         if((new File(directoriesToCreate.toString())).mkdirs() == false) return Boolean.FALSE;
       }
       // Move the file once directories are made
-      Files.move(Path.of(((escm.type.String)oldPathDatum).value()),Path.of(newPathString),StandardCopyOption.REPLACE_EXISTING);
+      try {
+        Files.move(Path.of(((escm.type.String)oldPathDatum).value()),Path.of(newPathString),StandardCopyOption.REPLACE_EXISTING);
+      } catch (Exception e) {
+        throw new Exceptionf("'(move-file! <old-path-string> <new-path-string>) couldn't move! path: %s", Exceptionf.profileArgs(parameters));
+      }
       return Boolean.TRUE;
     }
   }
@@ -760,7 +805,11 @@ public class FilePrimitives {
       Datum newPathDatum = parameters.get(1);
       if(!(newPathDatum instanceof escm.type.String))
         throw new Exceptionf("'(copy-file <old-path-string> <new-path-string>) new-path isn't a string: %s", Exceptionf.profileArgs(parameters));
-      Files.copy(Path.of(((escm.type.String)oldPathDatum).value()),Path.of(((escm.type.String)newPathDatum).value()));
+      try {
+        Files.copy(Path.of(((escm.type.String)oldPathDatum).value()),Path.of(((escm.type.String)newPathDatum).value()));
+      } catch (Exception e) {
+        throw new Exceptionf("'(copy-file <old-path-string> <new-path-string>) couldn't copy file: %s", Exceptionf.profileArgs(parameters));
+      }
       return escm.type.Void.VALUE;
     }
   }
@@ -784,12 +833,16 @@ public class FilePrimitives {
         throw new Exceptionf("'(copy-file! <old-path-string> <new-path-string>) new-path isn't a string: %s", Exceptionf.profileArgs(parameters));
       // Create intermediate directories as needed
       String newPathString = ((escm.type.String)newPathDatum).value();
-      Path directoriesToCreate = Path.of(newPathString).getParent();
-      if(directoriesToCreate != null) {
+      Path directoriesToCreate = Path.of(AbsolutePath.logic(newPathString)).getParent();
+      if(directoriesToCreate != null && !IsDirectoryP.logic(directoriesToCreate)) {
         if((new File(directoriesToCreate.toString())).mkdirs() == false) return Boolean.FALSE;
       }
       // Move the file once directories are made
-      Files.copy(Path.of(((escm.type.String)oldPathDatum).value()),Path.of(newPathString),StandardCopyOption.REPLACE_EXISTING);
+      try {
+        Files.copy(Path.of(((escm.type.String)oldPathDatum).value()),Path.of(newPathString),StandardCopyOption.REPLACE_EXISTING);
+      } catch (Exception e) {
+        throw new Exceptionf("'(copy-file! <old-path-string> <new-path-string>) couldn't copy! file: %s", Exceptionf.profileArgs(parameters));
+      }
       return Boolean.TRUE;
     }
   }

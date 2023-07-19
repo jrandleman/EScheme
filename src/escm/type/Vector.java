@@ -639,8 +639,9 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   public AssociativeCollection drop(int amount) throws Exception {
     synchronized(this) {
       int n = value.size();
-      if(amount < 0 || amount > n)
+      if(amount < 0)
         throw new Exceptionf("VECTOR [DROP]: invalid drop amount %d for vector %s", n, profile());
+      if(amount > n) return new Vector();
       return subvector(amount,n-amount);
     }
   }
@@ -651,8 +652,10 @@ public class Vector extends Datum implements OrderedCollection, Callable {
 
   public AssociativeCollection take(int amount) throws Exception {
     synchronized(this) {
-      if(amount < 0 || amount > value.size())
+      int n = value.size();
+      if(amount < 0)
         throw new Exceptionf("VECTOR [TAKE]: invalid take amount %d for vector %s", value.size(), profile());
+      if(amount > n) return subvector(0,n);
       return subvector(0,amount);
     }
   }

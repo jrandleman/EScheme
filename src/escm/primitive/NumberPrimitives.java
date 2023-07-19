@@ -153,7 +153,7 @@ public class NumberPrimitives {
         if(!(p instanceof Real))
           throw new Exceptionf("'(< <real> <real> ...) invalid non-real arg %s recieved!", p.profile());
         Real pValue = (Real)p;
-        if(lastValue.gte(pValue)) return Boolean.FALSE;
+        if(!lastValue.lt(pValue)) return Boolean.FALSE;
         lastValue = pValue;
       }
       return Boolean.TRUE;
@@ -179,7 +179,7 @@ public class NumberPrimitives {
         if(!(p instanceof Real))
           throw new Exceptionf("'(> <real> <real> ...) invalid non-real arg %s recieved!", p.profile());
         Real pValue = (Real)p;
-        if(lastValue.lte(pValue)) return Boolean.FALSE;
+        if(!lastValue.gt(pValue)) return Boolean.FALSE;
         lastValue = pValue;
       }
       return Boolean.TRUE;
@@ -205,7 +205,7 @@ public class NumberPrimitives {
         if(!(p instanceof Real))
           throw new Exceptionf("'(<= <real> <real> ...) invalid non-real arg %s recieved!", p.profile());
         Real pValue = (Real)p;
-        if(lastValue.gt(pValue)) return Boolean.FALSE;
+        if(!lastValue.lte(pValue)) return Boolean.FALSE;
         lastValue = pValue;
       }
       return Boolean.TRUE;
@@ -231,7 +231,7 @@ public class NumberPrimitives {
         if(!(p instanceof Real))
           throw new Exceptionf("'(>= <real> <real> ...) invalid non-real arg %s recieved!", p.profile());
         Real pValue = (Real)p;
-        if(lastValue.lt(pValue)) return Boolean.FALSE;
+        if(!lastValue.gte(pValue)) return Boolean.FALSE;
         lastValue = pValue;
       }
       return Boolean.TRUE;
@@ -297,6 +297,7 @@ public class NumberPrimitives {
       Datum base = parameters.get(1);
       if(!(base instanceof Number))
         throw new Exceptionf("'(log <number> <optional-base>) invalid non-numeric arg %s recieved!", base.profile());
+      if(base instanceof Real && ((Real)base).isZero()) return Inexact.NAN;
       return ((Number)n).log().div(((Number)base).log());
     }
   }
@@ -374,7 +375,7 @@ public class NumberPrimitives {
         if(!(p instanceof Real))
           throw new Exceptionf("'(min <real> <real> ...) invalid non-numeric arg %s recieved!", p.profile());
         Real pValue = (Real)p;
-        if(min.gt(pValue)) min = pValue;
+        if(pValue.isNaN() || (!min.isNaN() && min.gt(pValue))) min = pValue;
       }
       return min;
     }
@@ -395,9 +396,69 @@ public class NumberPrimitives {
         if(!(p instanceof Real))
           throw new Exceptionf("'(max <real> <real> ...) invalid non-numeric arg %s recieved!", p.profile());
         Real pValue = (Real)p;
-        if(max.lt(pValue)) max = pValue;
+        if(pValue.isNaN() || (!max.isNaN() && max.lt(pValue))) max = pValue;
       }
       return max;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // exact->inexact
+  public static class ExactToInexact extends Primitive {
+    public java.lang.String escmName() {
+      return "exact->inexact";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Number)) 
+        throw new Exceptionf("'(exact->inexact <number>) expects exactly 1 number: %s", Exceptionf.profileArgs(parameters));
+      return ((Number)parameters.get(0)).toInexact();
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // inexact->exact
+  public static class InexactToExact extends Primitive {
+    public java.lang.String escmName() {
+      return "inexact->exact";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Number)) 
+        throw new Exceptionf("'(inexact->exact <number>) expects exactly 1 number: %s", Exceptionf.profileArgs(parameters));
+      return ((Number)parameters.get(0)).toExact();
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // numerator
+  public static class Numerator extends Primitive {
+    public java.lang.String escmName() {
+      return "numerator";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Real)) 
+        throw new Exceptionf("'(numerator <real>) expects exactly 1 real: %s", Exceptionf.profileArgs(parameters));
+      return ((Real)parameters.get(0)).numerator();
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // denominator
+  public static class Denominator extends Primitive {
+    public java.lang.String escmName() {
+      return "denominator";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Real)) 
+        throw new Exceptionf("'(denominator <real>) expects exactly 1 real: %s", Exceptionf.profileArgs(parameters));
+      return ((Real)parameters.get(0)).denominator();
     }
   }
 
@@ -497,6 +558,36 @@ public class NumberPrimitives {
         throw new Exceptionf("'(modf <real>) invalid non-real arg: %s", Exceptionf.profileArgs(parameters));
       Real[] pair = ((Real)lhs).modf();
       return new escm.type.Pair(pair[0],pair[1]);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // integral
+  public static class Integral extends Primitive {
+    public java.lang.String escmName() {
+      return "integral";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Real)) 
+        throw new Exceptionf("'(integral <real>) expects exactly 1 real: %s", Exceptionf.profileArgs(parameters));
+      return ((Real)parameters.get(0)).integral();
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // fractional
+  public static class Fractional extends Primitive {
+    public java.lang.String escmName() {
+      return "fractional";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Real)) 
+        throw new Exceptionf("'(fractional <real>) expects exactly 1 real: %s", Exceptionf.profileArgs(parameters));
+      return ((Real)parameters.get(0)).fractional();
     }
   }
 
@@ -1194,7 +1285,7 @@ public class NumberPrimitives {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Number)) 
         throw new Exceptionf("'(magnitude <number>) not given exactly 1 number: %s", Exceptionf.profileArgs(parameters));
       Number n = (Number)parameters.get(0);
-      if(n instanceof Real) return n;
+      if(n instanceof Real) return ((Real)n).abs();
       return ((Complex)n).magnitude();
     }
   }

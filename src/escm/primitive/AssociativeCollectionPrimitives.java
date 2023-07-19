@@ -12,6 +12,7 @@ import escm.type.number.Real;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.AssociativeCollection;
+import escm.vm.type.OrderedCollection;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
@@ -336,10 +337,15 @@ public class AssociativeCollectionPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() == 2) {
+        if(!(parameters.get(1) instanceof OrderedCollection))
+          throw new Exceptionf("'(conj <value> <ordered-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        return (Datum)((OrderedCollection)parameters.get(1)).conj(parameters.get(0));
+      }
       if(parameters.size() != 3) 
         throw new Exceptionf("'(conj <key> <val> <associative-collection>) invalid args: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(2) instanceof AssociativeCollection))
-        throw new Exceptionf("'(conj <associative-collection> <key>) 1st arg isn't an <ac>: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(conj <key> <val> <associative-collection>) 3rd arg isn't an <ac>: %s", Exceptionf.profileArgs(parameters));
       return (Datum)((AssociativeCollection)parameters.get(2)).conj(parameters.get(0),parameters.get(1));
     }
   }
@@ -508,12 +514,12 @@ public class AssociativeCollectionPrimitives {
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() < 2) 
-        throw new Exceptionf("'(union <predicate?> <associative-collection> ...) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(union <elt=?> <associative-collection> ...) invalid args: %s", Exceptionf.profileArgs(parameters));
       Datum fst = parameters.get(0);
       if(!(fst instanceof Callable) || (fst instanceof AssociativeCollection))
-        throw new Exceptionf("'(union <predicate?> <associative-collection> ...) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(union <elt=?> <associative-collection> ...) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       Callable c = (Callable)fst;
-      AssociativeCollection[] acs = AssociativeCollection.parseParameters("(union <predicate?> <associative-collection> ...)",parameters,1);
+      AssociativeCollection[] acs = AssociativeCollection.parseParameters("(union <elt=?> <associative-collection> ...)",parameters,1);
       return acs[0].UnionArray(c,acs,continuation);
     }
   }

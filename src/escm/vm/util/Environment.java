@@ -20,6 +20,7 @@ import escm.type.procedure.Procedure;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
+import escm.vm.runtime.GlobalState;
 
 public class Environment implements Serializable {
   ////////////////////////////////////////////////////////////////////////////
@@ -109,6 +110,13 @@ public class Environment implements Serializable {
         } else {
           throw new Exceptionf("VM [GET] variable \"%s\" doesn't exist!%s", name.value(), getPossibleVariableIntentions(name));
         }
+      // Prefer showing the current global environment over the parameter environment
+      } else if(superEnv == GlobalState.parameterEnvironment && !superEnv.has(name)) {
+        if(name.hasSourceInformation()) {
+          throw new Exceptionf("VM [GET] variable \"%s\" doesn't exist!\n>> Location: %s%s", name.value(), name.source(), getPossibleVariableIntentions(name));
+        } else {
+          throw new Exceptionf("VM [GET] variable \"%s\" doesn't exist!%s", name.value(), getPossibleVariableIntentions(name));
+        }
       }
       return superEnv.get(name);
     }
@@ -123,6 +131,13 @@ public class Environment implements Serializable {
     Datum result = bindings.get(nameString);
     if(result == null) {
       if(superEnv == null) {
+        if(name.hasSourceInformation()) {
+          throw new Exceptionf("VM [SET!] variable \"%s\" doesn't exist!\n>> Location: %s%s", nameString, name.source(), getPossibleVariableIntentions(name));
+        } else {
+          throw new Exceptionf("VM [SET!] variable \"%s\" doesn't exist!%s", nameString, getPossibleVariableIntentions(name));
+        }
+      // Prefer showing the current global environment over the parameter environment
+      } else if(superEnv == GlobalState.parameterEnvironment && !superEnv.has(name)) {
         if(name.hasSourceInformation()) {
           throw new Exceptionf("VM [SET!] variable \"%s\" doesn't exist!\n>> Location: %s%s", nameString, name.source(), getPossibleVariableIntentions(name));
         } else {

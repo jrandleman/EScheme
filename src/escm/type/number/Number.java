@@ -40,6 +40,9 @@
 //   - boolean isExact()
 //   - boolean isInexact()
 //
+//   - Exact toExact()
+//   - Inexact toInexact()
+//
 //   - String toString()
 //   - String toString(int radix)
 
@@ -113,7 +116,8 @@ public abstract class Number extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Inexact Pattern (ONLY FOR RADIX 10!)
-  private static final Pattern INEXACT_PATTERN = Pattern.compile("(([-+]?(((([0-9]+\\.[0-9]*)|([0-9]*\\.[0-9]+))([eE][-+]?[0-9]+)?)|([0-9]+[eE][-+]?[0-9]+)|(Infinity)))|(NaN))");
+  private static final String SIGNLESS_NON_NAN_INEXACT_PATTERN = "(((([0-9]+\\.[0-9]*)|([0-9]*\\.[0-9]+))([eE][-+]?[0-9]+)?)|([0-9]+[eE][-+]?[0-9]+)|(Infinity))";
+  private static final Pattern INEXACT_PATTERN = Pattern.compile("(([-+]?"+SIGNLESS_NON_NAN_INEXACT_PATTERN+")|(NaN))");
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -133,11 +137,11 @@ public abstract class Number extends Datum {
 
   private static final Pattern INEXACT_COMPLEX_PATTERN = Pattern.compile(
     "(("+ // <inexact>?<inexact>i
-      "(([-+]?(((([0-9]+\\.[0-9]*)|([0-9]*\\.[0-9]+))([eE][-+]?[0-9]+)?)|([0-9]+[eE][-+]?[0-9]+)|(Infinity)))?([-+](((([0-9]+\\.[0-9]*)|([0-9]*\\.[0-9]+))([eE][-+]?[0-9]+)?)|([0-9]+[eE][-+]?[0-9]+)|(Infinity))))"+
+      "(([-+]?"+SIGNLESS_NON_NAN_INEXACT_PATTERN+")?([-+]"+SIGNLESS_NON_NAN_INEXACT_PATTERN+"))"+
       "|"+ // <exact><inexact>i
-      "(([-+]?([0-9]+(/[0-9]+)?))([-+](((([0-9]+\\.[0-9]*)|([0-9]*\\.[0-9]+))([eE][-+]?[0-9]+)?)|([0-9]+[eE][-+]?[0-9]+)|(Infinity))))"+
+      "(([-+]?([0-9]+(/[0-9]+)?))([-+]"+SIGNLESS_NON_NAN_INEXACT_PATTERN+"))"+
       "|"+ // <inexact><exact>i
-      "(([-+]?(((([0-9]+\\.[0-9]*)|([0-9]*\\.[0-9]+))([eE][-+]?[0-9]+)?)|([0-9]+[eE][-+]?[0-9]+)|(Infinity)))([-+]([0-9]+(/[0-9]+)?)))"+
+      "(([-+]?"+SIGNLESS_NON_NAN_INEXACT_PATTERN+")([-+]([0-9]+(/[0-9]+)?)))"+
     ")i)"
   );
 
@@ -222,13 +226,10 @@ public abstract class Number extends Datum {
 
   private static Real parseReal(String s) throws Exception {
     if(s == null) return new Exact();
-    if(s.equals("Infinity") || s.equals("-Infinity"))
-      return new Inexact(Double.parseDouble(s));
+    if(s.contains("Infinity") || s.contains("NaN")) return parseInexact(s);
     for(int i = 0, n = s.length(); i < n; ++i) {
       char c = s.charAt(i);
-      if(c=='.'||c=='e'||c=='E') {
-        return new Inexact(Double.parseDouble(s));
-      }
+      if(c=='.'||c=='e'||c=='E') return parseInexact(s);
     }
     return parseExact(s,DEC_RADIX);
   }
@@ -394,6 +395,13 @@ public abstract class Number extends Datum {
   public abstract boolean isExact();
 
   public abstract boolean isInexact();
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Exactness Conversion
+  public abstract Number toExact() throws Exception;
+
+  public abstract Number toInexact() throws Exception;
 
 
   ////////////////////////////////////////////////////////////////////////////

@@ -105,7 +105,7 @@ public class PortPrimitives {
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof InputPort))
-        throw new Exceptionf("'(port-position <input-port>) didn't receive 1 port: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(port-position <input-port>) didn't receive 1 input-port: %s", Exceptionf.profileArgs(parameters));
       InputPort ip = (InputPort)parameters.get(0);
       return new escm.type.Pair(new Exact(ip.lineNumber()),new Exact(ip.columnNumber()));
     }
@@ -322,8 +322,7 @@ public class PortPrimitives {
       InputPort originalInputPort = InputPort.getCurrent();
       InputPort ip = new InputPort(((escm.type.String)str).value());
       InputPort.setCurrent(ip);
-      ArrayList<Datum> args = new ArrayList<Datum>(1);
-      args.add(ip);
+      ArrayList<Datum> args = new ArrayList<Datum>();
       return ((Callable)cal).callWith(args,(value) -> () -> {
         InputPort.setCurrent(originalInputPort);
         ip.close();
@@ -352,8 +351,7 @@ public class PortPrimitives {
       OutputPort originalOutputPort = OutputPort.getCurrent();
       OutputPort op = new OutputPort(((escm.type.String)str).value(),append);
       OutputPort.setCurrent(op);
-      ArrayList<Datum> args = new ArrayList<Datum>(1);
-      args.add(op);
+      ArrayList<Datum> args = new ArrayList<Datum>();
       return ((Callable)cal).callWith(args,(value) -> () -> {
         OutputPort.setCurrent(originalOutputPort);
         op.close();
@@ -382,7 +380,7 @@ public class PortPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // peek-port
-  public static class ResetInputPortBang extends Primitive {
+  public static class PeekPort extends Primitive {
     public java.lang.String escmName() {
       return "peek-port";
     }

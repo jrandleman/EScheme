@@ -20,6 +20,13 @@ import escm.vm.runtime.GlobalState;
 
 public class Thread extends Datum {
   ////////////////////////////////////////////////////////////////////////////
+  // Static min/max thread priority values
+  public static int MIN_PRIORITY = java.lang.Thread.MIN_PRIORITY;
+
+  public static int MAX_PRIORITY = java.lang.Thread.MAX_PRIORITY;
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Static Current Thread Object Getter
   public static Thread currentThread() {
     return ((EscmThread)java.lang.Thread.currentThread()).currentThread;
@@ -88,20 +95,36 @@ public class Thread extends Datum {
     return thread.isDaemon();
   }
 
-  public void setDaemon(boolean on) {
-    thread.setDaemon(on);
+  public boolean setDaemon(boolean on) {
+    try {
+      thread.setDaemon(on);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
 
-  public void start() {
-    thread.start();
+  public boolean start() {
+    try {
+      thread.start();
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   public int getPriority() {
     return thread.getPriority();
   }
 
-  public void setPriority(int priority) {
-    thread.setPriority(priority);
+  public boolean setPriority(int priority) {
+    try {
+      if(priority < MIN_PRIORITY || priority > MAX_PRIORITY) return false;
+      thread.setPriority(priority);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
 
    // (returns whether was interrupted)
@@ -124,8 +147,13 @@ public class Thread extends Datum {
     }
   }
 
-  public void interrupt() {
-    thread.interrupt();
+  public boolean interrupt() {
+    try {
+      thread.interrupt();
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   public boolean isInterrupted() {

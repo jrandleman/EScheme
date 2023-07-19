@@ -252,8 +252,8 @@ public class StringPrimitives {
     // the string with those surrogate char pairs preserved in the same string together.
     private static ArrayList<java.lang.String> unifySurrogatePairsIntoOneString(java.lang.String[] splitStrs) {
       ArrayList<java.lang.String> unified = new ArrayList<java.lang.String>();
-      for(int i = 0; i < splitStrs.length-1; ++i) {
-        if(canUnifyStrings(splitStrs[i],splitStrs[i+1])) {
+      for(int i = 0; i < splitStrs.length; ++i) {
+        if(i+1 < splitStrs.length && canUnifyStrings(splitStrs[i],splitStrs[i+1])) {
           unified.add(java.lang.Character.toString(java.lang.Character.toCodePoint(splitStrs[i].charAt(0),splitStrs[i+1].charAt(0))));
           ++i;
         } else {
@@ -329,16 +329,16 @@ public class StringPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(string=? <string1> <string2> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string=? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
-        throw new Exceptionf("'(string=? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
+        throw new Exceptionf("'(string=? <string> ...) invalid non-string arg %s recieved!", p.profile());
       java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
-          throw new Exceptionf("'(string=? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
+          throw new Exceptionf("'(string=? <string> ...) invalid non-string arg %s recieved!", str.profile());
         java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareTo(strValue) != 0) return Boolean.FALSE;
         lastValue = strValue;
@@ -356,16 +356,16 @@ public class StringPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(string<? <string1> <string2> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string<? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
-        throw new Exceptionf("'(string<? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
+        throw new Exceptionf("'(string<? <string> ...) invalid non-string arg %s recieved!", p.profile());
       java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
-          throw new Exceptionf("'(string<? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
+          throw new Exceptionf("'(string<? <string> ...) invalid non-string arg %s recieved!", str.profile());
         java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareTo(strValue) >= 0) return Boolean.FALSE;
         lastValue = strValue;
@@ -383,16 +383,16 @@ public class StringPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(string>? <string1> <string2> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string>? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
-        throw new Exceptionf("'(string>? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
+        throw new Exceptionf("'(string>? <string> ...) invalid non-string arg %s recieved!", p.profile());
       java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
-          throw new Exceptionf("'(string>? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
+          throw new Exceptionf("'(string>? <string> ...) invalid non-string arg %s recieved!", str.profile());
         java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareTo(strValue) <= 0) return Boolean.FALSE;
         lastValue = strValue;
@@ -410,16 +410,16 @@ public class StringPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(string<=? <string1> <string2> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string<=? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
-        throw new Exceptionf("'(string<=? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
+        throw new Exceptionf("'(string<=? <string> ...) invalid non-string arg %s recieved!", p.profile());
       java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
-          throw new Exceptionf("'(string<=? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
+          throw new Exceptionf("'(string<=? <string> ...) invalid non-string arg %s recieved!", str.profile());
         java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareTo(strValue) > 0) return Boolean.FALSE;
         lastValue = strValue;
@@ -437,16 +437,16 @@ public class StringPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(string>=? <string1> <string2> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string>=? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
-        throw new Exceptionf("'(string>=? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
+        throw new Exceptionf("'(string>=? <string> ...) invalid non-string arg %s recieved!", p.profile());
       java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
-          throw new Exceptionf("'(string>=? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
+          throw new Exceptionf("'(string>=? <string> ...) invalid non-string arg %s recieved!", str.profile());
         java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareTo(strValue) < 0) return Boolean.FALSE;
         lastValue = strValue;
@@ -464,16 +464,16 @@ public class StringPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(string-ci=? <string1> <string2> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string-ci=? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
-        throw new Exceptionf("'(string-ci=? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
+        throw new Exceptionf("'(string-ci=? <string> ...) invalid non-string arg %s recieved!", p.profile());
       java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
-          throw new Exceptionf("'(string-ci=? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
+          throw new Exceptionf("'(string-ci=? <string> ...) invalid non-string arg %s recieved!", str.profile());
         java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareToIgnoreCase(strValue) != 0) return Boolean.FALSE;
         lastValue = strValue;
@@ -491,16 +491,16 @@ public class StringPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(string-ci<? <string1> <string2> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string-ci<? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
-        throw new Exceptionf("'(string-ci<? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
+        throw new Exceptionf("'(string-ci<? <string> ...) invalid non-string arg %s recieved!", p.profile());
       java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
-          throw new Exceptionf("'(string-ci<? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
+          throw new Exceptionf("'(string-ci<? <string> ...) invalid non-string arg %s recieved!", str.profile());
         java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareToIgnoreCase(strValue) >= 0) return Boolean.FALSE;
         lastValue = strValue;
@@ -518,16 +518,16 @@ public class StringPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(string-ci>? <string1> <string2> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string-ci>? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
-        throw new Exceptionf("'(string-ci>? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
+        throw new Exceptionf("'(string-ci>? <string> ...) invalid non-string arg %s recieved!", p.profile());
       java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
-          throw new Exceptionf("'(string-ci>? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
+          throw new Exceptionf("'(string-ci>? <string> ...) invalid non-string arg %s recieved!", str.profile());
         java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareToIgnoreCase(strValue) <= 0) return Boolean.FALSE;
         lastValue = strValue;
@@ -545,16 +545,16 @@ public class StringPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(string-ci<=? <string1> <string2> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string-ci<=? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
-        throw new Exceptionf("'(string-ci<=? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
+        throw new Exceptionf("'(string-ci<=? <string> ...) invalid non-string arg %s recieved!", p.profile());
       java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
-          throw new Exceptionf("'(string-ci<=? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
+          throw new Exceptionf("'(string-ci<=? <string> ...) invalid non-string arg %s recieved!", str.profile());
         java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareToIgnoreCase(strValue) > 0) return Boolean.FALSE;
         lastValue = strValue;
@@ -572,16 +572,16 @@ public class StringPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(string-ci>=? <string1> <string2> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string-ci>=? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
-        throw new Exceptionf("'(string-ci>=? <string1> <string2> ...) invalid non-string arg %s recieved!", p.profile());
+        throw new Exceptionf("'(string-ci>=? <string> ...) invalid non-string arg %s recieved!", p.profile());
       java.lang.String lastValue = ((escm.type.String)p).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum str = parameters.get(i);
         if(!(str instanceof escm.type.String))
-          throw new Exceptionf("'(string-ci>=? <string1> <string2> ...) invalid non-string arg %s recieved!", str.profile());
+          throw new Exceptionf("'(string-ci>=? <string> ...) invalid non-string arg %s recieved!", str.profile());
         java.lang.String strValue = ((escm.type.String)str).value();
         if(lastValue.compareToIgnoreCase(strValue) < 0) return Boolean.FALSE;
         lastValue = strValue;

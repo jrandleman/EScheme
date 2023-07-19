@@ -32,13 +32,11 @@
   "name": "char-lower-case?",
   "aliases": null,
   "description": "Returns whether <char> is lowercase.",
-  "description": "",
   "example": null
 }, {
   "name": "char-alphanumeric?",
   "aliases": null,
   "description": "Returns whether <char> is alphabetic or numeric.",
-  "description": "",
   "example": null
 }, {
   "name": "char-control?",

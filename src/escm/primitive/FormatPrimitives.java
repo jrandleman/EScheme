@@ -493,7 +493,7 @@ public class FormatPrimitives {
           continue;
         }
         // Invalid token!
-        throw new StringfException("'%s unknown token %%%c: %s", fmtStr.charAt(i), profileFormat(fmtStr,args));
+        throw new StringfException("'%s unknown token %%%c: %s", signature, fmtStr.charAt(i), profileFormat(fmtStr,args));
       }
       return sb.toString();
     }

@@ -6,11 +6,8 @@
 ;;               * This has to do with how we evaluate the stdlib prior receiving 
 ;;                 user code.
 
-;; => IMPORTANT: IN ORDER FOR CHANGES IN THIS FILE TO AFFECT THE ESCHEME RUNTIME
-;;               (IF IT WAS SERIALIZED), 1 OF 2 ACTIONS MUST BE TAKEN:
-;;                 1) RUN ESCHEME 1NC WITH THE --serialize-stdlib COMMAND-LINE FLAG
-;;                    ___OR___
-;;                 2) REINSTALL ESCHEME VIA "installer/Installer.java"
+;; => IMPORTANT: IN ORDER FOR CHANGES IN THIS FILE TO AFFECT THE ESCHEME RUNTIME (IF
+;;               IT WAS SERIALIZED) REINSTALL ESCHEME VIA "installer/Installer.java"
 
 ; PROVIDES:
 ;   - quote
@@ -637,11 +634,15 @@
   (cons (quote append) (iter lst)))
 
 (define-syntax quasiquote
-  (lambda (x) (escm-quasiquote->quote x 0)))
+  (lambda (x) 
+    (if (and (pair? x) (eq? (car x) 'quasiquote))
+        (escm-quasiquote->quote x 1)
+        (escm-quasiquote->quote x 0))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Implementing CASE: (case <value> ((<key> ...) <expr> ...) ...) 
+;;                    (case <value> ((<key> ...) <expr> ...) ... ((<key> ...) => <callable>) ...) 
 ;;                    (case <value> ((<key> ...) <expr> ...) ... (else <expr> ...))
 (define-syntax case
   (lambda (value . clauses)
@@ -967,7 +968,7 @@
 (define (scddddr spair) (scdr (scdr (scdr (scdr spair)))))
 
 (define (stream->list s list-length) ; facilitates printing stream contents
-  (if (>= list-length 0)
+  (if (> list-length 0)
       (cons (scar s) (stream->list (scdr s) (- list-length 1)))
       (quote ())))
 
@@ -1325,7 +1326,7 @@
 ;; (from <filepath-string> <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ...)
 ;; (from <filepath-string> <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ... :as <alias1-symbol> <alias2-symbol> ...)
 (define (escm-from-parse-arguments a b c xs)
-  (if (string? a)
+  (if (eq? c :import)
       (list a b xs)
       (list #f a (cons c xs))))
 

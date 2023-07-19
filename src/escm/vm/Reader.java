@@ -277,7 +277,7 @@ public class Reader {
   ////////////////////////////////////////////////////////////////////////////
   // Hashmap Literal Parsing Helper(s)
   // @param: <i> is where to start parsing
-  // @return: pair of parsed hashmap & position in <sourceCode> after the closing <]>
+  // @return: pair of parsed hashmap & position in <sourceCode> after the closing <}>
   private static Pair<Datum,Integer> parseHashmapLiteral(CharSequence sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
     int hashmapIndex = i-1;
     SourceInformation hashmapSource = source.clone();
@@ -509,13 +509,12 @@ public class Reader {
   //          => NOTE: returns <null> if at an "empty symbol" (IE if the reader was only given whitespace & comments)
   private static final String CURRENT_PARENT_PATH_READER_LITERAL = "#path";
 
-
   private static String getCurrentPathParent(int symbolStart, CharSequence sourceCode, SourceInformation symbolSource) throws ReaderException {
     try {
       String fileName = symbolSource.fileName();
       String parent = FilePrimitives.PathParent.logic(fileName);
       if(parent == null) return FilePrimitives.CurrentDirectory.logic();
-      return parent;  
+      return parent;
     } catch(Exception e) {
       throw new ReaderException(symbolStart,sourceCode,symbolSource,"READ ERROR: Can't generate \"#path\": %s", e.getMessage());
     }
