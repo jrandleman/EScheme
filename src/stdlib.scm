@@ -84,7 +84,8 @@
 ;   - define-class
 ;   - interface
 ;   - define-interface
-;   - super! ; MUST BE CALLED AS THE FIRST LINE IN CONSTRUCTORS TO AVOID UNDEFINED BEHAVIOR
+;   - super!       ; MUST BE CALLED AS THE FIRST LINE IN CONSTRUCTORS TO AVOID UNDEFINED BEHAVIOR
+;   - apply-super! ; MUST BE CALLED AS THE FIRST LINE IN CONSTRUCTORS TO AVOID UNDEFINED BEHAVIOR
 ;
 ;   - import
 ;   - reload
@@ -1281,8 +1282,8 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Implementing SUPER!: 
-;;   Helper macro to initialize an object's super object.
+;; Implementing SUPER! & APPLY-SUPER!: 
+;;   Helper macros to initialize an object's super object.
 ;;
 ;;   NOTE: _MUST_ BE USED AS THE _FIRST_ STATEMENT IN OBJECT CONSTRUCTORS.
 ;;          -:- -:- ANY OTHER USE RESULTS IN UNDEFINED BEHAVIOR -:- -:-
@@ -1292,6 +1293,11 @@
 (define-syntax super!
   (lambda params
     (cons 'set! (cons 'super (list (cons 'escm-oo-super! (cons 'self params)))))))
+
+; (apply-super! <param-list>)
+(define-syntax apply-super!
+  (lambda (params-list) 
+    (cons 'set! (cons 'super (list (list 'apply 'escm-oo-super! (list 'append '(list self) params-list)))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
