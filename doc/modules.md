@@ -42,7 +42,7 @@ a given module, without defining that module itself as a local variable.
 
 Modules may be introspected upon by 2 primitives:
 
-1. `module-source`: yield the absolute file path to the module (this is what
+1. `module-path`: yield the absolute file path to the module (this is what
    distinguishes one module from another under the hood).
 2. `module-bindings`: yield a list of the symbols defined in a module (beware:
    every module redefines the entire EScheme standard library!).
@@ -178,15 +178,15 @@ statement.
 (module? <obj>)
 ```
 
-### Module Source Location
+### Module Absolute Path Source Location
 ```scheme
-(module-source <module>)
+(module-path <module>)
 ```
 
 The absolute file path string of the module file's location, what
 distinguishes one module from another under the hood.
 
-### Module Variable Bindings
+### Module Variable Name Bindings List
 ```scheme
 (module-bindings <module>)
 ```

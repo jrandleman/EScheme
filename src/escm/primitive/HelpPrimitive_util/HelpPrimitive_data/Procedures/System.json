@@ -23,9 +23,9 @@
   "description": "Returns whether <obj> is a module object.",
   "example": null
 }, {
-  "name": "module-source",
+  "name": "module-path",
   "aliases": null,
-  "signatures": ["(module-source <module>)"],
+  "signatures": ["(module-path <module>)"],
   "description": "Returns the absolute file path of <module>'s original location.",
   "example": null
 }, {

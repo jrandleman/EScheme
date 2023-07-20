@@ -437,15 +437,15 @@ public class SystemPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // module-source
-  public static class ModuleSource extends Primitive {
+  // module-path
+  public static class ModulePath extends Primitive {
     public java.lang.String escmName() {
-      return "module-source";
+      return "module-path";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof EscmModule)) 
-        throw new Exceptionf("'(module-source <module>) didn't receive exactly 1 module: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(module-path <module>) didn't receive exactly 1 module: %s", Exceptionf.profileArgs(parameters));
       return new escm.type.String(((EscmModule)parameters.get(0)).absoluteFilePath());
     }
   }

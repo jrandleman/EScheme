@@ -41,7 +41,7 @@
 (import data-directory module-test)
 (ut (module? module-test) #t)
 (ut (module? 0) #f)
-(ut (string? (module-source module-test)) #t)
+(ut (string? (module-path module-test)) #t)
 (ut (list? (module-bindings module-test)) #t)
 (ut (module-test.f 4) 8)
 (ut (module-test.g 4) 16)
