@@ -18,6 +18,7 @@ import escm.vm.Interpreter;
 import escm.vm.type.Callable;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.Environment;
+import escm.vm.util.ObjectAccessChain;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
 
@@ -128,8 +129,23 @@ public class MetaPrimitives {
       return "syntax?";
     }
 
+    private static SyntaxProcedure isModuleMacro(Environment definitionEnvironment, Symbol moduleMacro) {
+      try {
+        Datum value = (new ObjectAccessChain(moduleMacro)).loadWithState(definitionEnvironment);
+        if(!(value instanceof SyntaxProcedure)) return null;
+        return (SyntaxProcedure)value;
+      } catch(Exception e) {
+        return null;
+      }
+    }
+
+    // Returns <null> if false, <SyntaxProcedure> if true
     public static SyntaxProcedure logic(Environment definitionEnvironment, Symbol name) {
       try {
+        // Check for module macro invocation (e.g. `Module.myMacro`)
+        if(ObjectAccessChain.is(name))
+          return isModuleMacro(definitionEnvironment,name);
+        // Check for variable macro invocation (e.g. `myMacro`)
         if(!definitionEnvironment.has(name)) return null;
         Datum value = definitionEnvironment.get(name);
         if(value instanceof SyntaxProcedure) return (SyntaxProcedure)value;

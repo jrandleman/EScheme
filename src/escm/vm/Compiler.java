@@ -20,7 +20,6 @@ import escm.util.Trampoline;
 import escm.primitive.MetaPrimitives;
 import escm.vm.type.Callable;
 import escm.vm.type.OrderedCollection;
-import escm.vm.util.ObjectAccessChain;
 import escm.vm.util.Environment;
 
 public class Compiler {
@@ -138,25 +137,9 @@ public class Compiler {
   }
 
 
-  private static SyntaxProcedure isModuleMacro(Environment definitionEnvironment, Symbol moduleMacro) {
-    try {
-      Datum value = (new ObjectAccessChain(moduleMacro)).loadWithState(definitionEnvironment);
-      if(!(value instanceof SyntaxProcedure)) return null;
-      return (SyntaxProcedure)value;
-    } catch(Exception e) {
-      return null;
-    }
-  }
-
-
   private static SyntaxProcedure isMacroApplication(Environment definitionEnvironment, Datum head) {
     if(!(head instanceof Symbol)) return null;
-    Symbol headSymbol = (Symbol)head;
-    // Check for module macro invocation
-    if(ObjectAccessChain.is(headSymbol)) 
-      return isModuleMacro(definitionEnvironment,headSymbol);
-    // Check for local macro invocation
-    return MetaPrimitives.IsSyntax.logic(definitionEnvironment,headSymbol);
+    return MetaPrimitives.IsSyntax.logic(definitionEnvironment,(Symbol)head);
   }
 
 
