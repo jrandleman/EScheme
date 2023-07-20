@@ -133,11 +133,6 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM CEIL EQUIVALENT
-(define ceil ceiling)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ESCM DIVREM EQUIVALENT
 (define (divrem a b) (cons (quotient a b) (remainder a b)))
 
@@ -425,7 +420,21 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DELETE PREVIOUSLY GENERATED FILES
+(define (delete-directory-files! dirname)
+  (when (file-directory? dirname)
+    (for-each 
+      (lambda (file)
+        (set! file (string-append dirname *file-separator* file))
+        (unless (file-directory? file)
+          (delete-file file)))
+      (directory-list dirname))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MAIN EXECUTION
+(delete-directory-files! GENERATED_TEST_DIRECTORY_PATH)
+
 (generate-unit-tests = "plus" + 1 generate-values-matrix)
 (generate-unit-tests = "plus" + 2 generate-values-matrix)
 
@@ -481,7 +490,7 @@
 
 (generate-unit-tests = "round" round 1 generate-real-values-matrix)
 (generate-unit-tests = "floor" floor 1 generate-real-values-matrix)
-(generate-unit-tests = "ceil" ceil 1 generate-real-values-matrix)
+(generate-unit-tests = "ceiling" ceiling 1 generate-real-values-matrix)
 (generate-unit-tests = "truncate" truncate 1 generate-real-values-matrix)
 
 (generate-unit-tests equal? "is_number" number? 1 generate-values-matrix)

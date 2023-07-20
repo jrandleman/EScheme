@@ -667,10 +667,10 @@ public class NumberPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // ceil
+  // ceiling
   public static class Ceiling extends Primitive {
     public java.lang.String escmName() {
-      return "ceil";
+      return "ceiling";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

@@ -168,13 +168,13 @@
   "example": null
 }, {
   "name": "ceiling",
-  "aliases": null,
+  "aliases": ["ceil"],
   "signatures": ["(ceiling <real>)"],
   "description": "Returns the ceiling value of <real>.",
   "example": null
 }, {
   "name": "truncate",
-  "aliases": null,
+  "aliases": ["trunc"],
   "signatures": ["(truncate <real>)"],
   "description": "Returns the truncated value of <real>.",
   "example": null
