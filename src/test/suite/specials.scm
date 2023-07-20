@@ -342,6 +342,11 @@
 (ut (unless #t 1 2) #void)
 (ut (unless #f 1 2) 2)
 
+(ut (when #t 1) 1)
+(ut (when #f 1) #void)
+(ut (when #t 1 2) 2)
+(ut (when #f 1 2) #void)
+
 
 (define val 0)
 (call/cc

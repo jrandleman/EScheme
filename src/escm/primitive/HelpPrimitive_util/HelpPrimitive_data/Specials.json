@@ -128,7 +128,13 @@
   "name": "unless",
   "aliases": null,
   "signatures": ["(unless <condition> <body> ...)"],
-  "description": "Execute \"<body> ...\" if <condition> is not true. Can be combined with the\n'*import*' global variable to mimic Python's \"if __name__=='__main__':\"\npattern:\n\n  (unless *import*\n    <execute-main-escheme-code-here> ...)",
+  "description": "Execute \"<body> ...\" if <condition> is not true. Can be combined with the\n'*import*' global variable to mimic Python's \"if __name__=='__main__':\"\npattern:\n\n  (unless *import*\n    <execute-main-escheme-code-here> ...)\n\nOpposite of <when>.",
+  "example": null
+}, {
+  "name": "when",
+  "aliases": null,
+  "signatures": ["(when <condition> <body> ...)"],
+  "description": "Execute \"<body> ...\" if <condition> is true. Opposite of <unless>.",
   "example": null
 }, {
   "name": "while",

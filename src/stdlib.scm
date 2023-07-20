@@ -32,6 +32,7 @@
 ;   - letrec
 ;   - letrec*
 ;   - unless
+;   - when
 ;   - while
 ;   - do
 ;
@@ -699,6 +700,14 @@
     (list 'if condition
          #void
          (cons 'begin body))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementing WHEN: (when <condition> <body> ...)
+(define-syntax when
+  (lambda (condition . body)
+    (list 'if condition
+      (cons 'begin body))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
