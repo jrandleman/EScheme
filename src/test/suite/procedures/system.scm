@@ -13,6 +13,7 @@
 (define exit-test-file (append data-directory "exit-test.scm"))
 (define load-test-file (append data-directory "load-test.scm"))
 (define load-test-2-file (append data-directory "load-test-2.scm"))
+(define process-killer-file (append data-directory "process-killer-test.scm"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -26,6 +27,8 @@
 
 (ut (caddr (system (append *escm-execution-command* exit-test-file " 0"))) 0)
 (ut (caddr (system (append *escm-execution-command* exit-test-file " 1"))) 1)
+
+(ut (< (car (time system 1000 (append *escm-execution-command* process-killer-file))) 60000) #t)
 
 (define *var1* 2)
 (ut (begin (load load-test-file) *var2*) (* 2 *var1*))

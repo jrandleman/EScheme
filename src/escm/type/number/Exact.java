@@ -89,14 +89,17 @@ public class Exact extends Real {
   ////////////////////////////////////////////////////////////////////////////
   // Value Coercion
   public int intValue() {
+    if(isInteger()) return num.intValue();
     return (int)(num.longValue() / den.longValue());
   }
 
   public long longValue() {
+    if(isInteger()) return num.longValue();
     return num.longValue() / den.longValue();
   }
 
   public double doubleValue() {
+    if(isInteger()) return num.doubleValue();
     return num.doubleValue() / den.doubleValue();
   }
 

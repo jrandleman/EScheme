@@ -175,7 +175,7 @@
 (module-path <module>) ; <module>'s absolute file path location
 (module-bindings <module>) ; list of <module>'s defined variable symbols (beware that all modules have all the stdlib!)
 
-(system <command-str> <optional-env-var-str-list> <optional-directory-str>)
+(system <optional-millisecond-timeout> <command-str> <optional-env-var-str-list> <optional-directory-str>)
 ```
 
 

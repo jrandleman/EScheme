@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import escm.type.Datum;
 import escm.type.number.Real;
 import escm.type.number.Exact;
+import escm.type.number.Inexact;
 import escm.type.Void;
 import escm.type.Symbol;
 import escm.type.Hashmap;
@@ -216,45 +217,68 @@ public class SystemPrimitives {
         escm.type.Pair par = (escm.type.Pair)list;
         Datum content = par.car();
         if(!(content instanceof escm.type.String))
-          throw new Exceptionf("'(system <cmd-str> <optional-env-var-str-list> <optional-dir-str>) %s list value %s isn't a string: %s", listContentType, content.profile(), Exceptionf.profileArgs(parameters));
+          throw new Exceptionf("'(system <optional-millisecond-timeout> <cmd-str> <optional-env-var-str-list> <optional-dir-str>) %s list value %s isn't a string: %s", listContentType, content.profile(), Exceptionf.profileArgs(parameters));
         strs.add(((escm.type.String)content).value());
         list = par.cdr();
       }
       return strs.toArray(new String[strs.size()]);
     }
 
-    private static String parseCommands(ArrayList<Datum> parameters) throws Exception {
-      Datum cmd = parameters.get(0);
+    private static Long parseMillisecondTimeout(ArrayList<Datum> parameters) throws Exception {
+      Datum timeout = parameters.get(0);
+      if(!(timeout instanceof Real)) return null;
+      Real r = (Real)timeout;
+      if(r.isNaN() || r.isNegative()) return (long)0;
+      if(r.isPositive() && r.isInfinite()) return null;
+      return r.longValue();
+    }
+
+    private static String parseCommands(Long timeout, ArrayList<Datum> parameters) throws Exception {
+      int cmdIdx = timeout == null ? 0 : 1;
+      if(parameters.size() < cmdIdx+1)
+        throw new Exceptionf("'(system <optional-millisecond-timeout> <cmd-str> <optional-env-var-str-list> <optional-dir-str>) invalid number of args: %s", Exceptionf.profileArgs(parameters));
+      Datum cmd = parameters.get(cmdIdx);
       if(cmd instanceof escm.type.String) return ((escm.type.String)cmd).value();
-      throw new Exceptionf("'(system <cmd-str> <optional-env-var-str-list> <optional-dir-str>) <cmds> isn't a string: %s", Exceptionf.profileArgs(parameters));
+      throw new Exceptionf("'(system <optional-millisecond-timeout> <cmd-str> <optional-env-var-str-list> <optional-dir-str>) <cmds> isn't a string: %s", Exceptionf.profileArgs(parameters));
     }
 
-    private static Datum parseEnvironmentVariables(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) return null;
-      Datum envp = parameters.get(1);
-      if(envp instanceof escm.type.Pair) return envp;
-      throw new Exceptionf("'(system <cmd-str> <optional-env-var-str-list> <optional-dir-str>) <env-vars> isn't a str list: %s", Exceptionf.profileArgs(parameters));
+    private static Datum parseEnvironmentVariables(Long timeout, ArrayList<Datum> parameters) throws Exception {
+      int envpIdx = timeout == null ? 1 : 2;
+      if(parameters.size() < envpIdx+1) return null;
+      Datum envp = parameters.get(envpIdx);
+      if(escm.type.Pair.isList(envp)) return envp;
+      throw new Exceptionf("'(system <optional-millisecond-timeout> <cmd-str> <optional-env-var-str-list> <optional-dir-str>) <env-vars> isn't a str list: %s", Exceptionf.profileArgs(parameters));
     }
 
-    private static File parseWorkingDirectory(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 3) return null;
-      Datum dir = parameters.get(2);
+    private static File parseWorkingDirectory(Long timeout, ArrayList<Datum> parameters) throws Exception {
+      int dirIdx = timeout == null ? 2 : 3;
+      if(parameters.size() < dirIdx+1) return null;
+      Datum dir = parameters.get(dirIdx);
       if(dir instanceof escm.type.String) return new File(((escm.type.String)dir).value());
-      throw new Exceptionf("'(system <cmd-str> <optional-env-var-str-list> <optional-dir-str>) <dir> isn't a str: %s", Exceptionf.profileArgs(parameters));
+      throw new Exceptionf("'(system <optional-millisecond-timeout> <cmd-str> <optional-env-var-str-list> <optional-dir-str>) <dir> isn't a str: %s", Exceptionf.profileArgs(parameters));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1 || parameters.size() > 3) 
-        throw new Exceptionf("'(system <cmd-str> <optional-env-var-str-list> <optional-dir-str>) didn't receive correct number of args: %s", Exceptionf.profileArgs(parameters));
-      String cmd = parseCommands(parameters);
-      Datum envp = parseEnvironmentVariables(parameters);
-      File dir = parseWorkingDirectory(parameters);
+      if(parameters.size() < 1 || parameters.size() > 4) 
+        throw new Exceptionf("'(system <optional-millisecond-timeout> <cmd-str> <optional-env-var-str-list> <optional-dir-str>) invalid number of args: %s", Exceptionf.profileArgs(parameters));
+      Long timeout = parseMillisecondTimeout(parameters);
+      String cmd = parseCommands(timeout,parameters);
+      Datum envp = parseEnvironmentVariables(timeout,parameters);
+      File dir = parseWorkingDirectory(timeout,parameters);
       ExecuteSystemCommand.Result result = null;
       if(envp == null) {
-        result = ExecuteSystemCommand.run(cmd);
+        if(timeout == null) {
+          result = ExecuteSystemCommand.run(cmd);
+        } else {
+          result = ExecuteSystemCommand.run(timeout.longValue(),cmd);
+        }
       } else {
         String[] envArray = convertStringListToStringArray(envp,"environment variables",parameters);
-        result = ExecuteSystemCommand.run(cmd,envArray,dir);
+        if(timeout == null) {
+          result = ExecuteSystemCommand.run(cmd,envArray,dir);
+        } else {
+          result = ExecuteSystemCommand.run(timeout.longValue(),cmd,envArray,dir);
+        }
       }
       return escm.type.Pair.List(new escm.type.String(result.out),new escm.type.String(result.err),new Exact(result.exit));
     }

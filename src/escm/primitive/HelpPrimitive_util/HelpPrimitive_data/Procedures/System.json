@@ -40,8 +40,11 @@
   "signatures": [
                   "(system <command-str>)",
                   "(system <command-str> <env-var-str-list>)",
-                  "(system <command-str> <env-var-str-list> <directory-str>)"
+                  "(system <command-str> <env-var-str-list> <directory-str>)",
+                  "(system <millisecond-timeout> <command-str>)",
+                  "(system <millisecond-timeout> <command-str> <env-var-str-list>)",
+                  "(system <millisecond-timeout> <command-str> <env-var-str-list> <directory-str>)"
                 ],
-  "description": "Executes a command, using the environment variable bindings in\n<env-var-str-list> (defaults to the current environment), in\nthe <directory-str> directory (defaults to the current working directory).\nPassed to Java's <Runtime.getRuntime().exec()>.\nReturns a list:\n  (<command-stdout-str> <command-stderr-str> <command-exit-code>)",
+  "description": "Executes a command, using the environment variable bindings in\n<env-var-str-list> (defaults to the current environment), in the\n<directory-str> directory (defaults to the current working directory).\n\nIf <millisecond-timeout> (a real number) is given and exceeded, the\nspawned process will terminate. Note that this is NOT a hard cap \nthough: hence passing 0 as <millisecond-timeout> may still have \nsystem-wide side effects.\n\nUltimately passed to Java's <Runtime.getRuntime().exec()>.\n\nReturns a list:\n  (<command-stdout-str> <command-stderr-str> <command-exit-code>)",
   "example": null
 }]

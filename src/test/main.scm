@@ -15,9 +15,11 @@
 (define (execute-test-file file)
   (set! total-files (+ total-files 1))
   (verbose-displayf "    %n) Executing Test File: %wa ..." total-files file)
-  (define test-result (system (append *escm-execution-command* file)))
+  (define time-result (time system (append *escm-execution-command* file)))
+  (define time-length (car time-result))
+  (define test-result (cdr time-result))
   (define error-code (caddr test-result))
-  (verbose-displayf " Exit Code: %n\n" error-code)
+  (verbose-displayf " Time: %nms; Exit Code: %n\n" time-length error-code)
   (if (not (= 0 error-code))
       (set! total-errors (+ total-errors 1)))
   (define err-msg (cadr test-result))
@@ -40,7 +42,7 @@
   (define start (epoch-time))
   (test-all-files (append #path *file-separator* "suite"))
   (define end (epoch-time))
-  (verbose-displayf ">>> Total Files: %n; Total Errors: %n; Success Rate: %.2n%%; Time: %.2ns\n" 
+  (verbose-displayf ">>> Total Files: %n; Total Errors: %n; Success Rate: %.2n%%; Total Time: %.2ns\n" 
     total-files 
     total-errors 
     (* 100.0 (/ (- total-files total-errors) total-files))
