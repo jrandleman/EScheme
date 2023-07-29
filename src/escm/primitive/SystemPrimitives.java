@@ -233,7 +233,7 @@ public class SystemPrimitives {
       return r.longValue();
     }
 
-    private static String parseCommands(Long timeout, ArrayList<Datum> parameters) throws Exception {
+    private static String parseCommand(Long timeout, ArrayList<Datum> parameters) throws Exception {
       int cmdIdx = timeout == null ? 0 : 1;
       if(parameters.size() < cmdIdx+1)
         throw new Exceptionf("'(system <optional-millisecond-timeout> <cmd-str> <optional-env-var-str-list> <optional-dir-str>) invalid number of args: %s", Exceptionf.profileArgs(parameters));
@@ -262,11 +262,11 @@ public class SystemPrimitives {
       if(parameters.size() < 1 || parameters.size() > 4) 
         throw new Exceptionf("'(system <optional-millisecond-timeout> <cmd-str> <optional-env-var-str-list> <optional-dir-str>) invalid number of args: %s", Exceptionf.profileArgs(parameters));
       Long timeout = parseMillisecondTimeout(parameters);
-      String cmd = parseCommands(timeout,parameters);
+      String cmd = parseCommand(timeout,parameters);
       Datum envp = parseEnvironmentVariables(timeout,parameters);
       File dir = parseWorkingDirectory(timeout,parameters);
       ExecuteSystemCommand.Result result = null;
-      if(envp == null) {
+      if(envp == null && dir == null) {
         if(timeout == null) {
           result = ExecuteSystemCommand.run(cmd);
         } else {
