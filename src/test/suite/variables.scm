@@ -19,9 +19,12 @@
 (ut (string? *file-separator*) #t)
 (ut (string? *path-separator*) #t)
 
-(ut (string? *os-name*) #t)
-(ut (string? *os-version*) #t)
-(ut (string? *os-architecture*) #t)
+; boolean if hit security restriction
+(ut (or (string? *os-name*) (boolean? *os-name*)) #t)
+(ut (or (string? *os-version*) (boolean? *os-version*)) #t)
+(ut (or (string? *os-architecture*) (boolean? *os-architecture*)) #t)
+(ut (or (string? *user-home*) (boolean? *user-home*)) #t)
+(ut (or (string? *user-name*) (boolean? *user-name*)) #t)
 
 (ut (string? *escm-path*) #t)
 (ut (string? *escm-execution-command*) #t)

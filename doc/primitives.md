@@ -25,6 +25,9 @@
 *os-version*
 *os-architecture*
 
+*user-name*
+*user-home*
+
 *escm-path*
 *escm-execution-command*
 

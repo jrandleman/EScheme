@@ -26,19 +26,31 @@
   "name": "*os-name*",
   "aliases": ["os-name"],
   "signatures": null,
-  "description": "String of the host operating system's name.",
+  "description": "String of the host operating system's name.\n#f if lacking security permission to access such.",
   "example": null
 }, {
   "name": "*os-version*",
   "aliases": ["os-version"],
   "signatures": null,
-  "description": "String of the host operating system's version.",
+  "description": "String of the host operating system's version.\n#f if lacking security permission to access such.",
   "example": null
 }, {
   "name": "*os-architecture*",
   "aliases": ["os-arch", "*os-arch*", "os-architecture"],
   "signatures": null,
-  "description": "String of the host operating system's architecture.",
+  "description": "String of the host operating system's architecture.\n#f if lacking security permission to access such.",
+  "example": null
+}, {
+  "name": "*user-name*",
+  "aliases": ["user-name"],
+  "signatures": null,
+  "description": "String of the system's active user name.\n#f if lacking security permission to access such.",
+  "example": null
+}, {
+  "name": "*user-home*",
+  "aliases": ["user-home"],
+  "signatures": null,
+  "description": "String of the system's user home directory.\n#f if lacking security permission to access such.",
   "example": null
 }, {
   "name": "*escm-path*",
