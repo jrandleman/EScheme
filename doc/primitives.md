@@ -57,10 +57,10 @@
 (<= <real> <real> ...)
 (>= <real> <real> ...)
 
-(+ <num> <num> ...)
+(+ <num> <num> ...) ; aliases by <bind> if only given callables
+(* <num> <num> ...) ; aliases by <compose> if only given callables
 (- <num> <num> ...) (- <num>)
 (/ <num> <num> ...) (/ <num>)
-(* <num> <num> ...)
 
 (expt <num> <num> ...)
 (exp <num>)
@@ -678,9 +678,11 @@
 ------------------------
 ## Functional:
 ```scheme
-(compose <callable> ...)
-(bind <callable> <obj> ...) ; bind <obj> ... as arguments to <callable>
+(compose <callable> ...)    ; aliased by <*> if only given callables
+(bind <callable> <obj> ...) ; aliased by <+> if only given callables
+
 (id <obj>)
+
 (procedure? <obj>)
 (callable? <obj>) ; (or (procedure? <obj>) (functor? <obj>) (class? <obj>))
 ```

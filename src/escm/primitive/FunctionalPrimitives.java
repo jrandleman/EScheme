@@ -115,11 +115,12 @@ public class FunctionalPrimitives {
     }
 
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1) 
+      int totalCallables = parameters.size();
+      if(totalCallables < 1) 
         throw new Exceptionf("'(bind <callable> <arg> ...) expects at least 1 callable: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof Callable)) 
         throw new Exceptionf("'(bind <callable> <arg> ...) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
-      if(parameters.size() == 1) return parameters.get(0);
+      if(totalCallables == 1) return parameters.get(0);
       ArrayList<Datum> parametersCopy = new ArrayList<Datum>(parameters);
       Callable p = (Callable)parametersCopy.get(0);
       parametersCopy.remove(0);

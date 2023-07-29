@@ -32,7 +32,7 @@
   "name": "+",
   "aliases": null,
   "signatures": ["(+ <num> <num> ...)"],
-  "description": "Returns the sum of \"<num> <num> ...\".",
+  "description": "Returns the sum of \"<num> <num> ...\".\nAliases <bind> if only given callables.",
   "example": null
 }, {
   "name": "-",
@@ -50,7 +50,7 @@
   "name": "*",
   "aliases": null,
   "signatures": ["(* <num> <num> ...)"],
-  "description": "Returns the product of \"<num> <num> ...\".\nNote that EScheme defines (* <n> 0) to be 0 for all numeric <n>.",
+  "description": "Returns the product of \"<num> <num> ...\".\nNote that EScheme defines (* <n> 0) to be 0 for all numeric <n>.\nAliases <compose> if only given callables.",
   "example": null
 }, {
   "name": "expt",

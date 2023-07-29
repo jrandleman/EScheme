@@ -2,13 +2,13 @@
   "name": "compose",
   "aliases": null,
   "signatures": ["(compose <callable> ...)"],
-  "description": "Create a new, variadic procedure that is the composition of \"<callable> ...\".",
+  "description": "Create a new, variadic procedure that is the composition of \"<callable> ...\".\nAliased by <*> if only given callables.",
   "example": null
 }, {
   "name": "bind",
   "aliases": null,
   "signatures": ["(bind <callable> <obj> ...)"],
-  "description": "Create a new procedure by binding \"<obj> ...\" as arguments to <callable>.",
+  "description": "Create a new procedure by binding \"<obj> ...\" as arguments to <callable>.\nAliased by <+> if only given callables.",
   "example": null
 }, {
   "name": "id",

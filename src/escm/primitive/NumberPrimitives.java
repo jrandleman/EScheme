@@ -13,8 +13,10 @@ import escm.type.number.Exact;
 import escm.type.number.Inexact;
 import escm.type.number.Complex;
 import escm.util.Exceptionf;
+import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
 import escm.vm.runtime.GlobalState;
+import escm.primitive.FunctionalPrimitives;
 
 public class NumberPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -26,6 +28,7 @@ public class NumberPrimitives {
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 0) throw new Exceptionf("'(+ <number> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.get(0) instanceof Callable) return FunctionalPrimitives.Bind.logic(parameters);
       Number sum = new Exact();
       for(Datum p : parameters) {
         if(!(p instanceof Number))
@@ -74,6 +77,7 @@ public class NumberPrimitives {
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 0) throw new Exceptionf("'(* <number> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.get(0) instanceof Callable) return FunctionalPrimitives.Compose.logic(parameters);
       Number product = new Exact(1);
       for(Datum p : parameters) {
         if(!(p instanceof Number))
