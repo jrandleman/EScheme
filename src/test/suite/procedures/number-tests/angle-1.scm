@@ -1,4 +1,4 @@
-(load "/Users/jordanrandleman/Desktop/EScheme/src/test/suite/procedures/../../lib.scm")
+(load (path #path ".." ".." ".." "lib.scm"))
 :nop
 (nut equal? (angle 0.0) '0.0)
 (nut equal? (angle Infinity) '0.0)

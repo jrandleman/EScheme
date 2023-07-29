@@ -1,4 +1,4 @@
-(load "/Users/jordanrandleman/Desktop/EScheme/src/test/suite/procedures/../../lib.scm")
+(load (path #path ".." ".." ".." "lib.scm"))
 (nut = (exact->inexact 0) '0.0)
 (nut = (exact->inexact 1) '1.0)
 (nut = (exact->inexact 4) '4.0)

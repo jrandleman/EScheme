@@ -6,7 +6,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IMPORTS
-(load #path (append ".." *file-separator* "lib.scm"))
+(load (path #path ".." "lib.scm"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -392,7 +392,7 @@
 
 
 ; <dosync> (etc.) correctness across threads is checked by "./procedures/concurrent.scm"
-(define module-dir (append #path *file-separator* ".." *file-separator* "examples" *file-separator* "specials"))
+(define module-dir (path #path ".." "examples" "specials"))
 (import module-dir module1)
 (ut (syntax? dosync) #t)
 (ut (syntax? dosync-module) #t)

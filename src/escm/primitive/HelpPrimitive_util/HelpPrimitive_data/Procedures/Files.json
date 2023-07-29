@@ -113,6 +113,12 @@
   "description": "Get the current working directory's absolute path as a string.\n\nNote that <current-directory> refers to the directory that launched\nthe current process. Use #path if you instead want to refer to the\ndirectory of the current file.",
   "example": null
 }, {
+  "name": "path",
+  "aliases": null,
+  "signatures": ["(path <str> ...)"],
+  "description": "Create a path by combining \"<str> ...\" with <*file-separator*> between each\ncomponent. Yields an absolute path. Passing no arguments is equivalent to\n(current-directory).",
+  "example": null
+}, {
   "name": "path-parent",
   "aliases": null,
   "signatures": ["(path-parent <path-str>)"],

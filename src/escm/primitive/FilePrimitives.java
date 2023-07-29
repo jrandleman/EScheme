@@ -477,6 +477,56 @@ public class FilePrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // path
+  public static class GeneratePath extends Primitive {
+    public java.lang.String escmName() {
+      return "path";
+    }
+
+    private static boolean hasTerminalSeparator(String s) {
+      return s.endsWith(File.separator);
+    }
+
+    private static String withoutStartingSeparator(String s) {
+      if(s.startsWith(File.separator)) return s.substring(File.separator.length());
+      return s;
+    }
+
+    private static String withoutTerminalSeparator(String s) {
+      if(s.endsWith(File.separator)) return s.substring(0,s.length()-File.separator.length());
+      return s;
+    }
+
+    public static String logic(String[] pathStrings) throws Exception {
+      if(pathStrings.length == 0) return CurrentDirectory.logic();
+      String path = pathStrings[0];
+      if(!hasTerminalSeparator(path)) path += File.separator;
+      for(int i = 1; i < pathStrings.length; ++i) {
+        String s = withoutStartingSeparator(pathStrings[i]);
+        if(s.length() == 0 || hasTerminalSeparator(s)) {
+          path += s;
+        } else {
+          path += s+File.separator;
+        }
+      }
+      return AbsolutePath.logic(withoutTerminalSeparator(path));
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      int totalArgs = parameters.size();
+      String[] args = new String[totalArgs];
+      for(int i = 0; i < totalArgs; ++i) {
+        Datum arg = parameters.get(i);
+        if(!(arg instanceof escm.type.String))
+          throw new Exceptionf("'(path <string> ...) arg %s isn't a string: %s", arg.profile(), Exceptionf.profileArgs(parameters));
+        args[i] = ((escm.type.String)arg).value();
+      }
+      return new escm.type.String(logic(args));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // path-parent
   public static class PathParent extends Primitive {
     public java.lang.String escmName() {

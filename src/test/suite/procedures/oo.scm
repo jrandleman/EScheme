@@ -4,7 +4,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IMPORTS
-(load #path (append ".." *file-separator* ".." *file-separator* "lib.scm"))
+(load (path #path ".." ".." "lib.scm"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -14,8 +14,8 @@
 (ut (meta-object? ((class))) #t)
 (ut (meta-object? (interface)) #t)
 
-(import (append #path *file-separator* ".." *file-separator* ".." *file-separator* "examples" *file-separator* "procedures" *file-separator* "system" *file-separator*) module-test)
-(ut (meta-object? module-test) #f) ; showing meta objects can use dot-syntax, but ARE NOT meta-objects
+(import (path #path ".." ".." "examples" "procedures" "system") module-test)
+(ut (meta-object? module-test) #f) ; showing modules can use dot-syntax, but ARE NOT meta-objects
 
 (ut (interface? 0) #f)
 (ut (interface? (class)) #f)

@@ -1,4 +1,4 @@
-(load "/Users/jordanrandleman/Desktop/EScheme/src/test/suite/procedures/../../lib.scm")
+(load (path #path ".." ".." ".." "lib.scm"))
 (nut = (ceiling 0) '0)
 (nut = (ceiling 0.0) '0.0)
 (nut = (ceiling Infinity) 'Infinity)

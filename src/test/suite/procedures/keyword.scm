@@ -4,11 +4,13 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IMPORTS
-(load #path (append ".." *file-separator* ".." *file-separator* "lib.scm"))
+(load (path #path ".." ".." "lib.scm"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TESTS
+(ut (keyword-append :a) :a)
+(ut (keyword-append :a :b) :ab)
 (ut (keyword-append :a :b :c) :abc)
 
 (ut (keyword? :abc) #t)

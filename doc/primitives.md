@@ -216,6 +216,7 @@
 
 (current-directory)
 
+(path <str> ...)
 (path-parent <path-str>)
 (path-file <path-str>)
 

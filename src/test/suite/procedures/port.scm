@@ -4,7 +4,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IMPORTS
-(load #path (append ".." *file-separator* ".." *file-separator* "lib.scm"))
+(load (path #path ".." ".." "lib.scm"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -23,12 +23,12 @@
 (define (temp-file) (path-file (port-path (open-output-file))))
 
 (define (local-temp-path)
-  (append #path *file-separator* (temp-file)))
+  (path #path (temp-file)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TESTS
-(define in-file (absolute-path (append #path *file-separator* ".." *file-separator* ".." *file-separator* "examples" *file-separator* "procedures" *file-separator* "io" *file-separator* "read.scm")))
+(define in-file (path #path ".." ".." "examples" "procedures" "io" "read.scm"))
 
 (define ip (open-input-file in-file))
 (ut (begin 'testing-open-input-file (and (open-port? ip) (input-port? ip))) #t)

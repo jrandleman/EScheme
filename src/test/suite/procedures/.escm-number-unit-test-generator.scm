@@ -15,7 +15,7 @@
         (list->string (list cwd))
         cwd)))
 
-(define ESCM_UNIT_TESTING_LIBRARY_PATH (string-append (current-directory) *file-separator* ".." *file-separator* ".." *file-separator* "lib.scm"))
+(define ESCM_UNIT_TESTING_LIBRARY_PATH "(load (path #path \"..\" \"..\" \"..\" \"lib.scm\"))")
 
 (define GENERATED_TEST_DIRECTORY_PATH (string-append (current-directory) *file-separator* "number-tests"))
 
@@ -411,7 +411,7 @@
     (open-output-file 
       (string-append GENERATED_TEST_DIRECTORY_PATH *file-separator* file-name "-" (number->string arg-count) ".scm")
       'replace))
-  (write (list 'load ESCM_UNIT_TESTING_LIBRARY_PATH) out-port)
+  (display ESCM_UNIT_TESTING_LIBRARY_PATH out-port)
   (newline out-port)
   (for-each 
     (lambda (args) (print out-port (generate-test =? op args)))
