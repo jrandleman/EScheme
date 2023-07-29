@@ -56,6 +56,10 @@
 ;   - pprintf [alias]
 ;   - pprint-to-string [alias]
 ;
+;   - print [alias]
+;   - printf [alias]
+;   - println
+;
 ;   - ++ [alias]
 ;   - ** [alias]
 ;
@@ -911,6 +915,17 @@
 (define pprintf pretty-printf)
 
 (define pprint-to-string pretty-print-to-string)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Aliasing <display>, <displayf>, & defining <println>
+(define print display)
+
+(define printf displayf)
+
+(defn println
+  ((obj) (display obj) (newline))
+  ((port obj) (display port obj) (newline port)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

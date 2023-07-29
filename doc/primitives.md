@@ -149,12 +149,14 @@
 ```scheme
 (pretty-print <optional-output-port> <obj>) ; aliased by <pprint>
 (write <optional-output-port> <obj>)
-(display <optional-output-port> <obj>)
+(display <optional-output-port> <obj>) ; aliased by <print>
 (newline <optional-output-port>)
 
 (pretty-printf <optional-output-port> <format-string> <arg> ...) ; aliased by <pprintf>
 (writef <optional-output-port> <format-string> <arg> ...)
-(displayf <optional-output-port> <format-string> <arg> ...)
+(displayf <optional-output-port> <format-string> <arg> ...) ; aliased by <printf>
+
+(println <optional-output-port> <obj>)
 
 (read <optional-input-port>)
 (read-string <str>) ; returns a pair: (cons <read-datum> <str-without-read-datum>)

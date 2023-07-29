@@ -42,10 +42,17 @@
 (ut (begin (display out-port "\"hello\"") (file-read (port-path out-port))) "hello")
 
 (new-out-port!)
-(ut (begin (display out-port "\"hello\"") (file-read (port-path out-port))) "hello")
+(ut (begin (newline out-port) (file-read-string (port-path out-port))) "\n")
+
+(ut eq? print display)
+(ut eq? printf displayf)
 
 (new-out-port!)
-(ut (begin (newline out-port) (file-read-string (port-path out-port))) "\n")
+(ut (begin (println out-port "\"hello\"") 
+           (println out-port "\"hello\"") 
+           (file-read (port-path out-port))) 
+    '(begin "hello" "hello"))
+
 
 ; Note: more extensive formatting tests are done in <format.scm>. This just tests our
 ;       ability to output <stringf>'s result to a port via <pprint>, <write>, & <display>
