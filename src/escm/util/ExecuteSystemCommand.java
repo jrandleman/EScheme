@@ -39,6 +39,15 @@ public class ExecuteSystemCommand {
     return millisecondTimeout+TIMEOUT_MS_BUFFER;
   }
 
+  private static String getInputStreamLines(InputStream ins) throws Exception {
+    String line = null;
+    StringBuilder buffer = new StringBuilder();
+    BufferedReader in = new BufferedReader(new InputStreamReader(ins));
+    while((line = in.readLine()) != null) buffer.append('\n'+line);
+    if(buffer.length() == 0) return "";
+    return buffer.substring(1);
+  }
+
   public static Result run(long millisecondTimeout, String command, String[] environmentVariableSettings, File workingDirectory) throws Exception {
     long timeout = preprocessMillisecondTimeout(millisecondTimeout);
     Process pro = Runtime.getRuntime().exec(command,environmentVariableSettings,workingDirectory);
@@ -67,15 +76,6 @@ public class ExecuteSystemCommand {
     return res;
   }
 
-  private static String getInputStreamLines(InputStream ins) throws Exception {
-    String line = null;
-    StringBuilder buffer = new StringBuilder();
-    BufferedReader in = new BufferedReader(new InputStreamReader(ins));
-    while((line = in.readLine()) != null) buffer.append('\n'+line);
-    if(buffer.length() == 0) return "";
-    return buffer.substring(1);
-  }
-
   public static Result run(String command, String[] environmentVariableSettings, File workingDirectory) throws Exception {
     Process pro = Runtime.getRuntime().exec(command,environmentVariableSettings,workingDirectory);
     Result res = new Result();
@@ -84,14 +84,6 @@ public class ExecuteSystemCommand {
     pro.waitFor();
     res.exit = pro.exitValue();
     return res;
-  }
-
-  public static Result run(long millisecondTimeout, String command, String[] environmentVariableSettings) throws Exception {
-    return run(millisecondTimeout, command, environmentVariableSettings, null);
-  }
-
-  public static Result run(String command, String[] environmentVariableSettings) throws Exception {
-    return run(command, environmentVariableSettings, null);
   }
 
   public static Result run(long millisecondTimeout, String command) throws Exception {
