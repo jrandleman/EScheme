@@ -57,3 +57,5 @@
 (ut (fractional -3/2) -5)
 (ut (fractional 1/8) 125)
 (ut (fractional -1/8) -125)
+
+(ut eq? ** expt) ; verify alias

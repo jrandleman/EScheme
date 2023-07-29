@@ -62,7 +62,7 @@
 (- <num> <num> ...) (- <num>)
 (/ <num> <num> ...) (/ <num>)
 
-(expt <num> <num> ...)
+(expt <num> <num> ...) ; aliased by <**>
 (exp <num>)
 (log <num> <optional-base>)
 (sqrt <num>)
@@ -430,7 +430,7 @@
 
 (key <predicate?> <ac>) ; returns key of left-most value satisfying <predicate?>
 
-(append <ac> ...)
+(append <ac> ...) ; aliased by <++>
 
 (delete <ac> <key>) ; return copy of <ac> w/o <key>
 

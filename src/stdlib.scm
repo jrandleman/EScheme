@@ -56,6 +56,9 @@
 ;   - pprintf [alias]
 ;   - pprint-to-string [alias]
 ;
+;   - ++ [alias]
+;   - ** [alias]
+;
 ;   - thread-define
 ;   - thread-set!
 ;   - thread-get
@@ -908,6 +911,13 @@
 (define pprintf pretty-printf)
 
 (define pprint-to-string pretty-print-to-string)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Aliasing <append> & <expt>
+(define ++ append)
+
+(define ** expt)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

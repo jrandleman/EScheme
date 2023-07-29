@@ -405,6 +405,8 @@
 (ut (append {:a 1} {:b 2} {:c 3}) {:a 1 :b 2 :c 3})
 (ut (append {:a 1 :b 2} {:c 3 :d 4} {:e 5 :f 6}) {:a 1 :b 2 :c 3 :d 4 :e 5 :f 6})
 
+(ut eq? ++ append) ; verify alias
+
 (ut (delete [1] 0) [])
 (ut (delete [1 2] 0) [2])
 (ut (delete [1 2] 1) [1])
