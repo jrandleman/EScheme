@@ -18,7 +18,6 @@ import escm.type.number.Exact;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.primitive.UtilityPrimitives_util.ContinuationProcedure;
-import escm.primitive.FunctionalPrimitives;
 import escm.primitive.MetaPrimitives;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
@@ -238,6 +237,13 @@ public class UtilityPrimitives {
     public java.lang.String escmName() {
       return "values";
     }
+
+    private static Datum convertArrayListToList(ArrayList<Datum> vals) {
+      Datum lis = Nil.VALUE;
+      for(int i = vals.size()-1; i >= 0; --i) 
+        lis = new Pair(vals.get(i),lis);
+      return lis;
+    }
     
     public static final Datum MAGIC = new Pair(new Symbol("multiple"),new Symbol("values"));
 
@@ -247,7 +253,7 @@ public class UtilityPrimitives {
 
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 1) return parameters.get(0);
-      return new Pair(MAGIC,FunctionalPrimitives.Compose.convertArrayListToList(parameters));
+      return new Pair(MAGIC,convertArrayListToList(parameters));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

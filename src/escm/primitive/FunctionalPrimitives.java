@@ -16,7 +16,6 @@ import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
-import escm.vm.type.AssociativeCollection;
 
 public class FunctionalPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -56,12 +55,15 @@ public class FunctionalPrimitives {
       return "callable?";
     }
 
+    public static boolean logic(Datum d) {
+      if(d instanceof EscmObject) return ((EscmObject)d).isFunctor();
+      return d instanceof Callable;
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(callable? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      Datum o = parameters.get(0);
-      if(o instanceof EscmObject) return Boolean.valueOf(((EscmObject)o).isFunctor());
-      return Boolean.valueOf(o instanceof Callable);
+      return Boolean.valueOf(logic(parameters.get(0)));
     }
   }
 
@@ -73,36 +75,34 @@ public class FunctionalPrimitives {
       return "compose";
     }
 
-    public static Datum convertArrayListToList(ArrayList<Datum> vals) {
-      Datum lis = Nil.VALUE;
-      for(int i = vals.size()-1; i >= 0; --i) 
-        lis = new Pair(vals.get(i),lis);
-      return lis;
+    private static Trampoline.Bounce applyComposedCallables(Datum result, int i, ArrayList<Datum> parameters, Trampoline.Continuation cont) throws Exception {
+      if(i < 0) return cont.run(result);
+      ArrayList<Datum> params = new ArrayList<Datum>(1);
+      params.add(result);
+      return ((Callable)parameters.get(i)).callWith(params,(intermediateResult) -> () -> {
+        return applyComposedCallables(intermediateResult,i-1,parameters,cont);
+      });
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(compose <callable> <callable> ...) expects at least 2 callable args: %s", Exceptionf.profileArgs(parameters));
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
+      int totalCallables = parameters.size();
+      if(totalCallables < 1) 
+        throw new Exceptionf("'(compose <callable> <callable> ...) expects at least 1 callable args: %s", Exceptionf.profileArgs(parameters));
       for(Datum param : parameters)
         if(!(param instanceof Callable))
           throw new Exceptionf("'(compose <callable> <callable> ...) arg %s isn't a callable: %s", param.profile(), Exceptionf.profileArgs(parameters));
-      ArrayList<Datum> parametersCopy = new ArrayList<Datum>(parameters);
-      Collections.reverse(parametersCopy);
-      Callable fstFcn = (Callable)parametersCopy.get(0);
-      parametersCopy.remove(0);
+      if(totalCallables == 1) return parameters.get(0);
+      Callable fstFcn = (Callable)parameters.get(totalCallables-1);
       Callable composedProcedures = (params, cont) -> {
-        Callable foldPrimitive = (foldLambdaParams, foldLambdaCont) -> {
-          Callable p = (Callable)foldLambdaParams.get(1);
-          foldLambdaParams.remove(1);
-          return p.callWith(foldLambdaParams,foldLambdaCont);
-        };
-        PrimitiveProcedure foldProcedure = new PrimitiveProcedure(Procedure.DEFAULT_NAME,foldPrimitive);
-        AssociativeCollection[] lis = new AssociativeCollection[]{(AssociativeCollection)convertArrayListToList(parametersCopy)};
-        return fstFcn.callWith(params,(seed) -> () -> {
-          return AssociativeCollectionPrimitives.Fold.logic(foldProcedure,seed,lis,cont);
+        return fstFcn.callWith(params,(result) -> () -> {
+          return applyComposedCallables(result,totalCallables-2,parameters,cont);
         });
       };
       return new PrimitiveProcedure(Procedure.DEFAULT_NAME,composedProcedures);
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      return logic(parameters);
     }
   }
 
@@ -114,11 +114,12 @@ public class FunctionalPrimitives {
       return "bind";
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(bind <callable> <arg> ...) expects at least 1 callable & 1 arg: %s", Exceptionf.profileArgs(parameters));
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(bind <callable> <arg> ...) expects at least 1 callable: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof Callable)) 
-        throw new Exceptionf("'(bind <callable> <arg> ...) 1st arg %s isn't a callable: %s", parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(bind <callable> <arg> ...) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() == 1) return parameters.get(0);
       ArrayList<Datum> parametersCopy = new ArrayList<Datum>(parameters);
       Callable p = (Callable)parametersCopy.get(0);
       parametersCopy.remove(0);
@@ -128,6 +129,10 @@ public class FunctionalPrimitives {
         return p.callWith(args,cont);
       };
       return new PrimitiveProcedure(Procedure.DEFAULT_NAME,bindPrimitive);
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      return logic(parameters);
     }
   }
 }

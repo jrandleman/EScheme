@@ -43,4 +43,7 @@
 (ut ((compose (bind * 3) (bind * 2) length) []) 0)
 (ut ((compose (bind * 3) (bind * 2) length) [1]) 6)
 (ut ((compose (bind * 3) (bind * 2) length) [1 2 3]) 18)
+(ut ((compose even? (bind * 3) (bind * 2) length) []) #t)
+(ut ((compose even? (bind * 3) (bind * 2) length) [1]) #t)
+(ut ((compose even? (bind * 3) (bind * 2) length) [1 2 3]) #t)
 (ut ((compose - +) 1 2 3) -6)
