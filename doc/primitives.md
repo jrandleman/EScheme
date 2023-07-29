@@ -217,7 +217,7 @@
 (current-directory)
 
 (path <str> ...)
-(path-parent <path-str>)
+(path-parent <path-str> <positive-int>)
 (path-file <path-str>)
 
 (make-directory <path-str>) ; triggers error if directories in <path-str> don't exist

@@ -10,6 +10,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.StandardCopyOption;
 import java.io.File;
 import escm.type.Datum;
+import escm.type.number.Real;
 import escm.type.bool.Boolean;
 import escm.util.Exceptionf;
 import escm.vm.Reader;
@@ -544,11 +545,28 @@ public class FilePrimitives {
       }
     }
 
+    private static int parseCompositionCount(int n, ArrayList<Datum> parameters) throws Exception {
+      if(n == 1) return 1;
+      Datum d = parameters.get(1);
+      if(!(d instanceof Real))
+        throw new Exceptionf("'(path-parent <path-string> <optional-positive-int>) 2nd arg isn't a positive int: %s", Exceptionf.profileArgs(parameters));
+      Real compositionCount = (Real)d;
+      if(!compositionCount.isInteger() || !compositionCount.isPositive())
+        throw new Exceptionf("'(path-parent <path-string> <optional-positive-int>) 2nd arg isn't a positive int: %s", Exceptionf.profileArgs(parameters));
+      return compositionCount.intValue();
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
-        throw new Exceptionf("'(path-parent <path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
-      String parent = logic(((escm.type.String)parameters.get(0)).value());
-      if(parent == null) return Boolean.FALSE;
+      int n = parameters.size();
+      if(n < 1 || n > 2 || !(parameters.get(0) instanceof escm.type.String)) 
+        throw new Exceptionf("'(path-parent <path-string> <optional-positive-int>) incorrect args: %s", Exceptionf.profileArgs(parameters));
+      int compositionCount = parseCompositionCount(n,parameters);
+      String parent = ((escm.type.String)parameters.get(0)).value();
+      while(compositionCount > 0) {
+        parent = logic(parent);
+        if(parent == null) return Boolean.FALSE;
+        --compositionCount;
+      }
       return new escm.type.String(parent);
     }
   }

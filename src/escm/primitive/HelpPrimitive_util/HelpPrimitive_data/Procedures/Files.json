@@ -50,7 +50,7 @@
   "name": "path?",
   "aliases": null,
   "signatures": ["(path? <path-str>)"],
-  "description": "Returns whether <path-str> is a path (directory or file).",
+  "description": "Returns whether <path-str> is a path (directory or file) that exists on the\nsystem.",
   "example": null
 }, {
   "name": "directory?",
@@ -121,8 +121,8 @@
 }, {
   "name": "path-parent",
   "aliases": null,
-  "signatures": ["(path-parent <path-str>)"],
-  "description": "Get <path-str>'s parent path. Returns #f if <path-str> doesn't have a parent.",
+  "signatures": ["(path-parent <path-str>)", "(path-parent <path-str> <positive-int>)"],
+  "description": "Get <path-str>'s parent path. Returns #f if <path-str> doesn't have a parent.\n<positive-int> denotes how many parents in the chain to go up (1 by default).",
   "example": null
 }, {
   "name": "path-file",
@@ -152,7 +152,7 @@
   "name": "absolute-path?",
   "aliases": null,
   "signatures": ["(absolute-path? <path-str>)"],
-  "description": "Returns whether <path-str> is an absolute path.\nEffectively: (equal? <path-str> (absolute-path <path-str>))",
+  "description": "Returns whether <path-str> is an absolute path. Note that this is different\nfrom <path?>: checks path structure, not whether it exists on the current\nsystem. Effectively: (equal? <path-str> (absolute-path <path-str>))",
   "example": null
 }, {
   "name": "file-extension",

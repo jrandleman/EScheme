@@ -188,6 +188,10 @@
 
 (ut (eq? (path (path-parent io-read-file) "read.scm") io-read-file) #t)
 (ut (eq? (path (path-parent io-read-file) (path-file io-read-file)) io-read-file) #t)
+(ut (eq? (path (path-parent io-read-file 1) "read.scm") io-read-file) #t)
+(ut (eq? (path (path-parent io-read-file 1) (path-file io-read-file)) io-read-file) #t)
+(ut (eq? (path (path-parent (path io-read-file "fake_directory") 2) "read.scm") io-read-file) #t)
+(ut (eq? (path (path-parent (path io-read-file "fake_directory") 2) (path-file io-read-file)) io-read-file) #t)
 
 (new-fp!)
 (define dir1 fp)
