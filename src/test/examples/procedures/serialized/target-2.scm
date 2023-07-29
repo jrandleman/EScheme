@@ -1,0 +1,1 @@
+(define target-2-variable 42)

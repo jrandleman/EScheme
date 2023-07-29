@@ -137,15 +137,15 @@ public class SerializationPrimitives {
       fileOut.close();
     }
 
-    public static Trampoline.Bounce logic(String escmPathStr, String serializePath, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
+    public static Trampoline.Bounce logic(String prmName, String escmPathStr, String serializePath, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
       Path escmPath = Path.of(escmPathStr);
       if(FilePrimitives.IsFileP.logic(escmPath) == false)
-        throw new Exceptionf("'(serialize <escm-file-path> <serialized-file-path>) 1st arg \"%s\" isn't a file!", escmPathStr);
+        throw new Exceptionf("'(%s <escm-file-path> <serialized-file-path>) 1st arg \"%s\" isn't a file!", prmName, escmPathStr);
       String escmContents = Files.readString(escmPath);
       ArrayList<Datum> escmExprs = FilePrimitives.FileRead.readBufferAsArrayList(escmPathStr,escmContents);
       return getDeserializedEscmInstructions(null,0,escmExprs.size(),escmExprs,definitionEnvironment,(instructionSet) -> () -> {
         if(!(instructionSet instanceof InstructionSet))
-          throw new Exceptionf("'(serialize <escm-file-path> <serialized-file-path>) compiling \"%s\" didn't yield an instruction set!", escmPathStr);
+          throw new Exceptionf("'(%s <escm-file-path> <serialized-file-path>) compiling \"%s\" didn't yield an instruction set!", prmName, escmPathStr);
         ArrayList<Instruction> instructions = ((InstructionSet)instructionSet).value();
         writeEscmSerializedInstructions(instructions,serializePath);
         return continuation.run(Void.VALUE);
@@ -155,7 +155,23 @@ public class SerializationPrimitives {
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String) || !(parameters.get(1) instanceof escm.type.String)) 
         throw new Exceptionf("'(serialize <escm-file-path> <serialized-file-path>) didn't receive 2 strings: %s", Exceptionf.profileArgs(parameters));
-      return logic(((escm.type.String)parameters.get(0)).value(), ((escm.type.String)parameters.get(1)).value(), this.definitionEnvironment, continuation);
+      return logic("serialize", ((escm.type.String)parameters.get(0)).value(), ((escm.type.String)parameters.get(1)).value(), this.definitionEnvironment, continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // serialize-module
+  public static class SerializeModule extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "serialize-module";
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String) || !(parameters.get(1) instanceof escm.type.String)) 
+        throw new Exceptionf("'(serialize-module <escm-file-path> <serialized-file-path>) didn't receive 2 strings: %s", Exceptionf.profileArgs(parameters));
+      Environment isolatedEnvironment = SystemPrimitives.EscmLoadModule.getModuleEnvironment();
+      return Serialize.logic("serialize-module", ((escm.type.String)parameters.get(0)).value(), ((escm.type.String)parameters.get(1)).value(), isolatedEnvironment, continuation);
     }
   }
 

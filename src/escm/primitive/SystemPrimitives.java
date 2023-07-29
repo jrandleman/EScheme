@@ -369,7 +369,7 @@ public class SystemPrimitives {
       return Load.addStringPaths(moduleAbsolutePath.toString(),moduleFileName);
     }
 
-    private static Environment getModuleEnvironment() throws Exception {
+    public static Environment getModuleEnvironment() throws Exception {
       Environment moduleEnvironment = GlobalState.getJavaPrimitiveEnvironment();
       // Note that we manually interpret our EScheme `stdlib.scm` every time, even if the serialized version
       // is available. For some reason, while serialization decreases boot time (as expected), it can nearly 

@@ -14,6 +14,9 @@
 (define target-ser-port (open-output-file)) ; create a temporary file
 (define target-ser-file (port-path target-ser-port))
 
+(define target-2-escm-file (append data-directory "target-2.scm"))
+(define target-2-ser-port (open-output-file)) ; create a temporary file
+(define target-2-ser-file (port-path target-2-ser-port))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TESTS
@@ -24,3 +27,9 @@
 (load target-ser-file)
 (import data-directory target)
 (ut (fact 5) (target.fact 5))
+
+(ut (serialized? target-2-escm-file) #f)
+(ut (begin (serialize-module target-2-escm-file target-2-ser-file) (serialized? target-2-ser-file)) #t)
+(ut (defined? target-2-variable) #f)
+(load target-2-ser-file)
+(ut (defined? target-2-variable) #t)

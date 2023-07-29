@@ -652,6 +652,7 @@
 (time <callable> <arg> ...) ; (<time-taken-in-milliseconds> . <result>)
 
 (serialize <escm-file-path> <serialized-file-path>)
+(serialize-module <escm-file-path> <serialized-file-path>)
 (serialized? <file-path>)
 ```
 

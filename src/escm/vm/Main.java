@@ -215,7 +215,8 @@ public class Main {
     Environment globalEnvironment = GlobalState.getJavaPrimitiveEnvironment();
     String escmStdlibPath = EscmPath.VALUE+File.separator+"src"+File.separator+"stdlib.scm";
     String serStdlibPath = EscmPath.VALUE+File.separator+"bin"+File.separator+"stdlib.ser";
-    Trampoline.resolve(SerializationPrimitives.Serialize.logic(escmStdlibPath,serStdlibPath,globalEnvironment,(ignore) -> () -> Trampoline.LAST_BOUNCE_SIGNAL));
+    Trampoline.Continuation terminalContinutation = (ignore) -> () -> Trampoline.LAST_BOUNCE_SIGNAL;
+    Trampoline.resolve(SerializationPrimitives.Serialize.logic("serialize",escmStdlibPath,serStdlibPath,globalEnvironment,terminalContinutation));
   }
 
 
