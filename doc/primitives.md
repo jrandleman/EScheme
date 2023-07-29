@@ -176,6 +176,8 @@
 (module-bindings <module>) ; list of <module>'s defined variable symbols (beware that all modules have all the stdlib!)
 
 (system <optional-millisecond-timeout> <command-str> <optional-env-var-str-list> <optional-directory-str>)
+
+(getenv <optional-var-name-str>)
 ```
 
 

@@ -55,3 +55,9 @@
 (ut (module-test.f 4) 8)
 (ut (module-test.g 4) 16)
 (ut (module-test.*3 4) 12)
+
+(ut (hashmap? (getenv)) #t)
+(ut (getenv "") #f)
+(let ((env-vars (getenv)))
+  (if (> (length env-vars) 0)
+      (ut (string? (getenv (car (hashmap-keys env-vars)))) #t)))

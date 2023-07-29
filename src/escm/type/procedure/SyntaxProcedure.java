@@ -66,7 +66,11 @@ public class SyntaxProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
   // Invocation source binding (used by escm.type.Symbol)
   public SyntaxProcedure loadWithInvocationSource(SourceInformation invocationSource) {
-    return new SyntaxProcedure(name,invocationSource,macro);
+    if(macro instanceof Procedure) {
+      return new SyntaxProcedure(name,invocationSource,(Callable)((Procedure)macro).loadWithInvocationSource(invocationSource));
+    } else {
+      return new SyntaxProcedure(name,invocationSource,macro);
+    }
   }
 
 

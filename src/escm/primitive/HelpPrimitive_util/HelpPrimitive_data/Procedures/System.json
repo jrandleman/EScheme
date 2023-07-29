@@ -49,4 +49,10 @@
                 ],
   "description": "Executes a command, using the environment variable bindings in\n<env-var-str-list> (defaults to those of the current environment), \nin the <directory-str> directory (defaults to the current working \ndirectory).\n\nNote that each environment variable string in <env-var-str-list>\nshould follow the \"name=value\" format.\n\nIf <millisecond-timeout> (a real number) is given and exceeded, the\nspawned process will terminate. Note that this is NOT a hard cap \nthough: hence passing 0 as <millisecond-timeout> may still have \nsystem-wide side effects.\n\nUltimately passed to Java's <Runtime.getRuntime().exec()>.\n\nReturns a list:\n  (<command-stdout-str> <command-stderr-str> <command-exit-code>)",
   "example": null
+}, {
+  "name": "getenv",
+  "aliases": null,
+  "signatures": ["(getenv)", "(getenv <var-name-str>)"],
+  "description": "If given no arguments, return a hashmap of name:value string environment \nvariable associations.\n\nIf given an environment variable name string, returns its string value. \nIf the given string is not an accessable environment variable, returns #f",
+  "example": null
 }]

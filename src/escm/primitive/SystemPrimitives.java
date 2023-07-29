@@ -6,6 +6,7 @@ package escm.primitive;
 import java.util.ArrayList;
 import java.util.Stack;
 import java.util.Calendar;
+import java.util.Map;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -511,6 +512,40 @@ public class SystemPrimitives {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol)) 
         throw new Exceptionf("'(escm-parameter? <symbol>) invalid args: %s", Exceptionf.profileArgs(parameters));
       return Boolean.valueOf(GlobalState.parameterEnvironment.has((Symbol)parameters.get(0)));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // getenv
+  public static class GetEnv extends Primitive {
+    public java.lang.String escmName() {
+      return "getenv";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      int n = parameters.size();
+      if(n > 1)
+        throw new Exceptionf("'(getenv <optional-var-name-str>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      if(n == 1) {
+        Datum varName = parameters.get(0);
+        if(!(varName instanceof escm.type.String))
+          throw new Exceptionf("'(getenv <optional-var-name-str>) <var-name> isn't a string: %s", Exceptionf.profileArgs(parameters));
+        try {
+          String value = System.getenv(((escm.type.String)varName).value());
+          if(value == null) return Boolean.FALSE;
+          return new escm.type.String(value);
+        } catch(Exception e) {
+          return Boolean.FALSE;
+        }
+      } else {
+        Map<String, String> env = System.getenv();
+        Hashmap vars = new Hashmap();
+        for (String envName : env.keySet()) {
+          vars.set(new escm.type.String(envName), new escm.type.String(env.get(envName)));
+        }
+        return vars;
+      }
     }
   }
 }
