@@ -110,7 +110,7 @@
   "name": "current-directory",
   "aliases": null,
   "signatures": ["(current-directory)"],
-  "description": "Get the current working directory's absolute path as a string.",
+  "description": "Get the current working directory's absolute path as a string.\n\nNote that <current-directory> refers to the directory that launched\nthe current process. Use #path if you instead want to refer to the\ndirectory of the current file.",
   "example": null
 }, {
   "name": "path-parent",
