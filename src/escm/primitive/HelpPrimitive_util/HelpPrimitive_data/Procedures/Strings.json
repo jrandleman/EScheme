@@ -65,6 +65,18 @@
   "description": "Returns the last index of <str2> in <str1> if present, or #f if it isn't.",
   "example": null
 }, {
+  "name": "string-prefix?",
+  "aliases": ["string-starts-with?"],
+  "signatures": ["(string-prefix? <str> <prefix-str>)"],
+  "description": "Returns whether <str> starts with <prefix-str>. Also see <string-suffix?>.",
+  "example": null
+}, {
+  "name": "string-suffix?",
+  "aliases": ["string-ends-with?"],
+  "signatures": ["(string-suffix? <str> <suffix-str>)"],
+  "description": "Returns whether <str> ends with <suffix-str>. Also see <string-prefix?>.",
+  "example": null
+}, {
   "name": "string-join",
   "aliases": null,
   "signatures": ["(string-join <str-list>)", "(string-join <str-list> <conjunction-str>)"],

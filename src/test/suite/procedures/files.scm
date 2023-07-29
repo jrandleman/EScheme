@@ -172,18 +172,14 @@
 
 (ut (path? (current-directory)) #t)
 
-(define (escm-string-ends-with? str suffix)
-    (define idx (string-contains-right str suffix))
-    (and idx (= (- (length str) idx) (length suffix))))
-
 ; testing path
-(ut (escm-string-ends-with? (path "hi" "there") (append "hi" *file-separator* "there")) #t)
-(ut (escm-string-ends-with? (path "hi" *file-separator* "there") (append "hi" *file-separator* "there")) #t)
-(ut (escm-string-ends-with? (path "hi" *file-separator* *file-separator* "there") (append "hi" *file-separator* "there")) #t)
-(ut (escm-string-ends-with? (path *file-separator* "hi" *file-separator* *file-separator* "there" *file-separator*) (append "hi" *file-separator* "there")) #t)
-(ut (escm-string-ends-with? (path *file-separator* "hi" *file-separator* *file-separator* "there" *file-separator* "man") (append "hi" *file-separator* "there" *file-separator* "man")) #t)
-(ut (escm-string-ends-with? (path "hi") (append "hi")) #t)
-(ut (escm-string-ends-with? (path *file-separator* "hi" *file-separator*) "hi") #t)
+(ut (string-suffix? (path "hi" "there") (append "hi" *file-separator* "there")) #t)
+(ut (string-suffix? (path "hi" *file-separator* "there") (append "hi" *file-separator* "there")) #t)
+(ut (string-suffix? (path "hi" *file-separator* *file-separator* "there") (append "hi" *file-separator* "there")) #t)
+(ut (string-suffix? (path *file-separator* "hi" *file-separator* *file-separator* "there" *file-separator*) (append "hi" *file-separator* "there")) #t)
+(ut (string-suffix? (path *file-separator* "hi" *file-separator* *file-separator* "there" *file-separator* "man") (append "hi" *file-separator* "there" *file-separator* "man")) #t)
+(ut (string-suffix? (path "hi") (append "hi")) #t)
+(ut (string-suffix? (path *file-separator* "hi" *file-separator*) "hi") #t)
 (ut (path) (current-directory))
 
 (ut (eq? (path (path-parent io-read-file) "read.scm") io-read-file) #t)

@@ -193,6 +193,36 @@ public class StringPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // string-prefix?
+  public static class StringPrefixP extends Primitive {
+    public java.lang.String escmName() {
+      return "string-prefix?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String) || !(parameters.get(1) instanceof escm.type.String)) 
+        throw new Exceptionf("'(string-prefix? <string> <prefix-string>) didn't receive exactly 2 strings: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(((escm.type.String)parameters.get(0)).value().startsWith(((escm.type.String)parameters.get(1)).value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // string-suffix?
+  public static class StringSuffixP extends Primitive {
+    public java.lang.String escmName() {
+      return "string-suffix?";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String) || !(parameters.get(1) instanceof escm.type.String)) 
+        throw new Exceptionf("'(string-suffix? <string> <suffix-string>) didn't receive exactly 2 strings: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(((escm.type.String)parameters.get(0)).value().endsWith(((escm.type.String)parameters.get(1)).value()));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // string-join
   public static class StringJoin extends Primitive {
     public java.lang.String escmName() {

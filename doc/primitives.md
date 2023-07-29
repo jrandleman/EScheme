@@ -384,6 +384,9 @@
 (string-contains <str1> <str2>) ; returns index of appearance or #f if not present
 (string-contains-right <str1> <str2>) ; returns index of appearance or #f if not present
 
+(string-prefix? <str> <prefix-str>)
+(string-suffix? <str> <suffix-str>)
+
 (string-join <string-list> <optional-str>) ; str defaults to ""
 (string-split <str> <optional-regex-str>)
 

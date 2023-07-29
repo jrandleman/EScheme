@@ -46,6 +46,20 @@
 (ut (string-contains-right "hello hello" "lo") 9)
 (ut (string-contains-right "hello hello" "ell") 7)
 
+(ut (string-prefix? "hello" "") #t)
+(ut (string-prefix? "hello" "hello") #t)
+(ut (string-prefix? "hello" "h") #t)
+(ut (string-prefix? "hello" "he") #t)
+(ut (string-prefix? "hello" "o") #f)
+(ut (string-prefix? "hello" "lo") #f)
+
+(ut (string-suffix? "hello" "") #t)
+(ut (string-suffix? "hello" "hello") #t)
+(ut (string-suffix? "hello" "h") #f)
+(ut (string-suffix? "hello" "he") #f)
+(ut (string-suffix? "hello" "o") #t)
+(ut (string-suffix? "hello" "lo") #t)
+
 (ut (string-join '()) "")
 (ut (string-join '() "--") "")
 (ut (string-join '("hey")) "hey")
