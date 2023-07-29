@@ -59,6 +59,12 @@
   "description": "Path string to the hosting EScheme implementation's directory.",
   "example": null
 }, {
+  "name": "*escm-version*",
+  "aliases": ["escm-version", "escheme-version", "*escheme-version*"],
+  "signatures": null,
+  "description": "String representing the current EScheme version number.",
+  "example": null
+}, {
   "name": "*escm-execution-command*",
   "aliases": ["escm-execution-command", "escm-exec-command", "escm-exec-cmd", "escm-execution-cmd", "*escm-exec-command*", "*escm-exec-cmd*", "*escm-execution-cmd*"],
   "signatures": null,

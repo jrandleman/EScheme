@@ -27,6 +27,7 @@
 (ut (or (string? *user-name*) (boolean? *user-name*)) #t)
 
 (ut (string? *escm-path*) #t)
+(ut (string? *escm-version*) #t)
 (ut (string? *escm-execution-command*) #t)
 
 (ut (and (parameter? *dosync-lock*) (mutex? *dosync-lock*) (not (mutex-locked? *dosync-lock*))) #t)

@@ -19,6 +19,7 @@ import escm.vm.runtime.installerGenerated.JvmPathPrefix;
 import escm.vm.runtime.installerGenerated.JavaStdLibLoader;
 import escm.vm.runtime.installerGenerated.EscmStdLibLoader;
 import escm.primitive.FilePrimitives;
+import escm.primitive.SystemPrimitives;
 
 public class GlobalState {
   ////////////////////////////////////////////////////////////////////////////
@@ -80,6 +81,7 @@ public class GlobalState {
     definitionEnvironment.define(new Symbol("*user-home*"),getSystemProperty("user.home"));
     definitionEnvironment.define(new Symbol("*user-name*"),getSystemProperty("user.name"));
     definitionEnvironment.define(new Symbol("*escm-path*"),new escm.type.String(EscmPath.VALUE));
+    definitionEnvironment.define(new Symbol("*escm-version*"),new escm.type.String(String.format("%.1f",SystemPrimitives.VERSION)));
     definitionEnvironment.define(new Symbol("*escm-execution-command*"),new escm.type.String(" "+JvmPathPrefix.VALUE+"java -classpath "+EscmPath.VALUE+File.separator+"bin Main "));
     definitionEnvironment.define(new Symbol("*min-radix*"),new Exact(Number.MIN_RADIX));
     definitionEnvironment.define(new Symbol("*max-radix*"),new Exact(Number.MAX_RADIX));

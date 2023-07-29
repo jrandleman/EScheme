@@ -29,6 +29,7 @@
 *user-home*
 
 *escm-path*
+*escm-version*
 *escm-execution-command*
 
 *dosync-lock* ; parameter
