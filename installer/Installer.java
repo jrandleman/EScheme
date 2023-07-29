@@ -113,17 +113,35 @@ public class Installer {
   };
 
 
-  private static String getInputStreamLines(InputStream ins, boolean reportLive) throws Exception {
+  private static void readStream(StringBuilder buffer, BufferedReader in) throws Exception {
     String line = null;
+    while((line = in.readLine()) != null) buffer.append('\n'+line);
+  }
+
+
+  private static void readStreamAndReportLive(StringBuilder buffer, BufferedReader in) throws Exception {
+    int last_ch = -1, ch = -1;
+    while((ch = in.read()) != -1) {
+      boolean line_start = (char)last_ch == '\n' || last_ch == -1;
+      if(line_start) {
+        System.out.print("  ");
+        buffer.append('\n');
+      }
+      System.out.print((char)ch);
+      System.out.flush();
+      buffer.append((char)ch);
+      last_ch = ch;
+    }
+  }
+
+
+  private static String getInputStreamLines(InputStream ins, boolean reportLive) throws Exception {
     StringBuilder buffer = new StringBuilder();
     BufferedReader in = new BufferedReader(new InputStreamReader(ins));
-    while((line = in.readLine()) != null) {
-      if(reportLive) {
-        System.out.print("  ");
-        System.out.println(line);
-        System.out.flush();
-      }
-      buffer.append('\n'+line);
+    if(reportLive) {
+      readStreamAndReportLive(buffer,in);
+    } else {
+      readStream(buffer,in);
     }
     if(buffer.length() == 0) return "";
     return buffer.substring(1);
