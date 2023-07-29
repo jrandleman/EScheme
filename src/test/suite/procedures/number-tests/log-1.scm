@@ -1,4 +1,4 @@
-(load (path #path ".." ".." ".." "lib.scm"))
+(load (path (path-parent #path 3) "lib.scm"))
 :nop
 (nut = (log 0.0) '-Infinity)
 (nut = (log Infinity) 'Infinity)

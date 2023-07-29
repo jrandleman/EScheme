@@ -1,4 +1,4 @@
-(load (path #path ".." ".." ".." "lib.scm"))
+(load (path (path-parent #path 3) "lib.scm"))
 (nut equal? (odd? 0) '#f)
 (nut equal? (odd? 0.0) '#f)
 :nop

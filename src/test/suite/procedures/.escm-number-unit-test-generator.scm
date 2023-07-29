@@ -15,7 +15,7 @@
         (list->string (list cwd))
         cwd)))
 
-(define ESCM_UNIT_TESTING_LIBRARY_PATH "(load (path #path \"..\" \"..\" \"..\" \"lib.scm\"))")
+(define ESCM_UNIT_TESTING_LIBRARY_PATH "(load (path (path-parent #path 3) \"lib.scm\"))")
 
 (define GENERATED_TEST_DIRECTORY_PATH (string-append (current-directory) *file-separator* "number-tests"))
 

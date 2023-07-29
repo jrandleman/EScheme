@@ -1,4 +1,4 @@
-(load (path #path ".." ".." ".." "lib.scm"))
+(load (path (path-parent #path 3) "lib.scm"))
 (nut equal? (magnitude 0) '0)
 (nut equal? (magnitude 0.0) '0.0)
 (nut equal? (magnitude Infinity) 'Infinity)

@@ -4,12 +4,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IMPORTS
-(load (path #path ".." ".." "lib.scm"))
+(load (path (path-parent #path 2) "lib.scm"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; VARIABLES
-(define data-directory (append (path #path ".." ".." "examples" "procedures" "serialized") *file-separator*))
+(define data-directory (append (path (path-parent #path 2) "examples" "procedures" "serialized") *file-separator*))
 (define target-escm-file (append data-directory "target.scm"))
 (define target-ser-port (open-output-file)) ; create a temporary file
 (define target-ser-file (port-path target-ser-port))

@@ -4,7 +4,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IMPORTS
-(load (path #path ".." ".." "lib.scm"))
+(load (path (path-parent #path 2) "lib.scm"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -14,7 +14,7 @@
 (ut (meta-object? ((class))) #t)
 (ut (meta-object? (interface)) #t)
 
-(import (path #path ".." ".." "examples" "procedures" "system") module-test)
+(import (path (path-parent #path 2) "examples" "procedures" "system") module-test)
 (ut (meta-object? module-test) #f) ; showing modules can use dot-syntax, but ARE NOT meta-objects
 
 (ut (interface? 0) #f)

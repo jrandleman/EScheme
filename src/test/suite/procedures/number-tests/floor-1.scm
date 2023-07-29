@@ -1,4 +1,4 @@
-(load (path #path ".." ".." ".." "lib.scm"))
+(load (path (path-parent #path 3) "lib.scm"))
 (nut = (floor 0) '0)
 (nut = (floor 0.0) '0.0)
 (nut = (floor Infinity) 'Infinity)

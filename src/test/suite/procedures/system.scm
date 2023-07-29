@@ -4,12 +4,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IMPORTS
-(load (path #path ".." ".." "lib.scm"))
+(load (path (path-parent #path 2) "lib.scm"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; VARIABLES
-(define data-directory (append (path #path ".." ".." "examples" "procedures" "system") *file-separator*))
+(define data-directory (append (path (path-parent #path 2) "examples" "procedures" "system") *file-separator*))
 (define exit-test-file (append data-directory "exit-test.scm"))
 (define load-test-file (append data-directory "load-test.scm"))
 (define load-test-2-file (append data-directory "load-test-2.scm"))

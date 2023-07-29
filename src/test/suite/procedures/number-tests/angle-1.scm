@@ -1,4 +1,4 @@
-(load (path #path ".." ".." ".." "lib.scm"))
+(load (path (path-parent #path 3) "lib.scm"))
 :nop
 (nut equal? (angle 0.0) '0.0)
 (nut equal? (angle Infinity) '0.0)

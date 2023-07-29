@@ -52,7 +52,7 @@ public class Installer {
     "  1. -h, --help                 | Print this information\n"+
     "  2. -v, --verbose              | Print out installation progress messages\n"+
     "  3. -u, --unit-tests           | Run EScheme's unit test suite after compilation\n"+
-    "  4. -i, --interpret-stdlib     | Don't serialize <../src/stdlib.scm>\n"+
+    "  4. -i, --interpret-stdlib     | Don't serialize <.."+File.separator+"src"+File.separator+"stdlib.scm>\n"+
     "  5. -j, --java-bin-path <path> | Set the path to our JVM's <bin> directory\n";
 
 

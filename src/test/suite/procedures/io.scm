@@ -4,12 +4,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IMPORTS
-(load (path #path ".." ".." "lib.scm"))
+(load (path (path-parent #path 2) "lib.scm"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; VARIABLES
-(define in-file (path #path ".." ".." "examples" "procedures" "io" "read.scm"))
+(define in-file (path (path-parent #path 2) "examples" "procedures" "io" "read.scm"))
 (define *in-file-contents*
 "(defn fact
   ((n) (fact n 1))

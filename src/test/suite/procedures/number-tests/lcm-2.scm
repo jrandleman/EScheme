@@ -1,4 +1,4 @@
-(load (path #path ".." ".." ".." "lib.scm"))
+(load (path (path-parent #path 3) "lib.scm"))
 (nut = (lcm 0.0 0.0) '0.0)
 (nut = (lcm 0.0 0.0) '0.0)
 (nut = (lcm 0 1) '0)

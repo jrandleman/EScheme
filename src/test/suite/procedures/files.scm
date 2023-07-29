@@ -4,12 +4,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IMPORTS
-(load (path #path ".." ".." "lib.scm"))
+(load (path (path-parent #path 2) "lib.scm"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; VARIABLES
-(def data-dir (append (path #path ".." ".." "examples" "procedures" "io") *file-separator*))
+(def data-dir (append (path (path-parent #path 2) "examples" "procedures" "io") *file-separator*))
 (define io-read-file (append data-dir "read.scm"))
 
 
