@@ -43,22 +43,22 @@ public class GlobalState {
 
   ////////////////////////////////////////////////////////////////////////////
   // Global Random Number Generator
-  private static Random prng = new Random();
+  private static final Random prng = new Random();
 
   public static synchronized double getRandomDouble() { return prng.nextDouble(); }
 
   ////////////////////////////////////////////////////////////////////////////
   // <SystemPrimitives> set of imported modules: {absFilePath: moduleVar, ...}
   // => Note this isn't thread-local since files are globally imported!
-  public static ConcurrentHashMap<String,EscmModule> importedModules = new ConcurrentHashMap<String,EscmModule>();
+  public static final ConcurrentHashMap<String,EscmModule> importedModules = new ConcurrentHashMap<String,EscmModule>();
 
   ////////////////////////////////////////////////////////////////////////////
   // Representing the Dynamic "Meta Thread" Environment
-  public static Environment metaThreadDynamicEnvironment = new Environment();
+  public static final Environment metaThreadDynamicEnvironment = new Environment();
 
   ////////////////////////////////////////////////////////////////////////////
   // Representing the Parameter "Truly Global" Environment
-  public static Environment parameterEnvironment = new Environment();
+  public static final Environment parameterEnvironment = new Environment();
 
   ////////////////////////////////////////////////////////////////////////////
   // Get the default environment (only has EScheme's core primitives defined)
@@ -82,7 +82,7 @@ public class GlobalState {
     definitionEnvironment.define(new Symbol("*user-name*"),getSystemProperty("user.name"));
     definitionEnvironment.define(new Symbol("*escm-path*"),new escm.type.String(EscmPath.VALUE));
     definitionEnvironment.define(new Symbol("*escm-version*"),new escm.type.String(String.format("%.1f",SystemPrimitives.VERSION)));
-    definitionEnvironment.define(new Symbol("*escm-execution-command*"),new escm.type.String(" "+JvmPathPrefix.VALUE+"java -classpath "+EscmPath.VALUE+File.separator+"bin Main "));
+    definitionEnvironment.define(new Symbol("*escm-execution-command*"),new escm.type.String(SystemPrimitives.ESCM_EXECUTION_COMMAND));
     definitionEnvironment.define(new Symbol("*min-radix*"),new Exact(Number.MIN_RADIX));
     definitionEnvironment.define(new Symbol("*max-radix*"),new Exact(Number.MAX_RADIX));
     definitionEnvironment.define(new Symbol("*min-priority*"),new Exact(Thread.MIN_PRIORITY));

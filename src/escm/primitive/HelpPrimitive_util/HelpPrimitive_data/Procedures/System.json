@@ -47,7 +47,13 @@
                   "(system <millisecond-timeout> <command-str> <directory-str>)",
                   "(system <millisecond-timeout> <command-str> <env-var-str-list> <directory-str>)"
                 ],
-  "description": "Executes a command, using the environment variable bindings in\n<env-var-str-list> (defaults to those of the current environment), \nin the <directory-str> directory (defaults to the current working \ndirectory).\n\nNote that each environment variable string in <env-var-str-list>\nshould follow the \"name=value\" format.\n\nIf <millisecond-timeout> (a real number) is given and exceeded, the\nspawned process will terminate. Note that this is NOT a hard cap \nthough: hence passing 0 as <millisecond-timeout> may still have \nsystem-wide side effects.\n\nUltimately passed to Java's <Runtime.getRuntime().exec()>.\n\nReturns a list:\n  (<command-stdout-str> <command-stderr-str> <command-exit-code>)",
+  "description": "Executes a command, using the environment variable bindings in\n<env-var-str-list> (defaults to those of the current environment), \nin the <directory-str> directory (defaults to the current working \ndirectory).\n\nNote that each environment variable string in <env-var-str-list>\nshould follow the \"name=value\" format.\n\nIf <millisecond-timeout> (a real number) is given and exceeded, the\nspawned process will terminate. Note that this is NOT a hard cap \nthough: hence passing 0 as <millisecond-timeout> may still have \nsystem-wide side effects.\n\nUltimately passed to Java's <Runtime.getRuntime().exec()>.\nReferenced by <escm>.\n\nReturns a list:\n  (<command-stdout-str> <command-stderr-str> <command-exit-code>)",
+  "example": null
+}, {
+  "name": "escm",
+  "aliases": null,
+  "signatures": ["(escm <escm-file> <optional-argv> ...)", "(escm <millisecond-timeout> <escm-file> <optional-argv> ...)"],
+  "description": "Execute an EScheme program in a seperate process. Effectively a wrapper \naround <system> that references <*escm-execution-command*>. Displays each \n<argv> to generate a single command string with <escm-file>.\n\nIf <millisecond-timeout> (a real number) is given and exceeded, the\nspawned process will terminate. Note that this is NOT a hard cap \nthough: hence passing 0 as <millisecond-timeout> may still have \nsystem-wide side effects.\n\nReturns a list:\n  (<program-stdout-str> <program-stderr-str> <program-exit-code>)",
   "example": null
 }, {
   "name": "getenv",

@@ -183,6 +183,8 @@
 
 (system <optional-millisecond-timeout> <command-str> <optional-env-var-str-list> <optional-directory-str>)
 
+(escm <optional-millisecond-timeout> <escm-file> <optional-argv> ...)
+
 (getenv <optional-var-name-str>)
 ```
 

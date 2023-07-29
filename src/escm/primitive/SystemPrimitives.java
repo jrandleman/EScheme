@@ -33,11 +33,17 @@ import escm.vm.util.ObjectAccessChain;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.EscmCallStack;
 import escm.vm.runtime.installerGenerated.EscmPath;
+import escm.vm.runtime.installerGenerated.JvmPathPrefix;
 
 public class SystemPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // Get the EScheme version number
   public static final double VERSION = 9.0;
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Get the EScheme command-line execution command
+  public static final String ESCM_EXECUTION_COMMAND = " "+JvmPathPrefix.VALUE+"java -classpath "+EscmPath.VALUE+File.separator+"bin Main ";
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -226,7 +232,7 @@ public class SystemPrimitives {
       return strs.toArray(new String[strs.size()]);
     }
 
-    private static Long parseMillisecondTimeout(ArrayList<Datum> parameters) throws Exception {
+    public static Long parseMillisecondTimeout(ArrayList<Datum> parameters) throws Exception {
       Datum timeout = parameters.get(0);
       if(!(timeout instanceof Real)) return null;
       Real r = (Real)timeout;
@@ -274,6 +280,44 @@ public class SystemPrimitives {
         result = ExecuteSystemCommand.run(cmd,envp,dir);
       } else {
         result = ExecuteSystemCommand.run(timeout.longValue(),cmd,envp,dir);
+      }
+      return escm.type.Pair.List(new escm.type.String(result.out),new escm.type.String(result.err),new Exact(result.exit));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // escm
+  public static class ExecuteEscmProgram extends Primitive {
+    public java.lang.String escmName() {
+      return "escm";
+    }
+
+    private static String parseEscmProgramCommand(Long timeout, ArrayList<Datum> parameters) throws Exception {
+      int n = parameters.size();
+      int cmdIdx = timeout == null ? 0 : 1;
+      if(n < cmdIdx+1)
+        throw new Exceptionf("'(escm <optional-millisecond-timeout> <escm-file> <optional-argv> ...) invalid number of args: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(cmdIdx) instanceof escm.type.String))
+        throw new Exceptionf("'(escm <optional-millisecond-timeout> <escm-file> <optional-argv> ...) <escm-file> isn't a string: %s", Exceptionf.profileArgs(parameters));
+      StringBuilder sb = new StringBuilder(ESCM_EXECUTION_COMMAND);
+      for(; cmdIdx < n; ++cmdIdx) {
+        sb.append(" ");
+        sb.append(parameters.get(cmdIdx).display());
+      }
+      return sb.toString();
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(escm <optional-millisecond-timeout> <escm-file> <optional-argv> ...) invalid number of args: %s", Exceptionf.profileArgs(parameters));
+      Long timeout = ExecuteCommand.parseMillisecondTimeout(parameters);
+      String cmd = parseEscmProgramCommand(timeout,parameters);
+      ExecuteSystemCommand.Result result = null;
+      if(timeout == null) {
+        result = ExecuteSystemCommand.run(cmd);
+      } else {
+        result = ExecuteSystemCommand.run(timeout.longValue(),cmd);
       }
       return escm.type.Pair.List(new escm.type.String(result.out),new escm.type.String(result.err),new Exact(result.exit));
     }
