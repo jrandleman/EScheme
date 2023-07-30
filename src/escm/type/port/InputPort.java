@@ -305,6 +305,14 @@ public class InputPort extends Port {
 
   ////////////////////////////////////////////////////////////////////////////
   // Datum Reader
+  private boolean isReaderLambdaLiteral(int input) throws Exception {
+    if(input != (int)Reader.LAMBDA_LITERAL_PREFIX) return false;
+    int next = pr.read();
+    pr.unread(next);
+    return next == (int)'(';
+  }
+
+
   public synchronized Datum readDatum() throws Exception {
     StringBuilder sb = new StringBuilder();
     SourceInformation datumSourceStart = new SourceInformation(name,lineNumber,columnNumber);
@@ -418,7 +426,7 @@ public class InputPort extends Port {
             }
             if(containerStack.empty()) break;
           // account for reader shorthands
-          } else if(Reader.isReaderShorthand((char)input) || input == '\\') {
+          } else if(Reader.isReaderShorthand((char)input) || isReaderLambdaLiteral(input)) {
             updatePortPosition(input);
             sb.append((char)input);
             if(input == ',') {

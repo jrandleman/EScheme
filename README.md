@@ -118,9 +118,9 @@
      * `(quote {a 42})` => `{(quote a) (quote 42)}`
 9. Immutable pairs & strings
    - Mutable pairs may be implemented by users via the object system!
-10. `\` reader lambda literal support
+10. `#(` reader lambda literal support
     - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
-    - `\%1` => `(lambda (%1) %1)`, `\(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
+    - `#(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
 11. Compile-time procedural macro system
     - No run-time expansion and all global in scope!
 12. Object System (classes, interfaces, and objects!)

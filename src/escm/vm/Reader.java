@@ -28,6 +28,12 @@ public class Reader {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Character prefix denoting a reader lambda literal
+  // => ___Must be followed by a '(' to register as a lambda literal!___
+  public static final char LAMBDA_LITERAL_PREFIX = '#';
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Length of the Reader's Error Substring
   private static final int READER_ERROR_SUBSTRING_LENGTH = 80;
 
@@ -120,6 +126,13 @@ public class Reader {
   private static final Symbol LAMBDA_SYMBOL = new escm.type.Symbol("lambda");
 
 
+  // Reader.LAMBDA_LITERAL_PREFIX + '('
+  private static boolean isReaderLambdaLiteral(CharSequence sourceCode, int i) {
+    if(sourceCode.charAt(i) != Reader.LAMBDA_LITERAL_PREFIX) return false;
+    return i+1 < sourceCode.length() && sourceCode.charAt(i+1) == '(';
+  }
+
+
   // @return: 0: nothing, -1: variadic, else: param #
   private static int parseParam(Symbol s) {
     if(s.value().length() == 0 || s.value().charAt(0) != '%') return 0;
@@ -177,7 +190,7 @@ public class Reader {
   // @return: pair of parsed lambda literal expansion & position in <sourceCode> after the parsed literal
   private static Pair<Datum,Integer> parseReaderLambdaLiteralLogic(CharSequence sourceCode, int i, Stack<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
     SourceInformation lambdaSource = source.clone();
-    source.updatePosition('\\');
+    source.updatePosition(LAMBDA_LITERAL_PREFIX);
     Pair<Datum,Integer> parsedItem = readLoop(sourceCode,i,containerStack,source,ignoringIncomplete);
     if(parsedItem.first == null)
       throw new IncompleteException(ignoringIncomplete,i-1, sourceCode, lambdaSource, "READ ERROR: Incomplete lambda reader shorthand literal!");
@@ -598,7 +611,7 @@ public class Reader {
       }
 
       // Expand reader lambda literals
-      if(sourceCode.charAt(i) == '\\') {
+      if(isReaderLambdaLiteral(sourceCode,i)) {
         return parseReaderLambdaLiteralLogic(sourceCode,i+1,containerStack,source,ignoringIncomplete);
       }
 
