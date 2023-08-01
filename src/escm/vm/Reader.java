@@ -282,7 +282,6 @@ public class Reader {
     if(i >= n)
       throw new IncompleteException(ignoringIncomplete,vectorIndex,sourceCode,vectorSource,"READ ERROR: Incomplete vector literal!");
     source.updatePosition(']');
-    containerStack.pop(); // opening ']'
     return new Pair<Datum,Integer>(vect,i+1);
   }
 
@@ -316,7 +315,6 @@ public class Reader {
     if(key != null)
       throw new ReaderException(hashmapIndex,sourceCode,hashmapSource,"READ ERROR: Hashmap literal %s key %s doesn't have a value!", hmap.write(), key.profile());
     source.updatePosition('}');
-    containerStack.pop(); // opening '}'
     return new Pair<Datum,Integer>(hmap,i+1);
   }
 
@@ -569,6 +567,7 @@ public class Reader {
         char opener = containerStack.pop();
         if(opener != '(')
           throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid parenthesis: found a closing ')' prior to closing '%c'!", opener);
+        return new Pair<Datum,Integer>(null,i);
       }
 
       // Account for bracket scoping
@@ -580,6 +579,7 @@ public class Reader {
         char opener = containerStack.pop();
         if(opener != '[')
           throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid bracket: found a closing ']' prior to closing '%c'!", opener);
+        return new Pair<Datum,Integer>(null,i);
       }
 
       // Account for curly-brace scoping
@@ -591,6 +591,7 @@ public class Reader {
         char opener = containerStack.pop();
         if(opener != '{')
           throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid curly-brace: found a closing '}' prior to closing '%c'!", opener);
+        return new Pair<Datum,Integer>(null,i);
       }
 
       // Ignore whitespace
