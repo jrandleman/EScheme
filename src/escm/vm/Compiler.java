@@ -55,19 +55,19 @@ public class Compiler {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Compiling Vector Literals (must evaluate their contents)
-  private static Trampoline.Bounce generateVectorCallInstructions(Datum v, int count, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
-    if(v instanceof Nil) return continuation.run(Pair.List(Pair.List(PUSH,VECTOR),Pair.List(CALL,new Exact(-count))));
-    Pair vPair = (Pair)v;
-    Datum hd = vPair.car();
+  // Compiling [] & {} Container Literals
+  private static Trampoline.Bounce generateContainerCallInstructions(Symbol containerName, Datum c, int count, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
+    if(c instanceof Nil) return continuation.run(Pair.List(Pair.List(PUSH,containerName),Pair.List(CALL,new Exact(-count))));
+    Pair cPair = (Pair)c;
+    Datum hd = cPair.car();
     if(!(hd instanceof Pair) && !(hd instanceof Vector) && !(hd instanceof Hashmap)) {
-      return () -> generateVectorCallInstructions(vPair.cdr(),count+1,definitionEnvironment,(applicationInstructions) -> () -> {
+      return () -> generateContainerCallInstructions(containerName,cPair.cdr(),count+1,definitionEnvironment,(applicationInstructions) -> () -> {
         return continuation.run(new Pair(Pair.List(PUSH,hd),applicationInstructions));
       });
     } else {
       return () -> run(hd,definitionEnvironment,(valueInstructions) -> () -> {
         Datum instructions = Pair.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
-        return generateVectorCallInstructions(vPair.cdr(),count+1,definitionEnvironment,(applicationInstructions) -> () -> {
+        return generateContainerCallInstructions(containerName,cPair.cdr(),count+1,definitionEnvironment,(applicationInstructions) -> () -> {
           return continuation.run(Pair.binaryAppend(instructions,applicationInstructions));
         });
       });
@@ -75,34 +75,17 @@ public class Compiler {
   }
 
 
+  ////////////////////////////////////////////////////////////////////////////
+  // Compiling Vector Literals (must evaluate their contents)
   private static Trampoline.Bounce compileVectorLiteral(Vector v, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
-    return generateVectorCallInstructions((Datum)((OrderedCollection)v.toList()).reverse(),1,definitionEnvironment,continuation);
+    return generateContainerCallInstructions(VECTOR,v.toReverseList(),1,definitionEnvironment,continuation);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Compiling Hashmap Literals (must evaluate their contents)
-  private static Trampoline.Bounce generateHashmapCallInstructions(Datum h, int count, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
-    if(h instanceof Nil) return continuation.run(Pair.List(Pair.List(PUSH,HASHMAP),Pair.List(CALL,new Exact(-count))));
-    Pair hPair = (Pair)h;
-    Datum hd = hPair.car();
-    if(!(hd instanceof Pair) && !(hd instanceof Vector) && !(hd instanceof Hashmap)) {
-      return () -> generateHashmapCallInstructions(hPair.cdr(),count+1,definitionEnvironment,(applicationInstructions) -> () -> {
-        return continuation.run(new Pair(Pair.List(PUSH,hd),applicationInstructions));
-      });
-    } else {
-      return () -> run(hd,definitionEnvironment,(valueInstructions) -> () -> {
-        Datum instructions = Pair.binaryAppend(valueInstructions,Pair.List(Pair.List(PUSH)));
-        return generateHashmapCallInstructions(hPair.cdr(),count+1,definitionEnvironment,(applicationInstructions) -> () -> {
-          return continuation.run(Pair.binaryAppend(instructions,applicationInstructions));
-        });
-      });
-    }
-  }
-
-
   private static Trampoline.Bounce compileHashmapLiteral(Hashmap h, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
-    return generateHashmapCallInstructions((Datum)((OrderedCollection)h.toList()).reverse(),1,definitionEnvironment,continuation);
+    return generateContainerCallInstructions(HASHMAP,h.toReverseList(),1,definitionEnvironment,continuation);
   }
 
 

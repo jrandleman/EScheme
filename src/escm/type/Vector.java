@@ -34,6 +34,8 @@
 //      - String toEscmString()
 //      - Hashmap toHashmap()
 //
+//      - Datum toReverseList() // used internally
+//
 //      - callWith(...) // given an index, returns the entry at that position
 
 package escm.type;
@@ -270,6 +272,18 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       }
       return h;
     }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Internal Coercions
+  public Datum toReverseList() {
+    Datum lis = escm.type.Nil.VALUE;
+    synchronized(this) {
+      for(int i = 0, n = value.size(); i < n; ++i)
+        lis = new escm.type.Pair(value.get(i),lis);
+    }
+    return lis;
   }
 
 

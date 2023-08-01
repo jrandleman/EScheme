@@ -22,6 +22,8 @@
 //      - Datum toList()
 //      - Vector toVector()
 //
+//      - Datum toReverseList() // used internally
+//
 //      - callWith(...) // given a key, returns the value at that position
 
 package escm.type;
@@ -143,6 +145,17 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
       v.push(entry.getValue());
     }
     return v;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Internal Coercions
+  public Datum toReverseList() {
+    Datum lis = Nil.VALUE;
+    for(ConcurrentHashMap.Entry<Datum,Datum> entry : value.entrySet()) {
+      lis = new Pair(entry.getValue(),new Pair(entry.getKey(),lis));
+    }
+    return lis;
   }
 
 
