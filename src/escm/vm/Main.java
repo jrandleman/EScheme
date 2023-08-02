@@ -209,7 +209,7 @@ public class Main {
   // Implementing the Unit Test Executor
   private static void executeUnitTests() throws Exception {
     ParsedCommandLine parsed = new ParsedCommandLine();
-    parsed.scriptName = EscmPath.VALUE+File.separator+"src"+File.separator+"test"+File.separator+"main.scm";
+    parsed.scriptName = EscmPath.VALUE+File.separator+"test"+File.separator+"main.scm";
     loadScript(parsed);
   }
 
