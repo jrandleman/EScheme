@@ -6,9 +6,6 @@
 ;;               * This has to do with how we evaluate the stdlib prior receiving 
 ;;                 user code.
 
-;; => IMPORTANT: IN ORDER FOR CHANGES IN THIS FILE TO AFFECT THE ESCHEME RUNTIME (IF
-;;               IT WAS SERIALIZED) REINSTALL ESCHEME VIA "installer/Installer.java"
-
 ; PROVIDES:
 ;   - quote
 ;   - define-syntax

@@ -137,7 +137,7 @@ public class SerializationPrimitives {
       fileOut.close();
     }
 
-    public static Trampoline.Bounce logic(String prmName, String escmPathStr, String serializePath, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
+    private static Trampoline.Bounce logic(String prmName, String escmPathStr, String serializePath, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
       Path escmPath = Path.of(escmPathStr);
       if(FilePrimitives.IsFileP.logic(escmPath) == false)
         throw new Exceptionf("'(%s <escm-file-path> <serialized-file-path>) 1st arg \"%s\" isn't a file!", prmName, escmPathStr);

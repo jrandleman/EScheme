@@ -11,6 +11,13 @@ import escm.vm.util.SourceInformation;
 
 public class EscmCallStack {
   ////////////////////////////////////////////////////////////////////////////
+  // Getting an empty callstack (used by <load>)
+  public static Stack<Pair<String,SourceInformation>> newCallStack() {
+    return new Stack<Pair<String,SourceInformation>>();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Registering a call
   public static void push(String calledFunctionName, SourceInformation invocationSource) {
     ((EscmThread)Thread.currentThread()).callStack.push(new Pair<String,SourceInformation>(calledFunctionName,invocationSource));

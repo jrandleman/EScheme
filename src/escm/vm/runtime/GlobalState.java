@@ -17,7 +17,6 @@ import escm.vm.util.Environment;
 import escm.vm.runtime.installerGenerated.EscmPath;
 import escm.vm.runtime.installerGenerated.JvmPathPrefix;
 import escm.vm.runtime.installerGenerated.JavaStdLibLoader;
-import escm.vm.runtime.installerGenerated.EscmStdLibLoader;
 import escm.primitive.FilePrimitives;
 import escm.primitive.SystemPrimitives;
 

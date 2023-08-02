@@ -25,7 +25,6 @@ import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.installerGenerated.EscmPath;
 import escm.primitive.SystemPrimitives;
 import escm.primitive.FilePrimitives;
-import escm.primitive.SerializationPrimitives;
 
 public class Main {
   ////////////////////////////////////////////////////////////////////////////
@@ -142,11 +141,11 @@ public class Main {
   }
 
 
-  private static void launchRepl(ParsedCommandLine parsedCmdLine, Environment globalEnvironment) throws Exception {
+  private static void launchRepl(boolean launchQuietly, Environment globalEnvironment) throws Exception {
     // Note that we DON'T set whether we're in the REPL here, as such risks
     //   causing a read/write race condition should a script loaded by "-l" 
     //   spawn a thread!
-    if(parsedCmdLine.launchingQuiet == false) {
+    if(launchQuietly == false) {
       printReplIntro();
     } else {
       GlobalState.setLastPrintedANewline(true); // to print opening ">" on the 1st line
@@ -169,23 +168,20 @@ public class Main {
   ////////////////////////////////////////////////////////////////////////////
   // Implementing our File Interpreter
   private static void loadScript(ParsedCommandLine parsedCmdLine) throws Exception {
-    // Initialize the runtime, load the file, & launch REPL if found "-l" prior the filename
-    Environment globalEnvironment = GlobalState.getDefaultEnvironment();
-    Trampoline.Continuation replIfReplingContinuation = (value) -> () -> {
-      if(parsedCmdLine.loadingIntoREPL) launchRepl(parsedCmdLine,globalEnvironment);
-      return Trampoline.LAST_BOUNCE_SIGNAL;
-    };
-    // Note that we set whether we're in the REPL here, as setting in <launchRepl>
-    //   could cause a read/write race condition should the loaded script spawn a 
-    //   thread!
-    if(parsedCmdLine.loadingIntoREPL) GlobalState.inREPL = true; // trigger exit message to be printed
     if(FilePrimitives.IsFileP.logic(Path.of(parsedCmdLine.scriptName)) == false)
       throw new Exceptionf("\"--load\": \"%s\" isn't a file!\n  %s", parsedCmdLine.scriptName, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
-    Trampoline.resolve(SystemPrimitives.Load.logic("load",parsedCmdLine.scriptName,globalEnvironment,replIfReplingContinuation));
+    if(parsedCmdLine.loadingIntoREPL) GlobalState.inREPL = true; // trigger exit message to be printed
+    Environment globalEnvironment = GlobalState.getDefaultEnvironment();
+    Trampoline.resolve(SystemPrimitives.Load.logic("load",parsedCmdLine.scriptName,globalEnvironment,(value) -> () -> {
+      if(parsedCmdLine.loadingIntoREPL) launchRepl(parsedCmdLine.launchingQuiet,globalEnvironment);
+      return Trampoline.LAST_BOUNCE_SIGNAL;
+    }));
   }
 
 
   private static void importScript(ParsedCommandLine parsedCmdLine) throws Exception {
+    if(FilePrimitives.IsFileP.logic(Path.of(parsedCmdLine.scriptName)) == false)
+      throw new Exceptionf("\"--import\": \"%s\" isn't a file!\n  %s", parsedCmdLine.scriptName, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
     GlobalState.inREPL = true; // trigger exit message to be printed
     Environment globalEnvironment = GlobalState.getDefaultEnvironment();
     Symbol modulePath = new Symbol(parsedCmdLine.scriptName);
@@ -194,7 +190,7 @@ public class Main {
     args.add(modulePath);
     Trampoline.resolve((new SystemPrimitives.EscmLoadModule()).callWith(args,(module) -> () -> {
       globalEnvironment.define(moduleName,module);
-      launchRepl(parsedCmdLine,globalEnvironment);
+      launchRepl(parsedCmdLine.launchingQuiet,globalEnvironment);
       return Trampoline.LAST_BOUNCE_SIGNAL;
     }));
   }
@@ -210,17 +206,6 @@ public class Main {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Implementing the <stdlib.scm> Serializer
-  private static void serializeStdLib() throws Exception {
-    Environment globalEnvironment = GlobalState.getJavaPrimitiveEnvironment();
-    String escmStdlibPath = EscmPath.VALUE+File.separator+"src"+File.separator+"stdlib.scm";
-    String serStdlibPath = EscmPath.VALUE+File.separator+"bin"+File.separator+"stdlib.ser";
-    Trampoline.Continuation terminalContinutation = (ignore) -> () -> Trampoline.LAST_BOUNCE_SIGNAL;
-    Trampoline.resolve(SerializationPrimitives.Serialize.logic("serialize",escmStdlibPath,serStdlibPath,globalEnvironment,terminalContinutation));
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // Implementing the Unit Test Executor
   private static void executeUnitTests() throws Exception {
     ParsedCommandLine parsed = new ParsedCommandLine();
@@ -232,7 +217,6 @@ public class Main {
   ////////////////////////////////////////////////////////////////////////////
   // Parse the command-line
   private static class ParsedCommandLine {
-    public boolean serializingStdLib = false; // --serialize-stdlib
     public boolean executeUnitTests  = false; // --unit-tests
     public boolean launchingQuiet    = false; // -q --quiet
     public boolean loadingIntoREPL   = false; // -l --load
@@ -254,10 +238,6 @@ public class Main {
     ParsedCommandLine parsed = new ParsedCommandLine();
     for(int i = 0; i < args.length; ++i) {
       switch(args[i]) {
-        case "--serialize-stdlib": {
-          parsed.serializingStdLib = true;
-          return parsed;
-        }
         case "--unit-tests": {
           parsed.executeUnitTests = true;
           return parsed;
@@ -317,14 +297,11 @@ public class Main {
       (params, cont) -> {
         ParsedCommandLine parsedCmdLine = parseCommandLine(args);
         try {
-          if(parsedCmdLine.serializingStdLib == true) {
-            serializeStdLib();
-          } else if(parsedCmdLine.executeUnitTests == true) {
+          if(parsedCmdLine.executeUnitTests == true) {
             executeUnitTests();
           } else if(parsedCmdLine.scriptName == null) {
-            Environment globalEnvironment = GlobalState.getDefaultEnvironment();
             GlobalState.inREPL = true; // trigger exit message to be printed
-            launchRepl(parsedCmdLine,globalEnvironment);
+            launchRepl(parsedCmdLine.launchingQuiet,GlobalState.getDefaultEnvironment());
           } else {
             launchScript(parsedCmdLine);
           }

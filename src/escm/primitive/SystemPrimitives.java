@@ -423,7 +423,7 @@ public class SystemPrimitives {
       //   upon loading, so we can afford evaluating it with a dummy continuation.
       Trampoline.Continuation terminalContinuation = (ignored) -> () -> Trampoline.LAST_BOUNCE_SIGNAL;
       ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(EscmPath.VALUE+File.separator+"src"+File.separator+"stdlib.scm",escmCode);
-      Trampoline.resolve(Load.evalEachExpression(exprs,0,new Stack<Pair<String,SourceInformation>>(),moduleEnvironment,terminalContinuation));
+      Trampoline.resolve(Load.evalEachExpression(exprs,0,EscmCallStack.newCallStack(),moduleEnvironment,terminalContinuation));
       moduleEnvironment.define(new Symbol("*import*"),Boolean.TRUE); // set <FALSE> in <GlobalState>
       return moduleEnvironment;
     }

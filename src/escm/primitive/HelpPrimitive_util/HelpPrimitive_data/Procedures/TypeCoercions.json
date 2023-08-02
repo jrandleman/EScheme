@@ -122,18 +122,18 @@
   "name": "write-to-string",
   "aliases": null,
   "signatures": ["(write-to-string <obj>)"],
-  "description": "Serialize <obj> in machine-readable form.",
+  "description": "Write <obj> to a string in machine-readable form.",
   "example": null
 }, {
   "name": "display-to-string",
   "aliases": null,
   "signatures": ["(display-to-string <obj>)"],
-  "description": "Serialize <obj> in human-readable form.",
+  "description": "Write <obj> to a string in human-readable form.",
   "example": null
 }, {
   "name": "pretty-print-to-string",
   "aliases": ["pprint-to-string"],
   "signatures": ["(pretty-print-to-string <obj>)"],
-  "description": "Serialize <obj> in indented, machine-readable form.\nAliased by <pprint-to-string>.",
+  "description": "Write <obj> to a string in indented, machine-readable form.\nAliased by <pprint-to-string>.",
   "example": null
 }]
