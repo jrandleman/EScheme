@@ -23,6 +23,7 @@ import escm.vm.runtime.EscmCallStack;
 import escm.vm.runtime.EscmThread;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.installerGenerated.EscmPath;
+import escm.vm.runtime.installerGenerated.JavaStdLibLoaderGenerator;
 import escm.primitive.SystemPrimitives;
 import escm.primitive.FilePrimitives;
 
@@ -215,13 +216,21 @@ public class Main {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Implementing Java StdLib Loader Generation
+  private static void generateJavaStdLibLoader() throws Exception {
+    JavaStdLibLoaderGenerator.execute();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Parse the command-line
   private static class ParsedCommandLine {
-    public boolean executeUnitTests  = false; // --unit-tests
-    public boolean launchingQuiet    = false; // -q --quiet
-    public boolean loadingIntoREPL   = false; // -l --load
-    public boolean importingIntoREPL = false; // -i --import
-    public String scriptName         = null;  // <null> denotes no script
+    public boolean executeUnitTests          = false; // --unit-tests
+    public boolean generateJavaStdLibLoader  = false; // --generate-java-stdlib-loader
+    public boolean launchingQuiet            = false; // -q --quiet
+    public boolean loadingIntoREPL           = false; // -l --load
+    public boolean importingIntoREPL         = false; // -i --import
+    public String scriptName                 = null;  // <null> denotes no script
   }
 
 
@@ -240,6 +249,10 @@ public class Main {
       switch(args[i]) {
         case "--unit-tests": {
           parsed.executeUnitTests = true;
+          return parsed;
+        }
+        case "--generate-java-stdlib-loader": {
+          parsed.generateJavaStdLibLoader = true;
           return parsed;
         }
         case "-v": case "--version": {
@@ -299,6 +312,8 @@ public class Main {
         try {
           if(parsedCmdLine.executeUnitTests == true) {
             executeUnitTests();
+          } else if(parsedCmdLine.generateJavaStdLibLoader == true) {
+            generateJavaStdLibLoader();
           } else if(parsedCmdLine.scriptName == null) {
             GlobalState.inREPL = true; // trigger exit message to be printed
             launchRepl(parsedCmdLine.launchingQuiet,GlobalState.getDefaultEnvironment());
