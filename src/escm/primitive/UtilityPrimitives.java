@@ -50,7 +50,7 @@ public class UtilityPrimitives {
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 0) 
         throw new Exceptionf("'(error <reason> <arg> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
-      StringBuffer sb = new StringBuffer();
+      StringBuilder sb = new StringBuilder();
       sb.append(parameters.get(0).display());
       for(int i = 1, n = parameters.size(); i < n; ++i)
         sb.append(" " + parameters.get(i).write());
