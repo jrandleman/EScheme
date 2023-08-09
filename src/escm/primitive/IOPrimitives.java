@@ -146,6 +146,35 @@ public class IOPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // println
+  public static class Println extends Primitive {
+    public java.lang.String escmName() {
+      return "println";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 && parameters.size() != 2) 
+        throw new Exceptionf("'(println <optional-output-port> <obj>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      Datum printed = null;
+      OutputPort port = null;
+      if(parameters.size() == 2) {
+        Datum portDatum = parameters.get(0);
+        if(!(portDatum instanceof OutputPort))
+          throw new Exceptionf("'(println <optional-output-port> <obj>) 1st arg isn't an output port: %s", Exceptionf.profileArgs(parameters));
+        port = (OutputPort)portDatum;
+        printed = parameters.get(1);
+      } else {
+        port = OutputPort.getCurrent();
+        printed = parameters.get(0);
+      }
+      port.println(printed.display());
+      if(GlobalState.inREPL && port.isStdout()) GlobalState.setLastPrintedANewline(true);
+      return escm.type.Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // pretty-printf
   public static class PrettyPrintf extends Primitive {
     public java.lang.String escmName() {

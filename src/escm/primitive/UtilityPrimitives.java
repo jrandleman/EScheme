@@ -108,11 +108,17 @@ public class UtilityPrimitives {
     public java.lang.String escmName() {
       return "force";
     }
+
+    public static Trampoline.Bounce logic(Datum delayed, Trampoline.Continuation continuation) throws Exception {
+      if(!(delayed instanceof Callable)) 
+        throw new Exceptionf("'(force <delayed>) <delayed> %s isn't a callable!", delayed.profile());
+      return ((Callable)delayed).callWith(new ArrayList<Datum>(),continuation);
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() != 1 || !(parameters.get(0) instanceof Callable)) 
+      if(parameters.size() != 1) 
         throw new Exceptionf("'(force <delayed>) didn't receive exactly 1 callable arg: %s", Exceptionf.profileArgs(parameters));
-      return ((Callable)parameters.get(0)).callWith(new ArrayList<Datum>(),continuation);
+      return logic(parameters.get(0),continuation);
     }
   }
 
@@ -166,6 +172,41 @@ public class UtilityPrimitives {
   // dynamic-wind
   //   See the below for an implementation of <dynamic-wind> w/ r4rs call/cc:
   //     https://groups.csail.mit.edu/mac/ftpdir/scheme-mail/HTML/rrrs-1992/msg00194.html
+  //
+  // (define *winds* '())
+  //
+  // (define (dynamic-wind <thunk1> <thunk2> <thunk3>)
+  //   (<thunk1>)
+  //   (set! *winds* (cons (cons <thunk1> <thunk3>) *winds*))
+  //   (let ((ans (<thunk2>)))
+  //     (set! *winds* (cdr *winds*))
+  //     (<thunk3>)
+  //     ans))
+  //
+  // (define call-with-current-continuation
+  //   (let ((oldcc call-with-current-continuation))
+  //     (lambda (proc)
+  //       (let ((winds *winds*))
+  //   (oldcc
+  //    (lambda (cont)
+  //      (proc (lambda (c2)
+  //        (dynamic:do-winds *winds* winds)
+  //        (cont c2)))))))))
+  //
+  // (define (dynamic:do-winds from to)
+  //   (set! *winds* from)
+  //   (cond ((eq? from to))
+  //   ((null? from)
+  //    (dynamic:do-winds from (cdr to))
+  //    ((caar to)))
+  //   ((null? to)
+  //    ((cdar from))
+  //    (dynamic:do-winds (cdr from) to))
+  //   (else
+  //    ((cdar from))
+  //    (dynamic:do-winds (cdr from) (cdr to))
+  //    ((caar to))))
+  //   (set! *winds* to))
   public static class DynamicWind extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "dynamic-wind";
@@ -233,6 +274,25 @@ public class UtilityPrimitives {
   //   See the below for an implementation of <values> & <call-with-values>:
   //     https://www.scheme.com/tspl4/control.html#./control:h8
   //       => Scroll right to the end of the section for the implementation!
+  //
+  // (define magic (cons 'multiple 'values)) 
+  //
+  // (define magic?
+  //   (lambda (x)
+  //     (and (pair? x) (eq? (car x) magic))))
+  //
+  // (define call/cc
+  //   (lambda (p)
+  //     (rnrs:call/cc
+  //       (lambda (k)
+  //         (p (lambda args
+  //              (k (apply values args)))))))) 
+  //
+  // (define values
+  //   (lambda args
+  //     (if (and (not (null? args)) (null? (cdr args)))
+  //         (car args)
+  //         (cons magic args)))) 
   public static class Values extends Primitive {
     public java.lang.String escmName() {
       return "values";
@@ -267,6 +327,13 @@ public class UtilityPrimitives {
   //   See the below for an implementation of <values> & <call-with-values>:
   //     https://www.scheme.com/tspl4/control.html#./control:h8
   //       => Scroll right to the end of the section for the implementation!
+  //
+  // (define call-with-values
+  //   (lambda (producer consumer)
+  //     (let ([x (producer)])
+  //       (if (magic? x)
+  //           (apply consumer (cdr x))
+  //           (consumer x))))))
   public static class CallWithValues extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "call-with-values";
@@ -301,6 +368,23 @@ public class UtilityPrimitives {
   // with-exception-handler
   //   See the below for an implementation of <with-exception-handler>, <raise>, & <guard>:
   //     https://srfi.schemers.org/srfi-34/srfi-34.html
+  //
+  // (define *current-exception-handlers*
+  //   (list (lambda (condition)
+  //           (error "unhandled exception" condition))))
+  //
+  // (define (with-exception-handler handler thunk)
+  //   (with-exception-handlers (cons handler *current-exception-handlers*)
+  //                            thunk))
+  //
+  // (define (with-exception-handlers new-handlers thunk)
+  //   (let ((previous-handlers *current-exception-handlers*))
+  //     (dynamic-wind
+  //       (lambda ()
+  //         (set! *current-exception-handlers* new-handlers))
+  //       thunk
+  //       (lambda ()
+  //         (set! *current-exception-handlers* previous-handlers)))))
   public static class WithExceptionHandler extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "with-exception-handler";
@@ -343,6 +427,15 @@ public class UtilityPrimitives {
   // raise
   //   See the below for an implementation of <with-exception-handler>, <raise>, & <guard>:
   //     https://srfi.schemers.org/srfi-34/srfi-34.html
+  //
+  // (define (raise obj)
+  //   (let ((handlers *current-exception-handlers*))
+  //     (with-exception-handlers (cdr handlers)
+  //       (lambda ()
+  //         ((car handlers) obj)
+  //         (error "handler returned"
+  //                (car handlers)
+  //                obj)))))
   public static class Raise extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "raise";

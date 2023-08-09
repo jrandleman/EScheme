@@ -92,13 +92,14 @@ public class MetaPrimitives {
       return "eval";
     }
 
+    public static Trampoline.Bounce logic(Datum data, Environment env, Trampoline.Continuation continuation) throws Exception {
+      return Compiler.run(data,env,(compiled) -> () -> Interpreter.run(new ExecutionState(env,Assembler.run(compiled)),continuation));
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(eval <escm-code-as-data>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      Datum data = parameters.get(0);
-      return Compiler.run(data,this.definitionEnvironment,(compiled) -> () -> {
-        return Interpreter.run(new ExecutionState(this.definitionEnvironment,Assembler.run(compiled)),continuation);
-      });
+      return logic(parameters.get(0),this.definitionEnvironment,continuation);
     }
   }
 
@@ -172,15 +173,15 @@ public class MetaPrimitives {
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2)
-        throw new Exceptionf("'(escmn-define-syntax <symbol> <callable>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(escm-define-syntax <symbol> <callable>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum name = parameters.get(0);
       if(!(name instanceof Symbol))
-        throw new Exceptionf("'(escmn-define-syntax <symbol> <callable>) 1st arg %s isn't a symbol: %s", name.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(escm-define-syntax <symbol> <callable>) 1st arg %s isn't a symbol: %s", name.profile(), Exceptionf.profileArgs(parameters));
       Datum value = parameters.get(1);
       if(!(value instanceof Callable))
-        throw new Exceptionf("'(escmn-define-syntax <symbol> <callable>) 2nd arg %s isn't a callable: %s", value.profile(), Exceptionf.profileArgs(parameters));
-      Symbol nameSumbol = (Symbol)name;
-      this.definitionEnvironment.define(nameSumbol,new SyntaxProcedure(nameSumbol.value(),(Callable)value));
+        throw new Exceptionf("'(escm-define-syntax <symbol> <callable>) 2nd arg %s isn't a callable: %s", value.profile(), Exceptionf.profileArgs(parameters));
+      Symbol nameSymbol = (Symbol)name;
+      this.definitionEnvironment.define(nameSymbol,new SyntaxProcedure(nameSymbol.value(),(Callable)value));
       return escm.type.Void.VALUE;
     }
   }
@@ -204,7 +205,7 @@ public class MetaPrimitives {
       SyntaxProcedure macro = IsSyntax.logic(this.definitionEnvironment,macroName);
       if(macro == null)
         throw new Exceptionf("'(expand-syntax <quoted-macro-expression>) given arg isn't a macro expression: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<Datum> macroArgs = MetaPrimitives.Apply.convertListToArrayList(macroExprList.cdr());
+      ArrayList<Datum> macroArgs = Apply.convertListToArrayList(macroExprList.cdr());
       return macro.callWith(macroArgs,continuation);
     }
   }

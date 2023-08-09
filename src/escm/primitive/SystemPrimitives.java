@@ -414,16 +414,7 @@ public class SystemPrimitives {
     }
 
     public static Environment getModuleEnvironment() throws Exception {
-      Environment moduleEnvironment = GlobalState.getJavaPrimitiveEnvironment();
-      // Note that we manually interpret our EScheme `stdlib.scm` every time, even if the serialized version
-      // is available. For some reason, while serialization decreases boot time (as expected), it can nearly 
-      // double import time.
-      String escmCode = Files.readString(Path.of(EscmPath.VALUE+File.separator+"src"+File.separator+"stdlib.scm"));
-      // Further note that we know our stdlib don't store any continuations using call/cc
-      //   upon loading, so we can afford evaluating it with a dummy continuation.
-      Trampoline.Continuation terminalContinuation = (ignored) -> () -> Trampoline.LAST_BOUNCE_SIGNAL;
-      ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(EscmPath.VALUE+File.separator+"src"+File.separator+"stdlib.scm",escmCode);
-      Trampoline.resolve(Load.evalEachExpression(exprs,0,EscmCallStack.newCallStack(),moduleEnvironment,terminalContinuation));
+      Environment moduleEnvironment = GlobalState.getDefaultEnvironment();
       moduleEnvironment.define(new Symbol("*import*"),Boolean.TRUE); // set <FALSE> in <GlobalState>
       return moduleEnvironment;
     }

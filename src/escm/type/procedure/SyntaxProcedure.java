@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import escm.util.Trampoline;
 import escm.type.Datum;
 import escm.vm.type.Callable;
+import escm.vm.type.PrimitiveSyntax;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.SourceInformation;
 
@@ -30,6 +31,16 @@ public class SyntaxProcedure extends Procedure {
     } else {
       this.macro = macro;
     }
+  }
+
+
+  public SyntaxProcedure(java.lang.String name, PrimitiveSyntax prm) {
+    this.name = name;
+    this.macro = new Callable() {
+      public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+        return continuation.run(prm.callWith(parameters));
+      }
+    };
   }
 
 

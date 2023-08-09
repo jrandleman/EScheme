@@ -18,8 +18,11 @@ import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.procedure.Procedure;
 import escm.type.procedure.PrimitiveProcedure;
+import escm.type.procedure.SyntaxProcedure;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
+import escm.vm.type.PrimitiveSyntax;
+import escm.vm.type.PrimitiveSyntaxCallable;
 import escm.vm.runtime.GlobalState;
 
 public class Environment implements Serializable {
@@ -161,6 +164,16 @@ public class Environment implements Serializable {
   }
 
 
+  public void set(Symbol name, PrimitiveSyntax prm) throws Exception {
+    set(name,(Datum)(new SyntaxProcedure(name.value(),prm)));
+  }
+
+
+  public void set(Symbol name, PrimitiveSyntaxCallable prm) throws Exception {
+    set(name,(Datum)(new SyntaxProcedure(name.value(),prm)));
+  }
+
+
   ////////////////////////////////////////////////////////////////////////////
   // Define value
   public void define(Symbol name, Datum value) {
@@ -176,5 +189,24 @@ public class Environment implements Serializable {
 
   public void define(Symbol name, PrimitiveCallable prm) {
     define(name,(Datum)(new PrimitiveProcedure(name.value(),prm)));
+  }
+
+
+  public void define(Symbol name, PrimitiveSyntax prm) {
+    define(name,(Datum)(new SyntaxProcedure(name.value(),prm)));
+  }
+
+
+  public void define(Symbol name, PrimitiveSyntaxCallable prm) {
+    define(name,(Datum)(new SyntaxProcedure(name.value(),prm)));
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Thread-safe one-time definition
+  //   => Returns whether the value was put
+  public boolean defineIfAbsent(Symbol name, Datum value) {
+    String nameString = name.value();
+    return bindings.putIfAbsent(nameString,value.loadWithName(nameString)) == null;
   }
 }
