@@ -90,6 +90,7 @@ public class CompoundProcedure extends Procedure {
 
 
   public CompoundProcedure loadWithState(ExecutionState exeState) {
+    if(state.definitionEnvironment != null) return this;
     return new CompoundProcedure(name,invocationSource,new State(exeState.env,state.compileTime));
   }
 

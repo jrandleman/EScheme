@@ -760,11 +760,11 @@ public class SyntaxStreamPrimitives {
       Datum compiledCallable = StreamMap.compiledAtom(c);
       return Scar.logic(stream,(scar) -> () -> {
         Datum compiledScar = StreamMap.compiledAtom(scar);
-        ArrayList<Datum> args = new ArrayList<Datum>();
-        args.add(scar);
         return Scdr.logic(stream,(scdr) -> () -> {
           Datum compiledScdr = StreamMap.compiledAtom(scdr);
           Datum recursiveCode = Pair.List(STREAM_FILTER,compiledCallable,compiledScdr);
+          ArrayList<Datum> args = new ArrayList<Datum>();
+          args.add(scar);
           return ((Callable)c).callWith(args,(passedTest) -> () -> {
             if(passedTest.isTruthy()) {
               return SyntaxCorePrimitives.Delay.run(compiledScar,this.definitionEnvironment,(delayedScar) -> () -> {
@@ -779,7 +779,7 @@ public class SyntaxStreamPrimitives {
         });
       });
     }
-    
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2) 
         throw new Exceptionf("'(stream-filter <callable> <stream>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
