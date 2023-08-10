@@ -20,6 +20,8 @@ import escm.type.Void;
 import escm.type.Symbol;
 import escm.type.number.Exact;
 import escm.type.bool.Boolean;
+import escm.type.procedure.Procedure;
+import escm.type.procedure.PrimitiveProcedure;
 import escm.vm.Compiler;
 import escm.vm.util.Environment;
 import escm.vm.type.OrderedCollection;
@@ -686,8 +688,29 @@ public class SyntaxCorePrimitives {
       return "delay";
     }
 
-    public static Trampoline.Bounce run(Datum delayedCode, Environment env, Trampoline.Continuation continuation) throws Exception {
-      return MetaPrimitives.Eval.logic(logic(delayedCode),env,continuation);
+    private static class DatumBox {
+      private Datum value = Boolean.FALSE;
+      public synchronized Datum value() {return value;}
+      public synchronized void setValue(Datum v) {value = v;}
+    }
+
+    private static class BooleanBox {
+      private boolean value = false;
+      public synchronized boolean value() {return value;}
+      public synchronized void setValue(boolean v) {value = v;}
+    }
+
+    public static Datum valueOf(Datum delayedCode, Environment env) throws Exception {
+      DatumBox result = new DatumBox();
+      BooleanBox isForced = new BooleanBox();
+      return new PrimitiveProcedure(Procedure.DEFAULT_NAME,(params, cont) -> {
+        if(isForced.value() == true) return cont.run(result.value());
+        return MetaPrimitives.Eval.logic(delayedCode,env,(codeResult) -> () -> {
+          result.setValue(codeResult);
+          isForced.setValue(true);
+          return cont.run(codeResult);
+        });
+      });
     }
 
     private static Datum logic(Datum delayedCode) throws Exception {

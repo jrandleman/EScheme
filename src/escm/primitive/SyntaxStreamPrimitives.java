@@ -713,7 +713,7 @@ public class SyntaxStreamPrimitives {
   //           (apply callable (map scar streams))
   //           (stream-map (map scdr streams)))))
   //   (stream-map streams))
-  public static class StreamMap extends PrimitiveCallable {
+  public static class StreamMap extends Primitive {
     public java.lang.String escmName() {
       return "stream-map";
     }
@@ -722,21 +722,21 @@ public class SyntaxStreamPrimitives {
       return Pair.List(SyntaxCorePrimitives.BYTECODE,Pair.List(SyntaxCorePrimitives.LOAD,atom));
     }
     
-    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 2) 
         throw new Exceptionf("'(stream-map <callable> <stream> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum c = parameters.get(0);
       if(!(c instanceof Callable))
         throw new Exceptionf("'(stream-map <callable> <stream> ...) invalid <callable>: %s", Exceptionf.profileArgs(parameters));
       Pair streams = (Pair)SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
-      if(streams.car() instanceof Nil) return continuation.run(Nil.VALUE);
+      if(streams.car() instanceof Nil) return Nil.VALUE;
       Datum compiledCallable = compiledAtom(c);
       Datum compiledStreams = compiledAtom(streams);
       Datum carCode = Pair.List(SyntaxCorePrimitives.APPLY,compiledCallable,Pair.List(MAP,SCAR,compiledStreams));
       Datum cdrCode = Pair.List(SyntaxCorePrimitives.APPLY,STREAM_MAP,Pair.List(SyntaxCorePrimitives.CONS,compiledCallable,Pair.List(MAP,SCDR,compiledStreams)));
-      return SyntaxCorePrimitives.Delay.run(carCode,this.definitionEnvironment,(car) -> () -> 
-              SyntaxCorePrimitives.Delay.run(cdrCode,this.definitionEnvironment,(cdr) -> () ->
-                continuation.run(new Pair(car,cdr))));
+      Datum delayedScar = SyntaxCorePrimitives.Delay.valueOf(carCode,this.definitionEnvironment);
+      Datum delayedScdr = SyntaxCorePrimitives.Delay.valueOf(cdrCode,this.definitionEnvironment);
+      return new Pair(delayedScar,delayedScdr);
     }
   }
 
@@ -767,11 +767,9 @@ public class SyntaxStreamPrimitives {
           args.add(scar);
           return ((Callable)c).callWith(args,(passedTest) -> () -> {
             if(passedTest.isTruthy()) {
-              return SyntaxCorePrimitives.Delay.run(compiledScar,this.definitionEnvironment,(delayedScar) -> () -> {
-                return SyntaxCorePrimitives.Delay.run(recursiveCode,this.definitionEnvironment,(delayedFilteredScdr) -> () -> {
-                  return continuation.run(new Pair(delayedScar,delayedFilteredScdr));
-                });
-              });
+              Datum delayedScar = SyntaxCorePrimitives.Delay.valueOf(compiledScar,this.definitionEnvironment);
+              Datum delayedFilteredScdr = SyntaxCorePrimitives.Delay.valueOf(recursiveCode,this.definitionEnvironment);
+              return continuation.run(new Pair(delayedScar,delayedFilteredScdr));
             } else {
               return logic(parameters,c,scdr,continuation);
             }
@@ -796,29 +794,27 @@ public class SyntaxStreamPrimitives {
   //
   // (define (stream-iterate update-callable seed)
   //     (scons seed (stream-iterate update-callable (update-callable seed))))
-  public static class StreamIterate extends PrimitiveCallable {
+  public static class StreamIterate extends Primitive {
     public java.lang.String escmName() {
       return "stream-iterate";
     }
 
-    private Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum c, Datum seed, Trampoline.Continuation continuation) throws Exception {
+    private Datum logic(ArrayList<Datum> parameters, Datum c, Datum seed) throws Exception {
       Datum compiledCallable = StreamMap.compiledAtom(c);
       Datum compiledSeed = StreamMap.compiledAtom(seed);
       Datum scdrCode = Pair.List(STREAM_ITERATE,compiledCallable,Pair.List(compiledCallable,compiledSeed));
-      return SyntaxCorePrimitives.Delay.run(compiledSeed,this.definitionEnvironment,(delayedScar) -> () -> {
-        return SyntaxCorePrimitives.Delay.run(scdrCode,this.definitionEnvironment,(delayedScdr) -> () -> {
-          return continuation.run(new Pair(delayedScar,delayedScdr));
-        });
-      });
+      Datum delayedScar = SyntaxCorePrimitives.Delay.valueOf(compiledSeed,this.definitionEnvironment);
+      Datum delayedScdr = SyntaxCorePrimitives.Delay.valueOf(scdrCode,this.definitionEnvironment);
+      return new Pair(delayedScar,delayedScdr);
     }
     
-    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
         throw new Exceptionf("'(stream-iterate <update-callable> <obj>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum c = parameters.get(0);
       if(!(c instanceof Callable))
         throw new Exceptionf("'(stream-iterate <update-callable> <obj>) invalid <callable>: %s", Exceptionf.profileArgs(parameters));
-      return logic(parameters,c,parameters.get(1),continuation);
+      return logic(parameters,c,parameters.get(1));
     }
   }
 
@@ -834,38 +830,36 @@ public class SyntaxStreamPrimitives {
   //   (if (null? objs)
   //       '()
   //       (stream-constant objs)))
-  public static class EscmStreamConstant extends PrimitiveCallable {
+  public static class EscmStreamConstant extends Primitive {
     public java.lang.String escmName() {
       return "escm-stream-constant";
     }
 
-    public static Trampoline.Bounce logic(Environment env, Datum originalObjs, Datum objs, Trampoline.Continuation continuation) throws Exception {
-      if(!(objs instanceof Pair)) return () -> logic(env,originalObjs,originalObjs,continuation);
+    public static Datum logic(Environment env, Datum originalObjs, Datum objs) throws Exception {
+      if(!(objs instanceof Pair)) return logic(env,originalObjs,originalObjs);
       Pair objsP = (Pair)objs;
       Datum carCode = StreamMap.compiledAtom(objsP.car());
       Datum cdrCode = Pair.List(ESCM_STREAM_CONSTANT,StreamMap.compiledAtom(originalObjs),StreamMap.compiledAtom(objsP.cdr()));
-      return SyntaxCorePrimitives.Delay.run(carCode,env,(delayedScar) -> () -> {
-        return SyntaxCorePrimitives.Delay.run(cdrCode,env,(delayedScdr) -> () -> {
-          return continuation.run(new Pair(delayedScar,delayedScdr));
-        });
-      });
+      Datum delayedScar = SyntaxCorePrimitives.Delay.valueOf(carCode,env);
+      Datum delayedScdr = SyntaxCorePrimitives.Delay.valueOf(cdrCode,env);
+      return new Pair(delayedScar,delayedScdr);
     }
     
-    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      return logic(this.definitionEnvironment,parameters.get(0),parameters.get(1),continuation);
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      return logic(this.definitionEnvironment,parameters.get(0),parameters.get(1));
     }
   }
 
 
-  public static class StreamConstant extends PrimitiveCallable {
+  public static class StreamConstant extends Primitive {
     public java.lang.String escmName() {
       return "stream-constant";
     }
     
-    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() == 0) return continuation.run(Nil.VALUE);
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() == 0) return Nil.VALUE;
       Datum objs = SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
-      return EscmStreamConstant.logic(this.definitionEnvironment,objs,objs,continuation);
+      return EscmStreamConstant.logic(this.definitionEnvironment,objs,objs);
     }
   }
 
@@ -898,11 +892,9 @@ public class SyntaxStreamPrimitives {
           Datum scarCode = StreamMap.compiledAtom(scar);
           return Scdr.logic(s,(scdr) -> () -> {
             Datum scdrCode = Pair.List(SyntaxCorePrimitives.APPLY,STREAM_APPEND,Pair.List(SyntaxCorePrimitives.CONS,StreamMap.compiledAtom(scdr),StreamMap.compiledAtom(streams)));
-            return SyntaxCorePrimitives.Delay.run(scarCode,this.definitionEnvironment,(delayedScar) -> () -> {
-              return SyntaxCorePrimitives.Delay.run(scdrCode,this.definitionEnvironment,(delayedScdr) -> () -> {
-                return continuation.run(new Pair(delayedScar,delayedScdr));
-              });
-            });
+            Datum delayedScar = SyntaxCorePrimitives.Delay.valueOf(scarCode,this.definitionEnvironment);
+            Datum delayedScdr = SyntaxCorePrimitives.Delay.valueOf(scdrCode,this.definitionEnvironment);
+            return continuation.run(new Pair(delayedScar,delayedScdr));
           });
         });
       }
@@ -940,11 +932,9 @@ public class SyntaxStreamPrimitives {
         Datum scarCode = StreamMap.compiledAtom(scar);
         return Scdr.logic(stream1,(scdr) -> () -> {
           Datum scdrCode = Pair.List(STREAM_INTERLEAVE,stream2Code,StreamMap.compiledAtom(scdr));
-          return SyntaxCorePrimitives.Delay.run(scarCode,this.definitionEnvironment,(delayedScar) -> () -> {
-            return SyntaxCorePrimitives.Delay.run(scdrCode,this.definitionEnvironment,(delayedScdr) -> () -> {
-              return continuation.run(new Pair(delayedScar,delayedScdr));
-            });
-          });
+          Datum delayedScar = SyntaxCorePrimitives.Delay.valueOf(scarCode,this.definitionEnvironment);
+          Datum delayedScdr = SyntaxCorePrimitives.Delay.valueOf(scdrCode,this.definitionEnvironment);
+          return continuation.run(new Pair(delayedScar,delayedScdr));
         });
       });
     }
