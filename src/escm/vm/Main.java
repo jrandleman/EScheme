@@ -182,19 +182,21 @@ public class Main {
 
 
   private static void importScript(ParsedCommandLine parsedCmdLine) throws Exception {
-    if(FilePrimitives.IsFileP.logic(Path.of(parsedCmdLine.scriptName)) == false)
-      throw new Exceptionf("\"--import\": \"%s\" isn't a file!\n  %s", parsedCmdLine.scriptName, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
     GlobalState.inREPL = true; // trigger exit message to be printed
-    Environment globalEnvironment = GlobalState.getDefaultEnvironment();
     Symbol modulePath = new Symbol(parsedCmdLine.scriptName);
     Symbol moduleName = SystemPrimitives.EscmGetModuleName.logic(modulePath);
     ArrayList<Datum> args = new ArrayList<Datum>();
     args.add(modulePath);
-    Trampoline.resolve((new SystemPrimitives.EscmLoadModule()).callWith(args,(module) -> () -> {
-      globalEnvironment.define(moduleName,module);
-      launchRepl(parsedCmdLine.launchingQuiet,globalEnvironment);
-      return Trampoline.LAST_BOUNCE_SIGNAL;
-    }));
+    Environment globalEnvironment = GlobalState.getDefaultEnvironment();
+    try {
+      Trampoline.resolve((new SystemPrimitives.EscmLoadModule()).callWith(args,(module) -> () -> {
+        globalEnvironment.define(moduleName,module);
+        launchRepl(parsedCmdLine.launchingQuiet,globalEnvironment);
+        return Trampoline.LAST_BOUNCE_SIGNAL;
+      }));
+    } catch(SystemPrimitives.EscmLoadModule.InvalidModuleException e) {
+      throw new Exceptionf("\"--import\": \"%s\" isn't a module!\n  %s", parsedCmdLine.scriptName, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
+    }
   }
 
 
@@ -317,10 +319,10 @@ public class Main {
       (params, cont) -> {
         ParsedCommandLine parsedCmdLine = parseCommandLine(args);
         try {
-          if(parsedCmdLine.executeUnitTests == true) {
-            executeUnitTests();
-          } else if(parsedCmdLine.generateJavaStdLibLoader == true) {
+          if(parsedCmdLine.generateJavaStdLibLoader == true) {
             generateJavaStdLibLoader();
+          } else if(parsedCmdLine.executeUnitTests == true) {
+            executeUnitTests();
           } else if(parsedCmdLine.scriptName == null) {
             GlobalState.inREPL = true; // trigger exit message to be printed
             launchRepl(parsedCmdLine.launchingQuiet,GlobalState.getDefaultEnvironment());

@@ -354,6 +354,12 @@ public class SystemPrimitives {
       return "escm-load-module";
     }
 
+    public static class InvalidModuleException extends Exceptionf {
+      public InvalidModuleException(String fmt, Object ... args) {
+        super(String.format(fmt,args));
+      }
+    }
+
     public static Path addPaths(Path path1, Path path2) {
       String s1 = path1.toString(), s2 = path2.toString();
       int n = s1.length();
@@ -406,10 +412,10 @@ public class SystemPrimitives {
         moduleAbsolutePath = moduleAbsolutePath.getParent();
       }
       if(moduleAbsolutePath == null)
-        throw new Exceptionf("'(escm-load-module <optional-filepath-string> <module-path-symbol>) module path doesn't exist: %s", Exceptionf.profileArgs(parameters));
+        throw new InvalidModuleException("'(escm-load-module <optional-filepath-string> <module-path-symbol>) module path doesn't exist: %s", Exceptionf.profileArgs(parameters));
       String moduleFileName = getModuleFileName(moduleAbsolutePath,moduleName);
       if(moduleFileName == null)
-        throw new Exceptionf("'(escm-load-module <optional-filepath-string> <module-path-symbol>) module path doesn't exist: %s", Exceptionf.profileArgs(parameters));
+        throw new InvalidModuleException("'(escm-load-module <optional-filepath-string> <module-path-symbol>) module path doesn't exist: %s", Exceptionf.profileArgs(parameters));
       return Load.addStringPaths(moduleAbsolutePath.toString(),moduleFileName);
     }
 
