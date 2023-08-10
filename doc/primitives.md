@@ -14,6 +14,10 @@
 ------------------------
 ## Variables:
 ```scheme
+#void ; reader literal that expands to a VOID value
+#nil  ; reader literal that expands to a NIl value (same as '())
+#eof  ; reader literal that expands to an EOF value
+
 #path ; reader literal that expands to a string (not a true variable)
 
 *argv*
