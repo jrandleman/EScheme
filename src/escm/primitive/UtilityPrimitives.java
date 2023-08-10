@@ -17,7 +17,7 @@ import escm.type.Symbol;
 import escm.type.number.Exact;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
-import escm.primitive.UtilityPrimitives_util.ContinuationProcedure;
+import escm.primitive.lib.utility.ContinuationProcedure;
 import escm.primitive.MetaPrimitives;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;

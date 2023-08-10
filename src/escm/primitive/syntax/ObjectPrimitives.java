@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.primitive.SyntaxOOPrimitives
+// Author: Jordan Randleman - escm.primitive.syntax.ObjectPrimitives
 // Purpose:
 //    Java primitives for object-oriented syntax macros. All of this logic
 //    used to be implemented in a <stdlib.scm> file, however, we now implement
@@ -6,7 +6,7 @@
 //      => Note that the original EScheme code is still included in comments
 //         throughout this file.
 
-package escm.primitive;
+package escm.primitive.syntax;
 import java.util.ArrayList;
 import escm.util.UniqueSymbol;
 import escm.util.Exceptionf;
@@ -18,7 +18,7 @@ import escm.type.Keyword;
 import escm.type.bool.Boolean;
 import escm.vm.type.PrimitiveSyntax;
 
-public class SyntaxOOPrimitives {
+public class ObjectPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // Static Helper Keywords
   public static Keyword EXTENDS = new Keyword("extends");
@@ -221,7 +221,7 @@ public class SyntaxOOPrimitives {
     // Given an inlined method property (stripped of :static), returns it expanded as a lambda property
     public static Datum expandInlinedMethod(Pair inlinedMethodProperty) {
       Pair bindings = (Pair)inlinedMethodProperty.car();
-      return Pair.List(bindings.car(),new Pair(SyntaxCorePrimitives.LAMBDA,new Pair(bindings.cdr(),inlinedMethodProperty.cdr())));
+      return Pair.List(bindings.car(),new Pair(CorePrimitives.LAMBDA,new Pair(bindings.cdr(),inlinedMethodProperty.cdr())));
     }
 
     // Determine if the given property is static
@@ -287,12 +287,12 @@ public class SyntaxOOPrimitives {
       Pair prop = (Pair)p.car();
       escm.util.Pair<Datum,Datum> tails = parsePropertyNamesAndValues(parameters,p.cdr());
       return new escm.util.Pair<Datum,Datum>(
-        new Pair(Pair.List(SyntaxCorePrimitives.QUOTE,prop.car()),tails.first),
+        new Pair(Pair.List(CorePrimitives.QUOTE,prop.car()),tails.first),
         new Pair(((Pair)prop.cdr()).car(),tails.second));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      Datum x = SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
+      Datum x = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
       // Extract "is-a"'s
       escm.util.Pair<Datum,Datum> superAndInterfaces = getSuperAndInterfaces(x);
       // Extract "has-a"'s
@@ -302,12 +302,12 @@ public class SyntaxOOPrimitives {
       escm.util.Pair<Datum,Datum> staticPropNamesAndVals = parsePropertyNamesAndValues(parameters,staticAndNonStaticProps.first);
       escm.util.Pair<Datum,Datum> instancePropNamesAndVals = parsePropertyNamesAndValues(parameters,ctorAndInstanceProps.second);
       // Generate the call to an internal primitive that makes our class!
-      return Pair.List(ESCM_OO_CLASS,superAndInterfaces.first,new Pair(SyntaxCorePrimitives.LIST,superAndInterfaces.second),
+      return Pair.List(ESCM_OO_CLASS,superAndInterfaces.first,new Pair(CorePrimitives.LIST,superAndInterfaces.second),
         ctorAndInstanceProps.first,
-        new Pair(SyntaxCorePrimitives.LIST,staticPropNamesAndVals.first),
-        new Pair(SyntaxCorePrimitives.LIST,staticPropNamesAndVals.second),
-        new Pair(SyntaxCorePrimitives.LIST,instancePropNamesAndVals.first),
-        new Pair(SyntaxCorePrimitives.LIST,instancePropNamesAndVals.second));
+        new Pair(CorePrimitives.LIST,staticPropNamesAndVals.first),
+        new Pair(CorePrimitives.LIST,staticPropNamesAndVals.second),
+        new Pair(CorePrimitives.LIST,instancePropNamesAndVals.first),
+        new Pair(CorePrimitives.LIST,instancePropNamesAndVals.second));
     }
   }
 
@@ -343,11 +343,11 @@ public class SyntaxOOPrimitives {
         throw new Exceptionf("'(define-class <name> <super-expr> <interfaces-expr> <prop> ...) <name> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
       Symbol name = (Symbol)nameDatum;
       Symbol obj = UniqueSymbol.generate(name.value()+"?-obj");
-      Datum classComponents = SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
-      return Pair.List(SyntaxCorePrimitives.BEGIN,
-        Pair.List(SyntaxCorePrimitives.DEFINE,Pair.List(new Symbol(name.value()+"?"),obj),
+      Datum classComponents = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
+      return Pair.List(CorePrimitives.BEGIN,
+        Pair.List(CorePrimitives.DEFINE,Pair.List(new Symbol(name.value()+"?"),obj),
           Pair.List(AND,Pair.List(IS_OBJECTP,obj),Pair.List(OO_ISP,obj,name))), // predicate generation!
-        Pair.List(SyntaxCorePrimitives.DEFINE,name,new Pair(CLASS,classComponents)));
+        Pair.List(CorePrimitives.DEFINE,name,new Pair(CLASS,classComponents)));
     }
   }
 
@@ -435,12 +435,12 @@ public class SyntaxOOPrimitives {
         Datum property = p.car();
         if(!(property instanceof Symbol))
           throw new Exceptionf("'(interface <interfaces-expr> <prop> ...) non-static <prop> %s isn't a symbol: %s", property.profile(), Exceptionf.profileArgs(parameters));
-        return new escm.util.Pair<Datum,Datum>(tails.first,new Pair(Pair.List(SyntaxCorePrimitives.QUOTE,property),tails.second));
+        return new escm.util.Pair<Datum,Datum>(tails.first,new Pair(Pair.List(CorePrimitives.QUOTE,property),tails.second));
       }
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      Datum x = SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
+      Datum x = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
       // Extract "is-a"'s
       Datum interfacesList = getInterfaces(x);
       // Extract "has-a"'s
@@ -448,10 +448,10 @@ public class SyntaxOOPrimitives {
       escm.util.Pair<Datum,Datum> staticAndNonStaticProps = getStaticAndNonStaticProperties(parameters,properties);
       escm.util.Pair<Datum,Datum> staticPropNamesAndVals = ClassMacro.parsePropertyNamesAndValues(parameters,staticAndNonStaticProps.first);
       // Generate the call to an internal primitive that makes our interface!
-      return Pair.List(ESCM_OO_INTERFACE,new Pair(SyntaxCorePrimitives.LIST,interfacesList),
-        new Pair(SyntaxCorePrimitives.LIST,staticPropNamesAndVals.first),
-        new Pair(SyntaxCorePrimitives.LIST,staticPropNamesAndVals.second),
-        new Pair(SyntaxCorePrimitives.LIST,staticAndNonStaticProps.second));
+      return Pair.List(ESCM_OO_INTERFACE,new Pair(CorePrimitives.LIST,interfacesList),
+        new Pair(CorePrimitives.LIST,staticPropNamesAndVals.first),
+        new Pair(CorePrimitives.LIST,staticPropNamesAndVals.second),
+        new Pair(CorePrimitives.LIST,staticAndNonStaticProps.second));
     }
   }
 
@@ -485,11 +485,11 @@ public class SyntaxOOPrimitives {
         throw new Exceptionf("'(define-interface <name> <interfaces-expr> <prop> ...) <name> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
       Symbol name = (Symbol)nameDatum;
       Symbol obj = UniqueSymbol.generate(name.value()+"?-obj");
-      Datum classComponents = SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
-      return Pair.List(SyntaxCorePrimitives.BEGIN,
-        Pair.List(SyntaxCorePrimitives.DEFINE,Pair.List(new Symbol(name.value()+"?"),obj),
+      Datum classComponents = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
+      return Pair.List(CorePrimitives.BEGIN,
+        Pair.List(CorePrimitives.DEFINE,Pair.List(new Symbol(name.value()+"?"),obj),
           Pair.List(AND,Pair.List(IS_OBJECTP,obj),Pair.List(OO_ISP,obj,name))), // predicate generation!
-        Pair.List(SyntaxCorePrimitives.DEFINE,name,new Pair(INTERFACE,classComponents)));
+        Pair.List(CorePrimitives.DEFINE,name,new Pair(INTERFACE,classComponents)));
     }
   }
 
@@ -512,8 +512,8 @@ public class SyntaxOOPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      Datum params = SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
-      return new Pair(SyntaxCorePrimitives.SET_BANG,new Pair(SUPER,Pair.List(new Pair(ESCM_OO_SUPER_BANG,new Pair(SELF,params)))));
+      Datum params = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
+      return new Pair(CorePrimitives.SET_BANG,new Pair(SUPER,Pair.List(new Pair(ESCM_OO_SUPER_BANG,new Pair(SELF,params)))));
     }
   }
 
@@ -538,10 +538,10 @@ public class SyntaxOOPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1)
         throw new Exceptionf("'(apply-super! <param-list>) invalid syntax: %s", Exceptionf.profileArgs(parameters));
-      return new Pair(SyntaxCorePrimitives.SET_BANG,new Pair(SUPER,
-        Pair.List(Pair.List(SyntaxCorePrimitives.APPLY,
+      return new Pair(CorePrimitives.SET_BANG,new Pair(SUPER,
+        Pair.List(Pair.List(CorePrimitives.APPLY,
           ESCM_OO_SUPER_BANG,
-          Pair.List(SyntaxCorePrimitives.APPEND,Pair.List(SyntaxCorePrimitives.LIST,SELF),parameters.get(0))))));
+          Pair.List(CorePrimitives.APPEND,Pair.List(CorePrimitives.LIST,SELF),parameters.get(0))))));
     }
   }
 }

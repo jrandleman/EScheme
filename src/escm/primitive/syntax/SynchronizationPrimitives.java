@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.primitive.SyntaxSynchronizationPrimitives
+// Author: Jordan Randleman - escm.primitive.syntax.SynchronizationPrimitives
 // Purpose:
 //    Java primitives for core synchronization syntax macros. All of this logic 
 //    used to be implemented in a <stdlib.scm> file, however, we now implement
@@ -6,7 +6,7 @@
 //      => Note that the original EScheme code is still included in comments
 //         throughout this file.
 
-package escm.primitive;
+package escm.primitive.syntax;
 import java.util.ArrayList;
 import escm.util.UniqueSymbol;
 import escm.util.Exceptionf;
@@ -17,7 +17,7 @@ import escm.type.Symbol;
 import escm.type.concurrent.Mutex;
 import escm.vm.type.PrimitiveSyntax;
 
-public class SyntaxSynchronizationPrimitives {
+public class SynchronizationPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // Static Helper Symbols
   public static Symbol DYNAMIC_WIND = new Symbol("dynamic-wind");
@@ -46,11 +46,11 @@ public class SyntaxSynchronizationPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      Datum exprs = SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
+      Datum exprs = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
       return Pair.List(DYNAMIC_WIND,
-        Pair.List(SyntaxCorePrimitives.LAMBDA,Nil.VALUE,Pair.List(MUTEX_LOCK,DOSYNC_LOCK)),
-        new Pair(SyntaxCorePrimitives.LAMBDA,new Pair(Nil.VALUE,exprs)),
-        Pair.List(SyntaxCorePrimitives.LAMBDA,Nil.VALUE,Pair.List(MUTEX_UNLOCK,DOSYNC_LOCK)));
+        Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,Pair.List(MUTEX_LOCK,DOSYNC_LOCK)),
+        new Pair(CorePrimitives.LAMBDA,new Pair(Nil.VALUE,exprs)),
+        Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,Pair.List(MUTEX_UNLOCK,DOSYNC_LOCK)));
     }
   }
 
@@ -70,11 +70,11 @@ public class SyntaxSynchronizationPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      Datum exprs = SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
+      Datum exprs = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
       return Pair.List(DYNAMIC_WIND,
-        Pair.List(SyntaxCorePrimitives.LAMBDA,Nil.VALUE,Pair.List(MUTEX_LOCK,DOSYNC_MODULE_LOCK)),
-        new Pair(SyntaxCorePrimitives.LAMBDA,new Pair(Nil.VALUE,exprs)),
-        Pair.List(SyntaxCorePrimitives.LAMBDA,Nil.VALUE,Pair.List(MUTEX_UNLOCK,DOSYNC_MODULE_LOCK)));
+        Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,Pair.List(MUTEX_LOCK,DOSYNC_MODULE_LOCK)),
+        new Pair(CorePrimitives.LAMBDA,new Pair(Nil.VALUE,exprs)),
+        Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,Pair.List(MUTEX_UNLOCK,DOSYNC_MODULE_LOCK)));
     }
   }
 
@@ -101,13 +101,13 @@ public class SyntaxSynchronizationPrimitives {
         throw new Exceptionf("'(dosync-with <mutex> <expr> ...) didn't receive <mutex>: %s", Exceptionf.profileArgs(parameters));
       Symbol cachedLock = UniqueSymbol.generate("dosync-with-lock");
       Datum lock = parameters.get(0);
-      Datum exprs = SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
-      return Pair.List(SyntaxCorePrimitives.BEGIN,
-        Pair.List(SyntaxCorePrimitives.DEFINE,cachedLock,lock),
+      Datum exprs = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
+      return Pair.List(CorePrimitives.BEGIN,
+        Pair.List(CorePrimitives.DEFINE,cachedLock,lock),
         Pair.List(DYNAMIC_WIND,
-          Pair.List(SyntaxCorePrimitives.LAMBDA,Nil.VALUE,Pair.List(MUTEX_LOCK,cachedLock)),
-          new Pair(SyntaxCorePrimitives.LAMBDA,new Pair(Nil.VALUE,exprs)),
-          Pair.List(SyntaxCorePrimitives.LAMBDA,Nil.VALUE,Pair.List(MUTEX_UNLOCK,cachedLock))));
+          Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,Pair.List(MUTEX_LOCK,cachedLock)),
+          new Pair(CorePrimitives.LAMBDA,new Pair(Nil.VALUE,exprs)),
+          Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,Pair.List(MUTEX_UNLOCK,cachedLock))));
     }
   }
 
@@ -130,11 +130,11 @@ public class SyntaxSynchronizationPrimitives {
       if(n == 2) {
         if(!(parameters.get(0) instanceof Symbol))
           throw new Exceptionf("'(thread-define <optional-thread> <symbol> <value>) invalid <symbol>: %s", Exceptionf.profileArgs(parameters));
-        return Pair.List(THREAD_DEFINE_PRIME,Pair.List(SyntaxCorePrimitives.QUOTE,parameters.get(0)),parameters.get(1));
+        return Pair.List(THREAD_DEFINE_PRIME,Pair.List(CorePrimitives.QUOTE,parameters.get(0)),parameters.get(1));
       } else {
         if(!(parameters.get(1) instanceof Symbol))
           throw new Exceptionf("'(thread-define <optional-thread> <symbol> <value>) invalid <symbol>: %s", Exceptionf.profileArgs(parameters));
-        return Pair.List(THREAD_DEFINE_PRIME,parameters.get(0),Pair.List(SyntaxCorePrimitives.QUOTE,parameters.get(1)),parameters.get(2));
+        return Pair.List(THREAD_DEFINE_PRIME,parameters.get(0),Pair.List(CorePrimitives.QUOTE,parameters.get(1)),parameters.get(2));
       }
     }
   }
@@ -158,11 +158,11 @@ public class SyntaxSynchronizationPrimitives {
       if(n == 2) {
         if(!(parameters.get(0) instanceof Symbol))
           throw new Exceptionf("'(thread-set! <optional-thread> <symbol> <value>) invalid <symbol>: %s", Exceptionf.profileArgs(parameters));
-        return Pair.List(THREAD_SET_BANG_PRIME,Pair.List(SyntaxCorePrimitives.QUOTE,parameters.get(0)),parameters.get(1));
+        return Pair.List(THREAD_SET_BANG_PRIME,Pair.List(CorePrimitives.QUOTE,parameters.get(0)),parameters.get(1));
       } else {
         if(!(parameters.get(1) instanceof Symbol))
           throw new Exceptionf("'(thread-set! <optional-thread> <symbol> <value>) invalid <symbol>: %s", Exceptionf.profileArgs(parameters));
-        return Pair.List(THREAD_SET_BANG_PRIME,parameters.get(0),Pair.List(SyntaxCorePrimitives.QUOTE,parameters.get(1)),parameters.get(2));
+        return Pair.List(THREAD_SET_BANG_PRIME,parameters.get(0),Pair.List(CorePrimitives.QUOTE,parameters.get(1)),parameters.get(2));
       }
     }
   }
@@ -186,11 +186,11 @@ public class SyntaxSynchronizationPrimitives {
       if(n == 1) {
         if(!(parameters.get(0) instanceof Symbol))
           throw new Exceptionf("'(thread-get <optional-thread> <symbol>) invalid <symbol>: %s", Exceptionf.profileArgs(parameters));
-        return Pair.List(THREAD_GET_PRIME,Pair.List(SyntaxCorePrimitives.QUOTE,parameters.get(0)));
+        return Pair.List(THREAD_GET_PRIME,Pair.List(CorePrimitives.QUOTE,parameters.get(0)));
       } else {
         if(!(parameters.get(1) instanceof Symbol))
           throw new Exceptionf("'(thread-get <optional-thread> <symbol>) invalid <symbol>: %s", Exceptionf.profileArgs(parameters));
-        return Pair.List(THREAD_GET_PRIME,parameters.get(0),Pair.List(SyntaxCorePrimitives.QUOTE,parameters.get(1)));
+        return Pair.List(THREAD_GET_PRIME,parameters.get(0),Pair.List(CorePrimitives.QUOTE,parameters.get(1)));
       }
     }
   }
@@ -214,11 +214,11 @@ public class SyntaxSynchronizationPrimitives {
       if(n == 1) {
         if(!(parameters.get(0) instanceof Symbol))
           throw new Exceptionf("'(thread-defined? <optional-thread> <symbol>) invalid <symbol>: %s", Exceptionf.profileArgs(parameters));
-        return Pair.List(THREAD_DEFINEDP_PRIME,Pair.List(SyntaxCorePrimitives.QUOTE,parameters.get(0)));
+        return Pair.List(THREAD_DEFINEDP_PRIME,Pair.List(CorePrimitives.QUOTE,parameters.get(0)));
       } else {
         if(!(parameters.get(1) instanceof Symbol))
           throw new Exceptionf("'(thread-defined? <optional-thread> <symbol>) invalid <symbol>: %s", Exceptionf.profileArgs(parameters));
-        return Pair.List(THREAD_DEFINEDP_PRIME,parameters.get(0),Pair.List(SyntaxCorePrimitives.QUOTE,parameters.get(1)));
+        return Pair.List(THREAD_DEFINEDP_PRIME,parameters.get(0),Pair.List(CorePrimitives.QUOTE,parameters.get(1)));
       }
     }
   }

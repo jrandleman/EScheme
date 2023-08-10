@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.primitive.SyntaxCorePrimitives
+// Author: Jordan Randleman - escm.primitive.syntax.CorePrimitives
 // Purpose:
 //    Java primitives for core standard syntax macros. All of this logic 
 //    used to be implemented in a <stdlib.scm> file, however, we now 
@@ -6,7 +6,7 @@
 //      => Note that the original EScheme code is still included in comments
 //         throughout this file.
 
-package escm.primitive;
+package escm.primitive.syntax;
 import java.util.ArrayList;
 import escm.util.UniqueSymbol;
 import escm.util.Exceptionf;
@@ -27,8 +27,9 @@ import escm.vm.util.Environment;
 import escm.vm.type.OrderedCollection;
 import escm.vm.type.PrimitiveSyntax;
 import escm.vm.type.PrimitiveSyntaxCallable;
+import escm.primitive.MetaPrimitives;
 
-public class SyntaxCorePrimitives {
+public class CorePrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // Static Helper Bytecode Symbols
   public static Symbol BYTECODE = new Symbol("bytecode");

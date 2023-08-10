@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.primitive.SyntaxModulePrimitives
+// Author: Jordan Randleman - escm.primitive.syntax.ModulePrimitives
 // Purpose:
 //    Java primitives for object-oriented syntax macros. All of this logic
 //    used to be implemented in a <stdlib.scm> file, however, we now implement
@@ -6,7 +6,7 @@
 //      => Note that the original EScheme code is still included in comments
 //         throughout this file.
 
-package escm.primitive;
+package escm.primitive.syntax;
 import java.util.ArrayList;
 import escm.util.UniqueSymbol;
 import escm.util.Exceptionf;
@@ -17,8 +17,9 @@ import escm.type.Symbol;
 import escm.type.Keyword;
 import escm.type.bool.Boolean;
 import escm.vm.type.PrimitiveSyntax;
+import escm.primitive.SystemPrimitives;
 
-public class SyntaxModulePrimitives {
+public class ModulePrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // Static Helper Keywords
   public static Keyword IMPORT = new Keyword("import");
@@ -61,14 +62,14 @@ public class SyntaxModulePrimitives {
         if(!(modulePath instanceof Symbol))
           throw new Exceptionf("'(import <optional-filepath> <module-path> :as <optional-module-alias>) non-symbol <module-path>: %s", Exceptionf.profileArgs(parameters));
         Symbol moduleName = SystemPrimitives.EscmGetModuleName.logic((Symbol)modulePath);
-        return Pair.List(SyntaxCorePrimitives.DEFINE,moduleName,Pair.List(ESCM_LOAD_MODULE,Pair.List(SyntaxCorePrimitives.QUOTE,modulePath)));
+        return Pair.List(CorePrimitives.DEFINE,moduleName,Pair.List(ESCM_LOAD_MODULE,Pair.List(CorePrimitives.QUOTE,modulePath)));
       } else if(n == 2) {
         Datum filepath = parameters.get(0);
         Datum modulePath = parameters.get(1);
         if(!(modulePath instanceof Symbol))
           throw new Exceptionf("'(import <optional-filepath> <module-path> :as <optional-module-alias>) non-symbol <module-path>: %s", Exceptionf.profileArgs(parameters));
         Symbol moduleName = SystemPrimitives.EscmGetModuleName.logic((Symbol)modulePath);
-        return Pair.List(SyntaxCorePrimitives.DEFINE,moduleName,Pair.List(ESCM_LOAD_MODULE,filepath,Pair.List(SyntaxCorePrimitives.QUOTE,modulePath)));
+        return Pair.List(CorePrimitives.DEFINE,moduleName,Pair.List(ESCM_LOAD_MODULE,filepath,Pair.List(CorePrimitives.QUOTE,modulePath)));
       } else if(n == 3) {
         Datum modulePath = parameters.get(0);
         if(!(modulePath instanceof Symbol))
@@ -78,7 +79,7 @@ public class SyntaxModulePrimitives {
         Datum moduleAlias = parameters.get(2);
         if(!(moduleAlias instanceof Symbol))
           throw new Exceptionf("'(import <optional-filepath> <module-path> :as <optional-module-alias>) non-symbol <module-alias>: %s", Exceptionf.profileArgs(parameters));
-        return Pair.List(SyntaxCorePrimitives.DEFINE,moduleAlias,Pair.List(ESCM_LOAD_MODULE,Pair.List(SyntaxCorePrimitives.QUOTE,modulePath)));
+        return Pair.List(CorePrimitives.DEFINE,moduleAlias,Pair.List(ESCM_LOAD_MODULE,Pair.List(CorePrimitives.QUOTE,modulePath)));
       } else { // if(n == 4)
         Datum filepath = parameters.get(0);
         Datum modulePath = parameters.get(1);
@@ -87,7 +88,7 @@ public class SyntaxModulePrimitives {
         if(!(parameters.get(2).eq(AS)))
           throw new Exceptionf("'(import <optional-filepath> <module-path> :as <optional-module-alias>) invalid syntax: %s", Exceptionf.profileArgs(parameters));
         Datum moduleAlias = parameters.get(3);
-        return Pair.List(SyntaxCorePrimitives.DEFINE,moduleAlias,Pair.List(ESCM_LOAD_MODULE,filepath,Pair.List(SyntaxCorePrimitives.QUOTE,modulePath)));
+        return Pair.List(CorePrimitives.DEFINE,moduleAlias,Pair.List(ESCM_LOAD_MODULE,filepath,Pair.List(CorePrimitives.QUOTE,modulePath)));
       }
     }
   }
@@ -110,7 +111,7 @@ public class SyntaxModulePrimitives {
       Datum moduleAlias = parameters.get(0);
       if(!(moduleAlias instanceof Symbol))
         throw new Exceptionf("'(reload <module-alias>) non-symbol <module-alias>: %s", Exceptionf.profileArgs(parameters));
-      return Pair.List(SyntaxCorePrimitives.SET_BANG,moduleAlias,Pair.List(ESCM_RELOAD_MODULE,moduleAlias));
+      return Pair.List(CorePrimitives.SET_BANG,moduleAlias,Pair.List(ESCM_RELOAD_MODULE,moduleAlias));
     }
   }
 
@@ -168,11 +169,11 @@ public class SyntaxModulePrimitives {
       if(parameters.get(2).eq(IMPORT)) {
         args.add(parameters.get(0));
         args.add(parameters.get(1));
-        args.add(SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,2));
+        args.add(CorePrimitives.Lambda.getAllExpressionsAfter(parameters,2));
       } else {
         args.add(Boolean.FALSE);
         args.add(parameters.get(0));
-        args.add(new Pair(parameters.get(2),SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,2)));
+        args.add(new Pair(parameters.get(2),CorePrimitives.Lambda.getAllExpressionsAfter(parameters,2)));
       }
       return args;
     }
@@ -203,7 +204,7 @@ public class SyntaxModulePrimitives {
         Pair aliases = (Pair)objsAndAliases.second;
         Symbol obj = (Symbol)objs.car();
         Symbol alias = (Symbol)aliases.car();
-        definitions = new Pair(Pair.List(SyntaxCorePrimitives.DEFINE,alias,new Symbol(hiddenModuleName.value()+DOT.value()+obj.value())),definitions);
+        definitions = new Pair(Pair.List(CorePrimitives.DEFINE,alias,new Symbol(hiddenModuleName.value()+DOT.value()+obj.value())),definitions);
         objsAndAliases.first = objs.cdr();
         objsAndAliases.second = aliases.cdr();
       }
@@ -220,12 +221,12 @@ public class SyntaxModulePrimitives {
       Datum aliasDefinitions = getObjectAndAliasDefinitions(parameters,hiddenModuleName,args.get(2));
       Datum loadModuleParameters = null;
       if(filepath.isTruthy()) {
-        loadModuleParameters = Pair.List(filepath,Pair.List(SyntaxCorePrimitives.QUOTE,modulePath));
+        loadModuleParameters = Pair.List(filepath,Pair.List(CorePrimitives.QUOTE,modulePath));
       } else {
-        loadModuleParameters = Pair.List(Pair.List(SyntaxCorePrimitives.QUOTE,modulePath));
+        loadModuleParameters = Pair.List(Pair.List(CorePrimitives.QUOTE,modulePath));
       }
-      return new Pair(SyntaxCorePrimitives.BEGIN,
-        new Pair(Pair.List(SyntaxCorePrimitives.DEFINE,hiddenModuleName,new Pair(ESCM_LOAD_MODULE,loadModuleParameters)),
+      return new Pair(CorePrimitives.BEGIN,
+        new Pair(Pair.List(CorePrimitives.DEFINE,hiddenModuleName,new Pair(ESCM_LOAD_MODULE,loadModuleParameters)),
           aliasDefinitions));
     }
   }

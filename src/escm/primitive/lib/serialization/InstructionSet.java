@@ -1,9 +1,9 @@
-// Author: Jordan Randleman - escm.primitive.SerializationPrimitives_util.InstructionSet
+// Author: Jordan Randleman - escm.primitive.lib.serialization.InstructionSet
 // Purpose:
 //    Special Datum used internally to store an instruction set during the 
 //    CPS execution of <serialize>.
 
-package escm.primitive.SerializationPrimitives_util;
+package escm.primitive.lib.serialization;
 import java.util.Objects;
 import java.util.ArrayList;
 import escm.type.Datum;

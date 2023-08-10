@@ -40,8 +40,8 @@ public class HelpPrimitive {
     private static final File dbDirectory = new File(EscmPath.VALUE + File.separator + "src"       
                                                                     + File.separator + "escm" 
                                                                     + File.separator + "primitive" 
-                                                                    + File.separator + "HelpPrimitive_util"
-                                                                    + File.separator + "HelpPrimitive_data");
+                                                                    + File.separator + "lib"
+                                                                    + File.separator + "help");
 
 
     //////////////////////////////////////////////////////////////////////////

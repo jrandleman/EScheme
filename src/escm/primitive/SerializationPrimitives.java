@@ -27,7 +27,7 @@ import escm.vm.util.Environment;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
 import escm.vm.runtime.GlobalState;
-import escm.primitive.SerializationPrimitives_util.InstructionSet;
+import escm.primitive.lib.serialization.InstructionSet;
 
 public class SerializationPrimitives {
   ////////////////////////////////////////////////////////////////////////////

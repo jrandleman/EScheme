@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.primitive.SyntaxGeneratorPrimitives
+// Author: Jordan Randleman - escm.primitive.syntax.GeneratorPrimitives
 // Purpose:
 //    Java primitives for generator syntax macros/procedures. All of this
 //    logic used to be implemented in a <stdlib.scm> file, however, we now
@@ -6,7 +6,7 @@
 //      => Note that the original EScheme code is still included in comments
 //         throughout this file.
 
-package escm.primitive;
+package escm.primitive.syntax;
 import java.util.ArrayList;
 import escm.util.UniqueSymbol;
 import escm.util.Exceptionf;
@@ -24,7 +24,7 @@ import escm.vm.type.PrimitiveCallable;
 import escm.vm.type.PrimitiveSyntax;
 import escm.vm.runtime.GlobalState;
 
-public class SyntaxGeneratorPrimitives {
+public class GeneratorPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // Static Helper Symbols
   public static Symbol DELAY = new Symbol("delay");
@@ -95,15 +95,15 @@ public class SyntaxGeneratorPrimitives {
         throw new Exceptionf("'(yield <optional-obj>) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       Datum yielded = n == 1 ? parameters.get(0) : (Datum)Void.VALUE;
       Symbol k = UniqueSymbol.generate("yield-k");
-      return Pair.List(SyntaxCorePrimitives.SET_BANG,ESCM_GENERATOR_ESCAPE,
-        Pair.List(SyntaxCorePrimitives.CALL_CC,
-          Pair.List(SyntaxCorePrimitives.LAMBDA,Pair.List(k),
+      return Pair.List(CorePrimitives.SET_BANG,ESCM_GENERATOR_ESCAPE,
+        Pair.List(CorePrimitives.CALL_CC,
+          Pair.List(CorePrimitives.LAMBDA,Pair.List(k),
             Pair.List(ESCM_GENERATOR_ESCAPE,
-              Pair.List(SyntaxCorePrimitives.CONS,
-                Pair.List(SyntaxCorePrimitives.CONS,Pair.List(SyntaxCorePrimitives.QUOTE,ESCM_GENERATOR),yielded),
-                Pair.List(SyntaxCorePrimitives.LAMBDA,Nil.VALUE,
-                  Pair.List(SyntaxCorePrimitives.CALL_CC,
-                    Pair.List(SyntaxCorePrimitives.LAMBDA,Pair.List(ESCM_GENERATOR_ESCAPE),
+              Pair.List(CorePrimitives.CONS,
+                Pair.List(CorePrimitives.CONS,Pair.List(CorePrimitives.QUOTE,ESCM_GENERATOR),yielded),
+                Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,
+                  Pair.List(CorePrimitives.CALL_CC,
+                    Pair.List(CorePrimitives.LAMBDA,Pair.List(ESCM_GENERATOR_ESCAPE),
                       Pair.List(k,ESCM_GENERATOR_ESCAPE)))))))));
     }
   }
@@ -139,18 +139,18 @@ public class SyntaxGeneratorPrimitives {
       if(parameters.size() < 1)
         throw new Exceptionf("'(define-generator (<generator-name> <param> ...) <body> ...) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       Datum bindings = parameters.get(0);
-      Datum body = SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
-      return Pair.List(SyntaxCorePrimitives.DEFINE,bindings,
-        Pair.List(SyntaxCorePrimitives.DEFINE,generatorObject,
-          Pair.List(SyntaxCorePrimitives.CONS,
-            Pair.List(SyntaxCorePrimitives.CONS,Pair.List(SyntaxCorePrimitives.QUOTE,ESCM_GENERATOR),Boolean.FALSE),
-            Pair.List(SyntaxCorePrimitives.LAMBDA,Nil.VALUE,
-              Pair.List(SyntaxCorePrimitives.CALL_CC,new Pair(SyntaxCorePrimitives.LAMBDA,new Pair(Pair.List(ESCM_GENERATOR_ESCAPE),body)))))),
-        Pair.List(SyntaxCorePrimitives.LAMBDA,Nil.VALUE,
-          Pair.List(SyntaxCorePrimitives.IF,Pair.List(ESCM_IS_GENERATORP,generatorObject),
-            Pair.List(SyntaxCorePrimitives.BEGIN,
-              Pair.List(SyntaxCorePrimitives.SET_BANG,generatorObject,Pair.List(Pair.List(CDR,generatorObject))),
-              Pair.List(SyntaxCorePrimitives.IF,Pair.List(ESCM_IS_GENERATORP,generatorObject),
+      Datum body = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
+      return Pair.List(CorePrimitives.DEFINE,bindings,
+        Pair.List(CorePrimitives.DEFINE,generatorObject,
+          Pair.List(CorePrimitives.CONS,
+            Pair.List(CorePrimitives.CONS,Pair.List(CorePrimitives.QUOTE,ESCM_GENERATOR),Boolean.FALSE),
+            Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,
+              Pair.List(CorePrimitives.CALL_CC,new Pair(CorePrimitives.LAMBDA,new Pair(Pair.List(ESCM_GENERATOR_ESCAPE),body)))))),
+        Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,
+          Pair.List(CorePrimitives.IF,Pair.List(ESCM_IS_GENERATORP,generatorObject),
+            Pair.List(CorePrimitives.BEGIN,
+              Pair.List(CorePrimitives.SET_BANG,generatorObject,Pair.List(Pair.List(CDR,generatorObject))),
+              Pair.List(CorePrimitives.IF,Pair.List(ESCM_IS_GENERATORP,generatorObject),
                 Pair.List(CDAR,generatorObject),
                 generatorObject)),
             GlobalState.GLOBAL_GENERATOR_COMPLETE)));
@@ -187,7 +187,7 @@ public class SyntaxGeneratorPrimitives {
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      Datum generatorObjects = SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
+      Datum generatorObjects = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
       if(!(generatorObjects instanceof Pair)) return continuation.run(Void.VALUE);
       Pair p = (Pair)generatorObjects;
       return iterate(parameters,0,p.length(),p,p,continuation);
@@ -232,9 +232,9 @@ public class SyntaxGeneratorPrimitives {
       if(parameters.size() < 1)
         throw new Exceptionf("'(complete-n-generators! <count> <generator-object> ...) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       Datum countDatum = parameters.get(0);
-      if(!SyntaxStreamPrimitives.ConvertStreamToList.isValidStreamIndex(countDatum))
+      if(!StreamPrimitives.ConvertStreamToList.isValidStreamIndex(countDatum))
         throw new Exceptionf("'(complete-n-generators! <count> <generator-object> ...) invalid <count>: %s", Exceptionf.profileArgs(parameters));
-      Datum generatorObjects = SyntaxCorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
+      Datum generatorObjects = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
       if(!(generatorObjects instanceof Pair)) return continuation.run(Void.VALUE);
       Pair p = (Pair)generatorObjects;
       return iterate(parameters,0,((Real)countDatum).intValue(),p,p,continuation);
