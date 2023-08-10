@@ -22,6 +22,7 @@ import escm.vm.util.SourceInformation;
 import escm.vm.runtime.EscmCallStack;
 import escm.vm.runtime.EscmThread;
 import escm.vm.runtime.GlobalState;
+import escm.vm.runtime.installerGenerated.JvmPathPrefix;
 import escm.vm.runtime.installerGenerated.EscmPath;
 import escm.vm.runtime.installerGenerated.JavaStdLibLoaderGenerator;
 import escm.primitive.SystemPrimitives;
@@ -243,6 +244,11 @@ public class Main {
   }
 
 
+  private static String getJavaBinPath() {
+    return JvmPathPrefix.VALUE.substring(0,JvmPathPrefix.VALUE.length()-File.separator.length());
+  }
+
+
   private static ParsedCommandLine parseCommandLine(String[] args) {
     ParsedCommandLine parsed = new ParsedCommandLine();
     for(int i = 0; i < args.length; ++i) {
@@ -259,6 +265,7 @@ public class Main {
           System.out.printf("Eerina's Scheme Version %s\n", SystemPrimitives.VERSION);
           System.out.printf("Target: %s %s\n", System.getProperty("os.name"),System.getProperty("os.version"));
           System.out.printf("InstalledDir: %s\n", EscmPath.VALUE);
+          System.out.printf("JavaBin: %s\n", getJavaBinPath());
           System.exit(0);
         }
         case "-h": case "--help": {
