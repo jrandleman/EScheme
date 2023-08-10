@@ -329,7 +329,7 @@ public class Installer {
     javaStdlibLoader.append("import escm.vm.type.PrimitiveSyntax;\n");
     javaStdlibLoader.append("import escm.vm.type.PrimitiveSyntaxCallable;\n");
     for(String prmFileName : prmFileNames) {
-      javaStdlibLoader.append("import escm.primitive."+prmFileName+";");
+      javaStdlibLoader.append("import escm.primitive."+prmFileName+";\n");
     }
     javaStdlibLoader.append("\n");
     javaStdlibLoader.append("public class JavaStdLibLoaderGenerator {\n");
