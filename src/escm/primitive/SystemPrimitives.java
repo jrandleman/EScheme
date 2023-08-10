@@ -537,6 +537,37 @@ public class SystemPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // escm-set-parameter!
+  public static class EscmSetParameterBang extends Primitive {
+    public java.lang.String escmName() {
+      return "escm-set-parameter!";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2 || !(parameters.get(0) instanceof Symbol)) 
+        throw new Exceptionf("'(escm-set-parameter! <symbol> <obj>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      GlobalState.parameterEnvironment.set((Symbol)parameters.get(0),parameters.get(1));
+      return Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // escm-get-parameter
+  public static class EscmGetParameter extends Primitive {
+    public java.lang.String escmName() {
+      return "escm-get-parameter";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol)) 
+        throw new Exceptionf("'(escm-get-parameter <symbol>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      return GlobalState.parameterEnvironment.get((Symbol)parameters.get(0));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // escm-parameter?
   public static class EscmIsParameterP extends Primitive {
     public java.lang.String escmName() {

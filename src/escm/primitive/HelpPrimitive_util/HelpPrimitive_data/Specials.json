@@ -284,7 +284,19 @@
   "name": "define-parameter",
   "aliases": ["parameter"],
   "signatures": ["(define-parameter <name> <obj>)"],
-  "description": "Defines a parameter variable. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nSee the <parameter?> 'help' entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!",
+  "description": "Defines a parameter variable. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nSee <set-parameter!> to set pre-existing parameters.\nSee <get-parameter> to explicitely evaluate a parameter variable.\nSee the <parameter?> 'help' entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!",
+  "example": null
+}, {
+  "name": "set-parameter!",
+  "aliases": null,
+  "signatures": ["(set-parameter! <name> <obj>)"],
+  "description": "Sets an existing parameter variable. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nSee <define-parameter> to create new parameters.\nSee <get-parameter> to explicitely evaluate a parameter variable.\nSee the <parameter?> 'help' entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!",
+  "example": null
+}, {
+  "name": "get-parameter",
+  "aliases": null,
+  "signatures": ["(get-parameter <name>)"],
+  "description": "Get a parameter variable's value. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nNote that parameter variables can also just be referenced by name, though\nbeware of shadowing them with a regular <define>!\n\nSee <define-parameter> to create new parameters.\nSee <set-parameter!> to set pre-existing parameters.\nSee the <parameter?> 'help' entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!",
   "example": null
 }, {
   "name": "parameter?",

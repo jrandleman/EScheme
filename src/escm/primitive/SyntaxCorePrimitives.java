@@ -81,6 +81,8 @@ public class SyntaxCorePrimitives {
   public static Symbol APPLY = new Symbol("apply");
   public static Symbol VALUES = new Symbol("values");
   public static Symbol ESCM_DEFINE_PARAMETER = new Symbol("escm-define-parameter");
+  public static Symbol ESCM_SET_PARAMETER_BANG = new Symbol("escm-set-parameter!");
+  public static Symbol ESCM_GET_PARAMETER = new Symbol("escm-get-parameter");
   public static Symbol ESCM_IS_PARAMETER_P = new Symbol("escm-parameter?");
 
 
@@ -1691,6 +1693,44 @@ public class SyntaxCorePrimitives {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Symbol))
         throw new Exceptionf("'(define-parameter <symbol> <obj>) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       return Pair.List(ESCM_DEFINE_PARAMETER,Pair.List(QUOTE,parameters.get(0)),parameters.get(1));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // (set-parameter! <symbol> <obj>)
+  //
+  // (define-syntax set-parameter!
+  //   (lambda (sym val)
+  //     (list 'escm-set-parameter! (list 'quote sym) val)))
+  public static class SetParameterBang extends PrimitiveSyntax {
+    public java.lang.String escmName() {
+      return "set-parameter!";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2 || !(parameters.get(0) instanceof Symbol))
+        throw new Exceptionf("'(set-parameter! <symbol> <obj>) invalid syntax: %s", Exceptionf.profileArgs(parameters));
+      return Pair.List(ESCM_SET_PARAMETER_BANG,Pair.List(QUOTE,parameters.get(0)),parameters.get(1));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // (get-parameter! <symbol>)
+  //
+  // (define-syntax get-parameter
+  //   (lambda (sym)
+  //     (list 'escm-get-parameter (list 'quote sym))))
+  public static class GetParameter extends PrimitiveSyntax {
+    public java.lang.String escmName() {
+      return "get-parameter";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol))
+        throw new Exceptionf("'(get-parameter <symbol>) invalid syntax: %s", Exceptionf.profileArgs(parameters));
+      return Pair.List(ESCM_GET_PARAMETER,Pair.List(QUOTE,parameters.get(0)));
     }
   }
 

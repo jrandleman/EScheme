@@ -447,3 +447,7 @@
 (ut (parameter? val2) #f)
 (define-parameter val2 10)
 (ut (parameter? val2) #t)
+(ut (get-parameter val2) 10)
+(set-parameter! val2 11)
+(ut val2 0)
+(ut (get-parameter val2) 11)
