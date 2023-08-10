@@ -1,9 +1,8 @@
 // Author: Jordan Randleman - Installer - MUST BE RUN WITHIN THE `EScheme/installer` DIRECTORY!
 //   => Command-Line Options: 
-//        -h, --help              (show these command-line options)
-//        -v, --verbose           (print status updates)
-//        -u, --unit-tests        (run EScheme's unit test suite after compilation)
-//        -j, --java-bin-path     (set the path to our JVM's <bin> directory)
+//        -h, --help       (show these command-line options)
+//        -v, --verbose    (print status updates)
+//        -u, --unit-tests (run EScheme's unit test suite after compilation)
 
 
 /*
@@ -42,17 +41,20 @@ import java.util.ArrayList;
 
 public class Installer {
   ////////////////////////////////////////////////////////////////////////////
+  // Java Runtime Bin Path (set on launch by <void main(String[])>)
+  private static String JAVA_BIN_PATH = null;
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Command-Line Parsing Setting Satus
   private static boolean VERBOSE_MODE = false;
   private static boolean EXECUTE_UNIT_TESTS = false;
-  private static String JAVA_BIN_PATH = null;
 
 
   public static final String COMMAND_LINE_FLAGS = 
     "  1. -h, --help                 | Print this information\n"+
     "  2. -v, --verbose              | Print out installation progress messages\n"+
-    "  3. -u, --unit-tests           | Run EScheme's unit test suite after compilation\n"+
-    "  4. -j, --java-bin-path <path> | Set the path to our JVM's <bin> directory\n";
+    "  3. -u, --unit-tests           | Run EScheme's unit test suite after compilation\n";
 
 
   private static void parseCommandLine(String[] args) {
@@ -65,14 +67,6 @@ public class Installer {
         }
         case "-u": case "--unit-tests": {
           EXECUTE_UNIT_TESTS = true;
-          break;
-        }
-        case "-j": case "--java-bin-path": {
-          if(i+1 == args.length) {
-            System.err.printf("> [ FATAL ] ESCM INSTALLER ERROR: Must follow \"--java-bin-path\" with a file path!\n", args[i]);
-            System.exit(1);
-          }
-          JAVA_BIN_PATH = args[++i];
           break;
         }
         case "-h": case "--help": {
@@ -94,8 +88,7 @@ public class Installer {
   ////////////////////////////////////////////////////////////////////////////
   // JVM/JRE Command Decoration
   private static String decorateJvmCmdPath(String cmd) {
-    if(JAVA_BIN_PATH == null) return cmd;
-    return JAVA_BIN_PATH + File.separator + cmd;
+    return JAVA_BIN_PATH + cmd;
   }
 
 
@@ -234,11 +227,7 @@ public class Installer {
     escmPath.append("package escm.vm.runtime.installerGenerated;\n");
     escmPath.append("\n");
     escmPath.append("public class JvmPathPrefix {\n");
-    if(JAVA_BIN_PATH == null) {
-      escmPath.append("  public static final java.lang.String VALUE = \"\";\n");
-    } else {
-      escmPath.append("  public static final java.lang.String VALUE = \"" + JAVA_BIN_PATH + File.separator + "\";\n");
-    }
+    escmPath.append("  public static final java.lang.String VALUE = \"" + JAVA_BIN_PATH + "\";\n");
     escmPath.append("}\n");
     escmPath.append("\n");
     try {
@@ -587,8 +576,29 @@ public class Installer {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Get Java Home Directory
+  private static String getJavaHomeDirectory() {
+    try {
+      String homePath = System.getProperty("java.home");
+      if(homePath.endsWith(File.separator) == false) {
+        return homePath+File.separator+"bin"+File.separator;
+      } else {
+        return homePath+"bin"+File.separator;
+      }
+    } catch(Exception e) {
+      System.err.println("> [ FATAL ] ESCM INSTALLER ERROR: Error Getting \"java.home\" System Property!");
+      System.err.println("  error: " + e);
+      System.err.println("> TERMINATING THE ESCM INSTALLER. RESOLVE AND RETRY.");
+      System.exit(1);
+      return null; // never reached: left in to satisfy <javac> type-checking
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Main Dispatch
   public static void main(String[] args) {
+    JAVA_BIN_PATH = getJavaHomeDirectory();
     parseCommandLine(args);
     String escmDir = getEscmDirectory();
     String generatedFilesDir = createInstallerNewFilesDirectory(escmDir);

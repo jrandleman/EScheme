@@ -30,4 +30,3 @@
 
 (display (stream->list fibs 30))
 (newline)
-
