@@ -704,7 +704,7 @@ public class SyntaxCorePrimitives {
       DatumBox result = new DatumBox();
       BooleanBox isForced = new BooleanBox();
       return new PrimitiveProcedure(Procedure.DEFAULT_NAME,(params, cont) -> {
-        if(isForced.value() == true) return cont.run(result.value());
+        if(isForced.value()) return cont.run(result.value());
         return MetaPrimitives.Eval.logic(delayedCode,env,(codeResult) -> () -> {
           result.setValue(codeResult);
           isForced.setValue(true);
