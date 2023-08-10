@@ -52,9 +52,9 @@ public class Installer {
 
 
   public static final String COMMAND_LINE_FLAGS = 
-    "  1. -h, --help                 | Print this information\n"+
-    "  2. -v, --verbose              | Print out installation progress messages\n"+
-    "  3. -u, --unit-tests           | Run EScheme's unit test suite after compilation\n";
+    "  1. -h, --help       | Print this information\n"+
+    "  2. -v, --verbose    | Print out installation progress messages\n"+
+    "  3. -u, --unit-tests | Run EScheme's unit test suite after compilation\n";
 
 
   private static void parseCommandLine(String[] args) {
