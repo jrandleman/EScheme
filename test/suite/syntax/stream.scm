@@ -116,6 +116,7 @@
 
 (define odd-pos-ints (stream-filter odd? pos-ints))
 (define pos-ints-2 (stream-interleave odd-pos-ints even-pos-ints))
+(ut (stream-interleave '() '()) '())
 (ut (stream->list pos-ints-2 0) '())
 (ut (stream->list pos-ints-2 10) '(1 2 3 4 5 6 7 8 9 10))
 (ut (stream-val pos-ints-2 0) 1)

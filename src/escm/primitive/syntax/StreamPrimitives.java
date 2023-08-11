@@ -895,14 +895,11 @@ public class StreamPrimitives {
       } else {
         if(!IsStreamP.logic(s))
           throw new Exceptionf("'(stream-append <stream> ...) invalid <stream> %s: %s", s.profile(), Exceptionf.profileArgs(parameters));
-        return Scar.logic(s,(scar) -> () -> {
-          Datum scarCode = StreamMap.compiledAtom(scar);
-          return Scdr.logic(s,(scdr) -> () -> {
-            Datum scdrCode = Pair.List(CorePrimitives.APPLY,STREAM_APPEND,Pair.List(CorePrimitives.CONS,StreamMap.compiledAtom(scdr),StreamMap.compiledAtom(streams)));
-            Datum delayedScar = CorePrimitives.Delay.valueOf(scarCode,this.definitionEnvironment);
-            Datum delayedScdr = CorePrimitives.Delay.valueOf(scdrCode,this.definitionEnvironment);
-            return continuation.run(new Pair(delayedScar,delayedScdr));
-          });
+        Datum carPromise = ((Pair)s).car();
+        return Scdr.logic(s,(scdr) -> () -> {
+          Datum scdrCode = Pair.List(CorePrimitives.APPLY,STREAM_APPEND,Pair.List(CorePrimitives.CONS,StreamMap.compiledAtom(scdr),StreamMap.compiledAtom(streams)));
+          Datum delayedScdr = CorePrimitives.Delay.valueOf(scdrCode,this.definitionEnvironment);
+          return continuation.run(new Pair(carPromise,delayedScdr));
         });
       }
     }
@@ -935,14 +932,11 @@ public class StreamPrimitives {
       if(!IsStreamP.logic(stream1))
         throw new Exceptionf("'(stream-interleave <stream> <stream>) invalid <stream> %s: %s", stream1.profile(), Exceptionf.profileArgs(parameters));
       Datum stream2Code = StreamMap.compiledAtom(stream2);
-      return Scar.logic(stream1,(scar) -> () -> {
-        Datum scarCode = StreamMap.compiledAtom(scar);
-        return Scdr.logic(stream1,(scdr) -> () -> {
-          Datum scdrCode = Pair.List(STREAM_INTERLEAVE,stream2Code,StreamMap.compiledAtom(scdr));
-          Datum delayedScar = CorePrimitives.Delay.valueOf(scarCode,this.definitionEnvironment);
-          Datum delayedScdr = CorePrimitives.Delay.valueOf(scdrCode,this.definitionEnvironment);
-          return continuation.run(new Pair(delayedScar,delayedScdr));
-        });
+      Datum carPromise = ((Pair)stream1).car();
+      return Scdr.logic(stream1,(scdr) -> () -> {
+        Datum scdrCode = Pair.List(STREAM_INTERLEAVE,stream2Code,StreamMap.compiledAtom(scdr));
+        Datum delayedScdr = CorePrimitives.Delay.valueOf(scdrCode,this.definitionEnvironment);
+        return continuation.run(new Pair(carPromise,delayedScdr));
       });
     }
     
@@ -1070,14 +1064,11 @@ public class StreamPrimitives {
       if(!IsStreamP.logic(stream))
         throw new Exceptionf("'%s invalid <stream>: %s", sig, Exceptionf.profileArgs(parameters));
       if(stream instanceof Nil || length <= 0) return continuation.run(Nil.VALUE);
-      return Scar.logic(stream,(scar) -> () -> {
-        Datum scarCode = StreamMap.compiledAtom(scar);
-        return Scdr.logic(stream,(scdr) -> () -> {
-          Datum scdrCode = Pair.List(STREAM_TAKE,StreamMap.compiledAtom(scdr),new Exact(length-1));
-          Datum delayedScar = CorePrimitives.Delay.valueOf(scarCode,env);
-          Datum delayedScdr = CorePrimitives.Delay.valueOf(scdrCode,env);
-          return continuation.run(new Pair(delayedScar,delayedScdr));
-        });
+      Datum carPromise = ((Pair)stream).car();
+      return Scdr.logic(stream,(scdr) -> () -> {
+        Datum scdrCode = Pair.List(STREAM_TAKE,StreamMap.compiledAtom(scdr),new Exact(length-1));
+        Datum delayedScdr = CorePrimitives.Delay.valueOf(scdrCode,env);
+        return continuation.run(new Pair(carPromise,delayedScdr));
       });
     }
     
