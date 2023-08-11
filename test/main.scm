@@ -13,8 +13,9 @@
       (apply displayf args)))
 
 (define (execute-test-file file)
+  (define test-file-name (slice file (+ 1 (length *escm-path*))))
   (set! total-files (+ total-files 1))
-  (verbose-displayf "    %n) Executing Test File: %wa ..." total-files file)
+  (verbose-displayf "    %n) Executing Test File: %wa ..." total-files test-file-name)
   (define time-result (time system (append *escm-execution-command* file)))
   (define time-length (car time-result))
   (define test-result (cdr time-result))
@@ -24,7 +25,7 @@
       (set! total-errors (+ total-errors 1)))
   (define err-msg (cadr test-result))
   (if (not (empty? err-msg))
-      (verbose-displayf "\n>>> Error Processing File %wa:\n%a\n\n" file err-msg)))
+      (verbose-displayf "\n>>> Error Processing File %wa:\n%a\n\n" test-file-name err-msg)))
 
 (define (test-all-files dir)
   (for-each 
