@@ -151,12 +151,14 @@
 (ut (stream->list (stream-take-while #(<= %1 5) (stream 1 2)) 5) '(1 2))
 (ut (stream->list (stream-take-while #(<= %1 5) (stream 1 2 3 4 5)) 5) '(1 2 3 4 5))
 (ut (stream->list (stream-take-while #(<= %1 5) (stream 1 2 3 4 5 6 7)) 5) '(1 2 3 4 5))
+(ut (stream->list (stream-take-while (lambda (x) #t) pos-ints) 5) '(1 2 3 4 5)) ; verify can handle infinite lists
 
 (ut (stream-drop '() 5) '())
 (ut (stream->list (stream-drop (stream 1 2) 0) 5) '(1 2))
 (ut (stream->list (stream-drop (stream 1 2) 5) 5) '())
 (ut (stream->list (stream-drop (stream 1 2 3 4 5) 5) 5) '())
 (ut (stream->list (stream-drop (stream 1 2 3 4 5 6 7) 5) 5) '(6 7))
+(ut (stream->list (stream-drop pos-ints 5) 3) '(6 7 8)) ; verify can handle infinite lists
 
 (ut (stream-drop-while #(<= %1 5) '()) '())
 (ut (stream->list (stream-drop-while #(<= %1 0) (stream 1 2)) 5) '(1 2))
@@ -177,6 +179,10 @@
 (ut (stream->list (stream-slice (stream 1 2 3 4 5) 1) 5) '(2 3 4 5))
 (ut (stream->list (stream-slice (stream 1 2 3 4 5) 2) 5) '(3 4 5))
 (ut (stream->list (stream-slice (stream 1 2 3 4 5) 5) 5) '())
+(ut (stream->list (stream-slice pos-ints 5) 3) '(6 7 8)) ; verify can handle infinite lists
+(ut (stream->list (stream-slice pos-ints 5 (lambda (x) #t)) 3) '(6 7 8)) ; verify can handle infinite lists
 
+(define pos-ints-3 (stream-unfold (lambda (x) #f) id (bind + 1) 1))
 (ut (stream->list (stream-unfold (bind < 5) (bind * 2) (bind + 1) 0) 10) '(0 2 4 6 8 10))
 (ut (stream->list (stream-unfold (bind < 5) (bind * 2) (bind + 1) 6) 10) '())
+(ut (stream->list pos-ints-3 5) '(1 2 3 4 5)) ; verify can handle infinite lists
