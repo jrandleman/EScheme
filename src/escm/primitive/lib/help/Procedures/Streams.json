@@ -290,6 +290,12 @@
   "name": "stream-unfold",
   "aliases": null,
   "signatures": ["(stream-unfold <break-condition> <map-callable> <successor-callable> <seed>)"],
-  "description": "Unfolds a stream from left to right, starting with <seed>. <break-condition>\ndetermines when unfolding stops, <map-callable> maps the <seed> to a value\nin the unfolded stream, and <successor-callable> increments <seed> for the\nnext round of unfolding.",
+  "description": "Unfolds a stream from left to right, starting with <seed>. <break-condition>\ndetermines when unfolding stops, <map-callable> maps the <seed> to a value\nin the unfolded stream, and <successor-callable> increments <seed> for the\nnext round of unfolding.\n\nSee <stream-unfolds> for an alternative without <break-condition>.",
+  "example": null
+}, {
+  "name": "stream-unfolds",
+  "aliases": null,
+  "signatures": ["(stream-unfolds <map-callable> <successor-callable> <seed>)"],
+  "description": "Unfolds a stream from left to right, starting with <seed>. <map-callable>\nmaps the <seed> to a value in the unfolded stream, and <successor-callable>\nincrements <seed> for the next round of unfolding.\n\nSee <stream-unfold> for an alternative with a <break-condition>.",
   "example": null
 }]

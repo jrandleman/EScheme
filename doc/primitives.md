@@ -735,6 +735,7 @@
 (stream-slice <stream> <start-index> <optional-length-or-predicate>)
 
 (stream-unfold <break-condition> <map-callable> <successor-callable> <seed>)
+(stream-unfolds <map-callable> <successor-callable> <seed>)
 ```
 
 

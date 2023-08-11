@@ -45,6 +45,7 @@ public class StreamPrimitives {
   public static Symbol STREAM_TAKE = new Symbol("stream-take");
   public static Symbol STREAM_TAKE_WHILE = new Symbol("stream-take-while");
   public static Symbol STREAM_UNFOLD = new Symbol("stream-unfold");
+  public static Symbol STREAM_UNFOLDS = new Symbol("stream-unfolds");
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -1303,6 +1304,46 @@ public class StreamPrimitives {
       if(!(parameters.get(2) instanceof Callable))
         throw new Exceptionf("'(stream-unfold <break-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       return logic(parameters.get(0),parameters.get(1),parameters.get(2),parameters.get(3),continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // stream-unfolds
+  //
+  // (define (stream-unfolds mapper succer seed)
+  //   (scons (mapper seed) (stream-unfolds mapper succer (succer seed))))
+  public static class StreamUnfoldStar extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "stream-unfolds";
+    }
+
+    private Trampoline.Bounce logic(Datum mapper, Datum successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
+      Datum compiledMapper = StreamMap.compiledAtom(mapper);
+      Datum compiledSuccessor = StreamMap.compiledAtom(successor);
+      ArrayList<Datum> mapArgs = new ArrayList<Datum>(1);
+      mapArgs.add(seed);
+      return ((Callable)mapper).callWith(mapArgs,(mapValue) -> () -> {
+        Datum scarCode = StreamMap.compiledAtom(mapValue);
+        ArrayList<Datum> sucArgs = new ArrayList<Datum>(1);
+        sucArgs.add(seed);
+        return ((Callable)successor).callWith(sucArgs,(sucValue) -> () -> {
+          Datum scdrCode = Pair.List(STREAM_UNFOLDS,compiledMapper,compiledSuccessor,StreamMap.compiledAtom(sucValue));
+          Datum delayedScar = CorePrimitives.Delay.valueOf(scarCode,this.definitionEnvironment);
+          Datum delayedScdr = CorePrimitives.Delay.valueOf(scdrCode,this.definitionEnvironment);
+          return continuation.run(new Pair(delayedScar,delayedScdr));
+        });
+      });
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 3) 
+        throw new Exceptionf("'(stream-unfolds <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(0) instanceof Callable))
+        throw new Exceptionf("'(stream-unfolds <map-callable> <successor-callable> <seed>) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(1) instanceof Callable))
+        throw new Exceptionf("'(stream-unfolds <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters.get(0),parameters.get(1),parameters.get(2),continuation);
     }
   }
 }

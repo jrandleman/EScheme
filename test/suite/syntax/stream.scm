@@ -186,3 +186,5 @@
 (ut (stream->list (stream-unfold (bind < 5) (bind * 2) (bind + 1) 0) 10) '(0 2 4 6 8 10))
 (ut (stream->list (stream-unfold (bind < 5) (bind * 2) (bind + 1) 6) 10) '())
 (ut (stream->list pos-ints-3 5) '(1 2 3 4 5)) ; verify can handle infinite lists
+
+(ut (stream->list (stream-unfolds (bind expt 2) (bind + 1) 0) 5) '(1 2 4 8 16))
