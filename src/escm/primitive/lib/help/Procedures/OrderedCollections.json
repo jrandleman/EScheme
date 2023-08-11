@@ -31,8 +31,8 @@
 }, {
   "name": "slice",
   "aliases": null,
-  "signatures": ["(slice <oc> <start-index>)", "(slice <oc> <start-index> <length>)", "(slice <oc> <start-index> <end-predicate?>)"],
-  "description": "Slices a subset of the items in <oc> starting from <start-index>.\nIf no other args are given, returns the rest of the items from <start-index>.\nIf <length> is given, returns at most <length> items.\nGiven <end-predicate?>, slices until a value satisfies <end-predicate?>.",
+  "signatures": ["(slice <oc> <start-index>)", "(slice <oc> <start-index> <length>)", "(slice <oc> <start-index> <predicate?>)"],
+  "description": "Slices a subset of the items in <oc> starting from <start-index>.\nIf no other args are given, returns the rest of the items from <start-index>.\nIf <length> is given, returns at most <length> items.\nGiven <predicate?>, slices while values satisfy <predicate?>.",
   "example": null
 }, {
   "name": "reverse",

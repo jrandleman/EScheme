@@ -480,7 +480,7 @@
 (init <oc>)
 (last <oc>)
 
-(slice <oc> <start-index> <optional-length-or-end-predicate>)
+(slice <oc> <start-index> <optional-length-or-predicate>)
 
 (reverse <oc>)
 

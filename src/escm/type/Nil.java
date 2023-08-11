@@ -306,7 +306,7 @@ public class Nil extends Datum implements OrderedCollection {
     return Nil.VALUE;
   }
 
-  public Trampoline.Bounce slice(int startIdx, Callable endPredicate, Trampoline.Continuation continuation) throws Exception {
+  public Trampoline.Bounce slice(int startIdx, Callable continuePredicate, Trampoline.Continuation continuation) throws Exception {
     return continuation.run(Nil.VALUE);
   }
 

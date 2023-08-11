@@ -692,13 +692,13 @@ public class String extends Datum implements OrderedCollection, Callable {
     public int count = 0;
   }
 
-  private Trampoline.Bounce sliceGetLastIdx(int i, int n, Callable endPredicate, Trampoline.Continuation continuation) throws Exception {
+  private Trampoline.Bounce sliceGetLastIdx(int i, int n, Callable continuePredicate, Trampoline.Continuation continuation) throws Exception {
     if(i >= n) return continuation.run(new Exact(i));
     ArrayList<Datum> args = new ArrayList<Datum>(1);
     args.add(charAt(i));
-    return endPredicate.callWith(args,(shouldEnd) -> () -> {
-      if(shouldEnd.isTruthy()) return continuation.run(new Exact(i+1));
-      return sliceGetLastIdx(i+1,n,endPredicate,continuation);
+    return continuePredicate.callWith(args,(shouldContinue) -> () -> {
+      if(!shouldContinue.isTruthy()) return continuation.run(new Exact(i));
+      return sliceGetLastIdx(i+1,n,continuePredicate,continuation);
     });
   }
 
@@ -721,10 +721,10 @@ public class String extends Datum implements OrderedCollection, Callable {
     return new String(sb.toString());
   }
 
-  public Trampoline.Bounce slice(int startIdx, Callable endPredicate, Trampoline.Continuation continuation) throws Exception {
+  public Trampoline.Bounce slice(int startIdx, Callable continuePredicate, Trampoline.Continuation continuation) throws Exception {
     int n = codePointLength();
     if(startIdx < 0 || startIdx >= n) return continuation.run(new String());
-    return sliceGetLastIdx(startIdx,n,endPredicate,(endIdx) -> () -> {
+    return sliceGetLastIdx(startIdx,n,continuePredicate,(endIdx) -> () -> {
       return continuation.run((Datum)slice(startIdx,((Real)endIdx).intValue()-startIdx));
     });
   }

@@ -890,19 +890,18 @@ public class Pair extends Datum implements OrderedCollection {
     return ((Pair)cdr).slice(startIdx-1,length);
   }
 
-  public Trampoline.Bounce slice(int startIdx, Callable endPredicate, Trampoline.Continuation continuation) throws Exception {
+  public Trampoline.Bounce slice(int startIdx, Callable continuePredicate, Trampoline.Continuation continuation) throws Exception {
     if(startIdx <= 0) {
       ArrayList<Datum> args = new ArrayList<Datum>();
       args.add(car);
-      return endPredicate.callWith(args,(shouldEnd) -> () -> {
-        if(shouldEnd.isTruthy() || !(cdr instanceof Pair)) {
-          return continuation.run(new Pair(car,Nil.VALUE));
-        }
-        return ((Pair)cdr).slice(0,endPredicate,(sliced) -> () -> continuation.run(new Pair(car,sliced)));
+      return continuePredicate.callWith(args,(shouldContinue) -> () -> {
+        if(!shouldContinue.isTruthy()) return continuation.run(Nil.VALUE);
+        if(!(cdr instanceof Pair)) return continuation.run(new Pair(car,Nil.VALUE));
+        return ((Pair)cdr).slice(0,continuePredicate,(sliced) -> () -> continuation.run(new Pair(car,sliced)));
       });
     }
     if(!(cdr instanceof Pair)) return continuation.run(Nil.VALUE);
-    return () -> ((Pair)cdr).slice(startIdx-1,endPredicate,continuation);
+    return () -> ((Pair)cdr).slice(startIdx-1,continuePredicate,continuation);
   }
 
   //////////////////////////////////////

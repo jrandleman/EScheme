@@ -110,7 +110,7 @@ public interface OrderedCollection extends AssociativeCollection {
 
   OrderedCollection slice(int startIdx) throws Exception; // <length> defaults to the end of the OrderedCollection
   OrderedCollection slice(int startIdx, int length) throws Exception;
-  Trampoline.Bounce slice(int startIdx, Callable endPredicate, Trampoline.Continuation continuation) throws Exception; // -> OrderedCollection
+  Trampoline.Bounce slice(int startIdx, Callable predicate, Trampoline.Continuation continuation) throws Exception; // -> OrderedCollection
 
   OrderedCollection reverse() throws Exception;
 
