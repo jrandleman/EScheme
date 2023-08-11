@@ -16,6 +16,7 @@ import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.number.Real;
+import escm.type.number.Exact;
 import escm.util.Trampoline;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
@@ -41,6 +42,9 @@ public class StreamPrimitives {
   public static Symbol STREAM_APPEND = new Symbol("stream-append");
   public static Symbol STREAM_INTERLEAVE = new Symbol("stream-interleave");
   public static Symbol IS_NULLP = new Symbol("null?");
+  public static Symbol STREAM_TAKE = new Symbol("stream-take");
+  public static Symbol STREAM_TAKE_WHILE = new Symbol("stream-take-while");
+  public static Symbol STREAM_UNFOLD = new Symbol("stream-unfold");
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -674,15 +678,15 @@ public class StreamPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (stream-ref <stream> <index>)
+  // (stream-val <stream> <index>)
   //
-  // (define (stream-ref s index)
+  // (define (stream-val s index)
   //   (if (= 0 index)
   //       (scar s)
-  //       (stream-ref (scdr s) (- index 1))))
-  public static class StreamRef extends PrimitiveCallable {
+  //       (stream-val (scdr s) (- index 1))))
+  public static class StreamVal extends PrimitiveCallable {
     public java.lang.String escmName() {
-      return "stream-ref";
+      return "stream-val";
     }
 
     private static Trampoline.Bounce logic(Datum s, int idx, Trampoline.Continuation continuation) throws Exception {
@@ -692,13 +696,13 @@ public class StreamPrimitives {
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2) 
-        throw new Exceptionf("'(stream-ref <stream> <index>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(stream-val <stream> <index>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum s = parameters.get(0);
       if(!IsStreamP.logic(s))
-        throw new Exceptionf("'(stream-ref <stream> <index>) invalid <stream>: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(stream-val <stream> <index>) invalid <stream>: %s", Exceptionf.profileArgs(parameters));
       Datum i = parameters.get(1);
       if(!ConvertStreamToList.isValidStreamIndex(i))
-        throw new Exceptionf("'(stream-ref <stream> <index>) invalid <list-length>: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(stream-val <stream> <index>) invalid <list-length>: %s", Exceptionf.profileArgs(parameters));
       return logic(s,((Real)i).intValue(),continuation);
     }
   }
@@ -755,11 +759,10 @@ public class StreamPrimitives {
       return "stream-filter";
     }
 
-    private Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum c, Datum stream, Trampoline.Continuation continuation) throws Exception {
+    private Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum c, Datum compiledCallable, Datum stream, Trampoline.Continuation continuation) throws Exception {
       if(!IsStreamP.logic(stream))
         throw new Exceptionf("'(stream-filter <callable> <stream>) invalid <stream>: %s", Exceptionf.profileArgs(parameters));
       if(stream instanceof Nil) return continuation.run(Nil.VALUE);
-      Datum compiledCallable = StreamMap.compiledAtom(c);
       return Scar.logic(stream,(scar) -> () -> {
         Datum compiledScar = StreamMap.compiledAtom(scar);
         return Scdr.logic(stream,(scdr) -> () -> {
@@ -773,7 +776,7 @@ public class StreamPrimitives {
               Datum delayedFilteredScdr = CorePrimitives.Delay.valueOf(recursiveCode,this.definitionEnvironment);
               return continuation.run(new Pair(delayedScar,delayedFilteredScdr));
             } else {
-              return logic(parameters,c,scdr,continuation);
+              return logic(parameters,c,compiledCallable,scdr,continuation);
             }
           });
         });
@@ -786,7 +789,8 @@ public class StreamPrimitives {
       Datum c = parameters.get(0);
       if(!(c instanceof Callable))
         throw new Exceptionf("'(stream-filter <callable> <stream>) invalid <callable>: %s", Exceptionf.profileArgs(parameters));
-      return logic(parameters,c,parameters.get(1),continuation);
+      Datum compiledCallable = StreamMap.compiledAtom(c);
+      return logic(parameters,c,compiledCallable,parameters.get(1),continuation);
     }
   }
 
@@ -981,6 +985,324 @@ public class StreamPrimitives {
             Pair.List(SCAR,s))));
       Datum letExpr = Pair.List(CorePrimitives.LET,Pair.List(Pair.List(s,sValue)),generatorProcedure);
       return MetaPrimitives.Eval.logic(letExpr,this.definitionEnvironment,continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // (stream-member <obj> <stream>)
+  //
+  // (define (stream-member obj stream-obj)
+  //   (if (null? stream-obj)
+  //       #f
+  //       (if (equal? obj (scar stream-obj))
+  //           stream-obj
+  //           (stream-member obj (scdr stream-obj)))))
+  public static class StreamMember extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "stream-member";
+    }
+
+    private static Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum obj, Datum stream, Trampoline.Continuation continuation) throws Exception {
+      if(!IsStreamP.logic(stream))
+        throw new Exceptionf("'(stream-member <obj> <stream>) invalid <stream>: %s", Exceptionf.profileArgs(parameters));
+      if(stream instanceof Nil) return continuation.run(Boolean.FALSE);
+      return Scar.logic(stream,(scar) -> () -> {
+        if(scar.equal(obj)) return continuation.run(stream);
+        return Scdr.logic(stream,(scdr) -> () -> logic(parameters,obj,scdr,continuation));
+      });
+    }
+    
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 2) 
+        throw new Exceptionf("'(stream-member <obj> <stream>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters,parameters.get(0),parameters.get(1),continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // (stream-memq <obj> <stream>)
+  //
+  // (define (stream-memq obj stream-obj)
+  //   (if (null? stream-obj)
+  //       #f
+  //       (if (eq? obj (scar stream-obj))
+  //           stream-obj
+  //           (stream-memq obj (scdr stream-obj)))))
+  public static class StreamMemq extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "stream-memq";
+    }
+
+    private static Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum obj, Datum stream, Trampoline.Continuation continuation) throws Exception {
+      if(!IsStreamP.logic(stream))
+        throw new Exceptionf("'(stream-memq <obj> <stream>) invalid <stream>: %s", Exceptionf.profileArgs(parameters));
+      if(stream instanceof Nil) return continuation.run(Boolean.FALSE);
+      return Scar.logic(stream,(scar) -> () -> {
+        if(scar.eq(obj)) return continuation.run(stream);
+        return Scdr.logic(stream,(scdr) -> () -> logic(parameters,obj,scdr,continuation));
+      });
+    }
+    
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 2) 
+        throw new Exceptionf("'(stream-memq <obj> <stream>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters,parameters.get(0),parameters.get(1),continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // (stream-take <stream> <length>)
+  //
+  // (define (stream-take stream-obj n)
+  //   (if (or (null? stream-obj) (<= n 0))
+  //       '()
+  //       (scons (scar stream-obj) (stream-take (scdr stream-obj) (- n 1)))))
+  public static class StreamTake extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "stream-take";
+    }
+
+    public static Trampoline.Bounce logic(String sig, ArrayList<Datum> parameters, Environment env, Datum stream, int length, Trampoline.Continuation continuation) throws Exception {
+      if(!IsStreamP.logic(stream))
+        throw new Exceptionf("'%s invalid <stream>: %s", sig, Exceptionf.profileArgs(parameters));
+      if(stream instanceof Nil || length <= 0) return continuation.run(Nil.VALUE);
+      return Scar.logic(stream,(scar) -> () -> {
+        Datum scarCode = StreamMap.compiledAtom(scar);
+        return Scdr.logic(stream,(scdr) -> () -> {
+          Datum scdrCode = Pair.List(STREAM_TAKE,StreamMap.compiledAtom(scdr),new Exact(length-1));
+          Datum delayedScar = CorePrimitives.Delay.valueOf(scarCode,env);
+          Datum delayedScdr = CorePrimitives.Delay.valueOf(scdrCode,env);
+          return continuation.run(new Pair(delayedScar,delayedScdr));
+        });
+      });
+    }
+    
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 2) 
+        throw new Exceptionf("'(stream-take <stream> <length>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum s = parameters.get(0);
+      if(!IsStreamP.logic(s))
+        throw new Exceptionf("'(stream-take <stream> <length>) invalid <stream>: %s", Exceptionf.profileArgs(parameters));
+      Datum l = parameters.get(1);
+      if(!ConvertStreamToList.isValidStreamIndex(l))
+        throw new Exceptionf("'(stream-take <stream> <length>) invalid <length>: %s", Exceptionf.profileArgs(parameters));
+      return logic("(stream-take <stream> <length>)",parameters,this.definitionEnvironment,s,((Real)l).intValue(),continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // (stream-take-while <predicate?> <stream>)
+  //
+  // (define (stream-take-while continue? stream-obj)
+  //   (if (or (null? stream-obj) (not (continue? (scar stream-obj))))
+  //       '()
+  //       (scons (scar stream-obj) (stream-take-while continue? (scdr stream-obj)))))
+  public static class StreamTakeWhile extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "stream-take-while";
+    }
+
+    public static Trampoline.Bounce logic(String sig, ArrayList<Datum> parameters, Environment env, Datum contPred, Datum stream, Trampoline.Continuation continuation) throws Exception {
+      if(!IsStreamP.logic(stream))
+        throw new Exceptionf("'%s invalid <stream>: %s", sig, Exceptionf.profileArgs(parameters));
+      if(stream instanceof Nil) return continuation.run(Nil.VALUE);
+      Datum compiledCallable = StreamMap.compiledAtom(contPred);
+      return Scar.logic(stream,(scar) -> () -> {
+        Datum scarCode = StreamMap.compiledAtom(scar);
+        ArrayList<Datum> args = new ArrayList<Datum>();
+        args.add(scar);
+        return ((Callable)contPred).callWith(args,(shouldContinue) -> () -> {
+          if(!shouldContinue.isTruthy()) return continuation.run(Nil.VALUE);
+          return Scdr.logic(stream,(scdr) -> () -> {
+            Datum scdrCode = Pair.List(STREAM_TAKE_WHILE,compiledCallable,StreamMap.compiledAtom(scdr));
+            Datum delayedScar = CorePrimitives.Delay.valueOf(scarCode,env);
+            Datum delayedScdr = CorePrimitives.Delay.valueOf(scdrCode,env);
+            return continuation.run(new Pair(delayedScar,delayedScdr));
+          });
+        });
+      });
+    }
+    
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 2) 
+        throw new Exceptionf("'(stream-take-while <predicate?> <stream>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum contPred = parameters.get(0);
+      if(!(contPred instanceof Callable))
+        throw new Exceptionf("'(stream-take-while <predicate?> <stream>) invalid <predicate?>: %s", Exceptionf.profileArgs(parameters));
+      Datum s = parameters.get(1);
+      if(!IsStreamP.logic(s))
+        throw new Exceptionf("'(stream-take-while <predicate?> <stream>) invalid <stream>: %s", Exceptionf.profileArgs(parameters));
+      return logic("(stream-take-while <predicate?> <stream>)",parameters,this.definitionEnvironment,contPred,s,continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // (stream-drop <stream> <length>)
+  //
+  // (define (stream-drop stream-obj n)
+  //   (if (or (null? stream-obj) (<= n 0))
+  //       stream-obj
+  //       (stream-drop (scdr stream-obj) (- n 1))))
+  public static class StreamDrop extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "stream-drop";
+    }
+
+    public static Trampoline.Bounce logic(String sig, ArrayList<Datum> parameters, Datum stream, int length, Trampoline.Continuation continuation) throws Exception {
+      if(!IsStreamP.logic(stream))
+        throw new Exceptionf("'%s invalid <stream>: %s", sig, Exceptionf.profileArgs(parameters));
+      if(stream instanceof Nil || length <= 0) return continuation.run(stream);
+      return Scdr.logic(stream,(scdr) -> () -> logic(sig,parameters,scdr,length-1,continuation));
+    }
+    
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 2) 
+        throw new Exceptionf("'(stream-drop <stream> <length>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum s = parameters.get(0);
+      if(!IsStreamP.logic(s))
+        throw new Exceptionf("'(stream-drop <stream> <length>) invalid <stream>: %s", Exceptionf.profileArgs(parameters));
+      Datum l = parameters.get(1);
+      if(!ConvertStreamToList.isValidStreamIndex(l))
+        throw new Exceptionf("'(stream-drop <stream> <length>) invalid <length>: %s", Exceptionf.profileArgs(parameters));
+      return logic("(stream-drop <stream> <length>)",parameters,s,((Real)l).intValue(),continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // (stream-drop-while <predicate?> <stream>)
+  //
+  // (define (stream-drop-while continue? stream-obj)
+  //   (if (or (null? stream-obj) (not (continue? (scar stream-obj))))
+  //       stream-obj
+  //       (stream-drop-while continue? (scdr stream-obj))))
+  public static class StreamDropWhile extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "stream-drop-while";
+    }
+
+    public static Trampoline.Bounce logic(String sig, ArrayList<Datum> parameters, Datum contPred, Datum stream, Trampoline.Continuation continuation) throws Exception {
+      if(!IsStreamP.logic(stream))
+        throw new Exceptionf("'%s invalid <stream>: %s", sig, Exceptionf.profileArgs(parameters));
+      if(stream instanceof Nil) return continuation.run(stream);
+      return Scar.logic(stream,(scar) -> () -> {
+        ArrayList<Datum> args = new ArrayList<Datum>();
+        args.add(scar);
+        return ((Callable)contPred).callWith(args,(shouldContinue) -> () -> {
+          if(!shouldContinue.isTruthy()) return continuation.run(stream);
+          return Scdr.logic(stream,(scdr) -> () -> logic(sig,parameters,contPred,scdr,continuation));
+        });
+      });
+    }
+    
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 2) 
+        throw new Exceptionf("'(stream-drop-while <predicate?> <stream>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum contPred = parameters.get(0);
+      if(!(contPred instanceof Callable))
+        throw new Exceptionf("'(stream-drop-while <predicate?> <stream>) invalid <predicate?>: %s", Exceptionf.profileArgs(parameters));
+      Datum s = parameters.get(1);
+      if(!IsStreamP.logic(s))
+        throw new Exceptionf("'(stream-drop-while <predicate?> <stream>) invalid <stream>: %s", Exceptionf.profileArgs(parameters));
+      return logic("(stream-drop-while <predicate?> <stream>)",parameters,contPred,s,continuation);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // stream-slice
+  //
+  // (defn stream-slice
+  //   ((stream-obj idx) (stream-drop stream-obj idx))
+  //   ((stream-obj idx n-or-continue?)
+  //     (if (number? n-or-continue?)
+  //         (stream-take (stream-drop stream-obj idx) n-or-continue?)
+  //         (stream-take-while n-or-continue? (stream-drop stream-obj idx)))))
+  public static class StreamSlice extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "stream-slice";
+    }
+    
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() < 2 || parameters.size() > 3) 
+        throw new Exceptionf("'(stream-slice <stream> <start-index> <optional-continue-predicate-or-length>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      Datum s = parameters.get(0);
+      if(!IsStreamP.logic(s))
+        throw new Exceptionf("'(stream-slice <stream> <start-index> <optional-continue-predicate-or-length>) 1st arg isn't a <stream>: %s", Exceptionf.profileArgs(parameters));
+      Datum i = parameters.get(1);
+      if(!ConvertStreamToList.isValidStreamIndex(i))
+        throw new Exceptionf("'(stream-slice <stream> <start-index> <optional-continue-predicate-or-length>) 2nd arg isn't an index: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() == 2) {
+        return StreamDrop.logic("(stream-slice <stream> <start-index>)",parameters,s,((Real)i).intValue(),continuation);
+      }
+      if(ConvertStreamToList.isValidStreamIndex(parameters.get(2))) {
+        Datum l = parameters.get(2);
+        return StreamDrop.logic("(stream-slice <stream> <start-index> <length>)",parameters,s,((Real)i).intValue(),(dropped) -> () -> {
+          return StreamTake.logic("(stream-slice <stream> <start-index> <length>)",parameters,this.definitionEnvironment,dropped,((Real)l).intValue(),continuation);
+        });
+      }
+      if(parameters.get(2) instanceof Callable) {
+        Datum contPred = parameters.get(2);
+        return StreamDrop.logic("(stream-slice <stream> <start-index> <predicate?>)",parameters,s,((Real)i).intValue(),(dropped) -> () -> {
+          return StreamTakeWhile.logic("(stream-slice <stream> <start-index> <predicate?>)",parameters,this.definitionEnvironment,contPred,dropped,continuation);
+        });
+      }
+      throw new Exceptionf("'(stream-slice <stream> <start-index> <optional-continue-predicate-or-length>) invalid 3rd arg: %s", Exceptionf.profileArgs(parameters));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // stream-unfold
+  //
+  // (define (stream-unfold break? mapper succer seed)
+  //   (if (break? seed)
+  //       '()
+  //       (scons (mapper seed) (stream-unfold break? mapper succer (succer seed)))))
+  public static class StreamUnfold extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "stream-unfold";
+    }
+
+    private Trampoline.Bounce logic(Datum breakCond, Datum mapper, Datum successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
+      Datum compiledBreakCond = StreamMap.compiledAtom(breakCond);
+      Datum compiledMapper = StreamMap.compiledAtom(mapper);
+      Datum compiledSuccessor = StreamMap.compiledAtom(successor);
+      ArrayList<Datum> breakArgs = new ArrayList<Datum>(1);
+      breakArgs.add(seed);
+      return ((Callable)breakCond).callWith(breakArgs,(shouldBreak) -> () -> {
+        if(shouldBreak.isTruthy()) return continuation.run(Nil.VALUE);
+        ArrayList<Datum> mapArgs = new ArrayList<Datum>(1);
+        mapArgs.add(seed);
+        return ((Callable)mapper).callWith(mapArgs,(mapValue) -> () -> {
+          Datum scarCode = StreamMap.compiledAtom(mapValue);
+          ArrayList<Datum> sucArgs = new ArrayList<Datum>(1);
+          sucArgs.add(seed);
+          return ((Callable)successor).callWith(sucArgs,(sucValue) -> () -> {
+            Datum scdrCode = Pair.List(STREAM_UNFOLD,compiledBreakCond,compiledMapper,compiledSuccessor,StreamMap.compiledAtom(sucValue));
+            Datum delayedScar = CorePrimitives.Delay.valueOf(scarCode,this.definitionEnvironment);
+            Datum delayedScdr = CorePrimitives.Delay.valueOf(scdrCode,this.definitionEnvironment);
+            return continuation.run(new Pair(delayedScar,delayedScdr));
+          });
+        });
+      });
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      if(parameters.size() != 4) 
+        throw new Exceptionf("'(stream-unfold <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(0) instanceof Callable))
+        throw new Exceptionf("'(stream-unfold <break-condition> <map-callable> <successor-callable> <seed>) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(1) instanceof Callable))
+        throw new Exceptionf("'(stream-unfold <break-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(parameters.get(2) instanceof Callable))
+        throw new Exceptionf("'(stream-unfold <break-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters.get(0),parameters.get(1),parameters.get(2),parameters.get(3),continuation);
     }
   }
 }

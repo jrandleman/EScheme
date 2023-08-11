@@ -191,9 +191,9 @@
   "description": "Equivalent to: (scdr (scdr (scdr (scdr <stream-pair>))))",
   "example": null
 }, {
-  "name": "stream-ref",
+  "name": "stream-val",
   "aliases": null,
-  "signatures": ["(stream-ref <stream> <index>)"],
+  "signatures": ["(stream-val <stream> <index>)"],
   "description": "Return the <index>th item in <stream>.",
   "example": null
 }, {
@@ -243,5 +243,53 @@
   "aliases": null,
   "signatures": ["(stream->generator <stream>)"],
   "description": "Return a thunk (nullary procedure) that, upon invocation, returns the\nnext item in the stream.\nReturns <*generator-complete*> once at the end of the stream.",
+  "example": null
+}, {
+  "name": "stream-member",
+  "aliases": null,
+  "signatures": ["(stream-member <obj> <stream>)"],
+  "description": "Returns the substream in <stream> starting with <obj> based on <equal?> item\nequality. Returns #f if <obj> isn't in <stream>. Note that this will run\nforever if <obj> isn't in <stream> and <stream> is infinite.",
+  "example": null
+}, {
+  "name": "stream-memq",
+  "aliases": null,
+  "signatures": ["(stream-memq <obj> <stream>)"],
+  "description": "Returns the substream in <stream> starting with <obj> based on <eq?> item\nequality. Returns #f if <obj> isn't in <stream>. Note that this will run\nforever if <obj> isn't in <stream> and <stream> is infinite.",
+  "example": null
+}, {
+  "name": "stream-take",
+  "aliases": null,
+  "signatures": ["(stream-take <stream> <length>)"],
+  "description": "Returns the first <length> items in <stream> as another stream.",
+  "example": null
+}, {
+  "name": "stream-take-while",
+  "aliases": null,
+  "signatures": ["(stream-take-while <predicate?> <stream>)"],
+  "description": "Returns a stream with the first items in <stream> while they satisfy\n<predicate?>.",
+  "example": null
+}, {
+  "name": "stream-drop",
+  "aliases": null,
+  "signatures": ["(stream-drop <stream> <length>)"],
+  "description": "Returns <stream> without its first <length> items as another stream.",
+  "example": null
+}, {
+  "name": "stream-drop-while",
+  "aliases": null,
+  "signatures": ["(stream-drop-while <predicate?> <stream>)"],
+  "description": "Returns <stream> without all of the leading items that satisfy <predicate?>\nas another stream. Note that this will run forever if <stream> is infinite\nand every item in it satisfies <predicate?>.",
+  "example": null
+}, {
+  "name": "stream-slice",
+  "aliases": null,
+  "signatures": ["(stream-slice <stream> <start-index>)", "(stream-slice <stream> <start-index> <length>)", "(stream-slice <stream> <start-index> <predicate?>)"],
+  "description": "Slices a subset of the items in <stream> starting from <start-index>.\nIf no other args are given, returns the rest of the items from <start-index>.\nIf <length> is given, returns at most <length> items.\nGiven <predicate?>, slices while values satisfy <predicate?>.\n\nNote that this may run infinitely if given an infinite stream where every\nvalue satisfies <predicate?>",
+  "example": null
+}, {
+  "name": "stream-unfold",
+  "aliases": null,
+  "signatures": ["(stream-unfold <break-condition> <map-callable> <successor-callable> <seed>)"],
+  "description": "Unfolds a stream from left to right, starting with <seed>. <break-condition>\ndetermines when unfolding stops, <map-callable> maps the <seed> to a value\nin the unfolded stream, and <successor-callable> increments <seed> for the\nnext round of unfolding.",
   "example": null
 }]

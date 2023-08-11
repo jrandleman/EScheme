@@ -708,17 +708,33 @@
 (stream? <obj>)
 
 (scar <stream-pair>) ... (scddddr <stream-pair>)
-(stream-ref <stream> <index>)
+(stream-val <stream> <index>)
 
 (stream->list <stream> <list-length>)
 
 (stream-map <callable> <stream> ...)
 (stream-filter <predicate?> <stream>)
+
 (stream-iterate <update-callable> <seed>)
 (stream-constant <obj> ...)
+
 (stream-append <stream> ...)
 (stream-interleave <stream1> <stream2>)
+
 (stream->generator <stream>)
+
+(stream-member <obj> <stream>)
+(stream-memq <obj> <stream>)
+
+(stream-take <stream> <length>)
+(stream-take-while <predicate?> <stream>)
+
+(stream-drop <stream> <length>)
+(stream-drop-while <predicate?> <stream>)
+
+(stream-slice <stream> <start-index> <optional-length-or-predicate>)
+
+(stream-unfold <break-condition> <map-callable> <successor-callable> <seed>)
 ```
 
 
