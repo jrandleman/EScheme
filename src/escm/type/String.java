@@ -487,11 +487,11 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Vector toACVector() throws Exception {
-    Vector v = new Vector();
+    ArrayList<Datum> vals = new ArrayList<Datum>();
     forEachChar((i,chr) -> {
-      v.push(chr);
+      vals.add(chr);
     });
-    return v;
+    return new Vector(0,vals);
   }
 
   public Hashmap toACHashmap() throws Exception {

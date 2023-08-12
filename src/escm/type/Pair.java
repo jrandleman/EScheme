@@ -9,6 +9,7 @@ import escm.type.bool.Boolean;
 import escm.type.number.Number;
 import escm.type.number.Exact;
 import escm.type.number.Real;
+import escm.type.procedure.Procedure;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
@@ -700,14 +701,14 @@ public class Pair extends Datum implements OrderedCollection {
   }
 
   public Vector toACVector() throws Exception {
-    Vector v = new Vector();
+    ArrayList<Datum> vals = new ArrayList<Datum>();
     Datum l = this;
     while(l instanceof Pair) {
       Pair p = (Pair)l;
-      v.push(p.car);
+      vals.add(p.car);
       l = p.cdr;
     }
-    return v;
+    return new Vector(0,vals);
   }
 
   public Hashmap toACHashmap() throws Exception {
@@ -922,25 +923,32 @@ public class Pair extends Datum implements OrderedCollection {
   // removing items
   //////////////////////////////////////
 
-  private Trampoline.Bounce removeLastIter(Callable predicate, int i, Vector v, Trampoline.Continuation continuation) throws Exception {
-    synchronized(v) {
-      int vLength = v.size();
-      if(i >= vLength) i = vLength-1;
-      if(i < 0) return continuation.run(Boolean.FALSE);
-      ArrayList<Datum> args = new ArrayList<Datum>();
-      args.add(v.get(i));
-      final int finalI = i; // required for lambda capture
-      return predicate.callWith(args,(shouldRemove) -> () -> {
-        if(shouldRemove.isTruthy()) return continuation.run(new Exact(finalI));
-        if(!(cdr instanceof Pair)) return continuation.run(Boolean.FALSE);
-        return () -> ((Pair)cdr).removeLastIter(predicate,finalI-1,v,continuation);
-      });
-    }
+  private static Datum generateDatumFromCallable(Callable c) {
+    if(c instanceof Datum) return (Datum)c;
+    return new PrimitiveProcedure(Procedure.DEFAULT_NAME,c);
   }
 
-  private Datum removeLastCreateList(int index) throws Exception {
-    if(index <= 0 || !(cdr instanceof Pair)) return cdr;
-    return new Pair(car,((Pair)cdr).removeLastCreateList(index-1));
+  private static Datum alwaysFalseCallable() {
+    return new PrimitiveProcedure(Procedure.DEFAULT_NAME,(params,cont) -> cont.run(Boolean.FALSE));
+  }
+
+  private static Trampoline.Bounce removeLastIter(Datum predicate, Datum lis, Trampoline.Continuation continuation) throws Exception {
+    if(!(lis instanceof Pair)) return continuation.run(new Pair(predicate,Nil.VALUE));
+    Pair plis = (Pair)lis;
+    return () -> removeLastIter(predicate,plis.cdr,(result) -> () -> {
+      Pair p = (Pair)result;
+      Datum newPredicate = p.car;
+      Datum recurResult = p.cdr;
+      ArrayList<Datum> args = new ArrayList<Datum>();
+      args.add(plis.car);
+      return ((Callable)newPredicate).callWith(args,(shouldRemove) -> () -> {
+        if(shouldRemove.isTruthy()) {
+          return continuation.run(new Pair(alwaysFalseCallable(),recurResult));
+        } else {
+          return continuation.run(new Pair(newPredicate,new Pair(plis.car,recurResult)));
+        }
+      });
+    });
   }
 
   public Trampoline.Bounce removeFirst(Callable predicate, Trampoline.Continuation continuation) throws Exception {
@@ -954,13 +962,7 @@ public class Pair extends Datum implements OrderedCollection {
   }
 
   public Trampoline.Bounce removeLast(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    Vector v = toACVector();
-    return removeLastIter(predicate,v.size()-1,v,(index) -> () -> {
-      if(index instanceof Real) {
-        return continuation.run(removeLastCreateList(((Real)index).intValue()));
-      }
-      return continuation.run(this);
-    });
+    return removeLastIter(generateDatumFromCallable(predicate),this,(result) -> () -> continuation.run(((Pair)result).cdr));
   }
 
   //////////////////////////////////////
@@ -1101,16 +1103,16 @@ public class Pair extends Datum implements OrderedCollection {
   // taking
   //////////////////////////////////////
 
-  private Trampoline.Bounce takeRightWhileCounter(Callable predicate, int n, Trampoline.Continuation continuation) throws Exception {
-    ArrayList<Datum> args = new ArrayList<Datum>();
-    args.add(car);
-    return predicate.callWith(args,(shouldTake) -> () -> {
-      if(shouldTake.isTruthy()) {
-        if(!(cdr instanceof Pair)) return continuation.run(new Exact(n+1));
-        return ((Pair)cdr).takeRightWhileCounter(predicate,n+1,continuation);
-      }
-      if(!(cdr instanceof Pair)) return continuation.run(new Exact(0));
-      return ((Pair)cdr).takeRightWhileCounter(predicate,0,continuation);
+  private Trampoline.Bounce takeRightWhileIter(Callable predicate, Datum lis, Trampoline.Continuation escape, Trampoline.Continuation continuation) throws Exception {
+    if(!(lis instanceof Pair)) return continuation.run(Nil.VALUE);
+    Pair plis = (Pair)lis;
+    return () -> takeRightWhileIter(predicate,plis.cdr,escape,(tail) -> () -> {
+      ArrayList<Datum> args = new ArrayList<Datum>();
+      args.add(plis.car);
+      return predicate.callWith(args,(keepTaking) -> () -> {
+        if(!keepTaking.isTruthy()) return escape.run(tail);
+        return continuation.run(new Pair(plis.car,tail));
+      });
     });
   }
 
@@ -1134,7 +1136,7 @@ public class Pair extends Datum implements OrderedCollection {
   }
 
   public Trampoline.Bounce takeRightWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    return takeRightWhileCounter(predicate,0,(length) -> () -> continuation.run((Datum)takeRight(((Real)length).intValue())));
+    return takeRightWhileIter(predicate,this,continuation,continuation);
   }
 
   //////////////////////////////////////

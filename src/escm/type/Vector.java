@@ -226,14 +226,16 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   }
 
   public Vector subvector(int idx, int length) throws Exception {
+    if(length <= 0) return new Vector(0,new ArrayList<Datum>());
     if(idx < 0)
       throw new Exceptionf("VECTOR [SUBVECTOR]: can't get subvector of %s with negative index %d", write(), idx);
-    ArrayList<Datum> subvect = new ArrayList<Datum>();
     synchronized(this) {
-      for(int n = value.size(), count = 0; idx < n && count < length; ++idx, ++count)
+      ArrayList<Datum> subvect = new ArrayList<Datum>(length);
+      for(int n = value.size(), count = 0; idx < n && count < length; ++idx, ++count) {
         subvect.add(value.get(idx));
+      }
+      return new Vector(0,subvect);
     }
-    return new Vector(0,subvect);
   }
 
 
@@ -978,12 +980,11 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       args.add(value.get(i));
       return predicate.callWith(args,(shouldRemove) -> () -> {
         if(shouldRemove.isTruthy()) {
-          ArrayList<Datum> removed;
           synchronized(this) {
-            removed = new ArrayList<Datum>(value);
+            ArrayList<Datum> removed = new ArrayList<Datum>(value);
+            if(i < removed.size()) removed.remove(i);
+            return continuation.run(new Vector(0,removed));
           }
-          removed.remove(i);
-          return continuation.run(new Vector(0,removed));
         }
         return removeIter(predicate,i+mod,increasing,mod,continuation);
       });
