@@ -1001,14 +1001,13 @@ public class Pair extends Datum implements OrderedCollection {
   //////////////////////////////////////
 
   private static Trampoline.Bounce FoldRightIter(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> Datum
-    AssociativeCollection[] tails = new AssociativeCollection[acs.length];
     ArrayList<Datum> params = new ArrayList<Datum>(acs.length);
     for(int i = 0; i < acs.length; ++i) {
       if(acs[i].length() == 0) return continuation.run(seed);
       params.add(acs[i].head());
-      tails[i] = (AssociativeCollection)acs[i].tail();
+      acs[i] = (AssociativeCollection)acs[i].tail(); // can mutate <acs> since never captured in a continuation (unlike <fold>)!
     }
-    return () -> FoldRightIter(c,seed,tails,(acc) -> () -> {
+    return () -> FoldRightIter(c,seed,acs,(acc) -> () -> {
       ArrayList<Datum> args = new ArrayList<Datum>(params);
       args.add(acc);
       return c.callWith(args,continuation);
