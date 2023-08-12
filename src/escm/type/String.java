@@ -740,10 +740,10 @@ public class String extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   public OrderedCollection reverse() throws Exception {
-    escm.type.Character[] chars = toChars();
+    int[] codepoints = toCodePoints();
     StringBuilder sb = new StringBuilder();
-    for(int i = chars.length-1; i >= 0; --i) {
-      sb.append(chars[i].display());
+    for(int i = codepoints.length-1; i >= 0; --i) {
+      sb.append(java.lang.Character.toString(codepoints[i]));
     }
     return new String(sb.toString());
   }
