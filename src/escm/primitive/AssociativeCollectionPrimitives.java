@@ -34,21 +34,6 @@ public class AssociativeCollectionPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // ac?
-  public static class IsAC extends Primitive {
-    public java.lang.String escmName() {
-      return "ac?";
-    }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1) 
-        throw new Exceptionf("'(ac? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(parameters.get(0) instanceof AssociativeCollection);
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // head
   public static class Head extends Primitive {
     public java.lang.String escmName() {

@@ -166,11 +166,17 @@ public class Nil extends Datum implements OrderedCollection {
   //////////////////////////////////////
   // append
   //////////////////////////////////////
-  public AssociativeCollection AppendArray(AssociativeCollection[] acs) throws Exception {
+
+  private static int getNonEmptyCount(AssociativeCollection[] acs) {
     int nonEmptyCount = 0;
     for(int i = 0; i < acs.length; ++i) {
       if(acs[i].length() > 0) ++nonEmptyCount;
     }
+    return nonEmptyCount;
+  }
+
+  public AssociativeCollection AppendArray(AssociativeCollection[] acs) throws Exception {
+    int nonEmptyCount = getNonEmptyCount(acs);
     if(nonEmptyCount == 0) return Nil.VALUE;
     AssociativeCollection[] nonEmptyACs = new AssociativeCollection[nonEmptyCount];
     nonEmptyCount = 0;
@@ -235,10 +241,7 @@ public class Nil extends Datum implements OrderedCollection {
   //////////////////////////////////////
 
   public Trampoline.Bounce UnionArray(Callable eltPredicate, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
-    int nonEmptyCount = 0;
-    for(int i = 0; i < acs.length; ++i) {
-      if(acs[i].length() > 0) ++nonEmptyCount;
-    }
+    int nonEmptyCount = getNonEmptyCount(acs);
     if(nonEmptyCount == 0) return continuation.run(Nil.VALUE);
     AssociativeCollection[] nonEmptyACs = new AssociativeCollection[nonEmptyCount];
     nonEmptyCount = 0;
@@ -257,10 +260,7 @@ public class Nil extends Datum implements OrderedCollection {
   }
 
   public Trampoline.Bounce SymmetricDifferenceArray(Callable eltPredicate, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
-    int nonEmptyCount = 0;
-    for(int i = 0; i < acs.length; ++i) {
-      if(acs[i].length() > 0) ++nonEmptyCount;
-    }
+    int nonEmptyCount = getNonEmptyCount(acs);
     if(nonEmptyCount == 0) return continuation.run(Nil.VALUE);
     AssociativeCollection[] nonEmptyACs = new AssociativeCollection[nonEmptyCount];
     nonEmptyCount = 0;

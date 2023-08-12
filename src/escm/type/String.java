@@ -21,21 +21,15 @@ import escm.vm.type.Callable;
 
 public class String extends Datum implements OrderedCollection, Callable {
   ////////////////////////////////////////////////////////////////////////////
-  // Private Value Field
-  private java.lang.String value = "";
+  // Private Value Fields
+  private final java.lang.String value;
+  private final int codePointLength;
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Value Getter
   public java.lang.String value() {
     return value;
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // CodePoint Count
-  public int codePointLength() {
-    return value.codePointCount(0,value.length());
   }
 
 
@@ -51,7 +45,7 @@ public class String extends Datum implements OrderedCollection, Callable {
       offset += java.lang.Character.charCount(codepoint);
       ++codePointIndex;
     }
-    throw new Exceptionf("STRING [GET]: Invalid index %d (size %d) for string %s", index, codePointLength(), write());
+    throw new Exceptionf("STRING [GET]: Invalid index %d (size %d) for string %s", index, codePointLength, write());
   }
 
   public escm.type.Character charAt(int index) throws Exception {
@@ -87,7 +81,6 @@ public class String extends Datum implements OrderedCollection, Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // EScheme Character Iteration
-
   private static interface CharacterIterationProcedure {
     public void exec(int idx, escm.type.Character ch);
   }
@@ -103,13 +96,31 @@ public class String extends Datum implements OrderedCollection, Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // EScheme Codepoint Iteration
+  private static interface CodepointIterationProcedure {
+    public void exec(int idx, int cp);
+  }
+
+  public void forEachCodepoint(CodepointIterationProcedure cip) {
+    int offset = 0, charsIdx = 0, strLength = value.length();
+    while(offset < strLength) {
+      int codepoint = value.codePointAt(offset);
+      cip.exec(charsIdx++,codepoint);
+      offset += java.lang.Character.charCount(codepoint);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Constructor
   public String(java.lang.String s) {
     value = s;
+    codePointLength = s.codePointCount(0,s.length());
   }
 
   public String() {
     value = "";
+    codePointLength = 0;
   }
 
 
@@ -122,8 +133,8 @@ public class String extends Datum implements OrderedCollection, Callable {
     if(!(idxDatum instanceof Real) || !((Real)idxDatum).isInteger())
       throw new Exceptionf("STRING [CALLABLE-GET]: Expects exactly 1 integer index arg for string %s: %s", write(), Exceptionf.profileArgs(arguments));
     int index = ((Real)idxDatum).intValue();
-    if(index < 0 || index >= codePointLength())
-      throw new Exceptionf("STRING [CALLABLE-GET]: Invalid index %d (size %d) for string %s", index, codePointLength(), write());
+    if(index < 0 || index >= codePointLength)
+      throw new Exceptionf("STRING [CALLABLE-GET]: Invalid index %d (size %d) for string %s", index, codePointLength, write());
     return continuation.run(charAt(index));
   }
 
@@ -203,19 +214,19 @@ public class String extends Datum implements OrderedCollection, Callable {
   // basic accessors
   //////////////////////////////////////
   public Datum head() throws Exception {
-    if(codePointLength() == 0) throw new Exceptionf("STRING [HEAD]: Can't get head of an empty string!");
+    if(codePointLength == 0) throw new Exceptionf("STRING [HEAD]: Can't get head of an empty string!");
     return charAt(0);
   }
 
   public AssociativeCollection tail() throws Exception {
-    if(codePointLength() == 0) throw new Exceptionf("STRING [TAIL]: Can't get tail of an empty string!");
+    if(codePointLength == 0) throw new Exceptionf("STRING [TAIL]: Can't get tail of an empty string!");
     StringBuilder sb = new StringBuilder();
-    forEachChar((idx,chr) -> { if(idx > 0) sb.append(chr.display()); });
+    forEachCodepoint((idx,cp) -> { if(idx > 0) sb.append(java.lang.Character.toString(cp)); });
     return new String(sb.toString());
   }
 
   public int length() {
-    return codePointLength();
+    return codePointLength;
   }
 
   //////////////////////////////////////
@@ -275,7 +286,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   private Trampoline.Bounce filterIter(Callable predicate, int acPos, Trampoline.Continuation continuation) throws Exception {
-    if(acPos >= codePointLength()) return continuation.run(Nil.VALUE);
+    if(acPos >= codePointLength) return continuation.run(Nil.VALUE);
     Datum hd = charAt(acPos);
     ArrayList<Datum> args = new ArrayList<Datum>(1);
     args.add(hd);
@@ -304,7 +315,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   private static final Exact ONE = new Exact(1);
 
   private Trampoline.Bounce countIter(Callable predicate, Number n, int acPos, Trampoline.Continuation continuation) throws Exception {
-    if(acPos >= codePointLength()) return continuation.run(n);
+    if(acPos >= codePointLength) return continuation.run(n);
     Datum hd = charAt(acPos);
     ArrayList<Datum> args = new ArrayList<Datum>(1);
     args.add(hd);
@@ -325,7 +336,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   private Trampoline.Bounce removeIter(Callable predicate, int acPos, Trampoline.Continuation continuation) throws Exception {
-    if(acPos >= codePointLength()) return continuation.run(Nil.VALUE);
+    if(acPos >= codePointLength) return continuation.run(Nil.VALUE);
     Datum hd = charAt(acPos);
     ArrayList<Datum> args = new ArrayList<Datum>(1);
     args.add(hd);
@@ -347,8 +358,8 @@ public class String extends Datum implements OrderedCollection, Callable {
     if(!(key instanceof Real) || !((Real)key).isInteger())
       throw new Exceptionf("STRING [VAL]: invalid index %s for string value", key.profile());
     Real r = (Real)key;
-    if(r.lt(ZERO) || r.gte(new Exact(codePointLength())))
-      throw new Exceptionf("STRING [VAL]: index %s out of string range [0,%d)", r.write(), codePointLength());
+    if(r.lt(ZERO) || r.gte(new Exact(codePointLength)))
+      throw new Exceptionf("STRING [VAL]: index %s out of string range [0,%d)", r.write(), codePointLength);
     return charAt(r.intValue());
   }
 
@@ -357,7 +368,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   private Trampoline.Bounce keyIter(Callable predicate, int acPos, Trampoline.Continuation continuation) throws Exception {
-    if(acPos >= codePointLength()) {
+    if(acPos >= codePointLength) {
       if(predicate instanceof Datum) {
         throw new Exceptionf("STRING [KEY]: no value in %s satisfies value predicate %s", write(), ((Datum)predicate).profile());
       }
@@ -395,11 +406,11 @@ public class String extends Datum implements OrderedCollection, Callable {
     if(!(key instanceof Real) || !((Real)key).isInteger())
       throw new Exceptionf("STRING [DELETE]: invalid index %s for string deletion", key.profile());
     int deleteIdx = ((Real)key).intValue();
-    if(deleteIdx < 0 || deleteIdx >= codePointLength())
-      throw new Exceptionf("STRING [DELETE]: index %d out of string range [0,%d)", deleteIdx, codePointLength());
+    if(deleteIdx < 0 || deleteIdx >= codePointLength)
+      throw new Exceptionf("STRING [DELETE]: index %d out of string range [0,%d)", deleteIdx, codePointLength);
     StringBuilder sb = new StringBuilder();
-    forEachChar((idx,chr) -> {
-      if(idx != deleteIdx) sb.append(chr.display());
+    forEachCodepoint((idx,cp) -> {
+      if(idx != deleteIdx) sb.append(java.lang.Character.toString(cp));
     });
     return new String(sb.toString());
   }
@@ -413,19 +424,18 @@ public class String extends Datum implements OrderedCollection, Callable {
       throw new Exceptionf("STRING [CONJ]: invalid non-char value %s for string", newValue.profile());
     if(!(key instanceof Real) || !((Real)key).isInteger())
       throw new Exceptionf("STRING [CONJ]: invalid index %s for string", key.profile());
-    int n = codePointLength();
     int idx = ((Real)key).intValue();
-    if(idx < -1 || idx > n)
-      throw new Exceptionf("STRING [CONJ]: index %d extends string bounds [-1,%d)", idx, n);
+    if(idx < -1 || idx > codePointLength)
+      throw new Exceptionf("STRING [CONJ]: index %d extends string bounds [-1,%d)", idx, codePointLength);
     if(idx == -1) {
       return new String(newValue.display() + value);
-    } else if(idx == n) {
+    } else if(idx == codePointLength) {
       return new String(value + newValue.display());
     } else {
       StringBuilder sb = new StringBuilder();
-      forEachChar((i,chr) -> {
+      forEachCodepoint((i,cp) -> {
         if(i != idx) {
-          sb.append(chr.display());
+          sb.append(java.lang.Character.toString(cp));
         } else {
           sb.append(newValue.display());
         }
@@ -441,8 +451,8 @@ public class String extends Datum implements OrderedCollection, Callable {
   public AssociativeCollection drop(int amount) throws Exception {
     StringBuilder sb = new StringBuilder();
     int start = Math.max(0,amount);
-    forEachChar((i,chr) -> {
-      if(i >= start) sb.append(chr.display());
+    forEachCodepoint((i,cp) -> {
+      if(i >= start) sb.append(java.lang.Character.toString(cp));
     });
     return new String(sb.toString());
   }
@@ -453,9 +463,9 @@ public class String extends Datum implements OrderedCollection, Callable {
 
   public AssociativeCollection take(int amount) throws Exception {
     StringBuilder sb = new StringBuilder();
-    int end = Math.min(codePointLength(),amount);
-    forEachChar((i,chr) -> {
-      if(i < end) sb.append(chr.display());
+    int end = Math.min(codePointLength,amount);
+    forEachCodepoint((i,cp) -> {
+      if(i < end) sb.append(java.lang.Character.toString(cp));
     });
     return new String(sb.toString());
   }
@@ -509,7 +519,7 @@ public class String extends Datum implements OrderedCollection, Callable {
 
   private Trampoline.Bounce UnionArrayIter(Callable eltPredicate, AssociativeCollection[] acs, int i, String s, int j, Datum values, Trampoline.Continuation continuation) throws Exception {
     if(i >= acs.length) return continuation.run(values);
-    if(j >= s.codePointLength()) return () -> UnionArrayIter(eltPredicate,acs,i+1,(i+1 >= acs.length) ? (String)acs[i] : (String)acs[i+1],0,values,continuation);
+    if(j >= s.codePointLength) return () -> UnionArrayIter(eltPredicate,acs,i+1,(i+1 >= acs.length) ? (String)acs[i] : (String)acs[i+1],0,values,continuation);
     escm.type.Character chr = s.charAt(j);
     return inValues(eltPredicate, chr, values, (isInValues) -> () -> {
       if(isInValues.isTruthy()) {
@@ -537,7 +547,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   private Trampoline.Bounce itemIntersectsAC(Callable eltPredicate, String ac, int acIdx, Datum item, Trampoline.Continuation continuation) throws Exception {
-    if(acIdx >= ac.codePointLength()) return continuation.run(Boolean.FALSE);
+    if(acIdx >= ac.codePointLength) return continuation.run(Boolean.FALSE);
     ArrayList<Datum> args = new ArrayList<Datum>(2);
     args.add(item);
     args.add(ac.charAt(acIdx));
@@ -557,7 +567,7 @@ public class String extends Datum implements OrderedCollection, Callable {
 
   private Trampoline.Bounce IntersectionArrayIter(Callable eltPredicate, AssociativeCollection[] acs, int acIdx, String s, int sIdx, Datum intersectingValues, Trampoline.Continuation continuation) throws Exception {
     if(acIdx >= acs.length) return continuation.run(intersectingValues);
-    if(sIdx >= s.codePointLength()) return () -> IntersectionArrayIter(eltPredicate,acs,acIdx+1,acIdx+1 >= acs.length ? (String)acs[acIdx] : (String)acs[acIdx+1],0,intersectingValues,continuation);
+    if(sIdx >= s.codePointLength) return () -> IntersectionArrayIter(eltPredicate,acs,acIdx+1,acIdx+1 >= acs.length ? (String)acs[acIdx] : (String)acs[acIdx+1],0,intersectingValues,continuation);
     escm.type.Character chr = s.charAt(sIdx);
     return inValues(eltPredicate, chr, intersectingValues, (isInValues) -> () -> {
       if(!isInValues.isTruthy()) {
@@ -590,7 +600,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   private Trampoline.Bounce inValuesString(Callable eltPredicate, Datum item, String valString, int i, Trampoline.Continuation continuation) throws Exception {
-    if(i >= valString.codePointLength()) return continuation.run(Boolean.FALSE);
+    if(i >= valString.codePointLength) return continuation.run(Boolean.FALSE);
     ArrayList<Datum> args = new ArrayList<Datum>();
     args.add(item);
     args.add(valString.charAt(i));
@@ -671,17 +681,15 @@ public class String extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   public OrderedCollection init() throws Exception {
-    int n = codePointLength();
-    if(n == 0) throw new Exceptionf("STRING [INIT]: Can't get init of an empty string!");
+    if(codePointLength == 0) throw new Exceptionf("STRING [INIT]: Can't get init of an empty string!");
     StringBuilder sb = new StringBuilder();
-    forEachChar((idx,chr) -> { if(idx < n-1) sb.append(chr.display()); });
+    forEachCodepoint((idx,cp) -> { if(idx < codePointLength-1) sb.append(java.lang.Character.toString(cp)); });
     return new String(sb.toString());
   }
 
   public Datum last() throws Exception {
-    int n = codePointLength();
-    if(n == 0) throw new Exceptionf("STRING [LAST]: Can't get last of an empty string!");
-    return charAt(n-1);
+    if(codePointLength == 0) throw new Exceptionf("STRING [LAST]: Can't get last of an empty string!");
+    return charAt(codePointLength-1);
   }
 
   //////////////////////////////////////
@@ -703,18 +711,17 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public OrderedCollection slice(int startIdx) throws Exception {
-    return slice(startIdx,codePointLength());
+    return slice(startIdx,codePointLength);
   }
 
   public OrderedCollection slice(int startIdx, int length) throws Exception {
-    int n = codePointLength();
-    if(startIdx < 0 || length <= 0 || startIdx >= n) return new String();
-    int sliceLength = Math.min(length,n-startIdx);
+    if(startIdx < 0 || length <= 0 || startIdx >= codePointLength) return new String();
+    int sliceLength = Math.min(length,codePointLength-startIdx);
     CounterWrapper cw = new CounterWrapper();
     StringBuilder sb = new StringBuilder();
-    forEachChar((idx,chr) -> { 
+    forEachCodepoint((idx,cp) -> { 
       if(idx >= startIdx && cw.count < sliceLength) {
-        sb.append(chr.display());
+        sb.append(java.lang.Character.toString(cp));
         ++cw.count;
       }
     });
@@ -722,9 +729,8 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce slice(int startIdx, Callable continuePredicate, Trampoline.Continuation continuation) throws Exception {
-    int n = codePointLength();
-    if(startIdx < 0 || startIdx >= n) return continuation.run(new String());
-    return sliceGetLastIdx(startIdx,n,continuePredicate,(endIdx) -> () -> {
+    if(startIdx < 0 || startIdx >= codePointLength) return continuation.run(new String());
+    return sliceGetLastIdx(startIdx,codePointLength,continuePredicate,(endIdx) -> () -> {
       return continuation.run((Datum)slice(startIdx,((Real)endIdx).intValue()-startIdx));
     });
   }
@@ -802,7 +808,7 @@ public class String extends Datum implements OrderedCollection, Callable {
     ArrayList<Datum> params = new ArrayList<Datum>(acs.length);
     for(int i = 0; i < acs.length; ++i) {
       String s = (String)acs[i];
-      if(eltIdx >= s.codePointLength()) return continuation.run(seed);  
+      if(eltIdx >= s.codePointLength) return continuation.run(seed);  
       params.add(s.charAt(eltIdx));
     }
     return () -> FoldRightArray(c,seed,eltIdx+1,acs,(acc) -> () -> {
@@ -837,8 +843,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce keyRight(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    int n = codePointLength();
-    return keyRight(predicate,n-1,n,(key) -> () -> {
+    return keyRight(predicate,codePointLength-1,codePointLength,(key) -> () -> {
       if(key instanceof Real) return continuation.run(key);
       if(predicate instanceof Datum) {
         throw new Exceptionf("STRING [KEY-RIGHT]: no value in %s satisfies value predicate %s", write(), ((Datum)predicate).profile());
@@ -854,7 +859,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   private static final Boolean KEEP_DROPPING_FLAG = Boolean.valueOf(false);
 
   public OrderedCollection dropRight(int length) throws Exception {
-    return slice(0,codePointLength()-length);
+    return slice(0,codePointLength-length);
   }
 
   private Trampoline.Bounce dropWhile(Callable predicate, int idx, int n, Trampoline.Continuation continuation) throws Exception {
@@ -868,7 +873,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce dropWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    return dropWhile(predicate,0,codePointLength(),continuation);
+    return dropWhile(predicate,0,codePointLength,continuation);
   }
 
   private Trampoline.Bounce dropRightWhile(Callable predicate, int idx, Trampoline.Continuation continuation) throws Exception {
@@ -882,7 +887,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce dropRightWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    return dropRightWhile(predicate,codePointLength()-1,continuation);
+    return dropRightWhile(predicate,codePointLength-1,continuation);
   }
 
   //////////////////////////////////////
@@ -890,9 +895,8 @@ public class String extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   public OrderedCollection takeRight(int length) throws Exception {
-    int n = codePointLength();
-    if(length >= n) return this;
-    return slice(n-length,n);
+    if(length >= codePointLength) return this;
+    return slice(codePointLength-length,codePointLength);
   }
 
   private Trampoline.Bounce takeWhile(Callable predicate, int idx, int n, Trampoline.Continuation continuation) throws Exception {
@@ -906,7 +910,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce takeWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    return takeWhile(predicate,0,codePointLength(),continuation);
+    return takeWhile(predicate,0,codePointLength,continuation);
   }
 
   private Trampoline.Bounce takeRightWhile(Callable predicate, int idx, int n, Trampoline.Continuation continuation) throws Exception {
@@ -920,8 +924,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce takeRightWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    int n = codePointLength();
-    return takeRightWhile(predicate,n-1,n,continuation);
+    return takeRightWhile(predicate,codePointLength-1,codePointLength,continuation);
   }
 
   //////////////////////////////////////
@@ -959,7 +962,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce sort(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
-    return sort(binaryPredicate,0,codePointLength(),continuation);
+    return sort(binaryPredicate,0,codePointLength,continuation);
   }
 
   private Trampoline.Bounce sorted(Callable binaryPredicate, int idx, int n, Trampoline.Continuation continuation) throws Exception {
@@ -974,7 +977,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce sorted(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
-    return sorted(binaryPredicate,0,codePointLength(),continuation);
+    return sorted(binaryPredicate,0,codePointLength,continuation);
   }
 
   //////////////////////////////////////
@@ -1006,7 +1009,7 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce merge(Callable binaryPredicate, OrderedCollection oc, Trampoline.Continuation continuation) throws Exception {
-    return mergeIter(binaryPredicate,this,(String)oc,0,0,codePointLength(),((String)oc).codePointLength(),(mergedList) -> () -> continuation.run(((AssociativeCollection)mergedList).toACString()));
+    return mergeIter(binaryPredicate,this,(String)oc,0,0,codePointLength,((String)oc).codePointLength,(mergedList) -> () -> continuation.run(((AssociativeCollection)mergedList).toACString()));
   }
 
   //////////////////////////////////////
@@ -1035,6 +1038,6 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce deleteNeighborDuplicates(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
-    return deleteListNeighborDuplicates(binaryPredicate,0,codePointLength(),(deldList) -> () -> continuation.run(((AssociativeCollection)deldList).toACString()));
+    return deleteListNeighborDuplicates(binaryPredicate,0,codePointLength,(deldList) -> () -> continuation.run(((AssociativeCollection)deldList).toACString()));
   }
 }

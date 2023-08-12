@@ -153,6 +153,12 @@ public class GlobalState {
   private static final Symbol STARSTAR = new Symbol("**");
   private static final Symbol EXPT = new Symbol("expt");
 
+  private static final Symbol IS_ACP = new Symbol("ac?");
+  private static final Symbol IS_ASSOCIATIVE_COLLECTIONP = new Symbol("associative-collection?");
+
+  private static final Symbol IS_OCP = new Symbol("oc?");
+  private static final Symbol IS_ORDERED_COLLECTIONP = new Symbol("ordered-collection?");
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Get the default environment (only has EScheme's core primitives defined)
@@ -189,6 +195,8 @@ public class GlobalState {
     definitionEnvironment.define(PRINTF,definitionEnvironment.get(DISPLAYF));
     definitionEnvironment.define(PLUSPLUS,definitionEnvironment.get(APPEND));
     definitionEnvironment.define(STARSTAR,definitionEnvironment.get(EXPT));
+    definitionEnvironment.define(IS_ACP,definitionEnvironment.get(IS_ASSOCIATIVE_COLLECTIONP));
+    definitionEnvironment.define(IS_OCP,definitionEnvironment.get(IS_ORDERED_COLLECTIONP));
     return definitionEnvironment;
   }
 };

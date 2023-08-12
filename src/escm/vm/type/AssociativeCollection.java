@@ -66,7 +66,7 @@ public interface AssociativeCollection {
       throw new Exceptionf("'%s arg #%d isn't an <ac> (associative container)", fcnSignature, i+1);
     }
     int type = 0;
-    AssociativeCollection[] acs = new AssociativeCollection [n-i];
+    AssociativeCollection[] acs = new AssociativeCollection[n-i];
     for(int j = 0; i < n; ++i, ++j) {
       Datum ac = args.get(i);
       if(!(ac instanceof AssociativeCollection)) {

@@ -32,21 +32,6 @@ public class OrderedCollectionPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // oc?
-  public static class IsOC extends Primitive {
-    public java.lang.String escmName() {
-      return "oc?";
-    }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1) 
-        throw new Exceptionf("'(oc? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      return Boolean.valueOf(parameters.get(0) instanceof OrderedCollection);
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // init
   public static class Init extends Primitive {
     public java.lang.String escmName() {

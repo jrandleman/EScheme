@@ -863,8 +863,9 @@ public class Pair extends Datum implements OrderedCollection {
 
   public OrderedCollection init() throws Exception {
     if(!(cdr instanceof Pair)) return Nil.VALUE;
-    if(!(((Pair)cdr).cdr instanceof Pair)) return new Pair(car,Nil.VALUE);
-    return new Pair(car,(Datum)((Pair)cdr).init());
+    Pair rest = (Pair)cdr;
+    if(!(rest.cdr instanceof Pair)) return new Pair(car,Nil.VALUE);
+    return new Pair(car,(Datum)rest.init());
   }
 
   public Datum last() throws Exception {
