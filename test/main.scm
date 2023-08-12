@@ -13,8 +13,8 @@
       (apply displayf args)))
 
 (define (execute-test-file file)
-  (define test-file-name (slice file (+ 1 (length *escm-path*))))
   (set! total-files (+ total-files 1))
+  (define test-file-name (slice file (+ (length *file-separator*) (length *escm-path*))))
   (verbose-displayf "    %n) Executing Test File: %wa ..." total-files test-file-name)
   (define time-result (time system (append *escm-execution-command* file)))
   (define time-length (car time-result))
