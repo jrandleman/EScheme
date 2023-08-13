@@ -1,6 +1,8 @@
 // Author: Jordan Randleman - escm.type.Pair
 // Purpose:
 //    Pair primitive type.
+//
+//    => NOTE THAT AC/OC PRIMITIVES EXPECT ALL ARGS TO BE LISTS!
 
 package escm.type;
 import java.util.ArrayList;
@@ -495,16 +497,13 @@ public class Pair extends Datum implements OrderedCollection {
   // count
   //////////////////////////////////////
 
-  private static final Exact ZERO = new Exact();
-  private static final Exact ONE = new Exact(1);
-
-  private static Trampoline.Bounce countIter(Callable predicate, Number n, Datum l, Trampoline.Continuation continuation) throws Exception {
-    if(!(l instanceof Pair)) return continuation.run(n);
+  private static Trampoline.Bounce countIter(Callable predicate, int n, Datum l, Trampoline.Continuation continuation) throws Exception {
+    if(!(l instanceof Pair)) return continuation.run(new Exact(n));
     Pair p = (Pair)l;
     ArrayList<Datum> args = new ArrayList<Datum>(1);
     args.add(p.car);
     return predicate.callWith(args,(shouldCount) -> () -> {
-      if(shouldCount.isTruthy()) return countIter(predicate,n.add(ONE),p.cdr,continuation);
+      if(shouldCount.isTruthy()) return countIter(predicate,n+1,p.cdr,continuation);
       return countIter(predicate,n,p.cdr,continuation);
     });
   }
@@ -513,7 +512,7 @@ public class Pair extends Datum implements OrderedCollection {
     if(length == DOTTED_LIST_LENGTH) {
       throw new Exceptionf("PAIR [COUNT]: can't count in a dotted-list %s", profile());
     }
-    return countIter(predicate,ZERO,this,continuation);
+    return countIter(predicate,0,this,continuation);
   }
 
   //////////////////////////////////////
@@ -549,15 +548,15 @@ public class Pair extends Datum implements OrderedCollection {
       throw new Exceptionf("PAIR [VAL]: can't get value in a dotted-list %s", profile());
     if(!(key instanceof Real) || !((Real)key).isInteger())
       throw new Exceptionf("PAIR [VAL]: invalid index %s for list value", key.profile());
-    Real r = (Real)key;
-    if(r.lt(ZERO) || r.gte(new Exact(length)))
-      throw new Exceptionf("PAIR [VAL]: index %s out of list range [0,%d)", r.write(), length);
-    Number idx = ZERO;
+    int keyInt = ((Real)key).intValue();
+    if(keyInt < 0 || keyInt >= length)
+      throw new Exceptionf("PAIR [VAL]: index %s out of list range [0,%d)", key.write(), length);
+    int idx = 0;
     Datum l = this;
     while(l instanceof Pair) {
       Pair p = (Pair)l;
-      if(idx.eqs(r)) return p.car;
-      idx = idx.add(ONE);
+      if(idx == keyInt) return p.car;
+      ++idx;
       l = p.cdr;
     }
     throw new Exceptionf("PAIR [VAL]: invalid index %s for list value", key.profile());
@@ -567,7 +566,7 @@ public class Pair extends Datum implements OrderedCollection {
   // key
   //////////////////////////////////////
 
-  private static Trampoline.Bounce keyIter(Callable predicate, Datum orginalL, Number idx, Datum l, Trampoline.Continuation continuation) throws Exception {
+  private static Trampoline.Bounce keyIter(Callable predicate, Datum orginalL, int idx, Datum l, Trampoline.Continuation continuation) throws Exception {
     if(!(l instanceof Pair)) {
       if(predicate instanceof Datum) {
         throw new Exceptionf("PAIR [KEY]: no value in %s satisfies value predicate %s", orginalL.write(), ((Datum)predicate).profile());
@@ -578,8 +577,8 @@ public class Pair extends Datum implements OrderedCollection {
     ArrayList<Datum> args = new ArrayList<Datum>(1);
     args.add(p.car);
     return predicate.callWith(args,(matchedValue) -> () -> {
-      if(matchedValue.isTruthy()) return continuation.run(idx);
-      return keyIter(predicate,orginalL,idx.add(ONE),p.cdr,continuation);
+      if(matchedValue.isTruthy()) return continuation.run(new Exact(idx));
+      return keyIter(predicate,orginalL,idx+1,p.cdr,continuation);
     });
   }
 
@@ -587,7 +586,7 @@ public class Pair extends Datum implements OrderedCollection {
     if(length == DOTTED_LIST_LENGTH) {
       throw new Exceptionf("PAIR [KEY]: can't get key in a dotted-list %s", profile());
     }
-    return keyIter(predicate,this,ZERO,this,continuation);
+    return keyIter(predicate,this,0,this,continuation);
   }
 
   //////////////////////////////////////
@@ -612,12 +611,12 @@ public class Pair extends Datum implements OrderedCollection {
   // delete
   //////////////////////////////////////
 
-  private static AssociativeCollection deleteIter(Real key, Number idx, Datum l) throws Exception {
+  private static AssociativeCollection deleteIter(int key, int idx, Datum l) throws Exception {
     if(!(l instanceof Pair)) 
-      throw new Exceptionf("PAIR [DELETE]: invalid index %s for list deletion", key.profile());
+      throw new Exceptionf("PAIR [DELETE]: invalid index %d for list deletion", key);
     Pair p = (Pair)l;
-    if(key.eqs(idx)) return (AssociativeCollection)p.cdr;
-    return new Pair(p.car,(Datum)deleteIter(key,idx.add(ONE),p.cdr));
+    if(key == idx) return (AssociativeCollection)p.cdr;
+    return new Pair(p.car,(Datum)deleteIter(key,idx+1,p.cdr));
   }
 
   public AssociativeCollection delete(Datum key) throws Exception { // returns <this> if deletion fails
@@ -625,26 +624,33 @@ public class Pair extends Datum implements OrderedCollection {
       throw new Exceptionf("PAIR [DELETE]: can't delete in a dotted-list %s", profile());
     if(!(key instanceof Real) || !((Real)key).isInteger())
       throw new Exceptionf("PAIR [DELETE]: invalid index %s for list deletion", key.profile());
-    Real r = (Real)key;
-    if(r.lt(ZERO) || r.gte(new Exact(length)))
-      throw new Exceptionf("PAIR [DELETE]: index %s out of list range [0,%d)", r.write(), length);
-    return deleteIter(r,ZERO,this);
+    int keyInt = ((Real)key).intValue();
+    if(keyInt < 0 || keyInt >= length)
+      throw new Exceptionf("PAIR [DELETE]: index %s out of list range [0,%d)", key.write(), length);
+    return deleteIter(keyInt,0,this);
   }
 
   //////////////////////////////////////
   // conj
   //////////////////////////////////////
 
-  private static final Exact NEGATIVE_ONE = new Exact(-1);
+  private static Datum conjAtIndex(Datum lis, Datum value, int idx) {
+    if(!(lis instanceof Pair)) return new Pair(value,Nil.VALUE);
+    Pair p = (Pair)lis;
+    if(idx <= 0) return new Pair(value,p.cdr);
+    return new Pair(p.car,conjAtIndex(p.cdr,value,idx-1));
+  }
 
   public AssociativeCollection conj(Datum key, Datum value) throws Exception {
     if(length == DOTTED_LIST_LENGTH)
       throw new Exceptionf("PAIR [CONJ]: can't conj onto a dotted-list %s", profile());
     if(!(key instanceof Real) || !((Real)key).isInteger())
       throw new Exceptionf("PAIR [CONJ]: invalid index %s for list", key.profile());
-    if(!((Real)key).eqs(NEGATIVE_ONE))
-      throw new Exceptionf("PAIR [CONJ]: index %s isn't index \"-1\" in list", key.write());
-    return new Pair(value,this);
+    int idx = ((Real)key).intValue();
+    if(idx < -1 || idx > length)
+      throw new Exceptionf("PAIR [CONJ]: index %d violates string bounds [-1,%d]", idx, length);
+    if(idx == -1) return new Pair(value,this);
+    return (AssociativeCollection)conjAtIndex(this,value,idx);
   }
 
   //////////////////////////////////////
@@ -652,9 +658,8 @@ public class Pair extends Datum implements OrderedCollection {
   //////////////////////////////////////
 
   public AssociativeCollection drop(int amount) throws Exception {
+    amount = Math.max(0,amount);
     if(amount >= length) return Nil.VALUE;
-    if(amount < 0)
-      throw new Exceptionf("PAIR [DROP]: invalid drop amount %d for list %s", length, profile());
     Datum p = this;
     while(amount > 0 && p instanceof Pair) {
       --amount;
@@ -674,8 +679,7 @@ public class Pair extends Datum implements OrderedCollection {
   }
 
   public AssociativeCollection take(int amount) throws Exception {
-    if(amount < 0)
-      throw new Exceptionf("PAIR [TAKE]: invalid take amount %d for list %s", length, profile());
+    amount = Math.max(0,amount);
     return (AssociativeCollection)takeRecur(amount,(Datum)this);
   }
 
@@ -714,11 +718,11 @@ public class Pair extends Datum implements OrderedCollection {
   public Hashmap toACHashmap() throws Exception {
     Hashmap h = new Hashmap();
     Datum l = this;
-    Number i = ZERO;
+    int i = 0;
     while(l instanceof Pair) {
       Pair p = (Pair)l;
-      h.set(i,p.car);
-      i = i.add(ONE);
+      h.set(new Exact(i),p.car);
+      ++i;
       l = p.cdr;
     }
     return h;

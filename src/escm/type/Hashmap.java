@@ -2,6 +2,8 @@
 // Purpose:
 //    Mutable hashmap primitive type.
 //
+//    => NOTE THAT AC/OC PRIMITIVES EXPECT ALL ARGS TO BE HASHMAPS!
+//
 //    Provides:
 //      - static Hashmap merge(ArrayList<Hashmap> hashmaps)
 //
@@ -415,24 +417,21 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   // count
   //////////////////////////////////////
 
-  private static final Exact ZERO = new Exact();
-  private static final Exact ONE = new Exact(1);
-
-  private Trampoline.Bounce countIter(Callable predicate, HashmapEntry[] ac, Number n, int acPos, Trampoline.Continuation continuation) throws Exception {
-    if(acPos >= ac.length) return continuation.run(n);
+  private Trampoline.Bounce countIter(Callable predicate, HashmapEntry[] ac, int n, int acPos, Trampoline.Continuation continuation) throws Exception {
+    if(acPos >= ac.length) return continuation.run(new Exact(n));
     Datum hd = ac[acPos].getValue();
     ArrayList<Datum> args = new ArrayList<Datum>(1);
     args.add(hd);
     return predicate.callWith(args,(shouldCount) -> () -> {
       if(shouldCount.isTruthy()) {
-        return countIter(predicate,ac,n.add(ONE),acPos+1,continuation);
+        return countIter(predicate,ac,n+1,acPos+1,continuation);
       }
       return countIter(predicate,ac,n,acPos+1,continuation);
     });
   }
 
   public Trampoline.Bounce count(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> Exact
-    return countIter(predicate,convertHashmapToEntryArray(this),ZERO,0,continuation);
+    return countIter(predicate,convertHashmapToEntryArray(this),0,0,continuation);
   }
 
   //////////////////////////////////////
@@ -490,13 +489,11 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   //////////////////////////////////////
 
   public AssociativeCollection AppendArray(AssociativeCollection[] acs) throws Exception {
-    Hashmap h = new Hashmap();
-    ArrayList<Hashmap> hs = new ArrayList<Hashmap>(acs.length);
+    ConcurrentHashMap<Datum,Datum> appended = new ConcurrentHashMap<Datum,Datum>();
     for(int i = 0; i < acs.length; ++i) {
-      hs.add((Hashmap)acs[i]);
+      appended.putAll(((Hashmap)acs[i]).value);
     }
-    h.addAll(hs);
-    return (AssociativeCollection)h;
+    return new Hashmap(appended);
   }
 
   //////////////////////////////////////
@@ -525,12 +522,13 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   //////////////////////////////////////
 
   public AssociativeCollection drop(int amount) throws Exception {
-    Hashmap h = new Hashmap();
+    amount = Math.max(0,amount);
+    ConcurrentHashMap<Datum,Datum> vals = new ConcurrentHashMap<Datum,Datum>();
     int i = 0;
     for(ConcurrentHashMap.Entry<Datum,Datum> entry : value.entrySet()) {
-      if(i++ >= amount) h.set(entry.getKey(),entry.getValue());
+      if(i++ >= amount) vals.put(entry.getKey(),entry.getValue());
     }
-    return (AssociativeCollection)h;
+    return (AssociativeCollection)(new Hashmap(vals));
   }
 
   //////////////////////////////////////
@@ -538,12 +536,13 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   //////////////////////////////////////
 
   public AssociativeCollection take(int amount) throws Exception {
-    Hashmap h = new Hashmap();
+    amount = Math.max(0,amount);
+    ConcurrentHashMap<Datum,Datum> vals = new ConcurrentHashMap<Datum,Datum>();
     int i = 0;
     for(ConcurrentHashMap.Entry<Datum,Datum> entry : value.entrySet()) {
-      if(i++ < amount) h.set(entry.getKey(),entry.getValue());
+      if(i++ < amount) vals.put(entry.getKey(),entry.getValue());
     }
-    return (AssociativeCollection)h;
+    return (AssociativeCollection)(new Hashmap(vals));
   }
 
   //////////////////////////////////////
@@ -553,7 +552,7 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   private static boolean validIndex(Datum d, Exact n) {
     if(!(d instanceof Real)) return false;
     Real r = (Real)d;
-    return r.isInteger() && r.gte(ZERO) && r.lt(n);
+    return r.isInteger() && !r.isNegative() && r.lt(n);
   }
 
   public Datum toACList() throws Exception {
@@ -636,14 +635,14 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
     HashmapEntry[][] acs_entries = convertHashmapsToEntryArrays(acs);
     return UnionArrayIter(eltPredicate,acs_entries,0,acs_entries[0],0,Nil.VALUE,(valuesList) -> () -> {
       Datum vl = valuesList; // lambda arg must be <final>
-      Hashmap h = new Hashmap();
+      ConcurrentHashMap<Datum,Datum> vals = new ConcurrentHashMap<Datum,Datum>();
       while(vl instanceof Pair) {
         Pair p = (Pair)vl;
         Pair kv = (Pair)p.car();
-        h.set(kv.car(),kv.cdr());
+        vals.put(kv.car(),kv.cdr());
         vl = p.cdr();
       }
-      return continuation.run(h);
+      return continuation.run(new Hashmap(vals));
     });
   }
 
@@ -690,14 +689,14 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
     HashmapEntry[][] acs_entries = convertHashmapsToEntryArrays(acs);
     return IntersectionArrayIter(eltPredicate,acs_entries,0,acs_entries[0],0,Nil.VALUE,(intersectingValues) -> () -> {
       Datum ivs = intersectingValues; // lambda arg must be <final>
-      Hashmap h = new Hashmap();
+      ConcurrentHashMap<Datum,Datum> vals = new ConcurrentHashMap<Datum,Datum>();
       while(ivs instanceof Pair) {
         Pair p = (Pair)ivs;
         Pair kv = (Pair)p.car();
-        h.set(kv.car(),kv.cdr());
+        vals.put(kv.car(),kv.cdr());
         ivs = p.cdr();
       }
-      return continuation.run(h);
+      return continuation.run(new Hashmap(vals));
     });
   }
 
@@ -743,14 +742,14 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   public Trampoline.Bounce DifferenceArray(Callable eltPredicate, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
     return DifferenceArrayIter(eltPredicate,convertHashmapToAlist((Hashmap)acs[0]),convertHashmapsToEntryArrays(acs),1,(differenceList) -> () -> {
       Datum dl = differenceList; // lambda arg must be <final>
-      Hashmap h = new Hashmap();
+      ConcurrentHashMap<Datum,Datum> vals = new ConcurrentHashMap<Datum,Datum>();
       while(dl instanceof Pair) {
         Pair p = (Pair)dl;
         Pair kv = (Pair)p.car();
-        h.set(kv.car(),kv.cdr());
+        vals.put(kv.car(),kv.cdr());
         dl = p.cdr();
       }
-      return continuation.run(h);
+      return continuation.run(new Hashmap(vals));
     });
   }
 

@@ -120,18 +120,13 @@ public class AssociativeCollectionPrimitives {
       return "fold";
     }
 
-    // Used by <FunctionalPrimitives.java>
-    public static Trampoline.Bounce logic(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
-      return acs[0].FoldArray(c,seed,acs,continuation);
-    }
-    
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() < 3) 
         throw new Exceptionf("'(fold <callable> <seed> <associative-collection> ...) invalid args: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof Callable))
         throw new Exceptionf("'(fold <callable> <seed> <associative-collection> ...) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       AssociativeCollection[] acs = AssociativeCollection.parseParameters("(fold <callable> <seed> <associative-collection> ...)",parameters,2);
-      return logic((Callable)parameters.get(0),parameters.get(1),acs,continuation);
+      return acs[0].FoldArray((Callable)parameters.get(0),parameters.get(1),acs,continuation);
     }
   }
 

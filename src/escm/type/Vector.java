@@ -2,6 +2,8 @@
 // Purpose:
 //    Mutable vector primitive type.
 //
+//    => NOTE THAT AC/OC PRIMITIVES EXPECT ALL ARGS TO BE VECTORS!
+//
 //    Provides:
 //      - static Vector append(ArrayList<Vector> vects)
 //
@@ -510,18 +512,15 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   // count
   //////////////////////////////////////
 
-  private static final Exact ZERO = new Exact();
-  private static final Exact ONE = new Exact(1);
-
-  private Trampoline.Bounce countIter(Callable predicate, Number n, int acPos, Trampoline.Continuation continuation) throws Exception {
+  private Trampoline.Bounce countIter(Callable predicate, int n, int acPos, Trampoline.Continuation continuation) throws Exception {
     synchronized(this) {
-      if(acPos >= value.size()) return continuation.run(n);
+      if(acPos >= value.size()) return continuation.run(new Exact(n));
       Datum hd = value.get(acPos);
       ArrayList<Datum> args = new ArrayList<Datum>(1);
       args.add(hd);
       return predicate.callWith(args,(shouldCount) -> () -> {
         if(shouldCount.isTruthy()) {
-          return countIter(predicate,n.add(ONE),acPos+1,continuation);
+          return countIter(predicate,n+1,acPos+1,continuation);
         }
         return countIter(predicate,n,acPos+1,continuation);
       });
@@ -529,7 +528,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce count(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> Exact
-    return countIter(predicate,ZERO,0,continuation);
+    return countIter(predicate,0,0,continuation);
   }
 
   //////////////////////////////////////
@@ -562,7 +561,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       throw new Exceptionf("VECTOR [VAL]: invalid index %s for vector value", key.profile());
     Real r = (Real)key;
     synchronized(this) {
-      if(r.lt(ZERO) || r.gte(new Exact(value.size())))
+      if(r.isNegative() || r.gte(new Exact(value.size())))
         throw new Exceptionf("VECTOR [VAL]: index %s out of vector range [0,%d)", r.write(), value.size());
       return value.get(r.intValue());
     }
@@ -598,13 +597,14 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   public AssociativeCollection AppendArray(AssociativeCollection[] acs) throws Exception {
-    Vector v = ((Vector)acs[0]).copy();
-    ArrayList<Vector> vs = new ArrayList<Vector>();
-    for(int i = 1; i < acs.length; ++i) {
-      vs.add((Vector)acs[i]);
+    ArrayList<Datum> appended = new ArrayList<Datum>();
+    for(int i = 0; i < acs.length; ++i) {
+      Vector v = (Vector)acs[i];
+      synchronized(v) {
+        appended.addAll(v.value);
+      }
     }
-    v.pushAll(vs);
-    return v;
+    return new Vector(0,appended);
   }
 
   //////////////////////////////////////
@@ -635,7 +635,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       int n = value.size();
       int idx = ((Real)key).intValue();
       if(idx < -1 || idx > n)
-        throw new Exceptionf("VECTOR [CONJ]: index %d extends vector bounds [-1,%d)", idx, n);
+        throw new Exceptionf("VECTOR [CONJ]: index %d violates vector bounds [-1,%d]", idx, n);
       Vector v = copy();
       if(idx == -1) {
         v.pushFront(newValue);
@@ -653,10 +653,9 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   public AssociativeCollection drop(int amount) throws Exception {
+    amount = Math.max(0,amount);
     synchronized(this) {
       int n = value.size();
-      if(amount < 0)
-        throw new Exceptionf("VECTOR [DROP]: invalid drop amount %d for vector %s", n, profile());
       if(amount > n) return new Vector();
       return subvector(amount,n-amount);
     }
@@ -667,10 +666,9 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   public AssociativeCollection take(int amount) throws Exception {
+    amount = Math.max(0,amount);
     synchronized(this) {
       int n = value.size();
-      if(amount < 0)
-        throw new Exceptionf("VECTOR [TAKE]: invalid take amount %d for vector %s", value.size(), profile());
       if(amount > n) return subvector(0,n);
       return subvector(0,amount);
     }
@@ -743,13 +741,13 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   public Trampoline.Bounce UnionArray(Callable eltPredicate, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
     return UnionArrayIter(eltPredicate,acs,0,(Vector)acs[0],0,Nil.VALUE,(valuesList) -> () -> {
       Datum vl = valuesList; // lambda arg must be <final>
-      Vector v = new Vector();
+      ArrayList<Datum> vals = new ArrayList<Datum>();
       while(vl instanceof Pair) {
         Pair p = (Pair)vl;
-        v.push(p.car());
+        vals.add(p.car());
         vl = p.cdr();
       }
-      return continuation.run(v);
+      return continuation.run(new Vector(0,vals));
     });
   }
 
@@ -800,13 +798,13 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   public Trampoline.Bounce IntersectionArray(Callable eltPredicate, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
     return IntersectionArrayIter(eltPredicate,acs,0,(Vector)acs[0],0,Nil.VALUE,(intersectingValues) -> () -> {
       Datum ivs = intersectingValues; // lambda arg must be <final>
-      Vector v = new Vector();
+      ArrayList<Datum> vals = new ArrayList<Datum>();
       while(ivs instanceof Pair) {
         Pair p = (Pair)ivs;
-        v.push(p.car());
+        vals.add(p.car());
         ivs = p.cdr();
       }
-      return continuation.run(v);
+      return continuation.run(new Vector(0,vals));
     });
   }
 
@@ -846,13 +844,13 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   public Trampoline.Bounce DifferenceArray(Callable eltPredicate, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
     return DifferenceArrayIter(eltPredicate,acs[0].toACList(),acs,1,(differenceList) -> () -> {
       Datum dl = differenceList; // lambda arg must be <final>
-      Vector v = new Vector();
+      ArrayList<Datum> vals = new ArrayList<Datum>();
       while(dl instanceof Pair) {
         Pair p = (Pair)dl;
-        v.push(p.car());
+        vals.add(p.car());
         dl = p.cdr();
       }
-      return continuation.run(v);
+      return continuation.run(new Vector(0,vals));
     });
   }
 

@@ -78,7 +78,7 @@ public interface OrderedCollection extends AssociativeCollection {
       throw new Exceptionf("'%s arg #%d isn't an <oc> (ordered container)", fcnSignature, i+1);
     }
     int type = 0;
-    OrderedCollection[] ocs = new OrderedCollection [n-i];
+    OrderedCollection[] ocs = new OrderedCollection[n-i];
     for(int j = 0; i < n; ++i, ++j) {
       Datum oc = args.get(i);
       if(!(oc instanceof OrderedCollection)) {

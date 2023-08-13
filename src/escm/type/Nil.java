@@ -1,13 +1,15 @@
 // Author: Jordan Randleman - escm.type.Nil
 // Purpose:
 //    Nil primitive type, also known as the "empty list".
+//
+//    => NOTE THAT AC/OC PRIMITIVES EXPECT ALL ARGS TO BE LISTS!
 
 package escm.type;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Objects;
 import escm.type.bool.Boolean;
-import escm.type.number.Number;
+import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.util.Exceptionf;
 import escm.util.Trampoline;
@@ -157,7 +159,7 @@ public class Nil extends Datum implements OrderedCollection {
 
   public Trampoline.Bounce key(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> Datum 
     if(predicate instanceof Datum) {
-      throw new Exceptionf("NIL [KEY]: can't get key of predicate %s in NIL!", predicate);
+      throw new Exceptionf("NIL [KEY]: can't get key of predicate %s in NIL!", ((Datum)predicate).profile());
     }
     throw new Exceptionf("NIL [KEY]: can't get key of predicate %s in NIL!", predicate);
     
@@ -199,8 +201,12 @@ public class Nil extends Datum implements OrderedCollection {
   //////////////////////////////////////
 
   public AssociativeCollection conj(Datum key, Datum value) throws Exception {
-    if(key instanceof Number && ((Number)key).eqs(ZERO)) return (AssociativeCollection)(new Pair(value,Nil.VALUE));
-    throw new Exceptionf("NIL [CONJ]: can't conj non-0 key %s with value %s onto NIL!", key.profile(), value.profile());
+    if(key instanceof Real && ((Real)key).isInteger()) {
+      int idx = ((Real)key).intValue();
+      if(idx == 0 || idx == -1) return (AssociativeCollection)(new Pair(value,Nil.VALUE));
+      throw new Exceptionf("NIL [CONJ]: index %d violates nil bounds [-1,0]", idx);
+    }
+    throw new Exceptionf("NIL [CONJ]: invalid index %s for nil", key.profile());
   }
 
   //////////////////////////////////////
@@ -221,11 +227,11 @@ public class Nil extends Datum implements OrderedCollection {
   //////////////////////////////////////
 
   public Datum toACList() throws Exception {
-    return Nil.VALUE;
+    return this;
   }
 
   public String toACString() throws Exception {
-    return new String("");
+    return new String();
   }
 
   public Vector toACVector() throws Exception {
