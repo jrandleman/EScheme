@@ -6,6 +6,7 @@ package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Pair;
+import escm.type.Nil;
 import escm.type.bool.Boolean;
 import escm.type.number.Exact;
 import escm.type.number.Real;
@@ -121,12 +122,19 @@ public class AssociativeCollectionPrimitives {
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() < 3) 
+      int n = parameters.size();
+      if(n < 3) 
         throw new Exceptionf("'(fold <callable> <seed> <associative-collection> ...) invalid args: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof Callable))
         throw new Exceptionf("'(fold <callable> <seed> <associative-collection> ...) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
-      AssociativeCollection[] acs = AssociativeCollection.parseParameters("(fold <callable> <seed> <associative-collection> ...)",parameters,2);
-      return acs[0].FoldArray((Callable)parameters.get(0),parameters.get(1),acs,continuation);
+      if(n == 3) {
+        if(!(parameters.get(2) instanceof AssociativeCollection))
+          throw new Exceptionf("'(fold <callable> <seed> <associative-collection> ...) 3rd arg isn't an <associative-collection>: %s", Exceptionf.profileArgs(parameters));
+        return ((AssociativeCollection)parameters.get(2)).fold((Callable)parameters.get(0),parameters.get(1),continuation);
+      } else {
+        AssociativeCollection[] acs = AssociativeCollection.parseParameters("(fold <callable> <seed> <associative-collection> ...)",parameters,2);
+        return acs[0].FoldArray((Callable)parameters.get(0),parameters.get(1),acs,continuation);
+      }
     }
   }
 
@@ -139,13 +147,19 @@ public class AssociativeCollectionPrimitives {
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() < 2) 
+      int n = parameters.size();
+      if(n < 2) 
         throw new Exceptionf("'(map <callable> <associative-collection> ...) invalid args: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof Callable))
         throw new Exceptionf("'(map <callable> <associative-collection> ...) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
-      Callable c = (Callable)parameters.get(0);
-      AssociativeCollection[] acs = AssociativeCollection.parseParameters("(map <callable> <associative-collection> ...)",parameters,1);
-      return acs[0].MapArray(c,acs,continuation);
+      if(n == 2) {
+        if(!(parameters.get(1) instanceof AssociativeCollection))
+          throw new Exceptionf("'(map <callable> <associative-collection> ...) 2nd arg isn't an <associative-collection>: %s", Exceptionf.profileArgs(parameters));
+        return ((AssociativeCollection)parameters.get(1)).map((Callable)parameters.get(0),continuation);
+      } else {
+        AssociativeCollection[] acs = AssociativeCollection.parseParameters("(map <callable> <associative-collection> ...)",parameters,1);
+        return acs[0].MapArray((Callable)parameters.get(0),acs,continuation);
+      }
     }
   }
 
@@ -158,13 +172,19 @@ public class AssociativeCollectionPrimitives {
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() < 2) 
+      int n = parameters.size();
+      if(n < 2) 
         throw new Exceptionf("'(for-each <callable> <associative-collection> ...) invalid args: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof Callable))
         throw new Exceptionf("'(for-each <callable> <associative-collection> ...) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
-      Callable c = (Callable)parameters.get(0);
-      AssociativeCollection[] acs = AssociativeCollection.parseParameters("(for-each <callable> <associative-collection> ...)",parameters,1);
-      return acs[0].ForEachArray(c,acs,continuation);
+      if(n == 2) {
+        if(!(parameters.get(1) instanceof AssociativeCollection))
+          throw new Exceptionf("'(for-each <callable> <associative-collection> ...) 2nd arg isn't an <associative-collection>: %s", Exceptionf.profileArgs(parameters));
+        return ((AssociativeCollection)parameters.get(1)).forEach((Callable)parameters.get(0),continuation);
+      } else {
+        AssociativeCollection[] acs = AssociativeCollection.parseParameters("(for-each <callable> <associative-collection> ...)",parameters,1);
+        return acs[0].ForEachArray((Callable)parameters.get(0),acs,continuation);
+      }
     }
   }
 
@@ -271,19 +291,40 @@ public class AssociativeCollectionPrimitives {
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
-      if(n == 0) return escm.type.Nil.VALUE;
+      if(n == 0) return Nil.VALUE;
       if(n == 1) return parameters.get(0);
-      if(!(parameters.get(n-1) instanceof AssociativeCollection)) {
-        Datum dotValue = parameters.get(n-1);
+      Datum dotValue = parameters.get(n-1);
+      if(!(dotValue instanceof AssociativeCollection)) {
         parameters.remove(n-1);
-        AssociativeCollection[] acs = AssociativeCollection.parseParameters("(append <associative-collection> ...)",parameters,0);
-        Datum result = (Datum)acs[0].AppendArray(acs);
-        if(Pair.isList(result)) 
-          return Pair.binaryAppend(result,dotValue);
-        // Intentionally trigger an error here, can only append a non-<ac> to a list.
-        parameters.add(dotValue);
-        AssociativeCollection.parseParameters("(append <associative-collection> ...)",parameters,0);
-        return (Datum)acs[0].AppendArray(acs);
+        Datum result = Nil.VALUE;
+        if(n == 2) {
+          result = parameters.get(0);
+          if(!(result instanceof AssociativeCollection))
+            throw new Exceptionf("'(append <associative-collection> ...) 1st arg isn't an <associative-collection>: %s, %s", Exceptionf.profileArgs(parameters), dotValue.profile());
+        } else if(n == 3) { // testing against <3> b/c of the removed dot-value
+          Datum param1 = parameters.get(0), param2 = parameters.get(1);
+          if(!(param1 instanceof AssociativeCollection))
+            throw new Exceptionf("'(append <associative-collection> ...) 1st arg isn't an <associative-collection>: %s, %s", Exceptionf.profileArgs(parameters), dotValue.profile());
+          if(!(param2 instanceof AssociativeCollection))
+            throw new Exceptionf("'(append <associative-collection> ...) 2nd arg isn't an <associative-collection>: %s, %s", Exceptionf.profileArgs(parameters), dotValue.profile());
+          AssociativeCollection ac1 = (AssociativeCollection)param1;
+          AssociativeCollection ac2 = AssociativeCollection.unifyType(ac1,(AssociativeCollection)param2);
+          result = (Datum)ac1.append(ac2);
+        } else {
+          AssociativeCollection[] acs = AssociativeCollection.parseParameters("(append <associative-collection> ...)",parameters,0);
+          result = (Datum)acs[0].AppendArray(acs);
+        }
+        if(Pair.isList(result)) return Pair.binaryAppend(result,dotValue);
+        throw new Exceptionf("'(append <associative-collection> ...) Can't append non-<ac> %s to %s: %s, %s", dotValue.profile(), result.write(), Exceptionf.profileArgs(parameters), dotValue.profile());
+      } else if(n == 2) {
+        Datum param1 = parameters.get(0), param2 = parameters.get(1);
+        if(!(param1 instanceof AssociativeCollection))
+          throw new Exceptionf("'(append <associative-collection> ...) 1st arg isn't an <associative-collection>: %s", Exceptionf.profileArgs(parameters));
+        if(!(param2 instanceof AssociativeCollection))
+          throw new Exceptionf("'(append <associative-collection> ...) 2nd arg isn't an <associative-collection>: %s", Exceptionf.profileArgs(parameters));
+        AssociativeCollection ac1 = (AssociativeCollection)param1;
+        AssociativeCollection ac2 = AssociativeCollection.unifyType(ac1,(AssociativeCollection)param2);
+        return (Datum)ac1.append(ac2);
       } else {
         AssociativeCollection[] acs = AssociativeCollection.parseParameters("(append <associative-collection> ...)",parameters,0);
         return (Datum)acs[0].AppendArray(acs);

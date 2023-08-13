@@ -330,7 +330,23 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   }
 
   //////////////////////////////////////
-  // fold
+  // fold (unary)
+  //////////////////////////////////////
+
+  private static Trampoline.Bounce foldIter(Callable c, Datum seed, HashmapEntry[] ac, int acPos, Trampoline.Continuation continuation) throws Exception {
+    if(acPos >= ac.length) return continuation.run(seed);
+    ArrayList<Datum> args = new ArrayList<Datum>(2);
+    args.add(seed);
+    args.add(ac[acPos].getValue());
+    return c.callWith(args,(acc) -> () -> foldIter(c,acc,ac,acPos+1,continuation));
+  }
+
+  public Trampoline.Bounce fold(Callable c, Datum seed, Trampoline.Continuation continuation) throws Exception { // -> Datum
+    return foldIter(c,seed,convertHashmapToEntryArray(this),0,continuation);
+  }
+
+  //////////////////////////////////////
+  // fold (binary+)
   //////////////////////////////////////
 
   private static Trampoline.Bounce FoldArrayIter(Callable c, Datum seed, HashmapEntry[][] acs, int acPos, Trampoline.Continuation continuation) throws Exception {
@@ -348,7 +364,7 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   }
 
   ///////////////////////////////////////
-  // map
+  // map (unary)
   ///////////////////////////////////////
 
   private static Hashmap convertAListToHashmap(Datum lis) {
@@ -361,6 +377,21 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
     }
     return h;
   }
+
+  private static Trampoline.Bounce mapIter(Callable c, HashmapEntry[] ac, int acPos, Trampoline.Continuation continuation) throws Exception {
+    if(acPos >= ac.length) return continuation.run(Nil.VALUE);
+    ArrayList<Datum> args = new ArrayList<Datum>(1);
+    args.add(ac[acPos].getValue());
+    return c.callWith(args,(mappedValue) -> () -> mapIter(c,ac,acPos+1,(mappedRest) -> () -> continuation.run(new Pair(new Pair(ac[acPos].getKey(),mappedValue),mappedRest))));
+  }
+
+  public Trampoline.Bounce map(Callable c, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
+    return mapIter(c,convertHashmapToEntryArray(this),0,(mappedList) -> () -> continuation.run(convertAListToHashmap(mappedList)));
+  }
+
+  ///////////////////////////////////////
+  // map (binary+)
+  ///////////////////////////////////////
 
   private static Trampoline.Bounce MapIter(Callable c, HashmapEntry[][] acs, int acPos, Trampoline.Continuation continuation) throws Exception {
     ArrayList<Datum> args = new ArrayList<Datum>(acs.length);
@@ -376,7 +407,22 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   }
 
   //////////////////////////////////////
-  // for-each
+  // for-each (unary)
+  //////////////////////////////////////
+
+  private static Trampoline.Bounce forEachIter(Callable c, HashmapEntry[] ac, int acPos, Trampoline.Continuation continuation) throws Exception {
+    if(acPos >= ac.length) return continuation.run(Void.VALUE);
+    ArrayList<Datum> args = new ArrayList<Datum>(1);
+    args.add(ac[acPos].getValue());
+    return c.callWith(args,(ignore) -> () -> forEachIter(c,ac,acPos+1,continuation));
+  }
+
+  public Trampoline.Bounce forEach(Callable c, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
+    return forEachIter(c,convertHashmapToEntryArray(this),0,continuation);
+  }
+
+  //////////////////////////////////////
+  // for-each (binary+)
   //////////////////////////////////////
 
   private static Trampoline.Bounce ForEachIter(Callable c, HashmapEntry[][] acs, int acPos, Trampoline.Continuation continuation) throws Exception {
@@ -487,6 +533,13 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   //////////////////////////////////////
   // append
   //////////////////////////////////////
+
+  public AssociativeCollection append(AssociativeCollection ac) throws Exception {
+    ConcurrentHashMap<Datum,Datum> appended = new ConcurrentHashMap<Datum,Datum>();
+    appended.putAll(value);
+    appended.putAll(((Hashmap)ac).value);
+    return new Hashmap(appended);
+  }
 
   public AssociativeCollection AppendArray(AssociativeCollection[] acs) throws Exception {
     ConcurrentHashMap<Datum,Datum> appended = new ConcurrentHashMap<Datum,Datum>();

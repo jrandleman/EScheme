@@ -403,7 +403,27 @@ public class Pair extends Datum implements OrderedCollection {
   }
 
   //////////////////////////////////////
-  // fold
+  // fold (unary)
+  //////////////////////////////////////
+
+  private static Trampoline.Bounce foldIter(Callable c, Datum seed, Datum lis, Trampoline.Continuation continuation) throws Exception { // -> Datum
+    if(!(lis instanceof Pair)) return continuation.run(seed);
+    Pair plis = (Pair)lis;
+    ArrayList<Datum> args = new ArrayList<Datum>(2);
+    args.add(seed);
+    args.add(plis.car);
+    return c.callWith(args,(acc) -> () -> foldIter(c,acc,plis.cdr,continuation));
+  }
+
+  public Trampoline.Bounce fold(Callable c, Datum seed, Trampoline.Continuation continuation) throws Exception { // -> Datum
+    if(length == DOTTED_LIST_LENGTH) {
+      throw new Exceptionf("PAIR [FOLD]: can't fold over dotted-list %s", profile());
+    }
+    return foldIter(c,seed,this,continuation);
+  }
+
+  //////////////////////////////////////
+  // fold (binary+)
   //////////////////////////////////////
 
   private static Trampoline.Bounce FoldIter(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> Datum
@@ -426,7 +446,26 @@ public class Pair extends Datum implements OrderedCollection {
   }
 
   ///////////////////////////////////////
-  // map
+  // map (unary)
+  ///////////////////////////////////////
+
+  private Trampoline.Bounce mapIter(Callable c, Datum lis, Trampoline.Continuation continuation) throws Exception {
+    if(!(lis instanceof Pair)) return continuation.run(Nil.VALUE);
+    Pair plis = (Pair)lis;
+    ArrayList<Datum> args = new ArrayList<Datum>(1);
+    args.add(plis.car);
+    return c.callWith(args,(mappedVal) -> () -> mapIter(c,plis.cdr,(mappedRest) -> () -> continuation.run(new Pair(mappedVal,mappedRest))));
+  }
+
+  public Trampoline.Bounce map(Callable c, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
+    if(length == DOTTED_LIST_LENGTH) {
+      throw new Exceptionf("PAIR [MAP]: can't map over dotted-list %s", profile());
+    }
+    return mapIter(c,this,continuation);
+  }
+
+  ///////////////////////////////////////
+  // map (binary+)
   ///////////////////////////////////////
 
   private Trampoline.Bounce MapIter(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
@@ -448,7 +487,26 @@ public class Pair extends Datum implements OrderedCollection {
   }
 
   //////////////////////////////////////
-  // for-each
+  // for-each (unary)
+  //////////////////////////////////////
+
+  private Trampoline.Bounce forEachIter(Callable c, Datum lis, Trampoline.Continuation continuation) throws Exception {
+    if(!(lis instanceof Pair)) return continuation.run(Nil.VALUE);
+    Pair plis = (Pair)lis;
+    ArrayList<Datum> args = new ArrayList<Datum>(1);
+    args.add(plis.car);
+    return c.callWith(args,(ignore) -> () -> forEachIter(c,plis.cdr,continuation));
+  }
+
+  public Trampoline.Bounce forEach(Callable c, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
+    if(length == DOTTED_LIST_LENGTH) {
+      throw new Exceptionf("PAIR [FOR-EACH]: can't iterate over dotted-list %s", profile());
+    }
+    return forEachIter(c,this,continuation);
+  }
+
+  //////////////////////////////////////
+  // for-each (binary+)
   //////////////////////////////////////
 
   private Trampoline.Bounce ForEachIter(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
@@ -597,6 +655,10 @@ public class Pair extends Datum implements OrderedCollection {
     if(!(p1 instanceof Pair)) return p2;
     Pair p = (Pair)p1;
     return new Pair(p.car,binaryAppend(p.cdr,p2));
+  }
+
+  public AssociativeCollection append(AssociativeCollection ac) throws Exception {
+    return (AssociativeCollection)binaryAppend(this,(Datum)ac);
   }
 
   public AssociativeCollection AppendArray(AssociativeCollection[] acs) throws Exception {
@@ -1001,7 +1063,30 @@ public class Pair extends Datum implements OrderedCollection {
   }
 
   //////////////////////////////////////
-  // fold-right
+  // fold-right (unary)
+  //////////////////////////////////////
+
+  private static Trampoline.Bounce foldRightIter(Callable c, Datum seed, Datum lis, Trampoline.Continuation continuation) throws Exception { // -> Datum
+    if(!(lis instanceof Pair)) return continuation.run(seed);
+    Pair plis = (Pair)lis;
+    ArrayList<Datum> params = new ArrayList<Datum>(1);
+    params.add(plis.car);
+    return () -> foldRightIter(c,seed,plis.cdr,(acc) -> () -> {
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
+      args.add(acc);
+      return c.callWith(args,continuation);
+    });
+  }
+
+  public Trampoline.Bounce foldRight(Callable c, Datum seed, Trampoline.Continuation continuation) throws Exception {
+    if(length == DOTTED_LIST_LENGTH) {
+      throw new Exceptionf("PAIR [FOLD-RIGHT]: can't fold over dotted-list %s", profile());
+    }
+    return foldRightIter(c,seed,this,continuation);
+  }
+
+  //////////////////////////////////////
+  // fold-right (binary+)
   //////////////////////////////////////
 
   private static Trampoline.Bounce FoldRightIter(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> Datum

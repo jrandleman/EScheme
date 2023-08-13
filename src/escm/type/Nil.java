@@ -119,12 +119,24 @@ public class Nil extends Datum implements OrderedCollection {
   // fold, map, for-each, filter
   //////////////////////////////////////
 
+  public Trampoline.Bounce fold(Callable c, Datum seed, Trampoline.Continuation continuation) throws Exception { // -> Datum
+    return continuation.run(seed);
+  }
+
   public Trampoline.Bounce FoldArray(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> Datum
     return continuation.run(seed);
   }
 
+  public Trampoline.Bounce map(Callable c, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
+    return continuation.run(Nil.VALUE);
+  }
+
   public Trampoline.Bounce MapArray(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
     return continuation.run(Nil.VALUE);
+  }
+
+  public Trampoline.Bounce forEach(Callable c, Trampoline.Continuation continuation) throws Exception { // -> Void
+    return continuation.run(Void.VALUE);
   }
 
   public Trampoline.Bounce ForEachArray(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> Void
@@ -175,6 +187,10 @@ public class Nil extends Datum implements OrderedCollection {
       if(acs[i].length() > 0) ++nonEmptyCount;
     }
     return nonEmptyCount;
+  }
+
+  public AssociativeCollection append(AssociativeCollection ac) throws Exception {
+    return ac;
   }
 
   public AssociativeCollection AppendArray(AssociativeCollection[] acs) throws Exception {
@@ -351,6 +367,10 @@ public class Nil extends Datum implements OrderedCollection {
   //////////////////////////////////////
   // fold-right
   //////////////////////////////////////
+
+  public Trampoline.Bounce foldRight(Callable c, Datum seed, Trampoline.Continuation continuation) throws Exception {
+    return continuation.run(seed);
+  }
 
   public Trampoline.Bounce FoldRightArray(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
     return continuation.run(seed);

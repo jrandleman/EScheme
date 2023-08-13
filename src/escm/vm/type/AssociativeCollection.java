@@ -20,6 +20,28 @@ public interface AssociativeCollection {
   static final int HASHMAP = 4;
 
 
+  // Returns <ac2> as <ac1>'s type:
+  public static AssociativeCollection unifyType(AssociativeCollection ac1, AssociativeCollection ac2) throws Exception {
+    if(escm.type.Pair.isList((Datum)ac1)) {
+      if(escm.type.Pair.isList((Datum)ac2)) return ac2;
+      return (AssociativeCollection)ac2.toACList();
+    }
+    if(ac1 instanceof escm.type.Vector) {
+      if(ac2 instanceof escm.type.Vector) return ac2;
+      return (AssociativeCollection)ac2.toACVector();
+    }
+    if(ac1 instanceof escm.type.String) {
+      if(ac2 instanceof escm.type.String) return ac2;
+      return (AssociativeCollection)ac2.toACString();
+    }
+    if(ac1 instanceof escm.type.Hashmap) {
+      if(ac2 instanceof escm.type.Hashmap) return ac2;
+      return (AssociativeCollection)ac2.toACHashmap();
+    }
+    throw new Exceptionf("Unknown <AssociativeCollection> unification super type given: %s", ((Datum)ac1).profile());
+  }
+
+
   // Unifies the types in <acs> according to the following hierarchy:
   //   String < List < Vector < Hashmap
   private static void unifyTypes(int type, AssociativeCollection[] acs) throws Exception {
@@ -98,10 +120,15 @@ public interface AssociativeCollection {
 
   int length();
 
+  Trampoline.Bounce fold(Callable c, Datum seed, Trampoline.Continuation continuation) throws Exception; // -> Datum
   Trampoline.Bounce FoldArray(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception; // -> Datum
 
+  Trampoline.Bounce map(Callable c, Trampoline.Continuation continuation) throws Exception; // -> AssociativeCollection
   Trampoline.Bounce MapArray(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception; // -> AssociativeCollection
+
+  Trampoline.Bounce forEach(Callable c, Trampoline.Continuation continuation) throws Exception; // -> Void
   Trampoline.Bounce ForEachArray(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception; // -> Void
+
   Trampoline.Bounce filter(Callable predicate, Trampoline.Continuation continuation) throws Exception; // -> AssociativeCollection
 
   Trampoline.Bounce count(Callable predicate, Trampoline.Continuation continuation) throws Exception; // -> Exact
@@ -111,6 +138,7 @@ public interface AssociativeCollection {
 
   Trampoline.Bounce key(Callable predicate, Trampoline.Continuation continuation) throws Exception; // -> Datum
 
+  AssociativeCollection append(AssociativeCollection ac) throws Exception;
   AssociativeCollection AppendArray(AssociativeCollection[] acs) throws Exception;
 
   AssociativeCollection delete(Datum key) throws Exception; // returns <this> if deletion fails

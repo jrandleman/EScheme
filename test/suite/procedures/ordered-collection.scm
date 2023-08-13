@@ -199,7 +199,7 @@
 (ut (fold-right char- 0 "") 0)
 (ut (fold-right char- 0 "3") 3)
 (ut (fold-right char- 0 "23") -1)
-(ut (fold-right char- 0 '"123") 2)
+(ut (fold-right char- 0 "123") 2)
 
 (define (char-- k c n) (- (char->int k) (char->int c) n))
 (ut (fold-right - 0 [] []) 0)
@@ -213,7 +213,7 @@
 (ut (fold-right char-- 0 "" "") 0)
 (ut (fold-right char-- 0 "3" "3") 0)
 (ut (fold-right char-- 0 "23" "23") 0)
-(ut (fold-right char-- 0 '"123" '"123") 0)
+(ut (fold-right char-- 0 "123" "123") 0)
 
 (define (char++ k c n) (+ (char->int k) (char->int c) n))
 (ut (fold-right + 0 [] []) 0)
@@ -227,7 +227,7 @@
 (ut (fold-right char++ 0 "" "") 0)
 (ut (fold-right char++ 0 "3" "3") 6)
 (ut (fold-right char++ 0 "23" "23") 10)
-(ut (fold-right char++ 0 '"123" '"123") 12)
+(ut (fold-right char++ 0 "123" "123") 12)
 
 (ut (key-right even? '(2)) 0)
 (ut (key-right even? '(2 4)) 1)

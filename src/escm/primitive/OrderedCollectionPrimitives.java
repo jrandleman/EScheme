@@ -172,14 +172,19 @@ public class OrderedCollectionPrimitives {
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() < 3) 
+      int n = parameters.size();
+      if(n < 3) 
         throw new Exceptionf("'(fold-right <callable> <seed> <ordered-collection> ...) invalid args: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof Callable))
         throw new Exceptionf("'(fold-right <callable> <seed> <ordered-collection> ...) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
-      Callable c = (Callable)parameters.get(0);
-      Datum seed = parameters.get(1);
-      OrderedCollection[] ocs = OrderedCollection.parseParameters("(fold-right <callable> <seed> <ordered-collection> ...)",parameters,2);
-      return ocs[0].FoldRightArray(c,seed,ocs,continuation);
+      if(n == 3) {
+        if(!(parameters.get(2) instanceof OrderedCollection))
+          throw new Exceptionf("'(fold-right <callable> <seed> <ordered-collection> ...) 3rd arg isn't an <ordered-collection>: %s", Exceptionf.profileArgs(parameters));
+        return ((OrderedCollection)parameters.get(2)).foldRight((Callable)parameters.get(0),parameters.get(1),continuation);
+      } else {
+        OrderedCollection[] ocs = OrderedCollection.parseParameters("(fold-right <callable> <seed> <ordered-collection> ...)",parameters,2);
+        return ocs[0].FoldRightArray((Callable)parameters.get(0),parameters.get(1),ocs,continuation);
+      }
     }
   }
 

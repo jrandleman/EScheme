@@ -238,7 +238,23 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   //////////////////////////////////////
-  // fold
+  // fold (unary)
+  //////////////////////////////////////
+
+  private static Trampoline.Bounce foldIter(Callable c, Datum seed, String s, int acPos, Trampoline.Continuation continuation) throws Exception {
+    if(acPos >= s.length()) return continuation.run(seed);
+    ArrayList<Datum> args = new ArrayList<Datum>(2);
+    args.add(seed);
+    args.add(s.charAt(acPos));
+    return c.callWith(args,(acc) -> () -> foldIter(c,acc,s,acPos+1,continuation));
+  }
+
+  public Trampoline.Bounce fold(Callable c, Datum seed, Trampoline.Continuation continuation) throws Exception { // -> Datum
+    return foldIter(c,seed,this,0,continuation);
+  }
+
+  //////////////////////////////////////
+  // fold (binary+)
   //////////////////////////////////////
 
   private static Trampoline.Bounce FoldArrayIter(Callable c, Datum seed, AssociativeCollection[] acs, int acPos, Trampoline.Continuation continuation) throws Exception {
@@ -256,7 +272,22 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   ///////////////////////////////////////
-  // map
+  // map (unary)
+  ///////////////////////////////////////
+
+  private static Trampoline.Bounce mapIter(Callable c, String s, int acPos, Trampoline.Continuation continuation) throws Exception {
+    if(acPos >= s.length()) return continuation.run(Nil.VALUE);
+    ArrayList<Datum> args = new ArrayList<Datum>(1);
+    args.add(s.charAt(acPos));
+    return c.callWith(args,(mappedValue) -> () -> mapIter(c,s,acPos+1,(mappedRest) -> () -> continuation.run(new Pair(mappedValue,mappedRest))));
+  }
+
+  public Trampoline.Bounce map(Callable c, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
+    return mapIter(c,this,0,(mappedList) -> () -> continuation.run(((AssociativeCollection)mappedList).toACString()));
+  }
+
+  ///////////////////////////////////////
+  // map (binary+)
   ///////////////////////////////////////
 
   private static Trampoline.Bounce MapIter(Callable c, AssociativeCollection[] acs, int acPos, Trampoline.Continuation continuation) throws Exception {
@@ -273,7 +304,22 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   //////////////////////////////////////
-  // for-each
+  // for-each (unary)
+  //////////////////////////////////////
+
+  private static Trampoline.Bounce forEachIter(Callable c, String s, int acPos, Trampoline.Continuation continuation) throws Exception {
+    if(acPos >= s.length()) return continuation.run(Void.VALUE);
+    ArrayList<Datum> args = new ArrayList<Datum>(1);
+    args.add(s.charAt(acPos));
+    return c.callWith(args,(ignore) -> () -> forEachIter(c,s,acPos+1,continuation));
+  }
+
+  public Trampoline.Bounce forEach(Callable c, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
+    return forEachIter(c,this,0,continuation);
+  }
+
+  //////////////////////////////////////
+  // for-each (binary+)
   //////////////////////////////////////
 
   private static Trampoline.Bounce ForEachIter(Callable c, AssociativeCollection[] acs, int acPos, Trampoline.Continuation continuation) throws Exception {
@@ -394,6 +440,10 @@ public class String extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
   // append
   //////////////////////////////////////
+
+  public AssociativeCollection append(AssociativeCollection ac) throws Exception {
+    return new String(value+((String)ac).value);
+  }
 
   public AssociativeCollection AppendArray(AssociativeCollection[] acs) throws Exception {
     StringBuilder sb = new StringBuilder();
@@ -609,7 +659,7 @@ public class String extends Datum implements OrderedCollection, Callable {
 
   private Trampoline.Bounce inValuesString(Callable eltPredicate, Datum item, String valString, int i, Trampoline.Continuation continuation) throws Exception {
     if(i >= valString.codePointLength()) return continuation.run(Boolean.FALSE);
-    ArrayList<Datum> args = new ArrayList<Datum>();
+    ArrayList<Datum> args = new ArrayList<Datum>(2);
     args.add(item);
     args.add(valString.charAt(i));
     return eltPredicate.callWith(args,(sameItem) -> () -> {
@@ -813,7 +863,26 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   //////////////////////////////////////
-  // fold-right
+  // fold-right (unary)
+  //////////////////////////////////////
+
+  private static Trampoline.Bounce foldRightIter(Callable c, Datum seed, int eltIdx, String s, Trampoline.Continuation continuation) throws Exception { // -> Datum
+    if(eltIdx >= s.codePointLength()) return continuation.run(seed);
+    ArrayList<Datum> params = new ArrayList<Datum>(1);
+    params.add(s.charAt(eltIdx));
+    return () -> foldRightIter(c,seed,eltIdx+1,s,(acc) -> () -> {
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
+      args.add(acc);
+      return c.callWith(args,continuation);
+    });
+  }
+
+  public Trampoline.Bounce foldRight(Callable c, Datum seed, Trampoline.Continuation continuation) throws Exception {
+    return foldRightIter(c,seed,0,this,continuation);
+  }
+
+  //////////////////////////////////////
+  // fold-right (binary+)
   //////////////////////////////////////
 
   private static Trampoline.Bounce FoldRightArray(Callable c, Datum seed, int eltIdx, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {

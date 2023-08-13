@@ -120,6 +120,7 @@ public interface OrderedCollection extends AssociativeCollection {
   Trampoline.Bounce skip(Callable predicate, Trampoline.Continuation continuation) throws Exception; // -> OrderedCollection
   Trampoline.Bounce skipRight(Callable predicate, Trampoline.Continuation continuation) throws Exception; // -> OrderedCollection
 
+  Trampoline.Bounce foldRight(Callable c, Datum seed, Trampoline.Continuation continuation) throws Exception; // -> Datum
   Trampoline.Bounce FoldRightArray(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception; // -> Datum
 
   Trampoline.Bounce keyRight(Callable predicate, Trampoline.Continuation continuation) throws Exception; // -> OrderedCollection
