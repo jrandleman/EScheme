@@ -622,15 +622,17 @@ public class String extends Datum implements OrderedCollection, Callable {
     });
   }
 
-  private Trampoline.Bounce UnionArrayIter(Callable eltPredicate, AssociativeCollection[] acs, int i, String s, int j, Datum values, Trampoline.Continuation continuation) throws Exception {
+  private Trampoline.Bounce UnionArrayIter(Callable eltPredicate, AssociativeCollection[] acs, int i, String s, int offset, Datum values, Trampoline.Continuation continuation) throws Exception {
     if(i >= acs.length) return continuation.run(values);
-    if(j >= s.codePointLength()) return () -> UnionArrayIter(eltPredicate,acs,i+1,(i+1 >= acs.length) ? (String)acs[i] : (String)acs[i+1],0,values,continuation);
-    escm.type.Character chr = s.charAt(j);
+    if(offset >= s.value.length()) return () -> UnionArrayIter(eltPredicate,acs,i+1,(i+1 >= acs.length) ? (String)acs[i] : (String)acs[i+1],0,values,continuation);
+    int codepoint = s.value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    escm.type.Character chr = new escm.type.Character(codepoint);
     return inValues(eltPredicate, chr, values, (isInValues) -> () -> {
       if(isInValues.isTruthy()) {
-        return UnionArrayIter(eltPredicate,acs,i,s,j+1,values,continuation);
+        return UnionArrayIter(eltPredicate,acs,i,s,offset+increment,values,continuation);
       }
-      return UnionArrayIter(eltPredicate,acs,i,s,j+1,new Pair(chr,values),continuation);
+      return UnionArrayIter(eltPredicate,acs,i,s,offset+increment,new Pair(chr,values),continuation);
     });
   }
 
@@ -651,14 +653,16 @@ public class String extends Datum implements OrderedCollection, Callable {
   // intersection set operation
   //////////////////////////////////////
 
-  private Trampoline.Bounce itemIntersectsAC(Callable eltPredicate, String ac, int acIdx, Datum item, Trampoline.Continuation continuation) throws Exception {
-    if(acIdx >= ac.codePointLength()) return continuation.run(Boolean.FALSE);
+  private Trampoline.Bounce itemIntersectsAC(Callable eltPredicate, String ac, int offset, Datum item, Trampoline.Continuation continuation) throws Exception {
+    if(offset >= ac.value.length()) return continuation.run(Boolean.FALSE);
     ArrayList<Datum> args = new ArrayList<Datum>(2);
     args.add(item);
-    args.add(ac.charAt(acIdx));
+    int codepoint = ac.value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    args.add(new escm.type.Character(codepoint));
     return eltPredicate.callWith(args,(isSameItem) -> () -> {
       if(isSameItem.isTruthy()) return continuation.run(Boolean.TRUE);
-      return itemIntersectsAC(eltPredicate,ac,acIdx+1,item,continuation);
+      return itemIntersectsAC(eltPredicate,ac,offset+increment,item,continuation);
     });
   }
 
@@ -670,20 +674,22 @@ public class String extends Datum implements OrderedCollection, Callable {
     });
   }
 
-  private Trampoline.Bounce IntersectionArrayIter(Callable eltPredicate, AssociativeCollection[] acs, int acIdx, String s, int sIdx, Datum intersectingValues, Trampoline.Continuation continuation) throws Exception {
+  private Trampoline.Bounce IntersectionArrayIter(Callable eltPredicate, AssociativeCollection[] acs, int acIdx, String s, int offset, Datum intersectingValues, Trampoline.Continuation continuation) throws Exception {
     if(acIdx >= acs.length) return continuation.run(intersectingValues);
-    if(sIdx >= s.codePointLength()) return () -> IntersectionArrayIter(eltPredicate,acs,acIdx+1,acIdx+1 >= acs.length ? (String)acs[acIdx] : (String)acs[acIdx+1],0,intersectingValues,continuation);
-    escm.type.Character chr = s.charAt(sIdx);
+    if(offset >= s.value.length()) return () -> IntersectionArrayIter(eltPredicate,acs,acIdx+1,acIdx+1 >= acs.length ? (String)acs[acIdx] : (String)acs[acIdx+1],0,intersectingValues,continuation);
+    int codepoint = s.value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    escm.type.Character chr = new escm.type.Character(codepoint);
     return inValues(eltPredicate, chr, intersectingValues, (isInValues) -> () -> {
       if(!isInValues.isTruthy()) {
         return itemIntersects(eltPredicate,acs,0,chr,(intersects) -> () -> {
           if(intersects.isTruthy()) {
-            return IntersectionArrayIter(eltPredicate,acs,acIdx,s,sIdx+1,new Pair(chr,intersectingValues),continuation);
+            return IntersectionArrayIter(eltPredicate,acs,acIdx,s,offset+increment,new Pair(chr,intersectingValues),continuation);
           }
-          return IntersectionArrayIter(eltPredicate,acs,acIdx,s,sIdx+1,intersectingValues,continuation);
+          return IntersectionArrayIter(eltPredicate,acs,acIdx,s,offset+increment,intersectingValues,continuation);
         });
       }
-      return IntersectionArrayIter(eltPredicate,acs,acIdx,s,sIdx+1,intersectingValues,continuation);
+      return IntersectionArrayIter(eltPredicate,acs,acIdx,s,offset+increment,intersectingValues,continuation);
     });
   }
 
@@ -704,14 +710,16 @@ public class String extends Datum implements OrderedCollection, Callable {
   // difference set operation
   //////////////////////////////////////
 
-  private Trampoline.Bounce inValuesString(Callable eltPredicate, Datum item, String valString, int i, Trampoline.Continuation continuation) throws Exception {
-    if(i >= valString.codePointLength()) return continuation.run(Boolean.FALSE);
+  private Trampoline.Bounce inValuesString(Callable eltPredicate, Datum item, String valString, int offset, Trampoline.Continuation continuation) throws Exception {
+    if(offset >= valString.value.length()) return continuation.run(Boolean.FALSE);
     ArrayList<Datum> args = new ArrayList<Datum>(2);
     args.add(item);
-    args.add(valString.charAt(i));
+    int codepoint = valString.value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    args.add(new escm.type.Character(codepoint));
     return eltPredicate.callWith(args,(sameItem) -> () -> {
       if(sameItem.isTruthy()) return continuation.run(Boolean.TRUE);
-      return inValuesString(eltPredicate,item,valString,i+1,continuation);
+      return inValuesString(eltPredicate,item,valString,offset+increment,continuation);
     });
   }
 
