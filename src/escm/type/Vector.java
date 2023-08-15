@@ -1014,10 +1014,11 @@ public class Vector extends Datum implements OrderedCollection, Callable {
 
   public Trampoline.Bounce slice(int startIdx, Callable continuePredicate, Trampoline.Continuation continuation) throws Exception {
     synchronized(this) {
-      if(startIdx < 0 || startIdx >= value.size()) return continuation.run(new Vector());
-      return sliceGetLastIdx(startIdx,continuePredicate,(endIdx) -> () -> {
+      int idx = startIdx <= 0 ? 0 : startIdx;
+      if(idx >= value.size()) return continuation.run(new Vector());
+      return sliceGetLastIdx(idx,continuePredicate,(endIdx) -> () -> {
         synchronized(this) {
-          return continuation.run(subvector(startIdx,((Real)endIdx).intValue()-startIdx));
+          return continuation.run(subvector(idx,((Real)endIdx).intValue()-idx));
         }
       });
     }

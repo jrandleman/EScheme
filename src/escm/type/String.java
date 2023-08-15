@@ -90,14 +90,14 @@ public class String extends Datum implements OrderedCollection, Callable {
   ////////////////////////////////////////////////////////////////////////////
   // EScheme Character Iteration
   private static interface CharacterIterationProcedure {
-    public void exec(int idx, escm.type.Character ch);
+    public boolean exec(int idx, escm.type.Character ch); // return if continuing
   }
 
   public void forEachChar(CharacterIterationProcedure cip) {
     int offset = 0, charsIdx = 0, strLength = value.length();
     while(offset < strLength) {
       int codepoint = value.codePointAt(offset);
-      cip.exec(charsIdx++,new escm.type.Character(codepoint));
+      if(!cip.exec(charsIdx++,new escm.type.Character(codepoint))) return;
       offset += java.lang.Character.charCount(codepoint);
     }
   }
@@ -106,14 +106,14 @@ public class String extends Datum implements OrderedCollection, Callable {
   ////////////////////////////////////////////////////////////////////////////
   // EScheme Codepoint Iteration
   private static interface CodepointIterationProcedure {
-    public void exec(int idx, int cp);
+    public boolean exec(int idx, int cp); // return if continuing
   }
 
   public void forEachCodepoint(CodepointIterationProcedure cip) {
     int offset = 0, charsIdx = 0, strLength = value.length();
     while(offset < strLength) {
       int codepoint = value.codePointAt(offset);
-      cip.exec(charsIdx++,codepoint);
+      if(!cip.exec(charsIdx++,codepoint)) return;
       offset += java.lang.Character.charCount(codepoint);
     }
   }
@@ -230,7 +230,10 @@ public class String extends Datum implements OrderedCollection, Callable {
   public AssociativeCollection tail() throws Exception {
     if(codePointLength() == 0) throw new Exceptionf("STRING [TAIL]: Can't get tail of an empty string!");
     StringBuilder sb = new StringBuilder();
-    forEachCodepoint((idx,cp) -> { if(idx > 0) sb.append(java.lang.Character.toString(cp)); });
+    forEachCodepoint((idx,cp) -> { 
+      if(idx > 0) sb.append(java.lang.Character.toString(cp)); 
+      return true;
+    });
     return new String(sb.toString());
   }
 
@@ -242,164 +245,189 @@ public class String extends Datum implements OrderedCollection, Callable {
   // fold (unary)
   //////////////////////////////////////
 
-  private static Trampoline.Bounce foldIter(Callable c, Datum seed, String s, int acPos, Trampoline.Continuation continuation) throws Exception {
-    if(acPos >= s.length()) return continuation.run(seed);
+  private static Trampoline.Bounce foldIter(Callable c, Datum seed, String s, int offset, int n, Trampoline.Continuation continuation) throws Exception {
+    if(offset >= n) return continuation.run(seed);
     ArrayList<Datum> args = new ArrayList<Datum>(2);
     args.add(seed);
-    args.add(s.charAt(acPos));
-    return c.callWith(args,(acc) -> () -> foldIter(c,acc,s,acPos+1,continuation));
+    int codepoint = s.value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    args.add(new escm.type.Character(codepoint));
+    return c.callWith(args,(acc) -> () -> foldIter(c,acc,s,offset+increment,n,continuation));
   }
 
   public Trampoline.Bounce fold(Callable c, Datum seed, Trampoline.Continuation continuation) throws Exception { // -> Datum
-    return foldIter(c,seed,this,0,continuation);
+    return foldIter(c,seed,this,0,value.length(),continuation);
   }
 
   //////////////////////////////////////
   // fold (binary+)
   //////////////////////////////////////
 
-  private static Trampoline.Bounce FoldArrayIter(Callable c, Datum seed, AssociativeCollection[] acs, int acPos, Trampoline.Continuation continuation) throws Exception {
+  private static Trampoline.Bounce FoldArrayIter(Callable c, Datum seed, AssociativeCollection[] acs, int[] offsets, Trampoline.Continuation continuation) throws Exception {
+    int[] newOffsets = new int[offsets.length];
     ArrayList<Datum> args = new ArrayList<Datum>(acs.length+1);
     args.add(seed);
     for(int i = 0; i < acs.length; ++i) {
-      if(acPos >= acs[i].length()) return continuation.run(seed);
-      args.add(((String)acs[i]).charAt(acPos));
+      String s = (String)acs[i];
+      if(offsets[i] >= s.value.length()) return continuation.run(seed);
+      int codepoint = s.value.codePointAt(offsets[i]);
+      args.add(new escm.type.Character(codepoint));
+      newOffsets[i] = offsets[i]+java.lang.Character.charCount(codepoint);
     }
-    return c.callWith(args,(acc) -> () -> FoldArrayIter(c,acc,acs,acPos+1,continuation));
+    return c.callWith(args,(acc) -> () -> FoldArrayIter(c,acc,acs,newOffsets,continuation));
   }
 
   public Trampoline.Bounce FoldArray(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> Datum
-    return FoldArrayIter(c,seed,acs,0,continuation);
+    return FoldArrayIter(c,seed,acs,new int[acs.length],continuation);
   }
 
   ///////////////////////////////////////
   // map (unary)
   ///////////////////////////////////////
 
-  private static Trampoline.Bounce mapIter(Callable c, String s, int acPos, Trampoline.Continuation continuation) throws Exception {
-    if(acPos >= s.length()) return continuation.run(EMPTY_STRING);
+  private static Trampoline.Bounce mapIter(Callable c, String s, int offset, int n, Trampoline.Continuation continuation) throws Exception {
+    if(offset >= n) return continuation.run(EMPTY_STRING);
     ArrayList<Datum> args = new ArrayList<Datum>(1);
-    args.add(s.charAt(acPos));
-    return c.callWith(args,(mappedValue) -> () -> mapIter(c,s,acPos+1,(mappedRest) -> () -> continuation.run(new String(mappedValue.display()+mappedRest.display()))));
+    int codepoint = s.value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    args.add(new escm.type.Character(codepoint));
+    return c.callWith(args,
+      (mappedValue) -> () -> mapIter(c,s,offset+increment,n,
+        (mappedRest) -> () -> continuation.run(new String(mappedValue.display()+mappedRest.display()))));
   }
 
   public Trampoline.Bounce map(Callable c, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
-    return mapIter(c,this,0,continuation);
+    return mapIter(c,this,0,value.length(),continuation);
   }
 
   ///////////////////////////////////////
   // map (binary+)
   ///////////////////////////////////////
 
-  private static Trampoline.Bounce MapIter(Callable c, AssociativeCollection[] acs, int acPos, Trampoline.Continuation continuation) throws Exception {
+  private static Trampoline.Bounce MapIter(Callable c, AssociativeCollection[] acs, int[] offsets, Trampoline.Continuation continuation) throws Exception {
+    int[] newOffsets = new int[offsets.length];
     ArrayList<Datum> args = new ArrayList<Datum>(acs.length);
     for(int i = 0; i < acs.length; ++i) {
-      if(acPos >= acs[i].length()) return continuation.run(EMPTY_STRING);
-      args.add(((String)acs[i]).charAt(acPos));
+      String s = (String)acs[i];
+      if(offsets[i] >= s.value.length()) return continuation.run(EMPTY_STRING);
+      int codepoint = s.value.codePointAt(offsets[i]);
+      args.add(new escm.type.Character(codepoint));
+      newOffsets[i] = offsets[i]+java.lang.Character.charCount(codepoint);
     }
-    return c.callWith(args,(mappedValue) -> () -> MapIter(c,acs,acPos+1,(mappedRest) -> () -> continuation.run(new String(mappedValue.display()+mappedRest.display()))));
+    return c.callWith(args,(mappedValue) -> () -> MapIter(c,acs,newOffsets,(mappedRest) -> () -> continuation.run(new String(mappedValue.display()+mappedRest.display()))));
   }
 
   public Trampoline.Bounce MapArray(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
-    return MapIter(c,acs,0,continuation);
+    return MapIter(c,acs,new int[acs.length],continuation);
   }
 
   //////////////////////////////////////
   // for-each (unary)
   //////////////////////////////////////
 
-  private static Trampoline.Bounce forEachIter(Callable c, String s, int acPos, Trampoline.Continuation continuation) throws Exception {
-    if(acPos >= s.length()) return continuation.run(Void.VALUE);
+  private static Trampoline.Bounce forEachIter(Callable c, String s, int offset, int n, Trampoline.Continuation continuation) throws Exception {
+    if(offset >= n) return continuation.run(Void.VALUE);
     ArrayList<Datum> args = new ArrayList<Datum>(1);
-    args.add(s.charAt(acPos));
-    return c.callWith(args,(ignore) -> () -> forEachIter(c,s,acPos+1,continuation));
+    int codepoint = s.value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    args.add(new escm.type.Character(codepoint));
+    return c.callWith(args,(ignore) -> () -> forEachIter(c,s,offset+increment,n,continuation));
   }
 
   public Trampoline.Bounce forEach(Callable c, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
-    return forEachIter(c,this,0,continuation);
+    return forEachIter(c,this,0,value.length(),continuation);
   }
 
   //////////////////////////////////////
   // for-each (binary+)
   //////////////////////////////////////
 
-  private static Trampoline.Bounce ForEachIter(Callable c, AssociativeCollection[] acs, int acPos, Trampoline.Continuation continuation) throws Exception {
+  private static Trampoline.Bounce ForEachIter(Callable c, AssociativeCollection[] acs, int[] offsets, Trampoline.Continuation continuation) throws Exception {
+    int[] newOffsets = new int[offsets.length];
     ArrayList<Datum> args = new ArrayList<Datum>(acs.length);
     for(int i = 0; i < acs.length; ++i) {
-      if(acPos >= acs[i].length()) return continuation.run(Void.VALUE);
-      args.add(((String)acs[i]).charAt(acPos));
+      String s = (String)acs[i];
+      if(offsets[i] >= s.value.length()) return continuation.run(Void.VALUE);
+      int codepoint = s.value.codePointAt(offsets[i]);
+      args.add(new escm.type.Character(codepoint));
+      newOffsets[i] = offsets[i]+java.lang.Character.charCount(codepoint);
     }
-    return c.callWith(args,(ignore) -> () -> ForEachIter(c,acs,acPos+1,continuation));
+    return c.callWith(args,(ignore) -> () -> ForEachIter(c,acs,newOffsets,continuation));
   }
 
   public Trampoline.Bounce ForEachArray(Callable c, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
-    return ForEachIter(c,acs,0,continuation);
+    return ForEachIter(c,acs,new int[acs.length],continuation);
   }
 
   //////////////////////////////////////
   // filter
   //////////////////////////////////////
 
-  private Trampoline.Bounce filterIter(Callable predicate, int acPos, Trampoline.Continuation continuation) throws Exception {
-    if(acPos >= codePointLength()) return continuation.run(EMPTY_STRING);
-    Datum hd = charAt(acPos);
+  private Trampoline.Bounce filterIter(Callable predicate, int offset, int n, Trampoline.Continuation continuation) throws Exception {
+    if(offset >= n) return continuation.run(EMPTY_STRING);
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    Datum hd = new escm.type.Character(codepoint);
     ArrayList<Datum> args = new ArrayList<Datum>(1);
     args.add(hd);
     return predicate.callWith(args,(shouldKeep) -> () -> {
       if(shouldKeep.isTruthy()) {
-        return filterIter(predicate,acPos+1,(filteredRest) -> () -> continuation.run(new String(hd.display()+filteredRest.display())));
+        return filterIter(predicate,offset+increment,n,(filteredRest) -> () -> continuation.run(new String(hd.display()+filteredRest.display())));
       }
-      return filterIter(predicate,acPos+1,continuation);
+      return filterIter(predicate,offset+increment,n,continuation);
     });
   }
 
   // Helper also used by <sort>
-  private Trampoline.Bounce filterFrom(Callable predicate, int acPos, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
-    return filterIter(predicate,acPos,continuation);
+  private Trampoline.Bounce filterFrom(Callable predicate, int offset, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
+    return filterIter(predicate,offset,value.length(),continuation);
   }
 
   public Trampoline.Bounce filter(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
-    return filterFrom(predicate,0,continuation);
+    return filterIter(predicate,0,value.length(),continuation);
   }
 
   //////////////////////////////////////
   // count
   //////////////////////////////////////
 
-  private Trampoline.Bounce countIter(Callable predicate, int n, int acPos, Trampoline.Continuation continuation) throws Exception {
-    if(acPos >= codePointLength()) return continuation.run(new Exact(n));
-    Datum hd = charAt(acPos);
+  private Trampoline.Bounce countIter(Callable predicate, int count, int offset, int n, Trampoline.Continuation continuation) throws Exception {
+    if(offset >= n) return continuation.run(new Exact(count));
     ArrayList<Datum> args = new ArrayList<Datum>(1);
-    args.add(hd);
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    args.add(new escm.type.Character(codepoint));
     return predicate.callWith(args,(shouldCount) -> () -> {
       if(shouldCount.isTruthy()) {
-        return countIter(predicate,n+1,acPos+1,continuation);
+        return countIter(predicate,count+1,offset+increment,n,continuation);
       }
-      return countIter(predicate,n,acPos+1,continuation);
+      return countIter(predicate,count,offset+increment,n,continuation);
     });
   }
 
   public Trampoline.Bounce count(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> Exact
-    return countIter(predicate,0,0,continuation);
+    return countIter(predicate,0,0,value.length(),continuation);
   }
 
   //////////////////////////////////////
   // remove (inverse of filter)
   //////////////////////////////////////
 
-  private Trampoline.Bounce removeIter(Callable predicate, int acPos, Trampoline.Continuation continuation) throws Exception {
-    if(acPos >= codePointLength()) return continuation.run(EMPTY_STRING);
-    Datum hd = charAt(acPos);
+  private Trampoline.Bounce removeIter(Callable predicate, int offset, int n, Trampoline.Continuation continuation) throws Exception {
+    if(offset >= n) return continuation.run(EMPTY_STRING);
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    Datum hd = new escm.type.Character(codepoint);
     ArrayList<Datum> args = new ArrayList<Datum>(1);
     args.add(hd);
     return predicate.callWith(args,(shouldRemove) -> () -> {
-      if(shouldRemove.isTruthy()) return removeIter(predicate,acPos+1,continuation); 
-      return removeIter(predicate,acPos+1,(removedRest) -> () -> continuation.run(new String(hd.display()+removedRest.display())));
+      if(shouldRemove.isTruthy()) return removeIter(predicate,offset+increment,n,continuation); 
+      return removeIter(predicate,offset+increment,n,(removedRest) -> () -> continuation.run(new String(hd.display()+removedRest.display())));
     });
   }
 
   public Trampoline.Bounce remove(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> AssociativeCollection
-    return removeIter(predicate,0,continuation);
+    return removeIter(predicate,0,value.length(),continuation);
   }
 
   //////////////////////////////////////
@@ -419,23 +447,25 @@ public class String extends Datum implements OrderedCollection, Callable {
   // key
   //////////////////////////////////////
 
-  private Trampoline.Bounce keyIter(Callable predicate, int acPos, Trampoline.Continuation continuation) throws Exception {
-    if(acPos >= codePointLength()) {
+  private Trampoline.Bounce keyIter(Callable predicate, int offset, int idx, int n, Trampoline.Continuation continuation) throws Exception {
+    if(offset >= n) {
       if(predicate instanceof Datum) {
         throw new Exceptionf("STRING [KEY]: no value in %s satisfies value predicate %s", write(), ((Datum)predicate).profile());
       }
       throw new Exceptionf("STRING [KEY]: no value in %s satisfies value predicate %s", write(), predicate);
     }
     ArrayList<Datum> args = new ArrayList<Datum>(1);
-    args.add(charAt(acPos));
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    args.add(new escm.type.Character(codepoint));
     return predicate.callWith(args,(matchedKey) -> () -> {
-      if(matchedKey.isTruthy()) return continuation.run(new Exact(acPos));
-      return keyIter(predicate,acPos+1,continuation);
+      if(matchedKey.isTruthy()) return continuation.run(new Exact(idx));
+      return keyIter(predicate,offset+increment,idx+1,n,continuation);
     });
   }
 
   public Trampoline.Bounce key(Callable predicate, Trampoline.Continuation continuation) throws Exception { // -> Datum
-    return keyIter(predicate,0,continuation);
+    return keyIter(predicate,0,0,value.length(),continuation);
   }
 
   //////////////////////////////////////
@@ -467,6 +497,7 @@ public class String extends Datum implements OrderedCollection, Callable {
     StringBuilder sb = new StringBuilder();
     forEachCodepoint((idx,cp) -> {
       if(idx != deleteIdx) sb.append(java.lang.Character.toString(cp));
+      return true;
     });
     return new String(sb.toString());
   }
@@ -496,6 +527,7 @@ public class String extends Datum implements OrderedCollection, Callable {
         } else {
           sb.append(newValue.display());
         }
+        return true;
       });
       return new String(sb.toString());
     }
@@ -510,6 +542,7 @@ public class String extends Datum implements OrderedCollection, Callable {
     StringBuilder sb = new StringBuilder();
     forEachCodepoint((i,cp) -> {
       if(i >= start) sb.append(java.lang.Character.toString(cp));
+      return true;
     });
     return new String(sb.toString());
   }
@@ -524,7 +557,12 @@ public class String extends Datum implements OrderedCollection, Callable {
     StringBuilder sb = new StringBuilder();
     int end = Math.min(codePointLength(),amount);
     forEachCodepoint((i,cp) -> {
-      if(i < end) sb.append(java.lang.Character.toString(cp));
+      if(i < end) {
+        sb.append(java.lang.Character.toString(cp));
+        return true;
+      } else {
+        return false;
+      }
     });
     return new String(sb.toString());
   }
@@ -534,11 +572,17 @@ public class String extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   public Datum toACList() throws Exception {
-    escm.type.Character[] chars = toChars();
     Datum lis = escm.type.Nil.VALUE;
-    for(int i = chars.length-1; i >= 0; --i)
-      lis = new escm.type.Pair(chars[i],lis);
-    return lis; 
+    for(int offset = value.length()-1; offset >= 0; --offset) {
+      char c = value.charAt(offset);
+      if(java.lang.Character.isLowSurrogate(c)) {
+        --offset;
+        lis = new escm.type.Pair(new escm.type.Character(value.codePointAt(offset)),lis);
+      } else {
+        lis = new escm.type.Pair(new escm.type.Character(c),lis);
+      }
+    }
+    return lis;
   }
 
   public String toACString() throws Exception {
@@ -549,6 +593,7 @@ public class String extends Datum implements OrderedCollection, Callable {
     ArrayList<Datum> vals = new ArrayList<Datum>();
     forEachChar((i,chr) -> {
       vals.add(chr);
+      return true;
     });
     return new Vector(0,vals);
   }
@@ -557,6 +602,7 @@ public class String extends Datum implements OrderedCollection, Callable {
     Hashmap h = new Hashmap();
     forEachChar((i,chr) -> {
       h.set(new Exact(i),chr);
+      return true;
     });
     return h;
   }
@@ -743,7 +789,14 @@ public class String extends Datum implements OrderedCollection, Callable {
     int n = codePointLength();
     if(n == 0) throw new Exceptionf("STRING [INIT]: Can't get init of an empty string!");
     StringBuilder sb = new StringBuilder();
-    forEachCodepoint((idx,cp) -> { if(idx < n-1) sb.append(java.lang.Character.toString(cp)); });
+    forEachCodepoint((idx,cp) -> { 
+      if(idx < n-1) {
+        sb.append(java.lang.Character.toString(cp)); 
+        return true;
+      } else {
+        return false;
+      }
+    });
     return new String(sb.toString());
   }
 
@@ -757,17 +810,29 @@ public class String extends Datum implements OrderedCollection, Callable {
   // slicing
   //////////////////////////////////////
 
+  private int getOffsetForIndex(int index) throws Exception {
+    int offset = 0, codePointIndex = 0, strLength = value.length();
+    while(offset < strLength) {
+      if(codePointIndex == index) return offset;
+      offset += java.lang.Character.charCount(value.codePointAt(offset));
+      ++codePointIndex;
+    }
+    return strLength;
+  }
+
   private static class CounterWrapper {
     public int count = 0;
   }
 
-  private Trampoline.Bounce sliceGetLastIdx(int i, int n, Callable continuePredicate, Trampoline.Continuation continuation) throws Exception {
+  private Trampoline.Bounce sliceGetLastIdx(int i, int n, int offset, Callable continuePredicate, Trampoline.Continuation continuation) throws Exception {
     if(i >= n) return continuation.run(new Exact(i));
     ArrayList<Datum> args = new ArrayList<Datum>(1);
-    args.add(charAt(i));
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    args.add(new escm.type.Character(codepoint));
     return continuePredicate.callWith(args,(shouldContinue) -> () -> {
       if(!shouldContinue.isTruthy()) return continuation.run(new Exact(i));
-      return sliceGetLastIdx(i+1,n,continuePredicate,continuation);
+      return sliceGetLastIdx(i+1,n,offset+increment,continuePredicate,continuation);
     });
   }
 
@@ -782,19 +847,22 @@ public class String extends Datum implements OrderedCollection, Callable {
     CounterWrapper cw = new CounterWrapper();
     StringBuilder sb = new StringBuilder();
     forEachCodepoint((idx,cp) -> { 
-      if(idx >= startIdx && cw.count < sliceLength) {
+      if(cw.count >= sliceLength) return false;
+      if(idx >= startIdx) {
         sb.append(java.lang.Character.toString(cp));
         ++cw.count;
       }
+      return true;
     });
     return new String(sb.toString());
   }
 
   public Trampoline.Bounce slice(int startIdx, Callable continuePredicate, Trampoline.Continuation continuation) throws Exception {
     int n = codePointLength();
-    if(startIdx < 0 || startIdx >= n) return continuation.run(EMPTY_STRING);
-    return sliceGetLastIdx(startIdx,n,continuePredicate,(endIdx) -> () -> {
-      return continuation.run((Datum)slice(startIdx,((Real)endIdx).intValue()-startIdx));
+    int idx = startIdx <= 0 ? 0 : startIdx;
+    if(idx >= n) return continuation.run(EMPTY_STRING);
+    return sliceGetLastIdx(idx,n,getOffsetForIndex(idx),continuePredicate,(endIdx) -> () -> {
+      return continuation.run((Datum)slice(idx,((Real)endIdx).intValue()-idx));
     });
   }
 
@@ -803,10 +871,15 @@ public class String extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
 
   public OrderedCollection reverse() throws Exception {
-    int[] codepoints = toCodePoints();
     StringBuilder sb = new StringBuilder();
-    for(int i = codepoints.length-1; i >= 0; --i) {
-      sb.append(java.lang.Character.toString(codepoints[i]));
+    for(int offset = value.length()-1; offset >= 0; --offset) {
+      char c = value.charAt(offset);
+      if(java.lang.Character.isLowSurrogate(c)) {
+        --offset;
+        sb.append(java.lang.Character.toString(value.codePointAt(offset)));
+      } else {
+        sb.append(c);
+      }
     }
     return new String(sb.toString());
   }
@@ -815,63 +888,105 @@ public class String extends Datum implements OrderedCollection, Callable {
   // removing items
   //////////////////////////////////////
 
-  private Trampoline.Bounce removeIter(Callable predicate, escm.type.Character[] chars, int i, boolean increasing, int mod, Trampoline.Continuation continuation) throws Exception {
-    if((increasing && i >= chars.length) || (!increasing && i < 0)) return continuation.run(this);
+  private Trampoline.Bounce removeFirstIter(Callable predicate, int i, int n, int offset, Trampoline.Continuation continuation) throws Exception {
+    if(i >= n) return continuation.run(this);
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
     ArrayList<Datum> args = new ArrayList<Datum>(1);
-    args.add(chars[i]);
+    args.add(new escm.type.Character(codepoint));
     return predicate.callWith(args,(shouldRemove) -> () -> {
       if(shouldRemove.isTruthy()) {
         StringBuilder sb = new StringBuilder();
-        for(int idx = 0; idx < chars.length; ++idx) {
-          if(idx != i) sb.append(chars[idx].display());
-        }
+        forEachCodepoint((idx,cp) -> { 
+          if(idx != i) sb.append(java.lang.Character.toString(cp)); 
+          return true;
+        });
         return continuation.run(new String(sb.toString()));
       }
-      return removeIter(predicate,chars,i+mod,increasing,mod,continuation);
+      return removeFirstIter(predicate,i+1,n,offset+increment,continuation);
     });
   }
 
   public Trampoline.Bounce removeFirst(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    return removeIter(predicate,toChars(),0,true,1,continuation);
+    return removeFirstIter(predicate,0,codePointLength(),0,continuation);
+  }
+
+  private Trampoline.Bounce removeLastIter(Callable predicate, int i, int offset, Trampoline.Continuation continuation) throws Exception {
+    if(i < 0) return continuation.run(this);
+    char c = value.charAt(offset);
+    boolean at32bitUnicode = java.lang.Character.isLowSurrogate(c);
+    int codepoint = at32bitUnicode ? value.codePointAt(offset-1) : c;
+    int decrement = at32bitUnicode ? 2 : 1;
+    ArrayList<Datum> args = new ArrayList<Datum>(1);
+    args.add(new escm.type.Character(codepoint));
+    return predicate.callWith(args,(shouldRemove) -> () -> {
+      if(shouldRemove.isTruthy()) {
+        StringBuilder sb = new StringBuilder();
+        forEachCodepoint((idx,cp) -> { 
+          if(idx != i) sb.append(java.lang.Character.toString(cp)); 
+          return true;
+        });
+        return continuation.run(new String(sb.toString()));
+      }
+      return removeLastIter(predicate,i-1,offset-decrement,continuation);
+    });
   }
 
   public Trampoline.Bounce removeLast(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    escm.type.Character[] chars = toChars();
-    return removeIter(predicate,chars,chars.length-1,false,-1,continuation);
+    return removeLastIter(predicate,codePointLength()-1,value.length()-1,continuation);
   }
 
   //////////////////////////////////////
   // skipping
   //////////////////////////////////////
 
-  private Trampoline.Bounce skipIter(Callable predicate, escm.type.Character[] chars, int i, boolean increasing, int mod, Trampoline.Continuation continuation) throws Exception {
-    if((increasing && i >= chars.length) || (!increasing && i < 0)) return continuation.run(Boolean.FALSE);
+  private Trampoline.Bounce skipIter(Callable predicate, int i, int n, int offset, Trampoline.Continuation continuation) throws Exception {
+    if(i >= n) return continuation.run(Boolean.FALSE);
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    escm.type.Character ithChar = new escm.type.Character(codepoint);
     ArrayList<Datum> args = new ArrayList<Datum>(1);
-    args.add(chars[i]);
+    args.add(ithChar);
     return predicate.callWith(args,(keepSkipping) -> () -> {
-      if(keepSkipping.isTruthy()) return skipIter(predicate,chars,i+mod,increasing,mod,continuation);
-      return continuation.run(chars[i]);
+      if(keepSkipping.isTruthy()) return skipIter(predicate,i+1,n,offset+increment,continuation);
+      return continuation.run(ithChar);
     });
   }
 
   public Trampoline.Bounce skip(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    return skipIter(predicate,toChars(),0,true,1,continuation);
+    return skipIter(predicate,0,codePointLength(),0,continuation);
+  }
+
+  private Trampoline.Bounce skipRightIter(Callable predicate, int i, int offset, Trampoline.Continuation continuation) throws Exception {
+    if(i < 0) return continuation.run(Boolean.FALSE);
+    char c = value.charAt(offset);
+    boolean at32bitUnicode = java.lang.Character.isLowSurrogate(c);
+    int codepoint = at32bitUnicode ? value.codePointAt(offset-1) : c;
+    int decrement = at32bitUnicode ? 2 : 1;
+    escm.type.Character ithChar = new escm.type.Character(codepoint);
+    ArrayList<Datum> args = new ArrayList<Datum>(1);
+    args.add(ithChar);
+    return predicate.callWith(args,(keepSkipping) -> () -> {
+      if(keepSkipping.isTruthy()) return skipRightIter(predicate,i-1,offset-decrement,continuation);
+      return continuation.run(ithChar);
+    });
   }
 
   public Trampoline.Bounce skipRight(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    escm.type.Character[] chars = toChars();
-    return skipIter(predicate,chars,chars.length-1,false,-1,continuation);
+    return skipRightIter(predicate,codePointLength()-1,value.length()-1,continuation);
   }
 
   //////////////////////////////////////
   // fold-right (unary)
   //////////////////////////////////////
 
-  private static Trampoline.Bounce foldRightIter(Callable c, Datum seed, int eltIdx, String s, Trampoline.Continuation continuation) throws Exception { // -> Datum
-    if(eltIdx >= s.codePointLength()) return continuation.run(seed);
+  private static Trampoline.Bounce foldRightIter(Callable c, Datum seed, int offset, int n, String s, Trampoline.Continuation continuation) throws Exception { // -> Datum
+    if(offset >= n) return continuation.run(seed);
     ArrayList<Datum> params = new ArrayList<Datum>(1);
-    params.add(s.charAt(eltIdx));
-    return () -> foldRightIter(c,seed,eltIdx+1,s,(acc) -> () -> {
+    int codepoint = s.value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    params.add(new escm.type.Character(codepoint));
+    return () -> foldRightIter(c,seed,offset+increment,n,s,(acc) -> () -> {
       ArrayList<Datum> args = new ArrayList<Datum>(params);
       args.add(acc);
       return c.callWith(args,continuation);
@@ -879,21 +994,23 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce foldRight(Callable c, Datum seed, Trampoline.Continuation continuation) throws Exception {
-    return foldRightIter(c,seed,0,this,continuation);
+    return foldRightIter(c,seed,0,value.length(),this,continuation);
   }
 
   //////////////////////////////////////
   // fold-right (binary+)
   //////////////////////////////////////
 
-  private static Trampoline.Bounce FoldRightArray(Callable c, Datum seed, int eltIdx, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
+  private static Trampoline.Bounce FoldRightArray(Callable c, Datum seed, int[] offsets, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
     ArrayList<Datum> params = new ArrayList<Datum>(acs.length);
     for(int i = 0; i < acs.length; ++i) {
       String s = (String)acs[i];
-      if(eltIdx >= s.codePointLength()) return continuation.run(seed);  
-      params.add(s.charAt(eltIdx));
+      if(offsets[i] >= s.value.length()) return continuation.run(seed);
+      int codepoint = s.value.codePointAt(offsets[i]);
+      params.add(new escm.type.Character(codepoint));
+      offsets[i] += java.lang.Character.charCount(codepoint); // can mutate <offsets> since never captured in a continuation (unlike <fold>)!
     }
-    return () -> FoldRightArray(c,seed,eltIdx+1,acs,(acc) -> () -> {
+    return () -> FoldRightArray(c,seed,offsets,acs,(acc) -> () -> {
       ArrayList<Datum> args = new ArrayList<Datum>(params);
       args.add(acc);
       return c.callWith(args,continuation);
@@ -902,31 +1019,35 @@ public class String extends Datum implements OrderedCollection, Callable {
 
 
   public Trampoline.Bounce FoldRightArray(Callable c, Datum seed, AssociativeCollection[] acs, Trampoline.Continuation continuation) throws Exception {
-    return FoldRightArray(c,seed,0,acs,continuation);
+    return FoldRightArray(c,seed,new int[acs.length],acs,continuation);
   }
 
   //////////////////////////////////////
   // key-right
   //////////////////////////////////////
 
-  private Trampoline.Bounce keyRight(Callable predicate, int idx, int n, Trampoline.Continuation continuation) throws Exception {
+  private Trampoline.Bounce keyRight(Callable predicate, int idx, int n, int offset, Trampoline.Continuation continuation) throws Exception {
     if(idx < 0 || idx >= n) {
       if(predicate instanceof Datum) {
         throw new Exceptionf("STRING [KEY-RIGHT]: can't find a right key from %s with predicate %s!", write(), ((Datum)predicate).profile());
       }
       throw new Exceptionf("STRING [KEY-RIGHT]: can't find a right key from %s with predicate %s!", write(), predicate);
     }
+    char c = value.charAt(offset);
+    boolean at32bitUnicode = java.lang.Character.isLowSurrogate(c);
+    int codepoint = at32bitUnicode ? value.codePointAt(offset-1) : c;
+    int decrement = at32bitUnicode ? 2 : 1;
     ArrayList<Datum> args = new ArrayList<Datum>();
-    args.add(charAt(idx));
+    args.add(new escm.type.Character(codepoint));
     return predicate.callWith(args,(shouldGetKey) -> () -> {
-      if(!shouldGetKey.isTruthy()) return keyRight(predicate,idx-1,n,continuation);
+      if(!shouldGetKey.isTruthy()) return keyRight(predicate,idx-1,n,offset-decrement,continuation);
       return continuation.run(new Exact(idx));
     });
   }
 
   public Trampoline.Bounce keyRight(Callable predicate, Trampoline.Continuation continuation) throws Exception {
     int n = codePointLength();
-    return keyRight(predicate,n-1,n,(key) -> () -> {
+    return keyRight(predicate,n-1,n,value.length()-1,(key) -> () -> {
       if(key instanceof Real) return continuation.run(key);
       if(predicate instanceof Datum) {
         throw new Exceptionf("STRING [KEY-RIGHT]: no value in %s satisfies value predicate %s", write(), ((Datum)predicate).profile());
@@ -945,32 +1066,38 @@ public class String extends Datum implements OrderedCollection, Callable {
     return slice(0,codePointLength()-length);
   }
 
-  private Trampoline.Bounce dropWhile(Callable predicate, int idx, int n, Trampoline.Continuation continuation) throws Exception {
-    if(idx >= n) return continuation.run(EMPTY_STRING);
+  private Trampoline.Bounce dropWhile(Callable predicate, int idx, int offset, int n, Trampoline.Continuation continuation) throws Exception {
+    if(offset >= n) return continuation.run(EMPTY_STRING);
     ArrayList<Datum> args = new ArrayList<Datum>(1);
-    args.add(charAt(idx));
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    args.add(new escm.type.Character(codepoint));
     return predicate.callWith(args,(keepDropping) -> () -> {
-      if(!keepDropping.isTruthy()) return continuation.run((Datum)slice(idx,n));
-      return dropWhile(predicate,idx+1,n,continuation);
+      if(!keepDropping.isTruthy()) return continuation.run((Datum)slice(idx));
+      return dropWhile(predicate,idx+1,offset+increment,n,continuation);
     });
   }
 
   public Trampoline.Bounce dropWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    return dropWhile(predicate,0,codePointLength(),continuation);
+    return dropWhile(predicate,0,0,value.length(),continuation);
   }
 
-  private Trampoline.Bounce dropRightWhile(Callable predicate, int idx, Trampoline.Continuation continuation) throws Exception {
+  private Trampoline.Bounce dropRightWhile(Callable predicate, int idx, int offset, Trampoline.Continuation continuation) throws Exception {
     if(idx < 0) return continuation.run(EMPTY_STRING);
+    char c = value.charAt(offset);
+    boolean at32bitUnicode = java.lang.Character.isLowSurrogate(c);
+    int codepoint = at32bitUnicode ? value.codePointAt(offset-1) : c;
+    int decrement = at32bitUnicode ? 2 : 1;
     ArrayList<Datum> args = new ArrayList<Datum>(1);
-    args.add(charAt(idx));
+    args.add(new escm.type.Character(codepoint));
     return predicate.callWith(args,(keepDropping) -> () -> {
       if(!keepDropping.isTruthy()) return continuation.run((Datum)slice(0,idx+1));
-      return dropRightWhile(predicate,idx-1,continuation);
+      return dropRightWhile(predicate,idx-1,offset-decrement,continuation);
     });
   }
 
   public Trampoline.Bounce dropRightWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    return dropRightWhile(predicate,codePointLength()-1,continuation);
+    return dropRightWhile(predicate,codePointLength()-1,value.length()-1,continuation);
   }
 
   //////////////////////////////////////
@@ -983,33 +1110,39 @@ public class String extends Datum implements OrderedCollection, Callable {
     return slice(n-length,n);
   }
 
-  private Trampoline.Bounce takeWhile(Callable predicate, int idx, int n, Trampoline.Continuation continuation) throws Exception {
-    if(idx >= n) return continuation.run(this);
+  private Trampoline.Bounce takeWhile(Callable predicate, int idx, int offset, int n, Trampoline.Continuation continuation) throws Exception {
+    if(offset >= n) return continuation.run(this);
     ArrayList<Datum> args = new ArrayList<Datum>(1);
-    args.add(charAt(idx));
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    args.add(new escm.type.Character(codepoint));
     return predicate.callWith(args,(keepTaking) -> () -> {
       if(!keepTaking.isTruthy()) return continuation.run((Datum)slice(0,idx));
-      return takeWhile(predicate,idx+1,n,continuation);
+      return takeWhile(predicate,idx+1,offset+increment,n,continuation);
     });
   }
 
   public Trampoline.Bounce takeWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
-    return takeWhile(predicate,0,codePointLength(),continuation);
+    return takeWhile(predicate,0,0,value.length(),continuation);
   }
 
-  private Trampoline.Bounce takeRightWhile(Callable predicate, int idx, int n, Trampoline.Continuation continuation) throws Exception {
+  private Trampoline.Bounce takeRightWhile(Callable predicate, int idx, int n, int offset, Trampoline.Continuation continuation) throws Exception {
     if(idx < 0) return continuation.run(this);
+    char c = value.charAt(offset);
+    boolean at32bitUnicode = java.lang.Character.isLowSurrogate(c);
+    int codepoint = at32bitUnicode ? value.codePointAt(offset-1) : c;
+    int decrement = at32bitUnicode ? 2 : 1;
     ArrayList<Datum> args = new ArrayList<Datum>(1);
-    args.add(charAt(idx));
+    args.add(new escm.type.Character(codepoint));
     return predicate.callWith(args,(keepTaking) -> () -> {
       if(!keepTaking.isTruthy()) return continuation.run((Datum)slice(idx+1,n));
-      return takeRightWhile(predicate,idx-1,n,continuation);
+      return takeRightWhile(predicate,idx-1,n,offset-decrement,continuation);
     });
   }
 
   public Trampoline.Bounce takeRightWhile(Callable predicate, Trampoline.Continuation continuation) throws Exception {
     int n = codePointLength();
-    return takeRightWhile(predicate,n-1,n,continuation);
+    return takeRightWhile(predicate,n-1,n,value.length()-1,continuation);
   }
 
   //////////////////////////////////////
@@ -1020,9 +1153,11 @@ public class String extends Datum implements OrderedCollection, Callable {
     return new String(lhs.value + hd.display() + rhs.value);
   }
 
-  private Trampoline.Bounce sort(Callable binaryPredicate, int idx, int n, Trampoline.Continuation continuation) throws Exception {
-    if(idx >= n) return continuation.run(EMPTY_STRING);
-    escm.type.Character hd = charAt(idx);
+  private Trampoline.Bounce sort(Callable binaryPredicate, int offset, int n, Trampoline.Continuation continuation) throws Exception {
+    if(offset >= n) return continuation.run(EMPTY_STRING);
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    escm.type.Character hd = new escm.type.Character(codepoint);
     Callable trueCondPrimitive = (params, cont) -> {
       ArrayList<Datum> args = new ArrayList<Datum>(params);
       args.add(hd);
@@ -1035,9 +1170,9 @@ public class String extends Datum implements OrderedCollection, Callable {
     };
     PrimitiveProcedure trueCond = new PrimitiveProcedure("escm-sort-in-lhs?", trueCondPrimitive);
     PrimitiveProcedure falseCond = new PrimitiveProcedure("escm-sort-in-rhs?", falseCondPrimitive);
-    return filterFrom(trueCond,idx+1,(lhs) -> () -> {
+    return filterFrom(trueCond,offset+increment,(lhs) -> () -> {
       return ((OrderedCollection)lhs).sort(binaryPredicate,(sortedLhs) -> () -> {
-        return filterFrom(falseCond,idx+1,(rhs) -> () -> {
+        return filterFrom(falseCond,offset+increment,(rhs) -> () -> {
           return ((OrderedCollection)rhs).sort(binaryPredicate,(sortedRhs) -> () -> {
             return continuation.run(mergeSortedHalves((String)sortedLhs,hd,(String)sortedRhs));
           });
@@ -1047,74 +1182,86 @@ public class String extends Datum implements OrderedCollection, Callable {
   }
 
   public Trampoline.Bounce sort(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
-    return sort(binaryPredicate,0,codePointLength(),continuation);
+    return sort(binaryPredicate,0,value.length(),continuation);
   }
 
-  private Trampoline.Bounce sorted(Callable binaryPredicate, int idx, int n, Trampoline.Continuation continuation) throws Exception {
+  private Trampoline.Bounce sorted(Callable binaryPredicate, int idx, int n, int offset, Trampoline.Continuation continuation) throws Exception {
     if(idx+1 >= n) return continuation.run(Boolean.TRUE);
     ArrayList<Datum> args = new ArrayList<Datum>(2);
-    args.add(charAt(idx));
-    args.add(charAt(idx+1));
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    args.add(new escm.type.Character(codepoint));
+    args.add(new escm.type.Character(value.codePointAt(offset+increment)));
     return binaryPredicate.callWith(args,(isEq) -> () -> {
-      if(isEq.isTruthy()) return sorted(binaryPredicate,idx+1,n,continuation);
+      if(isEq.isTruthy()) return sorted(binaryPredicate,idx+1,n,offset+increment,continuation);
       return continuation.run(Boolean.FALSE);
     });
   }
 
   public Trampoline.Bounce sorted(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
-    return sorted(binaryPredicate,0,codePointLength(),continuation);
+    return sorted(binaryPredicate,0,codePointLength(),0,continuation);
   }
 
   //////////////////////////////////////
   // merging
   //////////////////////////////////////
 
-  private static Trampoline.Bounce mergeIter(Callable binaryPredicate, String s1, String s2, int i1, int i2, int n1, int n2, Trampoline.Continuation continuation) throws Exception {
+  private static Trampoline.Bounce mergeIter(Callable binaryPredicate, String s1, String s2, int i1, int i2, int n1, int n2, int offset1, int offset2, Trampoline.Continuation continuation) throws Exception {
     if(i1 >= n1) return continuation.run((Datum)s2.slice(i2));
     if(i2 >= n2) return continuation.run((Datum)s1.slice(i1));
-    Datum s1Elt = s1.charAt(i1);
-    Datum s2Elt = s2.charAt(i2);
+    int codepoint1 = s1.value.codePointAt(offset1);
+    int increment1 = java.lang.Character.charCount(codepoint1);
+    int codepoint2 = s2.value.codePointAt(offset2);
+    int increment2 = java.lang.Character.charCount(codepoint2);
+    Datum s1Elt = new escm.type.Character(codepoint1);
+    Datum s2Elt = new escm.type.Character(codepoint2);
     ArrayList<Datum> args = new ArrayList<Datum>(2);
     args.add(s1Elt);
     args.add(s2Elt);
     return binaryPredicate.callWith(args,(lt) -> () -> {
       if(lt.isTruthy()) {
-        return mergeIter(binaryPredicate,s1,s2,i1+1,i2,n1,n2,(merged) -> () -> continuation.run(new String(s1Elt.display()+merged.display())));
+        return mergeIter(binaryPredicate,s1,s2,i1+1,i2,n1,n2,offset1+increment1,offset2,(merged) -> () -> continuation.run(new String(s1Elt.display()+merged.display())));
       }
-      return mergeIter(binaryPredicate,s1,s2,i1,i2+1,n1,n2,(merged) -> () -> continuation.run(new String(s2Elt.display()+merged.display())));
+      return mergeIter(binaryPredicate,s1,s2,i1,i2+1,n1,n2,offset1,offset2+increment2,(merged) -> () -> continuation.run(new String(s2Elt.display()+merged.display())));
     });
   }
 
   public Trampoline.Bounce merge(Callable binaryPredicate, OrderedCollection oc, Trampoline.Continuation continuation) throws Exception {
-    return mergeIter(binaryPredicate,this,(String)oc,0,0,codePointLength(),((String)oc).codePointLength(),continuation);
+    return mergeIter(binaryPredicate,this,(String)oc,0,0,codePointLength(),((String)oc).codePointLength(),0,0,continuation);
   }
 
   //////////////////////////////////////
   // duplicate neighbor deletion
   //////////////////////////////////////
 
-  private Trampoline.Bounce skipWhileHaveDuplicates(Callable binaryPredicate, Datum d, int idx, int n, Trampoline.Continuation continuation) throws Exception {
-    if(idx >= n) return continuation.run(new Exact(idx));
+  private Trampoline.Bounce skipWhileHaveDuplicates(Callable binaryPredicate, Datum d, int idx, int n, int offset, Trampoline.Continuation continuation) throws Exception {
+    if(idx >= n) return continuation.run(new Pair(new Exact(idx),new Exact(offset)));
     ArrayList<Datum> args = new ArrayList<Datum>(2);
     args.add(d);
-    args.add(charAt(idx));
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    args.add(new escm.type.Character(codepoint));
     return binaryPredicate.callWith(args,(isEq) -> () -> {
       if(isEq.isTruthy()) {
-        return skipWhileHaveDuplicates(binaryPredicate,d,idx+1,n,continuation);
+        return skipWhileHaveDuplicates(binaryPredicate,d,idx+1,n,offset+increment,continuation);
       }
-      return continuation.run(new Exact(idx));
+      return continuation.run(new Pair(new Exact(idx),new Exact(offset)));
     });
   }
 
-  private Trampoline.Bounce deleteListNeighborDuplicates(Callable binaryPredicate, int idx, int n, Trampoline.Continuation continuation) throws Exception {
+  private Trampoline.Bounce deleteListNeighborDuplicates(Callable binaryPredicate, int idx, int n, int offset, Trampoline.Continuation continuation) throws Exception {
     if(idx+1 >= n) return continuation.run((Datum)slice(idx));
-    Datum elt = charAt(idx);
-    return skipWhileHaveDuplicates(binaryPredicate,elt,idx+1,n,(idxAfterDups) -> () -> {
-      return deleteListNeighborDuplicates(binaryPredicate,((Real)idxAfterDups).intValue(),n,(deld) -> () -> continuation.run(new String(elt.display()+deld.display())));
+    int codepoint = value.codePointAt(offset);
+    int increment = java.lang.Character.charCount(codepoint);
+    Datum elt = new escm.type.Character(codepoint);
+    return skipWhileHaveDuplicates(binaryPredicate,elt,idx+1,n,offset+increment,(idxAndOffsetAfterDups) -> () -> {
+      Pair p = (Pair)idxAndOffsetAfterDups;
+      return deleteListNeighborDuplicates(binaryPredicate,((Real)p.car()).intValue(),n,((Real)p.cdr()).intValue(),
+        (deld) -> () -> continuation.run(new String(elt.display()+deld.display())));
     });
   }
 
   public Trampoline.Bounce deleteNeighborDuplicates(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
-    return deleteListNeighborDuplicates(binaryPredicate,0,codePointLength(),continuation);
+    return deleteListNeighborDuplicates(binaryPredicate,0,codePointLength(),0,continuation);
   }
 }
