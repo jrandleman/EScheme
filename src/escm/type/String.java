@@ -102,6 +102,19 @@ public class String extends Datum implements OrderedCollection, Callable {
     }
   }
 
+  public void forEachCharReverse(CharacterIterationProcedure cip) {
+    int lastIdx = value.length()-1;
+    for(int offset = lastIdx, charsIdx = lastIdx; offset >= 0; --offset, --charsIdx) {
+      char c = value.charAt(offset);
+      if(java.lang.Character.isLowSurrogate(c)) {
+        --offset;
+        if(!cip.exec(charsIdx++,new escm.type.Character(value.codePointAt(offset)))) return;
+      } else {
+        if(!cip.exec(charsIdx++,new escm.type.Character(c))) return;
+      }
+    }
+  }
+
 
   ////////////////////////////////////////////////////////////////////////////
   // EScheme Codepoint Iteration
@@ -115,6 +128,19 @@ public class String extends Datum implements OrderedCollection, Callable {
       int codepoint = value.codePointAt(offset);
       if(!cip.exec(charsIdx++,codepoint)) return;
       offset += java.lang.Character.charCount(codepoint);
+    }
+  }
+
+  public void forEachCodepointReverse(CodepointIterationProcedure cip) {
+    int lastIdx = value.length()-1;
+    for(int offset = lastIdx, charsIdx = lastIdx; offset >= 0; --offset, --charsIdx) {
+      char c = value.charAt(offset);
+      if(java.lang.Character.isLowSurrogate(c)) {
+        --offset;
+        if(!cip.exec(charsIdx++,value.codePointAt(offset))) return;
+      } else {
+        if(!cip.exec(charsIdx++,(int)c)) return;
+      }
     }
   }
 
@@ -571,18 +597,17 @@ public class String extends Datum implements OrderedCollection, Callable {
   // coercions
   //////////////////////////////////////
 
+  private static class ListBox {
+    public Datum value = Nil.VALUE;
+  }
+
   public Datum toACList() throws Exception {
-    Datum lis = escm.type.Nil.VALUE;
-    for(int offset = value.length()-1; offset >= 0; --offset) {
-      char c = value.charAt(offset);
-      if(java.lang.Character.isLowSurrogate(c)) {
-        --offset;
-        lis = new escm.type.Pair(new escm.type.Character(value.codePointAt(offset)),lis);
-      } else {
-        lis = new escm.type.Pair(new escm.type.Character(c),lis);
-      }
-    }
-    return lis;
+    ListBox lb = new ListBox();
+    forEachCharReverse((idx,chr)-> {
+      lb.value = new escm.type.Pair(chr,lb.value);
+      return true;
+    });
+    return lb.value;
   }
 
   public String toACString() throws Exception {
@@ -880,15 +905,10 @@ public class String extends Datum implements OrderedCollection, Callable {
 
   public OrderedCollection reverse() throws Exception {
     StringBuilder sb = new StringBuilder();
-    for(int offset = value.length()-1; offset >= 0; --offset) {
-      char c = value.charAt(offset);
-      if(java.lang.Character.isLowSurrogate(c)) {
-        --offset;
-        sb.append(java.lang.Character.toString(value.codePointAt(offset)));
-      } else {
-        sb.append(c);
-      }
-    }
+    forEachCodepointReverse((idx,cp) -> {
+      sb.append(java.lang.Character.toString(cp));
+      return true;
+    });
     return new String(sb.toString());
   }
 
