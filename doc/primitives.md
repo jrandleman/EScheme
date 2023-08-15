@@ -427,7 +427,7 @@
 (tail <ac>)
 
 (empty? <ac>)
-(length <ac>)
+(length <ac>) ; aliased by <len>
 (length+ <ac>) ; returns #f for dotted lists instead of throwing an error
 
 (fold <callable> <seed> <ac> ...)

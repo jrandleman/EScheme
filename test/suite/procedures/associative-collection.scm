@@ -129,6 +129,8 @@
 (ut (length "1\U00010002") 2)
 (ut (length "\U00010001\U00010002") 2)
 
+(ut eq? len length) ; verify alias
+
 (ut (length+ []) 0)
 (ut (length+ '()) 0)
 (ut (length+ {}) 0)

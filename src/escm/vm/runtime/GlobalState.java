@@ -159,6 +159,9 @@ public class GlobalState {
   private static final Symbol IS_OCP = new Symbol("oc?");
   private static final Symbol IS_ORDERED_COLLECTIONP = new Symbol("ordered-collection?");
 
+  private static final Symbol LEN = new Symbol("len");
+  private static final Symbol LENGTH = new Symbol("length");
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Get the default environment (only has EScheme's core primitives defined)
@@ -197,6 +200,7 @@ public class GlobalState {
     definitionEnvironment.define(STARSTAR,definitionEnvironment.get(EXPT));
     definitionEnvironment.define(IS_ACP,definitionEnvironment.get(IS_ASSOCIATIVE_COLLECTIONP));
     definitionEnvironment.define(IS_OCP,definitionEnvironment.get(IS_ORDERED_COLLECTIONP));
+    definitionEnvironment.define(LEN,definitionEnvironment.get(LENGTH));
     return definitionEnvironment;
   }
 };

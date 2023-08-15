@@ -30,9 +30,9 @@
   "example": null
 }, {
   "name": "length",
-  "aliases": null,
+  "aliases": ["len"],
   "signatures": ["(length <ac>)"],
-  "description": "Returns <ac>'s length.",
+  "description": "Returns <ac>'s length. Aliased by <len>.",
   "example": null
 }, {
   "name": "length+",
