@@ -144,19 +144,19 @@
   "name": "char-pair?",
   "aliases": null,
   "signatures": ["(char-pair? <char>)"],
-  "description": "Returns whether <char> is a 32bit surrogate java char pair.\nUsed to represent 32bit unicode values, such codepoints\nbecome 2 java chars once stringified.",
+  "description": "Returns whether <char> is a 32bit surrogate java char pair. Used to represent\n32bit unicode values, such codepoints become 2 java chars once stringified.\nNote that all EScheme string operations are codepoint-relative though! Hence a\nstring with a single surrogate java char pair in it will have a <length> of 1.\n\nSee <java-char?> to determine if a <char> is a 16bit unicode value, and\nsee <ascii-char?> to determine if a <char> is an ASCII value.",
   "example": null
 }, {
   "name": "java-char?",
   "aliases": null,
   "signatures": ["(java-char? <char>)"],
-  "description": "Returns whether <char> is a 16bit java char, correlating to exactly 1 char\nwithin strings.",
+  "description": "Returns whether <char> is a 16bit java char, correlating to exactly 1 char\nwithin strings under the hood. Note that all EScheme string operations are\ncodepoint-relative though! Hence a string with a single surrogate java\nchar pair in it will have a <length> of 1.\n\nSee <char-pair?> to determine if a <char> is a 32bit unicode value, and\nsee <ascii-char?> to determine if a <char> is an ASCII value.",
   "example": null
 }, {
   "name": "ascii-char?",
   "aliases": null,
   "signatures": ["(ascii-char? <char>)"],
-  "description": "Returns whether <char> is an 8bit ascii char, correlating to exactly 1 char\nwithin strings.",
+  "description": "Returns whether <char> is an 8bit ascii char, correlating to exactly 1 char\nwithin strings under the hood. Note that all EScheme string operations are\ncodepoint-relative though! Hence a string with a single surrogate java\nchar pair in it will have a <length> of 1.\n\nSee <char-pair?> to determine if a <char> is a 32bit unicode value, and\nsee <java-char?> to determine if a <char> is a 16bit unicode value.",
   "example": null
 }, {
   "name": "char-count",
