@@ -9,9 +9,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TESTS
-(ut (keyword-append :a) :a)
-(ut (keyword-append :a :b) :ab)
-(ut (keyword-append :a :b :c) :abc)
+(ut (append :a) :a)
+(ut (append :a :b) :ab)
+(ut (append :a :b :c) :abc)
 
 (ut (keyword? :abc) #t)
 (ut (keyword? #f) #f)

@@ -156,7 +156,7 @@ public class ModulePrimitives {
   //                   (list (list 'quote module-path)))))
   //           (map 
   //             (lambda (obj alias)
-  //               (list 'define alias (symbol-append hidden-module-name '. obj)))
+  //               (list 'define alias (append hidden-module-name '. obj)))
   //             (car fields) 
   //             (cdr fields)))))))
   public static class From extends PrimitiveSyntax {

@@ -566,7 +566,7 @@
 ------------------------
 ## Symbols:
 ```scheme
-(symbol-append <sym> ...)
+(append <sym> ...)
 (symbol? <obj>)
 ```
 
@@ -574,7 +574,7 @@
 ------------------------
 ## Keywords:
 ```scheme
-(keyword-append <keyword> ...)
+(append <keyword> ...)
 (keyword? <obj>)
 ```
 

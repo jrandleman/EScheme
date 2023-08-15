@@ -326,9 +326,9 @@ public class ObjectPrimitives {
   //
   // (define-syntax define-class
   //   (lambda (name . class-components)
-  //     (define obj (gensym (symbol-append name '? '-obj)))
+  //     (define obj (gensym (append name '? '-obj)))
   //     (list 'begin
-  //       (list 'define (list (symbol-append name '?) obj) (list 'and (list 'object? obj) (list 'oo-is? obj name))) ; predicate generation!
+  //       (list 'define (list (append name '?) obj) (list 'and (list 'object? obj) (list 'oo-is? obj name))) ; predicate generation!
   //       (list 'define name (cons 'class class-components)))))
   public static class DefineClass extends PrimitiveSyntax {
     public java.lang.String escmName() {
@@ -468,9 +468,9 @@ public class ObjectPrimitives {
   //
   // (define-syntax define-interface
   //   (lambda (name . interface-components)
-  //     (define obj (gensym (symbol-append name '? '-obj)))
+  //     (define obj (gensym (append name '? '-obj)))
   //     (list 'begin
-  //       (list 'define (list (symbol-append name '?) obj) (list 'and (list 'object? obj) (list 'oo-is? obj name))) ; predicate generation!
+  //       (list 'define (list (append name '?) obj) (list 'and (list 'object? obj) (list 'oo-is? obj name))) ; predicate generation!
   //       (list 'define name (cons 'interface interface-components)))))
   public static class DefineInterface extends PrimitiveSyntax {
     public java.lang.String escmName() {

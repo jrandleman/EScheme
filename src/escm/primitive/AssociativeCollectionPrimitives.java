@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
+import escm.type.Symbol;
+import escm.type.Keyword;
 import escm.type.bool.Boolean;
 import escm.type.number.Exact;
 import escm.type.number.Real;
@@ -288,11 +290,28 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "append";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      int n = parameters.size();
-      if(n == 0) return Nil.VALUE;
-      if(n == 1) return parameters.get(0);
+
+    private static Symbol appendSymbols(ArrayList<Datum> parameters) throws Exception {
+      StringBuilder sb = new StringBuilder();
+      for(Datum p : parameters) {
+        if(!(p instanceof Symbol))
+          throw new Exceptionf("'(append <symbol> ...) received a non-symbol object %s!", p.profile());
+        sb.append(((Symbol)p).value());
+      }
+      return new Symbol(sb.toString());
+    }
+
+    private static Keyword appendKeywords(ArrayList<Datum> parameters) throws Exception {
+      StringBuilder sb = new StringBuilder();
+      for(Datum p : parameters) {
+        if(!(p instanceof Keyword))
+          throw new Exceptionf("'(append <keyword> ...) received a non-keyword object %s!", p.profile());
+        sb.append(((Keyword)p).value().substring(1));
+      }
+      return new Keyword(sb.toString());
+    }
+
+    private static Datum appendAssociativeContainers(int n, ArrayList<Datum> parameters) throws Exception {
       Datum dotValue = parameters.get(n-1);
       if(!(dotValue instanceof AssociativeCollection)) {
         parameters.remove(n-1);
@@ -329,6 +348,16 @@ public class AssociativeCollectionPrimitives {
         AssociativeCollection[] acs = AssociativeCollection.parseParameters("(append <associative-collection> ...)",parameters,0);
         return (Datum)acs[0].AppendArray(acs);
       }
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      int n = parameters.size();
+      if(n == 0) return Nil.VALUE;
+      if(n == 1) return parameters.get(0);
+      Datum firstObj = parameters.get(0);
+      if(firstObj instanceof Symbol) return appendSymbols(parameters);
+      if(firstObj instanceof Keyword) return appendKeywords(parameters);
+      return appendAssociativeContainers(n,parameters);
     }
   }
 

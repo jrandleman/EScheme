@@ -9,7 +9,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TESTS
-(ut (symbol-append 'a 'b 'c) 'abc)
+(ut (append 'a) 'a)
+(ut (append 'a 'b) 'ab)
+(ut (append 'a 'b 'c) 'abc)
 
 (ut (symbol? 'abc) #t)
 (ut (symbol? #f) #f)

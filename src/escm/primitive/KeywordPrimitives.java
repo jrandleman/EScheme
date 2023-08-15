@@ -12,27 +12,6 @@ import escm.vm.type.Primitive;
 
 public class KeywordPrimitives {
   ////////////////////////////////////////////////////////////////////////////
-  // keyword-append
-  public static class KeywordAppend extends Primitive {
-    public java.lang.String escmName() {
-      return "keyword-append";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1) 
-        throw new Exceptionf("'(keyword-append <keyword> ...) requires at least 1 keyword arg: %s", Exceptionf.profileArgs(parameters));
-      StringBuilder sb = new StringBuilder();
-      for(Datum p : parameters) {
-        if(!(p instanceof Keyword))
-          throw new Exceptionf("'(keyword-append <keyword> ...) received a non-keyword object %s!", p.profile());
-        sb.append(((Keyword)p).value().substring(1));
-      }
-      return new Keyword(sb.toString());
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // keyword?
   public static class IsKeyword extends Primitive {
     public java.lang.String escmName() {
