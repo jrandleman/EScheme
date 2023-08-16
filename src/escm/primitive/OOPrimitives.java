@@ -262,14 +262,15 @@ public class OOPrimitives {
       Datum arg1 = parameters.get(0), arg2 = parameters.get(1);
       if(!(arg1 instanceof EscmObject))
         throw new Exceptionf("'(oo-is? <object> <class-or-interface>) 1st arg isn't a object: %s", Exceptionf.profileArgs(parameters));
-      if(!(arg2 instanceof EscmClass) && !(arg2 instanceof EscmInterface))
-        throw new Exceptionf("'(oo-is? <object> <class-or-interface>) 2nd arg isn't a class or interface: %s", Exceptionf.profileArgs(parameters));
       // confirm object is of the class
       if(arg2 instanceof EscmClass) {
         return Boolean.valueOf(((EscmObject)arg1).instanceOf((EscmClass)arg2));
       // confirm object implements the interface
-      } else {
+      } else if(arg2 instanceof EscmInterface) {
         return Boolean.valueOf(((EscmObject)arg1).instanceOf((EscmInterface)arg2));
+      // invalid 2nd <oo-is> arg
+      } else {
+        throw new Exceptionf("'(oo-is? <object> <class-or-interface>) 2nd arg isn't a class or interface: %s", Exceptionf.profileArgs(parameters));
       }
     }
   }
@@ -282,18 +283,13 @@ public class OOPrimitives {
       return "oo-has?";
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      // Validate Params
-      if(parameters.size() < 2) 
-        throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum mo = parameters.get(0);
-      if(!(mo instanceof MetaObject))
-        throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
+    public static ArrayList<Symbol> parseAccessChain(String primitiveSignature, int totalAccessChainParams, ArrayList<Datum> parameters) throws Exception {
       ArrayList<Symbol> accessChain = new ArrayList<Symbol>();
-      for(int i = 1, n = parameters.size(); i < n; ++i) {
-        if(!(parameters.get(i) instanceof Symbol))
-          throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) arg #%d isn't a symbol: %s", i+1, Exceptionf.profileArgs(parameters));
-        Symbol prop = (Symbol)parameters.get(i);
+      for(int i = 1; i < totalAccessChainParams; ++i) {
+        Datum d = parameters.get(i);
+        if(!(d instanceof Symbol))
+          throw new Exceptionf("'%s arg #%d isn't a symbol: %s", primitiveSignature, i+1, Exceptionf.profileArgs(parameters));
+        Symbol prop = (Symbol)d;
         if(ObjectAccessChain.is(prop)) {
           for(Symbol p : ObjectAccessChain.parse(prop)) {
             accessChain.add(p);
@@ -302,6 +298,18 @@ public class OOPrimitives {
           accessChain.add(prop);
         }
       }
+      return accessChain;
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      // Validate Params
+      int totalParameters = parameters.size();
+      if(totalParameters < 2) 
+        throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum mo = parameters.get(0);
+      if(!(mo instanceof MetaObject))
+        throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
+      ArrayList<Symbol> accessChain = parseAccessChain("(oo-has? <meta-object> <property-symbol-name> ...)",totalParameters,parameters);
       // "has?" Logic
       MetaObject obj = (MetaObject)mo;
       for(int i = 0, n = accessChain.size(); i < n; ++i) {
@@ -327,24 +335,13 @@ public class OOPrimitives {
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       // Validate Params
-      if(parameters.size() < 2) 
+      int totalParameters = parameters.size();
+      if(totalParameters < 2) 
         throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum mo = parameters.get(0);
       if(!(mo instanceof MetaObject))
         throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<Symbol> accessChain = new ArrayList<Symbol>();
-      for(int i = 1, n = parameters.size(); i < n; ++i) {
-        if(!(parameters.get(i) instanceof Symbol))
-          throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) arg #%d isn't a symbol: %s", i+1, Exceptionf.profileArgs(parameters));
-        Symbol prop = (Symbol)parameters.get(i);
-        if(ObjectAccessChain.is(prop)) {
-          for(Symbol p : ObjectAccessChain.parse(prop)) {
-            accessChain.add(p);
-          }
-        } else {
-          accessChain.add(prop);
-        }
-      }
+      ArrayList<Symbol> accessChain = OoHas.parseAccessChain("(oo-get <meta-object> <property-symbol-name> ...)",totalParameters,parameters);
       // "get" Logic
       for(int i = 0, n = accessChain.size(); i < n; ++i) {
         MetaObject obj = (MetaObject)mo;
@@ -367,43 +364,35 @@ public class OOPrimitives {
       return "oo-set!";
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      // Validate Params
-      if(parameters.size() < 3) 
-        throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) expects at least 3 args: %s", Exceptionf.profileArgs(parameters));
-      Datum mo = parameters.get(0);
-      if(!(mo instanceof MetaObject))
-        throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<Symbol> accessChain = new ArrayList<Symbol>();
-      for(int i = 1, n = parameters.size(); i < n-1; ++i) {
-        if(!(parameters.get(i) instanceof Symbol))
-          throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) arg #%d isn't a symbol: %s", i+1, Exceptionf.profileArgs(parameters));
-        Symbol prop = (Symbol)parameters.get(i);
-        if(ObjectAccessChain.is(prop)) {
-          for(Symbol p : ObjectAccessChain.parse(prop)) {
-            accessChain.add(p);
-          }
-        } else {
-          accessChain.add(prop);
-        }
-      }
-      Datum newValue = parameters.get(parameters.size()-1);
-      // "set!" Logic
+    public static Symbol getLastProp(String primitiveName, Datum mo, ArrayList<Symbol> accessChain, ArrayList<Datum> parameters) throws Exception {
       int n = accessChain.size()-1;
       for(int i = 0; i < n; ++i) {
         MetaObject obj = (MetaObject)mo;
         Symbol prop = accessChain.get(i);
         if(!obj.has(prop))
-          throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", prop, Exceptionf.profileArgs(parameters));
+          throw new Exceptionf("'(%s <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", primitiveName, prop, Exceptionf.profileArgs(parameters));
         mo = obj.get(prop);
         if(!(mo instanceof MetaObject))
-          throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) object property '%s isn't a meta-object: %s", prop, Exceptionf.profileArgs(parameters));
+          throw new Exceptionf("'(%s <meta-object> <property-symbol-name> ... <value>) object property '%s isn't a meta-object: %s", primitiveName, prop, Exceptionf.profileArgs(parameters));
       }
-      Symbol lastProp = accessChain.get(n);
+      return accessChain.get(n);
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      // Validate Params
+      int totalParameters = parameters.size();
+      if(totalParameters < 3) 
+        throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) expects at least 3 args: %s", Exceptionf.profileArgs(parameters));
+      Datum mo = parameters.get(0);
+      if(!(mo instanceof MetaObject))
+        throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
+      ArrayList<Symbol> accessChain = OoHas.parseAccessChain("(oo-set! <meta-object> <property-symbol-name> ... <value>)",totalParameters-1,parameters);
+      // "set!" Logic
+      Symbol lastProp = getLastProp("oo-set!",mo,accessChain,parameters);
       MetaObject obj = (MetaObject)mo;
       if(!obj.has(lastProp))
         throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", lastProp, Exceptionf.profileArgs(parameters));
-      obj.set(lastProp,newValue);
+      obj.set(lastProp,parameters.get(totalParameters-1));
       return Void.VALUE;
     }
   }
@@ -418,38 +407,16 @@ public class OOPrimitives {
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       // Validate Params
-      if(parameters.size() < 3) 
+      int totalParameters = parameters.size();
+      if(totalParameters < 3) 
         throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) expects at least 3 args: %s", Exceptionf.profileArgs(parameters));
       Datum mo = parameters.get(0);
       if(!(mo instanceof MetaObject))
         throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<Symbol> accessChain = new ArrayList<Symbol>();
-      for(int i = 1, n = parameters.size(); i < n-1; ++i) {
-        if(!(parameters.get(i) instanceof Symbol))
-          throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) arg #%d isn't a symbol: %s", i+1, Exceptionf.profileArgs(parameters));
-        Symbol prop = (Symbol)parameters.get(i);
-        if(ObjectAccessChain.is(prop)) {
-          for(Symbol p : ObjectAccessChain.parse(prop)) {
-            accessChain.add(p);
-          }
-        } else {
-          accessChain.add(prop);
-        }
-      }
-      Datum newValue = parameters.get(parameters.size()-1);
+      ArrayList<Symbol> accessChain = OoHas.parseAccessChain("(oo-define <meta-object> <property-symbol-name> ... <value>)",totalParameters-1,parameters);
       // "define" Logic
-      int n = accessChain.size()-1;
-      for(int i = 0; i < n; ++i) {
-        MetaObject obj = (MetaObject)mo;
-        Symbol prop = accessChain.get(i);
-        if(!obj.has(prop))
-          throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", prop, Exceptionf.profileArgs(parameters));
-        mo = obj.get(prop);
-        if(!(mo instanceof MetaObject))
-          throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) object property '%s isn't a meta-object: %s", prop, Exceptionf.profileArgs(parameters));
-      }
-      Symbol definedProp = accessChain.get(n);
-      ((MetaObject)mo).define(definedProp,newValue);
+      Symbol definedProp = OoSetBang.getLastProp("oo-define",mo,accessChain,parameters);
+      ((MetaObject)mo).define(definedProp,parameters.get(totalParameters-1));
       return Void.VALUE;
     }
   }
