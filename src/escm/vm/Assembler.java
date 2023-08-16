@@ -59,7 +59,7 @@ public class Assembler {
 
 
   private static boolean instructionIsUnary(Pair instruction) {
-    return instruction.cdr() instanceof Pair && ((Pair)instruction.cdr()).cdr() instanceof Nil;
+    return instruction.length() == 2;
   }
 
 

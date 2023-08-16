@@ -24,6 +24,26 @@ public class ObjectAccessChain extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Implementing Object Access Chain Parsing:
   //   'obj.prop1.prop2 => ['obj, 'prop1, 'prop2]
+  private static void validateObjectAccessChain(ArrayList<Symbol> accessChain, Symbol originalSymbol) throws Exception {
+    if(accessChain.size() < 2) {
+      if(originalSymbol.hasSourceInformation()) {
+        throw new Exceptionf("ObjectAccessChain: Invalid object access (%s) can't start or end with a period!\n>> Location: %s", originalSymbol.value(), originalSymbol.source());
+      } else {
+        throw new Exceptionf("ObjectAccessChain: Invalid object access (%s) can't start or end with a period!", originalSymbol.value());
+      }
+    }
+    for(Symbol access : accessChain) {
+      if(access.value().length() == 0) {
+        if(originalSymbol.hasSourceInformation()) {
+          throw new Exceptionf("ObjectAccessChain: Invalid object access (%s) can't contain sequential periods!\n>> Location: %s", originalSymbol.value(), originalSymbol.source());
+        } else {
+          throw new Exceptionf("ObjectAccessChain: Invalid object access (%s) can't contain sequential periods!", originalSymbol.value());
+        }
+      }
+    }
+  }
+
+
   private static long updatedColumnNumber(String[] accessChainStrings, int currentProperty, long originalColumnNumber) {
     for(int i = 0; i < currentProperty; ++i)
       originalColumnNumber += accessChainStrings[i].length()+1;
@@ -49,7 +69,7 @@ public class ObjectAccessChain extends Datum {
       for(int i = 0; i < accessChainStrings.length; ++i)
         accessChain.add(new Symbol(accessChainStrings[i]));
     }
-    validateObjectAccessChain(accessChain,accessChainSymbol);
+    validateObjectAccessChain(accessChain,accessChainSymbol); // won't trigger if <is(accessChainSymbol)>
     return accessChain;
   }
 
@@ -57,17 +77,19 @@ public class ObjectAccessChain extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Implementing Object Access Chain Checking 
   //   => Symbol contains a "." and isn't entirely made of "."s
-  public static boolean is(String accessChainString) {
-    if(accessChainString.contains(".")) {
-      for(int i = 0, n = accessChainString.length(); i < n; ++i) {
-        if(accessChainString.charAt(i) != '.') return true;
-      }
+  public static boolean is(String accessChain) {
+    int i = 0, n = accessChain.length();
+    while(i < n && accessChain.charAt(i) != '.') ++i;
+    if(i == 0 || i == n) return false;
+    while(i < n) {
+      if(accessChain.charAt(i) == '.' && (i == n-1 || accessChain.charAt(i+1) == '.')) return false;
+      ++i;
     }
-    return false;
+    return true;
   }
 
-  public static boolean is(Symbol accessChainString) {
-    return is(accessChainString.value());
+  public static boolean is(Symbol accessChain) {
+    return is(accessChain.value());
   }
 
 
@@ -85,28 +107,8 @@ public class ObjectAccessChain extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  private static void validateObjectAccessChain(ArrayList<Symbol> accessChain, Symbol originalSymbol) throws Exception {
-    if(accessChain.size() < 2) {
-      if(originalSymbol.hasSourceInformation()) {
-        throw new Exceptionf("ObjectAccessChain: Invalid object access (%s) can't start or end with a period!\n>> Location: %s", originalSymbol.value(), originalSymbol.source());
-      } else {
-        throw new Exceptionf("ObjectAccessChain: Invalid object access (%s) can't start or end with a period!", originalSymbol.value());
-      }
-    }
-    for(Symbol access : accessChain) {
-      if(access.value().length() == 0) {
-        if(originalSymbol.hasSourceInformation()) {
-          throw new Exceptionf("ObjectAccessChain: Invalid object access (%s) can't contain sequential periods!\n>> Location: %s", originalSymbol.value(), originalSymbol.source());
-        } else {
-          throw new Exceptionf("ObjectAccessChain: Invalid object access (%s) can't contain sequential periods!", originalSymbol.value());
-        }
-      }
-    }
-  }
-
   public ObjectAccessChain(Symbol s) throws Exception {
     value = parse(s);
-    validateObjectAccessChain(value,s);
   }
 
 
