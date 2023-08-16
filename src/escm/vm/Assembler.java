@@ -122,9 +122,8 @@ public class Assembler {
     Pair paramsPair = (Pair)params;
     // Unary variadic (if the "param list" is of 2 symbols with the first as the "." symbol)
     Symbol variadicParam = parseUnaryVariadicParameter(paramsPair);
-    if(variadicParam != null) {
+    if(variadicParam != null)
       return new escm.util.Pair<ArrayList<Symbol>,Symbol>(new ArrayList<Symbol>(),variadicParam);
-    }
     // Parse params
     ArrayList<Symbol> parameters = new ArrayList<Symbol>();
     while(params instanceof Pair) {

@@ -81,10 +81,7 @@ public class Reader {
   ////////////////////////////////////////////////////////////////////////////
   // Reader Shorthand Literal Parsing Helpers
   public static boolean isReaderShorthand(char c) {
-    if(c == '\'') return true;
-    if(c == '`') return true;
-    if(c == ',') return true;
-    return false;
+    return c == '\'' || c == '`' || c == ',';
   }
 
 
@@ -100,15 +97,16 @@ public class Reader {
   // @return: pair of parsed reader shorthand literal expansion & position in <sourceCode> after the parsed literal
   private static Pair<Datum,Integer> parseReaderShorthandLiteral(CharSequence sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
     SourceInformation shorthandSource = source.clone();
-    if(sourceCode.charAt(i) == '\'') {
+    char currentChar = sourceCode.charAt(i);
+    if(currentChar == '\'') {
       source.updatePosition('\'');
       return parseReaderShorthandLiteralLogic(sourceCode,"quote",i,i+1,containerStack,source,shorthandSource,ignoringIncomplete);
     }
-    if(sourceCode.charAt(i) == '`') {
+    if(currentChar == '`') {
       source.updatePosition('`');
       return parseReaderShorthandLiteralLogic(sourceCode,"quasiquote",i,i+1,containerStack,source,shorthandSource,ignoringIncomplete);
     }
-    if(sourceCode.charAt(i) == ',') {
+    if(currentChar == ',') {
       source.updatePosition(',');
       if(i+1 < n && sourceCode.charAt(i+1) == '@') {
         source.updatePosition('@');
@@ -134,11 +132,11 @@ public class Reader {
 
 
   // @return: 0: nothing, -1: variadic, else: param #
-  private static int parseParam(Symbol s) {
-    if(s.value().length() == 0 || s.value().charAt(0) != '%') return 0;
-    if(s.value().equals("%%")) return -1;
+  private static int parseParam(String s) {
+    if(s.length() == 0 || s.charAt(0) != '%') return 0;
+    if(s.equals("%%")) return -1;
     int result = 0;
-    try { result = Integer.parseInt(s.value().substring(1)); } catch (Exception e) {}
+    try { result = Integer.parseInt(s.substring(1)); } catch (Exception e) {}
     if(result <= 0) return 0;
     return result;
   }
@@ -154,7 +152,7 @@ public class Reader {
   // @return: Pair<>(numberOfParamsFound, variadicParam)
   private static Pair<Integer,String> parseParams(Datum body) {
     if(body instanceof Symbol) {
-      int result = parseParam((Symbol)body);
+      int result = parseParam(((Symbol)body).value());
       switch(result) {
         case -1: return new Pair<Integer,String>(0,"%%");
         case 0:  return null;
@@ -210,8 +208,11 @@ public class Reader {
     boolean isDotted = false;
     for(int i = 0, n = arr.size(); i < n; ++i) {
       if(isPeriodSymbol(arr.get(i))) {
-        if(i+2 != n) throw new ReaderException(listIndex, sourceCode, listSource, "READ ERROR: Invalid list literal: \".\" MUST be the penultimate symbol!");
-        isDotted = true; // "(. <obj>)" is equivalent to "<obj>" for the reader
+        isDotted = i+2 == n;
+        if(!isDotted && i+1 != n) {
+          // we support "." as the final symbol to allow "(quote .)"
+          throw new ReaderException(listIndex, sourceCode, listSource, "READ ERROR: Invalid list literal: \".\" MUST be the penultimate or final symbol!");
+        }
       }
     }
     return isDotted;
@@ -227,8 +228,9 @@ public class Reader {
     } else {
       arr.add(Nil.VALUE); // add NIL at the end of the sequence
     }
-    Datum list = arr.get(arr.size()-1);
-    for(int i = arr.size()-2; i >= 0; --i)
+    int n = arr.size();
+    Datum list = arr.get(n-1);
+    for(int i = n-2; i >= 0; --i)
       list = new escm.type.Pair(arr.get(i),list);
     return list;
   }
@@ -449,8 +451,9 @@ public class Reader {
     StringBuilder sb = new StringBuilder();
     source.updatePosition('"');
     while(i < n) {
-      source.updatePosition(sourceCode.charAt(i));
-      if(sourceCode.charAt(i) == '"') {
+      char currentChar = sourceCode.charAt(i);
+      source.updatePosition(currentChar);
+      if(currentChar == '"') {
         // verify a non-escaped quote
         int j = i-1, escapeCount = 0;
         while(j >= start && sourceCode.charAt(j) == '\\') {
@@ -460,10 +463,10 @@ public class Reader {
         if(escapeCount % 2 == 0) { // non-escaped <">
           return new Pair<Datum,Integer>(new escm.type.String(StringParser.unescape(sb.toString())),i+1);
         } else { // escaped <">
-          sb.append(sourceCode.charAt(i));
+          sb.append(currentChar);
         }
       } else {
-        sb.append(sourceCode.charAt(i));
+        sb.append(currentChar);
       }
       ++i;
     }
@@ -557,35 +560,34 @@ public class Reader {
   private static Pair<Datum,Integer> readLoop(CharSequence sourceCode, int startIndex, Stack<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
 
     for(int i = startIndex, n = sourceCode.length(); i < n; ++i) {
+      char currentChar = sourceCode.charAt(i);
 
       // Account for paren scoping
-      if(sourceCode.charAt(i) == '(') {
+      if(currentChar == '(') {
         containerStack.push('(');
-      } else if(sourceCode.charAt(i) == ')') {
+      } else if(currentChar == ')') {
         if(containerStack.empty())
           throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid parenthesis: found a ')' prior an associated '('!");
         char opener = containerStack.pop();
         if(opener != '(')
           throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid parenthesis: found a closing ')' prior to closing '%c'!", opener);
         return new Pair<Datum,Integer>(null,i);
-      }
 
       // Account for bracket scoping
-      if(sourceCode.charAt(i) == '[') {
+      } else if(currentChar == '[') {
         containerStack.push('[');
-      } else if(sourceCode.charAt(i) == ']') {
+      } else if(currentChar == ']') {
         if(containerStack.empty())
           throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid bracket: found a ']' prior an associated '['!");
         char opener = containerStack.pop();
         if(opener != '[')
           throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid bracket: found a closing ']' prior to closing '%c'!", opener);
         return new Pair<Datum,Integer>(null,i);
-      }
 
       // Account for curly-brace scoping
-      if(sourceCode.charAt(i) == '{') {
+      } else if(currentChar == '{') {
         containerStack.push('{');
-      } else if(sourceCode.charAt(i) == '}') {
+      } else if(currentChar == '}') {
         if(containerStack.empty())
           throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid curly-brace: found a '}' prior an associated '{'!");
         char opener = containerStack.pop();
@@ -595,13 +597,13 @@ public class Reader {
       }
 
       // Ignore whitespace
-      if(Character.isWhitespace(sourceCode.charAt(i))) {
-        source.updatePosition(sourceCode.charAt(i));
+      if(Character.isWhitespace(currentChar)) {
+        source.updatePosition(currentChar);
         continue;
       }
 
       // Skip comments
-      if(sourceCode.charAt(i) == ';') {
+      if(currentChar == ';') {
         while(i < n && sourceCode.charAt(i) != '\n') {
           source.updatePosition(sourceCode.charAt(i));
           ++i;
@@ -617,26 +619,26 @@ public class Reader {
       }
 
       // Expand reader shorthand literals
-      if(isReaderShorthand(sourceCode.charAt(i))) 
+      if(isReaderShorthand(currentChar)) 
         return parseReaderShorthandLiteral(sourceCode,i,n,containerStack,source,ignoringIncomplete);
 
       // Parse List/Pair
-      if(sourceCode.charAt(i) == '(') {
+      if(currentChar == '(') {
         return parseListLiteral(sourceCode,i+1,n,containerStack,source,ignoringIncomplete);
       }
 
       // Parse Vector
-      if(sourceCode.charAt(i) == '[') {
+      if(currentChar == '[') {
         return parseVectorLiteral(sourceCode,i+1,n,containerStack,source,ignoringIncomplete);
       }
 
       // Parse Hashmap
-      if(sourceCode.charAt(i) == '{') {
+      if(currentChar == '{') {
         return parseHashmapLiteral(sourceCode,i+1,n,containerStack,source,ignoringIncomplete);
       }
 
       // Check for atomic-value literals
-      if(sourceCode.charAt(i) == '#') {
+      if(currentChar == '#') {
         // Parse Boolean Literals
         if(isBooleanLiteral(sourceCode,i,n)) 
           return parseBooleanLiteral(sourceCode,i,source);
@@ -659,12 +661,12 @@ public class Reader {
       }
 
       // Parse String Literals
-      if(sourceCode.charAt(i) == '"') {
+      if(currentChar == '"') {
         return parseStringLiteral(sourceCode,i+1,n,source,ignoringIncomplete);
       }
 
       // Parse Keyword Literals
-      if(sourceCode.charAt(i) == ':') {
+      if(currentChar == ':') {
         source.updatePosition(':');
         return parseKeywordLiteral(sourceCode,i+1,n,source);
       }

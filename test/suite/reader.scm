@@ -65,8 +65,11 @@
 (ut (string? "") #t)
 (ut (string? "a") #t)
 (ut (string? "\"") #t)
-(ut (string? "\n\t\f\r\b") #t)
 (ut (string? "\\") #t)
+(ut (string? "\\\"") #t)
+(ut (string? "\\\\") #t)
+(ut (string? "\\\\\"") #t)
+(ut (string? "\n\t\f\r\b") #t)
 (ut (string? "\u0041") #t)
 (ut (string? "\U0001F525") #t) ; extended unicode syntax
 (ut (string? "\U0001f525") #t) ; extended unicode syntax
