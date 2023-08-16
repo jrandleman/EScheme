@@ -29,32 +29,26 @@ public class Assembler {
   ////////////////////////////////////////////////////////////////////////////
   // Instruction identification
   private static int getInstructionIndex(Datum instruction, String s) throws Exception {
-    if(s.equals("define"))       return Instruction.DEFINE;
-    if(s.equals("set!"))         return Instruction.SET;
-
-    if(s.equals("defined?"))     return Instruction.DEFINEDP;
-
-    if(s.equals("ifn"))          return Instruction.IFN;
-    if(s.equals("jump"))         return Instruction.JUMP;
-
-    if(s.equals("load"))         return Instruction.LOAD;
-    if(s.equals("load-symbol"))  return Instruction.LOAD_SYMBOL;
-
-    if(s.equals("call"))         return Instruction.CALL;
-
-    if(s.equals("push"))         return Instruction.PUSH;
-    if(s.equals("pop"))          return Instruction.POP;
-
-    if(s.equals("return"))       return Instruction.RETURN;
-
-    if(s.equals("load-closure")) return Instruction.Pseudo.LOAD_CLOSURE;
-
-    throw new Exceptionf("ASM ERROR: %s isn't a valid bytecode instruction/syntax!", instruction.profile());
+    switch(s) {
+      case "define":       return Instruction.DEFINE;
+      case "set!":         return Instruction.SET;
+      case "defined?":     return Instruction.DEFINEDP;
+      case "ifn":          return Instruction.IFN;
+      case "jump":         return Instruction.JUMP;
+      case "load":         return Instruction.LOAD;
+      case "load-symbol":  return Instruction.LOAD_SYMBOL;
+      case "call":         return Instruction.CALL;
+      case "push":         return Instruction.PUSH;
+      case "pop":          return Instruction.POP;
+      case "return":       return Instruction.RETURN;
+      case "load-closure": return Instruction.Pseudo.LOAD_CLOSURE;
+      default: throw new Exceptionf("ASM ERROR: %s isn't a valid bytecode instruction/syntax!", instruction.profile());
+    }
   }
 
 
   private static boolean instructionIsNullary(Pair instruction) {
-    return instruction.cdr() instanceof Nil;
+    return instruction.length() == 1;
   }
 
 
@@ -101,6 +95,20 @@ public class Assembler {
   }
 
 
+  private static boolean isPeriodSymbol(Datum s) {
+    return s instanceof Symbol && ((Symbol)s).value().equals(".");
+  }
+
+
+  // Returns <null> if <params> isn't variadic
+  private static Symbol parseUnaryVariadicParameter(Pair params) {
+    if(params.length() != 2 || !isPeriodSymbol(params.car())) return null;
+    Datum variadicSymbol = ((Pair)params.cdr()).car();
+    if(variadicSymbol instanceof Symbol) return (Symbol)variadicSymbol;
+    return null;
+  }
+
+
   private static escm.util.Pair<ArrayList<Symbol>,Symbol> parseSyntaxParameters(Pair instruction, Datum params) throws Exception {
     // No params
     if(params instanceof Nil) 
@@ -112,9 +120,10 @@ public class Assembler {
     if(!(params instanceof Pair))
       throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
     Pair paramsPair = (Pair)params;
-    // Unary variadic (if the "param list" is of 2 items with the first as the "." symbol)
-    if(paramsPair.car() instanceof Symbol && ((Symbol)paramsPair.car()).value().equals(".")) {
-      return new escm.util.Pair<ArrayList<Symbol>,Symbol>(new ArrayList<Symbol>(),(Symbol)paramsPair.car());
+    // Unary variadic (if the "param list" is of 2 symbols with the first as the "." symbol)
+    Symbol variadicParam = parseUnaryVariadicParameter(paramsPair);
+    if(variadicParam != null) {
+      return new escm.util.Pair<ArrayList<Symbol>,Symbol>(new ArrayList<Symbol>(),variadicParam);
     }
     // Parse params
     ArrayList<Symbol> parameters = new ArrayList<Symbol>();
@@ -142,7 +151,8 @@ public class Assembler {
     ArrayList<ArrayList<Instruction>> instructionsList = new ArrayList<ArrayList<Instruction>>();
     Datum iterator = instruction.cdr();
     while(iterator instanceof Pair) {
-      Datum clause = ((Pair)iterator).car();
+      Pair iteratorPair = (Pair)iterator;
+      Datum clause = iteratorPair.car();
       if(!(clause instanceof Pair))
         throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
       Pair clausePair = (Pair)clause;
@@ -150,7 +160,7 @@ public class Assembler {
       paramsList.add(params.first);
       variadicParamList.add(params.second);
       instructionsList.add(run(clausePair.cdr()));
-      iterator = ((Pair)iterator).cdr();
+      iterator = iteratorPair.cdr();
     }
     return new SyntaxComponents(paramsList,variadicParamList,instructionsList);
   }
@@ -213,10 +223,10 @@ public class Assembler {
         Datum arg = getInstructionArgument(instructionPair);
         if(!(arg instanceof Real) || !((Real)arg).isInteger())
           throw new Exceptionf("ASM ERROR: \"if\" instruction %s must have an integer arg!", instruction.profile());
-        int branchAmount = ((Real)arg).intValue();
-        if(branchAmount == 0)
+        Real branchAmount = (Real)arg;
+        if(branchAmount.isZero())
           throw new Exceptionf("ASM ERROR: \"if\" instruction %s must have a non-0 arg!", instruction.profile());
-        return new Instruction(Instruction.IFN,new Inexact(branchAmount));
+        return new Instruction(Instruction.IFN,new Inexact(branchAmount.doubleValue()));
       }
 
       ////////////////////////////////////////////////////////////////////////
@@ -225,11 +235,10 @@ public class Assembler {
         Datum arg = getInstructionArgument(instructionPair);
         if(!(arg instanceof Real) || !((Real)arg).isInteger())
           throw new Exceptionf("ASM ERROR: \"jump\" instruction %s must have an integer arg!", instruction.profile());
-        int branchAmount = ((Real)arg).intValue();
-        if(branchAmount == 0)
-        if(branchAmount == 0)
+        Real branchAmount = (Real)arg;
+        if(branchAmount.isZero())
           throw new Exceptionf("ASM ERROR: \"jump\" instruction %s must have a non-0 arg!", instruction.profile());
-        return new Instruction(Instruction.JUMP,new Inexact(branchAmount));
+        return new Instruction(Instruction.JUMP,new Inexact(branchAmount.doubleValue()));
       }
 
       ////////////////////////////////////////////////////////////////////////
@@ -258,8 +267,9 @@ public class Assembler {
       // (load-closure (<arg> ...) <instruction> ...)
       case Instruction.Pseudo.LOAD_CLOSURE: {
         SyntaxComponents components = parseSyntaxComponents(instructionPair);
-        for(ArrayList<Instruction> instructions : components.instructionsList)
+        for(ArrayList<Instruction> instructions : components.instructionsList) {
           boundBranchAmounts(instructions);
+        }
         CompoundProcedure compoundProcedure = new CompoundProcedure(components.paramsList,components.variadicParamList,components.instructionsList);
         return new Instruction(Instruction.LOAD,compoundProcedure);
       }
