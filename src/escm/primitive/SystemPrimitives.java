@@ -333,8 +333,8 @@ public class SystemPrimitives {
 
     public static Symbol logic(Symbol modulePath) throws Exception {
       if(ObjectAccessChain.is(modulePath)) {
-        ArrayList<Symbol> path = ObjectAccessChain.parse(modulePath);
-        return path.get(path.size()-1);
+        Symbol[] path = ObjectAccessChain.parse(modulePath);
+        return path[path.length-1];
       } 
       return modulePath;
     }
@@ -368,17 +368,17 @@ public class SystemPrimitives {
       return Path.of(s1+File.separator+s2);
     }
 
-    private static ArrayList<Symbol> getModulePathSymbols(Symbol modulePath) throws Exception {
+    private static Symbol[] getModulePathSymbols(Symbol modulePath) throws Exception {
       if(ObjectAccessChain.is(modulePath)) return ObjectAccessChain.parse(modulePath);
-      ArrayList<Symbol> path = new ArrayList<Symbol>();
-      path.add(modulePath);
+      Symbol[] path = new Symbol[1];
+      path[0] = modulePath;
       return path;
     }
 
-    private static String createModuleDirectoryString(ArrayList<Symbol> modulePath) {
+    private static String createModuleDirectoryString(Symbol[] modulePath) {
       StringBuilder path = new StringBuilder(File.separator);
-      for(int i = 0, n = modulePath.size()-1; i < n; ++i) {
-        path.append(modulePath.get(i).value());
+      for(int i = 0, n = modulePath.length-1; i < n; ++i) {
+        path.append(modulePath[i].value());
         path.append(File.separator);
       }
       return path.toString();
@@ -400,7 +400,7 @@ public class SystemPrimitives {
       return null;
     }
 
-    private static String getModuleAbsoluteFilePath(String moduleName, ArrayList<Symbol> modulePath, String filePath, ArrayList<Datum> parameters) throws Exception {
+    private static String getModuleAbsoluteFilePath(String moduleName, Symbol[] modulePath, String filePath, ArrayList<Datum> parameters) throws Exception {
       Path moduleDirectoryPath = Path.of(createModuleDirectoryString(modulePath));
       Path moduleAbsolutePath = Path.of(FilePrimitives.AbsolutePath.logic(filePath));
       while(moduleAbsolutePath != null) {
@@ -457,8 +457,8 @@ public class SystemPrimitives {
         filePath = ((escm.type.String)parameters.get(0)).value();
         moduleName = (Symbol)parameters.get(1);
       }
-      ArrayList<Symbol> symbolicPath = getModulePathSymbols(moduleName);
-      String moduleStringName = symbolicPath.get(symbolicPath.size()-1).value();
+      Symbol[] symbolicPath = getModulePathSymbols(moduleName);
+      String moduleStringName = symbolicPath[symbolicPath.length-1].value();
       String absoluteFilePath = getModuleAbsoluteFilePath(moduleStringName,symbolicPath,filePath,parameters);
       return logic("escm-load-module",false,moduleStringName,absoluteFilePath,continuation);
     }

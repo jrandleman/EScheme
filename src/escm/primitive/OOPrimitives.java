@@ -316,7 +316,9 @@ public class OOPrimitives {
           throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) arg #%d isn't a symbol: %s", i+1, Exceptionf.profileArgs(parameters));
         Symbol prop = (Symbol)parameters.get(i);
         if(ObjectAccessChain.is(prop)) {
-          accessChain.addAll(ObjectAccessChain.parse(prop));
+          for(Symbol p : ObjectAccessChain.parse(prop)) {
+            accessChain.add(p);
+          }
         } else {
           accessChain.add(prop);
         }
@@ -357,7 +359,9 @@ public class OOPrimitives {
           throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) arg #%d isn't a symbol: %s", i+1, Exceptionf.profileArgs(parameters));
         Symbol prop = (Symbol)parameters.get(i);
         if(ObjectAccessChain.is(prop)) {
-          accessChain.addAll(ObjectAccessChain.parse(prop));
+          for(Symbol p : ObjectAccessChain.parse(prop)) {
+            accessChain.add(p);
+          }
         } else {
           accessChain.add(prop);
         }
@@ -397,7 +401,9 @@ public class OOPrimitives {
           throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) arg #%d isn't a symbol: %s", i+1, Exceptionf.profileArgs(parameters));
         Symbol prop = (Symbol)parameters.get(i);
         if(ObjectAccessChain.is(prop)) {
-          accessChain.addAll(ObjectAccessChain.parse(prop));
+          for(Symbol p : ObjectAccessChain.parse(prop)) {
+            accessChain.add(p);
+          }
         } else {
           accessChain.add(prop);
         }
@@ -443,7 +449,9 @@ public class OOPrimitives {
           throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) arg #%d isn't a symbol: %s", i+1, Exceptionf.profileArgs(parameters));
         Symbol prop = (Symbol)parameters.get(i);
         if(ObjectAccessChain.is(prop)) {
-          accessChain.addAll(ObjectAccessChain.parse(prop));
+          for(Symbol p : ObjectAccessChain.parse(prop)) {
+            accessChain.add(p);
+          }
         } else {
           accessChain.add(prop);
         }

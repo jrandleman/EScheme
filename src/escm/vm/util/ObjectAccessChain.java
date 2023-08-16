@@ -10,8 +10,6 @@
 
 package escm.vm.util;
 import java.util.Objects;
-import java.util.ArrayList;
-import java.util.Arrays;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.oo.Dottable;
@@ -24,26 +22,6 @@ public class ObjectAccessChain extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Implementing Object Access Chain Parsing:
   //   'obj.prop1.prop2 => ['obj, 'prop1, 'prop2]
-  private static void validateObjectAccessChain(ArrayList<Symbol> accessChain, Symbol originalSymbol) throws Exception {
-    if(accessChain.size() < 2) {
-      if(originalSymbol.hasSourceInformation()) {
-        throw new Exceptionf("ObjectAccessChain: Invalid object access (%s) can't start or end with a period!\n>> Location: %s", originalSymbol.value(), originalSymbol.source());
-      } else {
-        throw new Exceptionf("ObjectAccessChain: Invalid object access (%s) can't start or end with a period!", originalSymbol.value());
-      }
-    }
-    for(Symbol access : accessChain) {
-      if(access.value().length() == 0) {
-        if(originalSymbol.hasSourceInformation()) {
-          throw new Exceptionf("ObjectAccessChain: Invalid object access (%s) can't contain sequential periods!\n>> Location: %s", originalSymbol.value(), originalSymbol.source());
-        } else {
-          throw new Exceptionf("ObjectAccessChain: Invalid object access (%s) can't contain sequential periods!", originalSymbol.value());
-        }
-      }
-    }
-  }
-
-
   private static long updatedColumnNumber(String[] accessChainStrings, int currentProperty, long originalColumnNumber) {
     for(int i = 0; i < currentProperty; ++i)
       originalColumnNumber += accessChainStrings[i].length()+1;
@@ -58,18 +36,18 @@ public class ObjectAccessChain extends Datum {
   }
 
 
-  public static ArrayList<Symbol> parse(Symbol accessChainSymbol) throws Exception {
+  // @PRECONDITION: ObjectAccessChain.is(accessChainSymbol)
+  public static Symbol[] parse(Symbol accessChainSymbol) throws Exception {
     String[] accessChainStrings = accessChainSymbol.value().split("\\.");
-    ArrayList<Symbol> accessChain = new ArrayList<Symbol>(accessChainStrings.length);
+    Symbol[] accessChain = new Symbol[accessChainStrings.length];
     if(accessChainSymbol.hasSourceInformation()) {
       SourceInformation originalSource = accessChainSymbol.source();
       for(int i = 0; i < accessChainStrings.length; ++i)
-        accessChain.add(generatePropertySymbol(accessChainStrings,i,originalSource));
+        accessChain[i] = generatePropertySymbol(accessChainStrings,i,originalSource);
     } else {
       for(int i = 0; i < accessChainStrings.length; ++i)
-        accessChain.add(new Symbol(accessChainStrings[i]));
+        accessChain[i] = new Symbol(accessChainStrings[i]);
     }
-    validateObjectAccessChain(accessChain,accessChainSymbol); // won't trigger if <is(accessChainSymbol)>
     return accessChain;
   }
 
@@ -95,18 +73,19 @@ public class ObjectAccessChain extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Private Chain Field
-  private ArrayList<Symbol> value = null;
+  private Symbol[] value = null;
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Chain Getter
-  public ArrayList<Symbol> value() {
+  public Symbol[] value() {
     return value;
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
+  // @PRECONDITION: ObjectAccessChain.is(accessChainSymbol)
   public ObjectAccessChain(Symbol s) throws Exception {
     value = parse(s);
   }
@@ -147,7 +126,13 @@ public class ObjectAccessChain extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public String display() {
-    return String.format("#<object-access-chain %s>", value);
+    StringBuilder sb = new StringBuilder("#<object-access-chain [");
+    for(int i = 0; i < value.length; ++i) {
+      sb.append(value[i].value());
+      if(i+1<value.length) sb.append(' ');
+    }
+    sb.append("]>");
+    return sb.toString();
   }
 
   public String write() {
@@ -162,100 +147,104 @@ public class ObjectAccessChain extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Define a new value in the object property chain
   public void define(ExecutionState state, Datum newPropValue) throws Exception {
-    Datum result = state.env.get(value.get(0));
+    Datum result = state.env.get(value[0]);
     if(!(result instanceof Dottable)) {
-      if(value.get(0).hasSourceInformation()) {
-        throw new Exceptionf("ObjectAccessChain: <define> foremost item \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(0), result.profile(), value, value.get(0).source());
+      if(value[0].hasSourceInformation()) {
+        throw new Exceptionf("ObjectAccessChain: <define> foremost item \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[0], result.profile(), value, value[0].source());
       } else {
-        throw new Exceptionf("ObjectAccessChain: <define> foremost item \"%s\" (%s) isn't a meta-object: %s", value.get(0), result.profile(), value);
+        throw new Exceptionf("ObjectAccessChain: <define> foremost item \"%s\" (%s) isn't <dottable>: %s", value[0], result.profile(), value);
       }
     }
-    for(int i = 1, n = value.size()-1; i < n; ++i) {
-      result = ((Dottable)result).get(value.get(i));
+    int n = value.length-1;
+    for(int i = 1; i < n; ++i) {
+      result = ((Dottable)result).get(value[i]);
       if(!(result instanceof Dottable)) {
-        if(value.get(i).hasSourceInformation()) {
-          throw new Exceptionf("ObjectAccessChain: <define> property \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(i), result.profile(), value, value.get(i).source());
+        if(value[i].hasSourceInformation()) {
+          throw new Exceptionf("ObjectAccessChain: <define> property \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[i], result.profile(), value, value[i].source());
         } else {
-          throw new Exceptionf("ObjectAccessChain: <define> property \"%s\" (%s) isn't a meta-object: %s", value.get(i), result.profile(), value);
+          throw new Exceptionf("ObjectAccessChain: <define> property \"%s\" (%s) isn't <dottable>: %s", value[i], result.profile(), value);
         }
       }
     }
-    ((Dottable)result).define(value.get(value.size()-1),newPropValue);
+    ((Dottable)result).define(value[n],newPropValue);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Set an existing value in the object property chain
   public void set(ExecutionState state, Datum newPropValue) throws Exception {
-    Datum result = state.env.get(value.get(0));
+    Datum result = state.env.get(value[0]);
     if(!(result instanceof Dottable)) {
-      if(value.get(0).hasSourceInformation()) {
-        throw new Exceptionf("ObjectAccessChain: <set!> foremost item \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(0), result.profile(), value, value.get(0).source());
+      if(value[0].hasSourceInformation()) {
+        throw new Exceptionf("ObjectAccessChain: <set!> foremost item \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[0], result.profile(), value, value[0].source());
       } else {
-        throw new Exceptionf("ObjectAccessChain: <set!> foremost item \"%s\" (%s) isn't a meta-object: %s", value.get(0), result.profile(), value);
+        throw new Exceptionf("ObjectAccessChain: <set!> foremost item \"%s\" (%s) isn't <dottable>: %s", value[0], result.profile(), value);
       }
     }
-    for(int i = 1, n = value.size()-1; i < n; ++i) {
-      result = ((Dottable)result).get(value.get(i));
+    int n = value.length-1;
+    for(int i = 1; i < n; ++i) {
+      result = ((Dottable)result).get(value[i]);
       if(!(result instanceof Dottable)) {
-        if(value.get(i).hasSourceInformation()) {
-          throw new Exceptionf("ObjectAccessChain: <set!> property \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(i), result.profile(), value, value.get(i).source());
+        if(value[i].hasSourceInformation()) {
+          throw new Exceptionf("ObjectAccessChain: <set!> property \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[i], result.profile(), value, value[i].source());
         } else {
-          throw new Exceptionf("ObjectAccessChain: <set!> property \"%s\" (%s) isn't a meta-object: %s", value.get(i), result.profile(), value);
+          throw new Exceptionf("ObjectAccessChain: <set!> property \"%s\" (%s) isn't <dottable>: %s", value[i], result.profile(), value);
         }
       }
     }
-    ((Dottable)result).set(value.get(value.size()-1),newPropValue);
+    ((Dottable)result).set(value[n],newPropValue);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Check if an object property chain is valid
   public boolean has(ExecutionState state) throws Exception {
-    Datum result = state.env.get(value.get(0));
+    Datum result = state.env.get(value[0]);
     if(!(result instanceof Dottable)) {
-      if(value.get(0).hasSourceInformation()) {
-        throw new Exceptionf("ObjectAccessChain: <has?> foremost item \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(0), result.profile(), value, value.get(0).source());
+      if(value[0].hasSourceInformation()) {
+        throw new Exceptionf("ObjectAccessChain: <has?> foremost item \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[0], result.profile(), value, value[0].source());
       } else {
-        throw new Exceptionf("ObjectAccessChain: <has?> foremost item \"%s\" (%s) isn't a meta-object: %s", value.get(0), result.profile(), value);
+        throw new Exceptionf("ObjectAccessChain: <has?> foremost item \"%s\" (%s) isn't <dottable>: %s", value[0], result.profile(), value);
       }
     }
-    for(int i = 1, n = value.size()-1; i < n; ++i) {
-      result = ((Dottable)result).get(value.get(i));
+    int n = value.length-1;
+    for(int i = 1; i < n; ++i) {
+      result = ((Dottable)result).get(value[i]);
       if(!(result instanceof Dottable)) {
-        if(value.get(i).hasSourceInformation()) {
-          throw new Exceptionf("ObjectAccessChain: <has?> property \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(i), result.profile(), value, value.get(i).source());
+        if(value[i].hasSourceInformation()) {
+          throw new Exceptionf("ObjectAccessChain: <has?> property \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[i], result.profile(), value, value[i].source());
         } else {
-          throw new Exceptionf("ObjectAccessChain: <has?> property \"%s\" (%s) isn't a meta-object: %s", value.get(i), result.profile(), value);
+          throw new Exceptionf("ObjectAccessChain: <has?> property \"%s\" (%s) isn't <dottable>: %s", value[i], result.profile(), value);
         }
       }
     }
-    return ((Dottable)result).has(value.get(value.size()-1));
+    return ((Dottable)result).has(value[n]);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter (effectively "get")
   public Datum loadWithState(Environment env) throws Exception {
-    Datum result = env.get(value.get(0));
+    Datum result = env.get(value[0]);
     if(!(result instanceof Dottable)) {
-      if(value.get(0).hasSourceInformation()) {
-        throw new Exceptionf("ObjectAccessChain: <get> foremost item \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", value.get(0), result.profile(), value, value.get(0).source());
+      if(value[0].hasSourceInformation()) {
+        throw new Exceptionf("ObjectAccessChain: <get> foremost item \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[0], result.profile(), value, value[0].source());
       } else {
-        throw new Exceptionf("ObjectAccessChain: <get> foremost item \"%s\" (%s) isn't a meta-object: %s", value.get(0), result.profile(), value);
+        throw new Exceptionf("ObjectAccessChain: <get> foremost item \"%s\" (%s) isn't <dottable>: %s", value[0], result.profile(), value);
       }
     }
-    for(int i = 1, n = value.size(); i < n; ++i) {
-      Symbol prop = value.get(i);
-      result = ((Dottable)result).get(prop);
-      if(i+1 < n && !(result instanceof Dottable)) {
-        if(prop.hasSourceInformation()) {
-          throw new Exceptionf("ObjectAccessChain: <get> property \"%s\" (%s) isn't a meta-object: %s\n>> Location: %s", prop, result.profile(), value, prop.source());
-        } else {
-          throw new Exceptionf("ObjectAccessChain: <get> property \"%s\" (%s) isn't a meta-object: %s", prop, result.profile(), value);
+    for(int i = 1, n = value.length; i < n; ++i) {
+      result = ((Dottable)result).get(value[i]);
+      if(i+1 < n) {
+        if(!(result instanceof Dottable)) {
+          if(value[i].hasSourceInformation()) {
+            throw new Exceptionf("ObjectAccessChain: <get> property \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[i], result.profile(), value, value[i].source());
+          } else {
+            throw new Exceptionf("ObjectAccessChain: <get> property \"%s\" (%s) isn't <dottable>: %s", value[i], result.profile(), value);
+          }
         }
-      } else if(i+1 == n && result instanceof Procedure && prop.hasSourceInformation()) {
-        result = ((Procedure)result).loadWithInvocationSource(prop.source());
+      } else if(result instanceof Procedure && value[i].hasSourceInformation()) {
+        result = ((Procedure)result).loadWithInvocationSource(value[i].source());
       }
     }
     return result;
