@@ -62,7 +62,7 @@
 (<= <real> <real> ...)
 (>= <real> <real> ...)
 
-(+ <num> <num> ...) ; aliases <append> if given <symbol>/<keyword>/<ac> args, or <bind> if given callables
+(+ <num> <num> ...) ; aliases <append> if given <symbol>/<keyword>/<ac>, or <bind> if given callables
 (* <num> <num> ...) ; aliases <compose> if only given callables
 (- <num> <num> ...) (- <num>)
 (/ <num> <num> ...) (/ <num>)

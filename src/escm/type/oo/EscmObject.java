@@ -85,7 +85,7 @@ public class EscmObject extends MetaObject implements Callable {
   ////////////////////////////////////////////////////////////////////////////
   // Functor Predicate
   public boolean isFunctor() {
-    return props.containsKey("->procedure");
+    return has("->procedure");
   }
 
 

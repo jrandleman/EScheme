@@ -7,6 +7,7 @@
 //    - String readableName() // returns <"#<anonymous>"> if an anonymous class
 //
 //    - ArrayList<String> instanceProps() // returns instance property names
+//    - boolean hasInstanceProp()         // returns if has an instance property name
 //
 //    - callWith(...) // overloads constructing an object instance of this class!
 
@@ -109,9 +110,14 @@ public class EscmClass extends MetaObject implements Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Instance Property Serialization Operations
+  // Instance Property Operations
   public ArrayList<String> instanceProps() {
     return new ArrayList<String>(objectProps.keySet());
+  }
+
+
+  public boolean hasInstanceProp(String name) throws Exception {
+    return objectProps.containsKey(name);
   }
 
 

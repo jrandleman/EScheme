@@ -5,8 +5,8 @@
 //
 // Includes:
 //    - Datum get(String name)
-//    - void  set(String name, Datum newValue)
-//    - void  define(String name, Datum newValue)
+//    - void set(String name, Datum newValue)
+//    - void define(String name, Datum newValue)
 //    - boolean has(String name)
 
 

@@ -114,9 +114,8 @@ public class EscmInterface extends MetaObject {
       return;
     }
     inheritanceChain.add(cls.readableName());
-    ArrayList<String> objProps = cls.instanceProps();
     for(String prop : requiredProps) {
-      if(!objProps.contains(prop)) {
+      if(!cls.hasInstanceProp(prop)) {
         confirmSatisfiedBy(cls.getSuper(),inheritanceChain,topmostClass,prop);
       }
     }
