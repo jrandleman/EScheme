@@ -61,35 +61,27 @@ public class OOPrimitives {
       Datum ctor = parameters.get(2);
       if(ctor.eq(Boolean.FALSE)) return null;
       if(!(ctor instanceof CompoundProcedure))
-        throw new Exceptionf("'class <new> constructor must be a procedure (given %s): %s", ctor.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'class <new> constructor must be a custom procedure (given %s): %s", ctor.profile(), Exceptionf.profileArgs(parameters));
       return (CompoundProcedure)ctor;
     }
 
-    private static ArrayList<String> parsePropertyNames(ArrayList<Datum> parameters, String propType, int parameterIndex) throws Exception {
-      Datum nameList = parameters.get(parameterIndex);
-      ArrayList<String> names = new ArrayList<String>();
-      while(nameList instanceof escm.type.Pair) {
-        escm.type.Pair par = (escm.type.Pair)nameList;
-        Datum name = par.car();
+    private static ConcurrentHashMap<String,Datum> parsePropertyNamesAndValues(ArrayList<Datum> parameters, String propType, int nameIndex, int valIndex) throws Exception {
+      Datum nameList = parameters.get(nameIndex);
+      Datum valueList = parameters.get(valIndex);
+      ConcurrentHashMap<String,Datum> namesAndValues = new ConcurrentHashMap<String,Datum>();
+      while(nameList instanceof escm.type.Pair && valueList instanceof escm.type.Pair) {
+        escm.type.Pair np = (escm.type.Pair)nameList;
+        escm.type.Pair vp = (escm.type.Pair)valueList;
+        Datum name = np.car();
         if(!(name instanceof Symbol))
           throw new Exceptionf("'class %s property name %s isn't a symbol: %s", propType, name.profile(), Exceptionf.profileArgs(parameters));
-        names.add(((Symbol)name).value());
-        nameList = par.cdr();
+        namesAndValues.put(((Symbol)name).value(),vp.car());
+        nameList = np.cdr();
+        valueList = vp.cdr();
       }
-      return names;
-    }
-
-    private static ArrayList<Datum> parsePropertyValues(ArrayList<Datum> parameters, String propType, int parameterIndex, int totalPropNames) throws Exception {
-      Datum valueList = parameters.get(parameterIndex);
-      ArrayList<Datum> values = new ArrayList<Datum>();
-      while(valueList instanceof escm.type.Pair) {
-        escm.type.Pair par = (escm.type.Pair)valueList;
-        values.add((Datum)par.car());
-        valueList = par.cdr();
-      }
-      if(values.size() != totalPropNames)
-        throw new Exceptionf("'class given different number of %s property names and values (%d & %d respectively): %s", propType, totalPropNames, values.size(), Exceptionf.profileArgs(parameters));
-      return values;
+      if(nameList instanceof escm.type.Pair || valueList instanceof escm.type.Pair)
+        throw new Exceptionf("'class given different number of %s property names and values: %s", propType, Exceptionf.profileArgs(parameters));
+      return namesAndValues;
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -99,19 +91,8 @@ public class OOPrimitives {
       EscmClass supr = parseSuper(parameters);
       ArrayList<EscmInterface> interfaces = parseInterfaces(parameters);
       CompoundProcedure ctor = parseConstructor(parameters);
-      ArrayList<String> staticNames = parsePropertyNames(parameters,"static",3);
-      ArrayList<Datum> staticValues = parsePropertyValues(parameters,"static",4,staticNames.size());
-      ArrayList<String> instanceNames = parsePropertyNames(parameters,"instance",5);
-      ArrayList<Datum> instanceValues = parsePropertyValues(parameters,"instance",6,instanceNames.size());
-      // Bind property names to values
-      ConcurrentHashMap<String,Datum> staticProps = new ConcurrentHashMap<String,Datum>();
-      for(int i = 0, n = staticNames.size(); i < n; ++i) {
-        staticProps.put(staticNames.get(i),staticValues.get(i));
-      }
-      ConcurrentHashMap<String,Datum> instanceProps = new ConcurrentHashMap<String,Datum>();
-      for(int i = 0, n = instanceNames.size(); i < n; ++i) {
-        instanceProps.put(instanceNames.get(i),instanceValues.get(i));
-      }
+      ConcurrentHashMap<String,Datum> staticProps = parsePropertyNamesAndValues(parameters,"static",3,4);
+      ConcurrentHashMap<String,Datum> instanceProps = parsePropertyNamesAndValues(parameters,"instance",5,6);
       if(ctor != null) instanceProps.put("new",ctor);
       // Create the class!
       return new EscmClass(supr,interfaces,staticProps,instanceProps);
@@ -141,31 +122,37 @@ public class OOPrimitives {
       return interfaces;
     }
 
-    private static ArrayList<String> parsePropertyNames(ArrayList<Datum> parameters, String propType, int parameterIndex) throws Exception {
-      Datum nameList = parameters.get(parameterIndex);
+    private static ArrayList<String> parseInstancePropertyNames(ArrayList<Datum> parameters) throws Exception {
+      Datum nameList = parameters.get(3);
       ArrayList<String> names = new ArrayList<String>();
       while(nameList instanceof escm.type.Pair) {
         escm.type.Pair par = (escm.type.Pair)nameList;
         Datum name = par.car();
         if(!(name instanceof Symbol))
-          throw new Exceptionf("'interface %s property name %s isn't a symbol: %s", propType, name.profile(), Exceptionf.profileArgs(parameters));
+          throw new Exceptionf("'interface instance property name %s isn't a symbol: %s", name.profile(), Exceptionf.profileArgs(parameters));
         names.add(((Symbol)name).value());
         nameList = par.cdr();
       }
       return names;
     }
 
-    private static ArrayList<Datum> parsePropertyValues(ArrayList<Datum> parameters, String propType, int parameterIndex, int totalPropNames) throws Exception {
-      Datum valueList = parameters.get(parameterIndex);
-      ArrayList<Datum> values = new ArrayList<Datum>();
-      while(valueList instanceof escm.type.Pair) {
-        escm.type.Pair par = (escm.type.Pair)valueList;
-        values.add((Datum)par.car());
-        valueList = par.cdr();
+    private static ConcurrentHashMap<String,Datum> parsePropertyNamesAndValues(ArrayList<Datum> parameters) throws Exception {
+      Datum nameList = parameters.get(1);
+      Datum valueList = parameters.get(2);
+      ConcurrentHashMap<String,Datum> namesAndValues = new ConcurrentHashMap<String,Datum>();
+      while(nameList instanceof escm.type.Pair && valueList instanceof escm.type.Pair) {
+        escm.type.Pair np = (escm.type.Pair)nameList;
+        escm.type.Pair vp = (escm.type.Pair)valueList;
+        Datum name = np.car();
+        if(!(name instanceof Symbol))
+          throw new Exceptionf("'interface static property name %s isn't a symbol: %s", name.profile(), Exceptionf.profileArgs(parameters));
+        namesAndValues.put(((Symbol)name).value(),vp.car());
+        nameList = np.cdr();
+        valueList = vp.cdr();
       }
-      if(values.size() != totalPropNames)
-        throw new Exceptionf("'interface given different number of %s property names and values (%d & %d respectively): %s", propType, totalPropNames, values.size(), Exceptionf.profileArgs(parameters));
-      return values;
+      if(nameList instanceof escm.type.Pair || valueList instanceof escm.type.Pair)
+        throw new Exceptionf("'interface given different number of static property names and values: %s", Exceptionf.profileArgs(parameters));
+      return namesAndValues;
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -173,14 +160,8 @@ public class OOPrimitives {
         throw new Exceptionf("'(escm-oo-interface <interface-list> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list>) expects exactly 4 args: %s", Exceptionf.profileArgs(parameters));
       // Parse components
       ArrayList<EscmInterface> interfaces = parseInterfaces(parameters);
-      ArrayList<String> staticNames = parsePropertyNames(parameters,"static",1);
-      ArrayList<Datum> staticValues = parsePropertyValues(parameters,"static",2,staticNames.size());
-      ArrayList<String> instanceNames = parsePropertyNames(parameters,"instance",3);
-      // Bind property names to values
-      ConcurrentHashMap<String,Datum> staticProps = new ConcurrentHashMap<String,Datum>();
-      for(int i = 0, n = staticNames.size(); i < n; ++i) {
-        staticProps.put(staticNames.get(i),staticValues.get(i));
-      }
+      ConcurrentHashMap<String,Datum> staticProps = parsePropertyNamesAndValues(parameters);
+      ArrayList<String> instanceNames = parseInstancePropertyNames(parameters);
       // Create the interface!
       return new EscmInterface(interfaces,staticProps,instanceNames);
     }
@@ -285,12 +266,10 @@ public class OOPrimitives {
         throw new Exceptionf("'(oo-is? <object> <class-or-interface>) 2nd arg isn't a class or interface: %s", Exceptionf.profileArgs(parameters));
       // confirm object is of the class
       if(arg2 instanceof EscmClass) {
-        if(((EscmObject)arg1).instanceOf((EscmClass)arg2)) return Boolean.TRUE;
-        return Boolean.FALSE;
+        return Boolean.valueOf(((EscmObject)arg1).instanceOf((EscmClass)arg2));
       // confirm object implements the interface
       } else {
-        if(((EscmObject)arg1).instanceOf((EscmInterface)arg2)) return Boolean.TRUE;
-        return Boolean.FALSE;
+        return Boolean.valueOf(((EscmObject)arg1).instanceOf((EscmInterface)arg2));
       }
     }
   }
@@ -410,7 +389,8 @@ public class OOPrimitives {
       }
       Datum newValue = parameters.get(parameters.size()-1);
       // "set!" Logic
-      for(int i = 0, n = accessChain.size(); i < n-1; ++i) {
+      int n = accessChain.size()-1;
+      for(int i = 0; i < n; ++i) {
         MetaObject obj = (MetaObject)mo;
         Symbol prop = accessChain.get(i);
         if(!obj.has(prop))
@@ -419,7 +399,7 @@ public class OOPrimitives {
         if(!(mo instanceof MetaObject))
           throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) object property '%s isn't a meta-object: %s", prop, Exceptionf.profileArgs(parameters));
       }
-      Symbol lastProp = accessChain.get(accessChain.size()-1);
+      Symbol lastProp = accessChain.get(n);
       MetaObject obj = (MetaObject)mo;
       if(!obj.has(lastProp))
         throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", lastProp, Exceptionf.profileArgs(parameters));
@@ -458,7 +438,8 @@ public class OOPrimitives {
       }
       Datum newValue = parameters.get(parameters.size()-1);
       // "define" Logic
-      for(int i = 0, n = accessChain.size(); i < n-1; ++i) {
+      int n = accessChain.size()-1;
+      for(int i = 0; i < n; ++i) {
         MetaObject obj = (MetaObject)mo;
         Symbol prop = accessChain.get(i);
         if(!obj.has(prop))
@@ -467,7 +448,7 @@ public class OOPrimitives {
         if(!(mo instanceof MetaObject))
           throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) object property '%s isn't a meta-object: %s", prop, Exceptionf.profileArgs(parameters));
       }
-      Symbol definedProp = accessChain.get(accessChain.size()-1);
+      Symbol definedProp = accessChain.get(n);
       ((MetaObject)mo).define(definedProp,newValue);
       return Void.VALUE;
     }
@@ -526,55 +507,69 @@ public class OOPrimitives {
     }
 
     private Datum getObjectProperties(EscmObject obj) {
-      HashSet<String> propNames = new HashSet<String>();
-      while(obj != null) {
-        propNames.addAll(obj.props());
-        obj = obj.getSuper();
-      }
+      HashSet<String> instanceNames = new HashSet<String>();
       Datum propList = Nil.VALUE;
-      for(String propName : propNames) {
-        propList = new escm.type.Pair(new Symbol(propName),propList);
+      while(obj != null) {
+        for(String name : obj.props()) {
+          if(!instanceNames.contains(name)) {
+            instanceNames.add(name);
+            propList = new escm.type.Pair(new Symbol(name),propList);
+          }
+        }
+        obj = obj.getSuper();
       }
       return propList;
     }
 
     private Datum getClassProperties(EscmClass obj) {
-      HashSet<String> instancePropNames = new HashSet<String>();
-      HashSet<String> staticPropNames = new HashSet<String>();
-      while(obj != null) {
-        staticPropNames.addAll(obj.props());
-        instancePropNames.addAll(obj.instanceProps());
-        obj = obj.getSuper();
-      }
+      HashSet<String> staticNames = new HashSet<String>();
+      HashSet<String> instanceNames = new HashSet<String>();
       Datum propList = Nil.VALUE;
-      for(String instancePropName : instancePropNames) {
-        propList = new escm.type.Pair(new Symbol(instancePropName),propList);
-      }
-      for(String staticPropName : staticPropNames) {
-        propList = new escm.type.Pair(escm.type.Pair.List(new Keyword("static"),new Symbol(staticPropName)),propList);
+      while(obj != null) {
+        for(String name : obj.props()) {
+          if(!staticNames.contains(name)) {
+            staticNames.add(name);
+            propList = new escm.type.Pair(escm.type.Pair.List(new Keyword("static"),new Symbol(name)),propList);
+          }
+        }
+        for(String name : obj.instanceProps()) {
+          if(!instanceNames.contains(name)) {
+            instanceNames.add(name);
+            propList = new escm.type.Pair(new Symbol(name),propList);
+          }
+        }
+        obj = obj.getSuper();
       }
       return propList;
     }
 
-    private void getInterfaceProperties_recur(HashSet<String> instancePropNames, HashSet<String> staticPropNames, EscmInterface iface) {
-      instancePropNames.addAll(iface.instanceProps());
-      staticPropNames.addAll(iface.props());
-      for(EscmInterface implemented : iface.getEscmInterfaces())
-        getInterfaceProperties_recur(instancePropNames,staticPropNames,implemented);
+    private Datum getInterfaceProperties(HashSet<String> staticNames, HashSet<String> instanceNames, EscmInterface obj, Datum propList) {
+      EscmInterface iter = obj;
+      while(iter != null) {
+        for(String name : iter.props()) {
+          if(!staticNames.contains(name)) {
+            staticNames.add(name);
+            propList = new escm.type.Pair(escm.type.Pair.List(new Keyword("static"),new Symbol(name)),propList);
+          }
+        }
+        for(String name : iter.instanceProps()) {
+          if(!instanceNames.contains(name)) {
+            instanceNames.add(name);
+            propList = new escm.type.Pair(new Symbol(name),propList);
+          }
+        }
+        iter = iter.getSuper();
+      }
+      for(EscmInterface implemented : obj.getEscmInterfaces())
+        propList = getInterfaceProperties(staticNames,instanceNames,implemented,propList);
+      return propList;
     }
 
     private Datum getInterfaceProperties(EscmInterface obj) {
-      HashSet<String> instancePropNames = new HashSet<String>();
-      HashSet<String> staticPropNames = new HashSet<String>();
-      getInterfaceProperties_recur(instancePropNames,staticPropNames,obj);
+      HashSet<String> staticNames = new HashSet<String>();
+      HashSet<String> instanceNames = new HashSet<String>();
       Datum propList = Nil.VALUE;
-      for(String instancePropName : instancePropNames) {
-        propList = new escm.type.Pair(new Symbol(instancePropName),propList);
-      }
-      for(String staticPropName : staticPropNames) {
-        propList = new escm.type.Pair(escm.type.Pair.List(new Keyword("static"),new Symbol(staticPropName)),propList);
-      }
-      return propList;
+      return getInterfaceProperties(staticNames,instanceNames,obj,propList);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -607,8 +602,8 @@ public class OOPrimitives {
       Datum obj = parameters.get(0);
       if(!(obj instanceof EscmObject))
         throw new Exceptionf("'(escm-oo-super! <object> <param> ...) 1st arg isn't an object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<Datum> args = new ArrayList<Datum>(parameters.subList(1,parameters.size()));
-      return ((EscmObject)obj).updateSuper(args,continuation);
+      parameters.remove(0);
+      return ((EscmObject)obj).updateSuper(parameters,continuation);
     }
   }
 }

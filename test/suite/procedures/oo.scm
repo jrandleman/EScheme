@@ -133,7 +133,7 @@
 
 (list-has-values? (oo-properties o1) 'I1v 'IBase2v 'class 'I2v 'IBase1v 'C1v 'CBasev 'abc)
 (list-has-values? (oo-properties C1) '(:static name) '(:static sCBasev) '(:static abc) '(:static sC1v) 'I1v 'IBase2v 'I2v 'IBase1v 'C1v 'CBasev)
-(list-has-values? (oo-properties IBase1) '(:static name) '(:static sIBase1v) 'IBase1v)
+(list-has-values? (oo-properties I1) '(:static name) '(:static sIBase1v) '(:static sIBase2v) '(:static sI1v) 'I1v 'IBase1v 'IBase2v)
 
 (ut o1.class C1)
 (ut o1.class.name 'C1)

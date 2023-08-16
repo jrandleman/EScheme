@@ -32,12 +32,12 @@ public class MethodProcedure extends CompoundProcedure {
 
   // With <super> bound!
   public MethodProcedure(CompoundProcedure rootProcedure, MetaObject supr) throws Exception {
-    super(rootProcedure.name,rootProcedure.invocationSource,new CompoundProcedure.State(getSuperBoundEnvironment(rootProcedure,supr),rootProcedure.state.compileTime));
+    super(rootProcedure.name,rootProcedure.invocationSource,new State(getSuperBoundEnvironment(rootProcedure,supr),rootProcedure.state.compileTime));
   }
 
   // With <super> bound!
   public MethodProcedure(CompoundProcedure rootProcedure, MetaObject supr, String name) throws Exception {
-    super(name,rootProcedure.invocationSource,new CompoundProcedure.State(getSuperBoundEnvironment(rootProcedure,supr),rootProcedure.state.compileTime));
+    super(name,rootProcedure.invocationSource,new State(getSuperBoundEnvironment(rootProcedure,supr),rootProcedure.state.compileTime));
   }
   
 
