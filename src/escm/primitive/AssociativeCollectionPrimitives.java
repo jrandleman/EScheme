@@ -349,15 +349,23 @@ public class AssociativeCollectionPrimitives {
         return (Datum)acs[0].AppendArray(acs);
       }
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+
+    // Used by <+>
+    public static boolean isAppendable(Datum d) {
+      return d instanceof Symbol || d instanceof Keyword || d instanceof AssociativeCollection;
+    }
+
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
-      if(n == 0) return Nil.VALUE;
-      if(n == 1) return parameters.get(0);
+      if(n < 2) return n == 0 ? Nil.VALUE : parameters.get(0);
       Datum firstObj = parameters.get(0);
       if(firstObj instanceof Symbol) return appendSymbols(parameters);
       if(firstObj instanceof Keyword) return appendKeywords(parameters);
       return appendAssociativeContainers(n,parameters);
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      return logic(parameters);
     }
   }
 

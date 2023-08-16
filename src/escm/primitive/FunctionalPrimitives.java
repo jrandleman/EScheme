@@ -121,11 +121,10 @@ public class FunctionalPrimitives {
       if(!(parameters.get(0) instanceof Callable)) 
         throw new Exceptionf("'(bind <callable> <arg> ...) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       if(totalCallables == 1) return parameters.get(0);
-      ArrayList<Datum> parametersCopy = new ArrayList<Datum>(parameters);
-      Callable p = (Callable)parametersCopy.get(0);
-      parametersCopy.remove(0);
+      Callable p = (Callable)parameters.get(0);
+      parameters.remove(0);
       Callable bindPrimitive = (params, cont) -> {
-        ArrayList<Datum> args = new ArrayList<Datum>(parametersCopy);
+        ArrayList<Datum> args = new ArrayList<Datum>(parameters);
         args.addAll(params);
         return p.callWith(args,cont);
       };

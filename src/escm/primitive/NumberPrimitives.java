@@ -6,6 +6,7 @@ package escm.primitive;
 import java.util.ArrayList;
 import java.util.Random;
 import escm.type.Datum;
+import escm.type.Nil;
 import escm.type.bool.Boolean;
 import escm.type.number.Number;
 import escm.type.number.Real;
@@ -17,18 +18,17 @@ import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
 import escm.vm.runtime.GlobalState;
 import escm.primitive.FunctionalPrimitives;
+import escm.primitive.AssociativeCollectionPrimitives;
 
 public class NumberPrimitives {
   ////////////////////////////////////////////////////////////////////////////
-  // +
+  // + (aliases <append> and <bind> too)
   public static class Plus extends Primitive {
     public java.lang.String escmName() {
       return "+";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() == 0) throw new Exceptionf("'(+ <number> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
-      if(parameters.get(0) instanceof Callable) return FunctionalPrimitives.Bind.logic(parameters);
+
+    private static Datum logic(ArrayList<Datum> parameters) throws Exception {
       Number sum = new Exact();
       for(Datum p : parameters) {
         if(!(p instanceof Number))
@@ -36,6 +36,23 @@ public class NumberPrimitives {
         sum = sum.add((Number)p);
       }
       return sum;
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      // alias <append> for no/single args
+      int n = parameters.size();
+      if(n < 2) return n == 0 ? Nil.VALUE : parameters.get(0);
+      // Add numbers
+      Datum firstparam = parameters.get(0);
+      if(firstparam instanceof Number) 
+        return logic(parameters);
+      // Append values
+      if(AssociativeCollectionPrimitives.Append.isAppendable(firstparam))
+        return AssociativeCollectionPrimitives.Append.logic(parameters);
+      // Bind procedures
+      if(firstparam instanceof Callable) 
+        return FunctionalPrimitives.Bind.logic(parameters);
+      throw new Exceptionf("'(+ <number> ...) invalid non-numeric arg %s recieved!", firstparam.profile());
     }
   }
 

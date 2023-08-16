@@ -32,7 +32,7 @@
   "name": "+",
   "aliases": null,
   "signatures": ["(+ <num> <num> ...)"],
-  "description": "Returns the sum of \"<num> <num> ...\".\nAliases <bind> if only given callables.",
+  "description": "Returns the sum of \"<num> <num> ...\". Aliases <append> if given a <symbol>,\n<keyword>, or <associative-collection>. Aliases <bind> if give a callable.",
   "example": null
 }, {
   "name": "-",

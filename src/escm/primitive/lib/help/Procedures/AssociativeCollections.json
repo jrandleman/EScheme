@@ -90,9 +90,9 @@
   "example": null
 }, {
   "name": "append",
-  "aliases": ["++"],
+  "aliases": null,
   "signatures": ["(append)", "(append <obj>)", "(append <symbol> ...)", "(append <keyword> ...)", "(append <ac> ...)"],
-  "description": "Aliased by <++>. Given nothing, returns NIL. Given '<obj>', returns <obj>.\n\nGiven '<symbol> ...':\n  Returns a new symbol of '<symbol> ...' concatenated with one another.\n\nGiven '<keyword> ...':\n  Returns a new keyword of '<keyword> ...' concatenated with one another.\n\nGiven '<ac> ...':\n  Creates a new associative collection by appending '<ac> ...' together.\n\n    => Note that the '<ac> ...' values will have their types unified according\n       to the following hierarchy: String < List < Vector < Hashmap",
+  "description": "Aliased by <+>. Given nothing, returns NIL. Given '<obj>', returns <obj>.\n\nGiven '<symbol> ...':\n  Returns a new symbol of '<symbol> ...' concatenated with one another.\n\nGiven '<keyword> ...':\n  Returns a new keyword of '<keyword> ...' concatenated with one another.\n\nGiven '<ac> ...':\n  Creates a new associative collection by appending '<ac> ...' together.\n\n    => Note that the '<ac> ...' values will have their types unified according\n       to the following hierarchy: String < List < Vector < Hashmap",
   "example": null
 }, {
   "name": "delete",

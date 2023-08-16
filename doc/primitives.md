@@ -62,8 +62,8 @@
 (<= <real> <real> ...)
 (>= <real> <real> ...)
 
-(+ <num> <num> ...) ; aliases by <bind> if only given callables
-(* <num> <num> ...) ; aliases by <compose> if only given callables
+(+ <num> <num> ...) ; aliases <append> if given <symbol>/<keyword>/<ac> args, or <bind> if given callables
+(* <num> <num> ...) ; aliases <compose> if only given callables
 (- <num> <num> ...) (- <num>)
 (/ <num> <num> ...) (/ <num>)
 
@@ -443,7 +443,7 @@
 
 (key <predicate?> <ac>) ; returns key of left-most value satisfying <predicate?>
 
-(append <ac> ...) ; aliased by <++>
+(append <ac> ...) ; aliased by <+>
 
 (delete <ac> <key>) ; return copy of <ac> w/o <key>
 

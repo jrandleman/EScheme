@@ -147,9 +147,6 @@ public class GlobalState {
   private static final Symbol PRINTF = new Symbol("printf");
   private static final Symbol DISPLAYF = new Symbol("displayf");
 
-  private static final Symbol PLUSPLUS = new Symbol("++");
-  private static final Symbol APPEND = new Symbol("append");
-
   private static final Symbol STARSTAR = new Symbol("**");
   private static final Symbol EXPT = new Symbol("expt");
 
@@ -196,7 +193,6 @@ public class GlobalState {
     definitionEnvironment.define(PPRINT_TO_STRING,definitionEnvironment.get(PRETTY_PRINT_TO_STRING));
     definitionEnvironment.define(PRINT,definitionEnvironment.get(DISPLAY));
     definitionEnvironment.define(PRINTF,definitionEnvironment.get(DISPLAYF));
-    definitionEnvironment.define(PLUSPLUS,definitionEnvironment.get(APPEND));
     definitionEnvironment.define(STARSTAR,definitionEnvironment.get(EXPT));
     definitionEnvironment.define(IS_ACP,definitionEnvironment.get(IS_ASSOCIATIVE_COLLECTIONP));
     definitionEnvironment.define(IS_OCP,definitionEnvironment.get(IS_ORDERED_COLLECTIONP));
