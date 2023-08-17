@@ -523,38 +523,36 @@ public class OOPrimitives {
       return propList.value;
     }
 
-    private Datum getInterfaceProperties(HashSet<String> staticNames, HashSet<String> instanceNames, EscmInterface obj, Datum propList) {
+    private Datum getInterfaceProperties(HashSet<String> staticNames, HashSet<String> instanceNames, EscmInterface obj, DatumBox propList) {
       EscmInterface iter = obj;
-      DatumBox propListBox = new DatumBox(propList);
       while(iter != null) {
         iter.forEachProperty((name) -> {
           if(!staticNames.contains(name)) {
             staticNames.add(name);
-            propListBox.value = new escm.type.Pair(escm.type.Pair.List(STATIC_KEYWORD,new Symbol(name)),propListBox.value);
+            propList.value = new escm.type.Pair(escm.type.Pair.List(STATIC_KEYWORD,new Symbol(name)),propList.value);
           }
           return true;
         });
         iter.forEachInstanceProperty((name) -> {
           if(!instanceNames.contains(name)) {
             instanceNames.add(name);
-            propListBox.value = new escm.type.Pair(new Symbol(name),propListBox.value);
+            propList.value = new escm.type.Pair(new Symbol(name),propList.value);
           }
           return true;
         });
         iter = iter.getSuper();
       }
       obj.forEachInterface((implemented) -> {
-        propListBox.value = getInterfaceProperties(staticNames,instanceNames,implemented,propListBox.value);
+        propList.value = getInterfaceProperties(staticNames,instanceNames,implemented,propList);
         return true;
       });
-      return propListBox.value;
+      return propList.value;
     }
 
     private Datum getInterfaceProperties(EscmInterface obj) {
       HashSet<String> staticNames = new HashSet<String>();
       HashSet<String> instanceNames = new HashSet<String>();
-      Datum propList = Nil.VALUE;
-      return getInterfaceProperties(staticNames,instanceNames,obj,propList);
+      return getInterfaceProperties(staticNames,instanceNames,obj,new DatumBox(Nil.VALUE));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
