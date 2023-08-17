@@ -481,19 +481,22 @@ public class OOPrimitives {
       return "oo-properties";
     }
 
+    private static Keyword STATIC_KEYWORD = new Keyword("static");
+
     private Datum getObjectProperties(EscmObject obj) {
       HashSet<String> instanceNames = new HashSet<String>();
-      Datum propList = Nil.VALUE;
+      DatumBox propList = new DatumBox(Nil.VALUE);
       while(obj != null) {
-        for(String name : obj.props()) {
+        obj.forEachProperty((name) -> {
           if(!instanceNames.contains(name)) {
             instanceNames.add(name);
-            propList = new escm.type.Pair(new Symbol(name),propList);
+            propList.value = new escm.type.Pair(new Symbol(name),propList.value);
           }
-        }
+          return true;
+        });
         obj = obj.getSuper();
       }
-      return propList;
+      return propList.value;
     }
 
     private Datum getClassProperties(EscmClass obj) {
@@ -501,12 +504,15 @@ public class OOPrimitives {
       HashSet<String> instanceNames = new HashSet<String>();
       Datum propList = Nil.VALUE;
       while(obj != null) {
-        for(String name : obj.props()) {
+        DatumBox db = new DatumBox(propList);
+        obj.forEachProperty((name) -> {
           if(!staticNames.contains(name)) {
             staticNames.add(name);
-            propList = new escm.type.Pair(escm.type.Pair.List(new Keyword("static"),new Symbol(name)),propList);
+            db.value = new escm.type.Pair(escm.type.Pair.List(STATIC_KEYWORD,new Symbol(name)),db.value);
           }
-        }
+          return true;
+        });
+        propList = db.value;
         for(String name : obj.instanceProps()) {
           if(!instanceNames.contains(name)) {
             instanceNames.add(name);
@@ -521,12 +527,15 @@ public class OOPrimitives {
     private Datum getInterfaceProperties(HashSet<String> staticNames, HashSet<String> instanceNames, EscmInterface obj, Datum propList) {
       EscmInterface iter = obj;
       while(iter != null) {
-        for(String name : iter.props()) {
+        DatumBox db = new DatumBox(propList);
+        obj.forEachProperty((name) -> {
           if(!staticNames.contains(name)) {
             staticNames.add(name);
-            propList = new escm.type.Pair(escm.type.Pair.List(new Keyword("static"),new Symbol(name)),propList);
+            db.value = new escm.type.Pair(escm.type.Pair.List(STATIC_KEYWORD,new Symbol(name)),db.value);
           }
-        }
+          return true;
+        });
+        propList = db.value;
         for(String name : iter.instanceProps()) {
           if(!instanceNames.contains(name)) {
             instanceNames.add(name);

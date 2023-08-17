@@ -4,7 +4,8 @@
 //
 // Includes:
 //    - MetaObject getSuper()
-//    - ArrayList<EscmInterface> getEscmInterfaces()
+//    - boolean hasInterface(EscmInterface iface)
+//    - void forEachInterface(InterfaceIterationProcedure ip)
 //
 //    - Datum get(String name)
 //    - void  set(String name, Datum newValue)
@@ -12,7 +13,8 @@
 //
 //    - boolean has(String name)
 //
-//    - ArrayList<String> props() // returns list of prop names
+//    - boolean hasProp(String name)
+//    - void forEachProperty(PropertyIterationProcedure pp) // iterates over prop names
 //
 //    - static BindingsMap copyProps(BindingsMap props)
 //      * BindingsMap ::= ConcurrentHashMap<String,Datum>
@@ -189,11 +191,18 @@ public abstract class MetaObject extends Dottable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Property Serialization Operations
-  public ArrayList<String> props() {
-    ArrayList<String> propsList = new ArrayList<String>();
-    for(String key : props.keySet())
-      propsList.add(key);
-    return propsList;
+  public static interface PropertyIterationProcedure {
+    public boolean exec(String prop); // returns whether to continue
+  }
+
+  public boolean hasProp(String name) {
+    return props.containsKey(name);
+  }
+
+  public void forEachProperty(PropertyIterationProcedure pp) {
+    for(String prop : props.keySet()) {
+      if(!pp.exec(prop)) return;
+    }
   }
 
 
