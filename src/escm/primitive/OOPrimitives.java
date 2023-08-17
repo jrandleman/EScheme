@@ -445,6 +445,14 @@ public class OOPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // oo-interfaces
+  private static class DatumBox {
+    public Datum value = Nil.VALUE;
+    public DatumBox(Datum val) {
+      value = val;
+    }
+  }
+
+
   public static class OoInterfaces extends Primitive {
     public java.lang.String escmName() {
       return "oo-interfaces";
@@ -456,12 +464,12 @@ public class OOPrimitives {
       Datum obj = parameters.get(0);
       if(!(obj instanceof MetaObject))
         throw new Exceptionf("'(oo-interfaces <meta-object>) arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<EscmInterface> interfaces = ((MetaObject)obj).getEscmInterfaces();
-      Datum interfaceList = Nil.VALUE;
-      for(EscmInterface iface : interfaces) {
-        interfaceList = new escm.type.Pair(iface,interfaceList);
-      }
-      return interfaceList;
+      DatumBox db = new DatumBox(Nil.VALUE);
+      ((MetaObject)obj).forEachInterface((iface) -> {
+        db.value = new escm.type.Pair(iface,db.value);
+        return true;
+      });
+      return db.value;
     }
   }
 
@@ -527,9 +535,12 @@ public class OOPrimitives {
         }
         iter = iter.getSuper();
       }
-      for(EscmInterface implemented : obj.getEscmInterfaces())
-        propList = getInterfaceProperties(staticNames,instanceNames,implemented,propList);
-      return propList;
+      DatumBox db = new DatumBox(propList);
+      obj.forEachInterface((implemented) -> {
+        db.value = getInterfaceProperties(staticNames,instanceNames,implemented,db.value);
+        return true;
+      });
+      return db.value;
     }
 
     private Datum getInterfaceProperties(EscmInterface obj) {

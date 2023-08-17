@@ -43,8 +43,14 @@ public class EscmClass extends MetaObject implements Callable {
   // Interfaces Implemented
   private ArrayList<EscmInterface> interfaces = null;
 
-  public ArrayList<EscmInterface> getEscmInterfaces() {
-    return new ArrayList<EscmInterface>(interfaces);
+  public boolean hasInterface(EscmInterface iface) {
+    return interfaces.contains(iface);
+  }
+
+  public void forEachInterface(InterfaceIterationProcedure ip) {
+    for(EscmInterface iface : interfaces) {
+      if(!ip.exec(iface)) return;
+    }
   }
 
 

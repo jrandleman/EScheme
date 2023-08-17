@@ -31,8 +31,12 @@ public class EscmObject extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Interfaces Implemented
-  public ArrayList<EscmInterface> getEscmInterfaces() {
-    return escmClass.getEscmInterfaces();
+  public boolean hasInterface(EscmInterface iface) {
+    return escmClass.hasInterface(iface);
+  }
+
+  public void forEachInterface(InterfaceIterationProcedure ip) {
+    escmClass.forEachInterface(ip);
   }
 
 
@@ -110,22 +114,31 @@ public class EscmObject extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Instance of Interface or Class
+  private static class BooleanBox {
+    public boolean value = false;
+  }
+
+
   private boolean interfaceImplementsInterface(EscmInterface i1, EscmInterface i2) {
-    for(EscmInterface iface : i1.getEscmInterfaces()) {
-      if(iface.eq(i2) || interfaceImplementsInterface(iface,i2)) return true;
-    }
-    return false;
+    BooleanBox bb = new BooleanBox();
+    i1.forEachInterface((iface) -> {
+      bb.value = iface.eq(i2) || interfaceImplementsInterface(iface,i2);
+      return !bb.value;
+    });
+    return bb.value;
   }
 
 
   public boolean instanceOf(EscmInterface i) {
     EscmObject obj = this;
     while(obj != null) {
-      ArrayList<EscmInterface> interfaces = obj.escmClass.getEscmInterfaces();
-      if(interfaces.contains(i)) return true;
-      for(EscmInterface iface : interfaces) {
-        if(interfaceImplementsInterface(iface,i)) return true;
-      }
+      if(obj.escmClass.hasInterface(i)) return true;
+      BooleanBox bb = new BooleanBox();
+      obj.escmClass.forEachInterface((iface) -> {
+        bb.value = interfaceImplementsInterface(iface,i);
+        return !bb.value;
+      });
+      if(bb.value) return true;
       obj = obj.superObject;
     }
     return false;

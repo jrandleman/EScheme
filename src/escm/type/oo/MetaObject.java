@@ -37,7 +37,13 @@ public abstract class MetaObject extends Dottable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Interfaces Abstraction
-  public abstract ArrayList<EscmInterface> getEscmInterfaces();
+  public static interface InterfaceIterationProcedure {
+    public boolean exec(EscmInterface iface); // returns whether to continue
+  }
+
+  public abstract boolean hasInterface(EscmInterface iface);
+
+  public abstract void forEachInterface(InterfaceIterationProcedure ip);
 
 
   ////////////////////////////////////////////////////////////////////////////
