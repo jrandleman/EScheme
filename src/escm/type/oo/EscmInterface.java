@@ -7,7 +7,8 @@
 //    - String name()         // returns <""> if an anonymous interface
 //    - String readableName() // returns <"#<anonymous>"> if an anonymous interface
 //
-//    - ArrayList<String> instanceProps() // returns instance property names
+//    - boolean hasInstanceProp(String name)
+//    - void forEachInstanceProperty(InstancePropertyIterationProcedure ipp) // iterates over prop names
 //
 //    - void confirmSatisfiedBy(EscmClass class) // throws an error if the given class doesn't satisfy <this>
 
@@ -85,13 +86,28 @@ public class EscmInterface extends MetaObject {
 
   ////////////////////////////////////////////////////////////////////////////
   // Instance Property Serialization Operations
-  public ArrayList<String> instanceProps() {
-    return new ArrayList<String>(requiredProps);
+  public static interface InstancePropertyIterationProcedure {
+    public boolean exec(String prop); // returns whether to continue
+  }
+
+  public boolean hasInstanceProp(String name) {
+    return requiredProps.contains(name);
+  }
+
+  public void forEachInstanceProperty(InstancePropertyIterationProcedure ipp) {
+    for(String prop : requiredProps) {
+      if(!ipp.exec(prop)) return;
+    }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Class Satisfaction Verification
+  private static class StringArrayListBox {
+    public ArrayList<String> value = new ArrayList<String>();
+  }
+
+
   private String stringifyArrayListString(ArrayList<String> al) {
     StringBuilder sb = new StringBuilder("{");
     for(int i = 0, n = al.size(); i < n; ++i) {
@@ -102,10 +118,20 @@ public class EscmInterface extends MetaObject {
   }
 
 
+  private ArrayList<String> getClassInstanceProperties(EscmClass topmostClass) {
+    StringArrayListBox sb = new StringArrayListBox();
+    topmostClass.forEachInstanceProperty((prop) -> {
+      sb.value.add(prop);
+      return true;
+    });
+    return sb.value;
+  }
+
+
   private String generateSatisfactionError(EscmClass topmostClass, ArrayList<String> inheritanceChain, String missedReqProp) {
     if(inheritanceChain.size() > 0) inheritanceChain.remove(0);
     return String.format("Class with instance props %s inheriting %s doesn't have required prop \"%s\" for interface \"%s\"", 
-                                   stringifyArrayListString(topmostClass.instanceProps()), 
+                                   stringifyArrayListString(getClassInstanceProperties(topmostClass)), 
                                    stringifyArrayListString(inheritanceChain), 
                                    missedReqProp, 
                                    readableName());

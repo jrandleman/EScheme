@@ -502,54 +502,52 @@ public class OOPrimitives {
     private Datum getClassProperties(EscmClass obj) {
       HashSet<String> staticNames = new HashSet<String>();
       HashSet<String> instanceNames = new HashSet<String>();
-      Datum propList = Nil.VALUE;
+      DatumBox propList = new DatumBox(Nil.VALUE);
       while(obj != null) {
-        DatumBox db = new DatumBox(propList);
         obj.forEachProperty((name) -> {
           if(!staticNames.contains(name)) {
             staticNames.add(name);
-            db.value = new escm.type.Pair(escm.type.Pair.List(STATIC_KEYWORD,new Symbol(name)),db.value);
+            propList.value = new escm.type.Pair(escm.type.Pair.List(STATIC_KEYWORD,new Symbol(name)),propList.value);
           }
           return true;
         });
-        propList = db.value;
-        for(String name : obj.instanceProps()) {
+        obj.forEachInstanceProperty((name) -> {
           if(!instanceNames.contains(name)) {
             instanceNames.add(name);
-            propList = new escm.type.Pair(new Symbol(name),propList);
+            propList.value = new escm.type.Pair(new Symbol(name),propList.value);
           }
-        }
+          return true;
+        });
         obj = obj.getSuper();
       }
-      return propList;
+      return propList.value;
     }
 
     private Datum getInterfaceProperties(HashSet<String> staticNames, HashSet<String> instanceNames, EscmInterface obj, Datum propList) {
       EscmInterface iter = obj;
+      DatumBox propListBox = new DatumBox(propList);
       while(iter != null) {
-        DatumBox db = new DatumBox(propList);
-        obj.forEachProperty((name) -> {
+        iter.forEachProperty((name) -> {
           if(!staticNames.contains(name)) {
             staticNames.add(name);
-            db.value = new escm.type.Pair(escm.type.Pair.List(STATIC_KEYWORD,new Symbol(name)),db.value);
+            propListBox.value = new escm.type.Pair(escm.type.Pair.List(STATIC_KEYWORD,new Symbol(name)),propListBox.value);
           }
           return true;
         });
-        propList = db.value;
-        for(String name : iter.instanceProps()) {
+        iter.forEachInstanceProperty((name) -> {
           if(!instanceNames.contains(name)) {
             instanceNames.add(name);
-            propList = new escm.type.Pair(new Symbol(name),propList);
+            propListBox.value = new escm.type.Pair(new Symbol(name),propListBox.value);
           }
-        }
+          return true;
+        });
         iter = iter.getSuper();
       }
-      DatumBox db = new DatumBox(propList);
       obj.forEachInterface((implemented) -> {
-        db.value = getInterfaceProperties(staticNames,instanceNames,implemented,db.value);
+        propListBox.value = getInterfaceProperties(staticNames,instanceNames,implemented,propListBox.value);
         return true;
       });
-      return db.value;
+      return propListBox.value;
     }
 
     private Datum getInterfaceProperties(EscmInterface obj) {

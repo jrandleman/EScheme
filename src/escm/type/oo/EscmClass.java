@@ -6,8 +6,8 @@
 //    - String name()         // returns <""> if an anonymous class
 //    - String readableName() // returns <"#<anonymous>"> if an anonymous class
 //
-//    - ArrayList<String> instanceProps() // returns instance property names
-//    - boolean hasInstanceProp()         // returns if has an instance property name
+//    - boolean hasInstanceProp(String name)
+//    - void forEachInstanceProperty(InstancePropertyIterationProcedure ipp) // iterates over prop names
 //
 //    - callWith(...) // overloads constructing an object instance of this class!
 
@@ -117,13 +117,18 @@ public class EscmClass extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Instance Property Operations
-  public ArrayList<String> instanceProps() {
-    return new ArrayList<String>(objectProps.keySet());
+  public static interface InstancePropertyIterationProcedure {
+    public boolean exec(String prop); // returns whether to continue
   }
-
 
   public boolean hasInstanceProp(String name) throws Exception {
     return objectProps.containsKey(name);
+  }
+
+  public void forEachInstanceProperty(InstancePropertyIterationProcedure ipp) {
+    for(String prop : objectProps.keySet()) {
+      if(!ipp.exec(prop)) return;
+    }
   }
 
 
