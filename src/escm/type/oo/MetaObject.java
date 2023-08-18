@@ -216,6 +216,16 @@ public abstract class MetaObject extends Dottable {
     }
   }
 
+  protected void convertProceduresToNamedMethods() throws Exception {
+    for(ConcurrentHashMap.Entry<String,Datum> e : props.entrySet()) {
+      Datum val = e.getValue();
+      if(shouldConvertToMethod(val)) {
+        String key = e.getKey();
+        props.put(e.getKey(),new MethodProcedure(this,getSuper(),(CompoundProcedure)val,generateMethodName(key)));
+      }
+    }
+  }
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Type

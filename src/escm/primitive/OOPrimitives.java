@@ -33,9 +33,16 @@ public class OOPrimitives {
       return "escm-oo-class";
     }
 
+    // Returns <null> if <name-string> DNE
+    public static String parseOptionalClassOrInterfaceName(ArrayList<Datum> parameters) {
+      Datum nameString = parameters.get(0);
+      if(nameString instanceof escm.type.String) return ((escm.type.String)nameString).value();
+      return null;
+    }
+
     // Returns <null> if <super> DNE
     private static EscmClass parseSuper(ArrayList<Datum> parameters) throws Exception {
-      Datum supr = parameters.get(0);
+      Datum supr = parameters.get(1);
       if(supr.eq(Boolean.FALSE)) return null;
       if(!(supr instanceof EscmClass))
         throw new Exceptionf("'class <super> parameter isn't a class (given %s): %s", supr.profile(), Exceptionf.profileArgs(parameters));
@@ -43,7 +50,7 @@ public class OOPrimitives {
     }
 
     private static ArrayList<EscmInterface> parseInterfaces(ArrayList<Datum> parameters) throws Exception {
-      Datum interfaceList = parameters.get(1);
+      Datum interfaceList = parameters.get(2);
       ArrayList<EscmInterface> interfaces = new ArrayList<EscmInterface>();
       while(interfaceList instanceof escm.type.Pair) {
         escm.type.Pair par = (escm.type.Pair)interfaceList;
@@ -58,7 +65,7 @@ public class OOPrimitives {
 
     // Returns <null> if constructor DNE
     private static CompoundProcedure parseConstructor(ArrayList<Datum> parameters) throws Exception {
-      Datum ctor = parameters.get(2);
+      Datum ctor = parameters.get(3);
       if(ctor.eq(Boolean.FALSE)) return null;
       if(!(ctor instanceof CompoundProcedure))
         throw new Exceptionf("'class <new> constructor must be a custom procedure (given %s): %s", ctor.profile(), Exceptionf.profileArgs(parameters));
@@ -85,17 +92,18 @@ public class OOPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 7) 
-        throw new Exceptionf("'(escm-oo-class <super> <interface-list> <ctor> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list> <instance-prop-value-list>) expects exactly 7 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() != 8) 
+        throw new Exceptionf("'(escm-oo-class <name-string> <super> <interface-list> <ctor> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list> <instance-prop-value-list>) expects exactly 8 args: %s", Exceptionf.profileArgs(parameters));
       // Parse components
+      String className = parseOptionalClassOrInterfaceName(parameters);
       EscmClass supr = parseSuper(parameters);
       ArrayList<EscmInterface> interfaces = parseInterfaces(parameters);
       CompoundProcedure ctor = parseConstructor(parameters);
-      ConcurrentHashMap<String,Datum> staticProps = parsePropertyNamesAndValues(parameters,"static",3,4);
-      ConcurrentHashMap<String,Datum> instanceProps = parsePropertyNamesAndValues(parameters,"instance",5,6);
+      ConcurrentHashMap<String,Datum> staticProps = parsePropertyNamesAndValues(parameters,"static",4,5);
+      ConcurrentHashMap<String,Datum> instanceProps = parsePropertyNamesAndValues(parameters,"instance",6,7);
       if(ctor != null) instanceProps.put("new",ctor);
       // Create the class!
-      return new EscmClass(supr,interfaces,staticProps,instanceProps);
+      return new EscmClass(className,supr,interfaces,staticProps,instanceProps);
     }
   }
 
@@ -109,7 +117,7 @@ public class OOPrimitives {
 
     // Returns <null> if <super> DNE
     private static ArrayList<EscmInterface> parseInterfaces(ArrayList<Datum> parameters) throws Exception {
-      Datum interfaceList = parameters.get(0);
+      Datum interfaceList = parameters.get(1);
       ArrayList<EscmInterface> interfaces = new ArrayList<EscmInterface>();
       while(interfaceList instanceof escm.type.Pair) {
         escm.type.Pair par = (escm.type.Pair)interfaceList;
@@ -122,23 +130,9 @@ public class OOPrimitives {
       return interfaces;
     }
 
-    private static ArrayList<String> parseInstancePropertyNames(ArrayList<Datum> parameters) throws Exception {
-      Datum nameList = parameters.get(3);
-      ArrayList<String> names = new ArrayList<String>();
-      while(nameList instanceof escm.type.Pair) {
-        escm.type.Pair par = (escm.type.Pair)nameList;
-        Datum name = par.car();
-        if(!(name instanceof Symbol))
-          throw new Exceptionf("'interface instance property name %s isn't a symbol: %s", name.profile(), Exceptionf.profileArgs(parameters));
-        names.add(((Symbol)name).value());
-        nameList = par.cdr();
-      }
-      return names;
-    }
-
     private static ConcurrentHashMap<String,Datum> parsePropertyNamesAndValues(ArrayList<Datum> parameters) throws Exception {
-      Datum nameList = parameters.get(1);
-      Datum valueList = parameters.get(2);
+      Datum nameList = parameters.get(2);
+      Datum valueList = parameters.get(3);
       ConcurrentHashMap<String,Datum> namesAndValues = new ConcurrentHashMap<String,Datum>();
       while(nameList instanceof escm.type.Pair && valueList instanceof escm.type.Pair) {
         escm.type.Pair np = (escm.type.Pair)nameList;
@@ -155,15 +149,30 @@ public class OOPrimitives {
       return namesAndValues;
     }
 
+    private static ArrayList<String> parseInstancePropertyNames(ArrayList<Datum> parameters) throws Exception {
+      Datum nameList = parameters.get(4);
+      ArrayList<String> names = new ArrayList<String>();
+      while(nameList instanceof escm.type.Pair) {
+        escm.type.Pair par = (escm.type.Pair)nameList;
+        Datum name = par.car();
+        if(!(name instanceof Symbol))
+          throw new Exceptionf("'interface instance property name %s isn't a symbol: %s", name.profile(), Exceptionf.profileArgs(parameters));
+        names.add(((Symbol)name).value());
+        nameList = par.cdr();
+      }
+      return names;
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 4) 
-        throw new Exceptionf("'(escm-oo-interface <interface-list> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list>) expects exactly 4 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() != 5) 
+        throw new Exceptionf("'(escm-oo-interface <name-string> <interface-list> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list>) expects exactly 5 args: %s", Exceptionf.profileArgs(parameters));
       // Parse components
+      String interfaceName = EscmOoClass.parseOptionalClassOrInterfaceName(parameters);
       ArrayList<EscmInterface> interfaces = parseInterfaces(parameters);
       ConcurrentHashMap<String,Datum> staticProps = parsePropertyNamesAndValues(parameters);
       ArrayList<String> instanceNames = parseInstancePropertyNames(parameters);
       // Create the interface!
-      return new EscmInterface(interfaces,staticProps,instanceNames);
+      return new EscmInterface(interfaceName,interfaces,staticProps,instanceNames);
     }
   }
 

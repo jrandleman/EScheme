@@ -42,7 +42,7 @@ public class ObjectPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (class (:extends <super>) (:implements <interface> ...) <prop> ...)
+  // (class <optional-name-string> (:extends <super>) (:implements <interface> ...) <prop> ...)
   //
   // <prop> ::= (<name> <value>)
   //          | ((<method-name> <param> ...) <body> ...)
@@ -51,6 +51,12 @@ public class ObjectPrimitives {
   //
   // <super> MUST be an expression that evals to a class type.
   // <interface> MUST be an expression that evals to an interface type.
+  // 
+  // NOTE: The EScheme code below doesn't account for parsing <name-string>: a new
+  // ===== internal preemptive-naming trick used by <define-class>, it allows us to 
+  //       pre-bind our method names upon initial class construction, rather than
+  //       only later when we bind a symbol to the class object in the environment. 
+  //       * This allows us to reduce the number of method allocations by half!
   //
   //
   // ; Returns the super object if exists, else #f 
@@ -165,6 +171,18 @@ public class ObjectPrimitives {
   public static class ClassMacro extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "class";
+    }
+
+    // Extract <name-string> if exists, else #f
+    public static Datum parseOptionalClassOrInterfaceName(ArrayList<Datum> parameters) {
+      if(parameters.size() > 0) {
+        Datum d = parameters.get(0);
+        if(d instanceof escm.type.String) {
+          parameters.remove(0);
+          return d;
+        }
+      }
+      return Boolean.FALSE;
     }
 
     // If <clause> is a list starting with <key> & has 1+ following items
@@ -292,8 +310,10 @@ public class ObjectPrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      Datum x = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
+      // Extract optional name (provided by <define-class>)
+      Datum className = parseOptionalClassOrInterfaceName(parameters);
       // Extract "is-a"'s
+      Datum x = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
       escm.util.Pair<Datum,Datum> superAndInterfaces = getSuperAndInterfaces(x);
       // Extract "has-a"'s
       Datum properties = getProperties(superAndInterfaces.first,superAndInterfaces.second,x);
@@ -302,7 +322,7 @@ public class ObjectPrimitives {
       escm.util.Pair<Datum,Datum> staticPropNamesAndVals = parsePropertyNamesAndValues(parameters,staticAndNonStaticProps.first);
       escm.util.Pair<Datum,Datum> instancePropNamesAndVals = parsePropertyNamesAndValues(parameters,ctorAndInstanceProps.second);
       // Generate the call to an internal primitive that makes our class!
-      return Pair.List(ESCM_OO_CLASS,superAndInterfaces.first,new Pair(CorePrimitives.LIST,superAndInterfaces.second),
+      return Pair.List(ESCM_OO_CLASS,className,superAndInterfaces.first,new Pair(CorePrimitives.LIST,superAndInterfaces.second),
         ctorAndInstanceProps.first,
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.first),
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.second),
@@ -322,6 +342,10 @@ public class ObjectPrimitives {
   //
   // <super> MUST be an expression that evals to a class type.
   // <interface> MUST be an expression that evals to an interface type.
+  // 
+  // NOTE: The EScheme code below doesn't account for generating the <name-string>
+  // ===== argument passed to <class>. See <class>'s comment description above for
+  //       more details.
   //
   //
   // (define-syntax define-class
@@ -347,19 +371,26 @@ public class ObjectPrimitives {
       return Pair.List(CorePrimitives.BEGIN,
         Pair.List(CorePrimitives.DEFINE,Pair.List(new Symbol(name.value()+"?"),obj),
           Pair.List(AND,Pair.List(IS_OBJECTP,obj),Pair.List(OO_ISP,obj,name))), // predicate generation!
-        Pair.List(CorePrimitives.DEFINE,name,new Pair(CLASS,classComponents)));
+        Pair.List(CorePrimitives.DEFINE,name,new Pair(CLASS,new Pair(new escm.type.String(name.value()),classComponents))));
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (interface (:extends <interface> ...) <prop> ...)
+  // (interface <optional-name-string> (:extends <interface> ...) <prop> ...)
   //
   // <prop> ::= <name>
   //          | (:static <name> <value>)
   //          | (:static (<method-name> <param> ...) <body> ...)
   //
   // <interface> MUST be an expression that evals to an interface type.
+  // 
+  // NOTE: The EScheme code below doesn't account for parsing <name-string>: a new
+  // ===== internal preemptive-naming trick used by <define-interface>, it allows us
+  //       to pre-bind our method names upon initial interface construction, rather
+  //       than only later when we bind a symbol to the interface object in the 
+  //       environment. 
+  //       * This allows us to reduce the number of method allocations by half!
   //
   //
   // ; Returns the list of implemented interfaces if exists, else NIL
@@ -440,15 +471,17 @@ public class ObjectPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      Datum x = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
+      // Extract optional name (provided by <define-interface>)
+      Datum interfaceName = ClassMacro.parseOptionalClassOrInterfaceName(parameters);
       // Extract "is-a"'s
+      Datum x = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
       Datum interfacesList = getInterfaces(x);
       // Extract "has-a"'s
       Datum properties = getProperties(interfacesList,x);
       escm.util.Pair<Datum,Datum> staticAndNonStaticProps = getStaticAndNonStaticProperties(parameters,properties);
       escm.util.Pair<Datum,Datum> staticPropNamesAndVals = ClassMacro.parsePropertyNamesAndValues(parameters,staticAndNonStaticProps.first);
       // Generate the call to an internal primitive that makes our interface!
-      return Pair.List(ESCM_OO_INTERFACE,new Pair(CorePrimitives.LIST,interfacesList),
+      return Pair.List(ESCM_OO_INTERFACE,interfaceName,new Pair(CorePrimitives.LIST,interfacesList),
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.first),
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.second),
         new Pair(CorePrimitives.LIST,staticAndNonStaticProps.second));
@@ -464,6 +497,10 @@ public class ObjectPrimitives {
   //          | (:static (<method-name> <param> ...) <body> ...)
   //
   // <interface> MUST be an expression that evals to an interface type.
+  // 
+  // NOTE: The EScheme code below doesn't account for generating the <name-string>
+  // ===== argument passed to <interface>. See <interface>'s comment description
+  //       above for more details.
   //
   //
   // (define-syntax define-interface
@@ -489,7 +526,7 @@ public class ObjectPrimitives {
       return Pair.List(CorePrimitives.BEGIN,
         Pair.List(CorePrimitives.DEFINE,Pair.List(new Symbol(name.value()+"?"),obj),
           Pair.List(AND,Pair.List(IS_OBJECTP,obj),Pair.List(OO_ISP,obj,name))), // predicate generation!
-        Pair.List(CorePrimitives.DEFINE,name,new Pair(INTERFACE,classComponents)));
+        Pair.List(CorePrimitives.DEFINE,name,new Pair(INTERFACE,new Pair(new escm.type.String(name.value()),classComponents))));
     }
   }
 

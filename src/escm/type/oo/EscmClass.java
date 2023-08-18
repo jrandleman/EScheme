@@ -71,7 +71,7 @@ public class EscmClass extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  public EscmClass(EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) throws Exception {
+  public EscmClass(String name, EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) throws Exception {
     this.superClass = superClass;
     this.interfaces = interfaces;
     this.props = props;
@@ -79,7 +79,13 @@ public class EscmClass extends MetaObject implements Callable {
     for(EscmInterface iface : interfaces) {
       iface.confirmSatisfiedBy(this);
     }
-    this.convertProceduresToMethods();
+    if(name == null) {
+      this.convertProceduresToMethods();
+    } else {
+      this.props.put("name",new Symbol(name));
+      this.convertProceduresToNamedMethods();
+      this.bindInstanceMethodsWithName();
+    }
   }
 
 
@@ -102,6 +108,17 @@ public class EscmClass extends MetaObject implements Callable {
     sb.append(propertyName);
     sb.append(" [class::instance]");
     return sb.toString();
+  }
+
+
+  private void bindInstanceMethodsWithName() {
+    for(ConcurrentHashMap.Entry<String,Datum> e : this.objectProps.entrySet()) {
+      Datum val = e.getValue();
+      if(val instanceof CompoundProcedure) {
+        String key = e.getKey();
+        this.objectProps.put(key,((CompoundProcedure)val).loadWithName(generateInstanceMethodName(key)));
+      }
+    }
   }
 
 
@@ -199,18 +216,8 @@ public class EscmClass extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  private void bindInstanceMethodsWithName() {
-    for(ConcurrentHashMap.Entry<String,Datum> e : this.objectProps.entrySet()) {
-      Datum val = e.getValue();
-      if(val instanceof CompoundProcedure) {
-        String key = e.getKey();
-        this.objectProps.put(key,((CompoundProcedure)val).loadWithName(generateInstanceMethodName(key)));
-      }
-    }
-  }
-
-
-  private EscmClass(String name, EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) {
+  // We use <ignore> here to distinguish from the <public> ctor
+  private EscmClass(int ignore, String name, EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) {
     this.superClass = superClass;
     this.interfaces = interfaces;
     this.props = props;
@@ -222,10 +229,8 @@ public class EscmClass extends MetaObject implements Callable {
 
 
   public EscmClass loadWithName(String name) {
-    if(name.equals("self") || name.equals("super")) return this;
-    String currentName = name();
-    if(currentName.length() > 0) return this;
-    return new EscmClass(name,this.superClass,this.interfaces,this.props,this.objectProps);
+    if(name.equals("self") || name.equals("super") || name().length() > 0) return this;
+    return new EscmClass(0,name,this.superClass,this.interfaces,this.props,this.objectProps);
   }
 
 

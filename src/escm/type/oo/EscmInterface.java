@@ -65,11 +65,16 @@ public class EscmInterface extends MetaObject {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  public EscmInterface(ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) throws Exception {
+  public EscmInterface(String name, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) throws Exception {
     this.interfaces = interfaces;
     this.props = props;
     this.requiredProps = requiredProps;
-    this.convertProceduresToMethods();
+    if(name == null) {
+      this.convertProceduresToMethods();
+    } else {
+      this.props.put("name",new Symbol(name));
+      this.convertProceduresToNamedMethods();
+    }
   }
 
 
@@ -200,7 +205,8 @@ public class EscmInterface extends MetaObject {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  private EscmInterface(String name, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) {
+  // We use <ignore> here to distinguish from the <public> ctor
+  private EscmInterface(int ignore, String name, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) {
     this.interfaces = interfaces;
     this.props = props;
     this.props.put("name",new Symbol(name));
@@ -210,10 +216,8 @@ public class EscmInterface extends MetaObject {
 
 
   public EscmInterface loadWithName(String name) {
-    if(name.equals("self") || name.equals("super")) return this;
-    String currentName = name();
-    if(currentName.length() > 0) return this;
-    return new EscmInterface(name,this.interfaces,this.props,this.requiredProps);
+    if(name.equals("self") || name.equals("super") || name().length() > 0) return this;
+    return new EscmInterface(0,name,this.interfaces,this.props,this.requiredProps);
   }
 
 
