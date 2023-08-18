@@ -18,6 +18,7 @@ import escm.util.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.Datum;
 import escm.type.Symbol;
+import escm.type.bool.Boolean;
 import escm.type.procedure.CompoundProcedure;
 import escm.type.procedure.MethodProcedure;
 import escm.vm.type.Callable;
@@ -70,16 +71,6 @@ public class EscmClass extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  private void convertInstanceProceduresToMethods() {
-    for(ConcurrentHashMap.Entry<String,Datum> e : this.objectProps.entrySet()) {
-      Datum val = e.getValue();
-      if(val instanceof CompoundProcedure) {
-        this.objectProps.put(e.getKey(),new MethodProcedure((CompoundProcedure)val));
-      }
-    }
-  }
-
-
   public EscmClass(EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) throws Exception {
     this.superClass = superClass;
     this.interfaces = interfaces;
@@ -88,8 +79,7 @@ public class EscmClass extends MetaObject implements Callable {
     for(EscmInterface iface : interfaces) {
       iface.confirmSatisfiedBy(this);
     }
-    this.convertProceduresToMethodsAndBindSuper();
-    this.convertInstanceProceduresToMethods();
+    this.convertProceduresToMethods();
   }
 
 
@@ -142,7 +132,7 @@ public class EscmClass extends MetaObject implements Callable {
       return continuation.run(obj);
     }
     obj.props.remove("new");
-    return ((MethodProcedure)ctor).loadWithSelf(obj).callWith(new ArrayList<Datum>(),(ignored) -> () -> continuation.run(obj));
+    return ((MethodProcedure)ctor).callWith(new ArrayList<Datum>(),(ignored) -> () -> continuation.run(obj));
   }
 
 
@@ -158,7 +148,7 @@ public class EscmClass extends MetaObject implements Callable {
     Datum ctor = obj.props.get("new");
     if(ctor != null && ctor instanceof MethodProcedure) {
       obj.props.remove("new");
-      return ((MethodProcedure)ctor).loadWithSelf(obj).callWith(args,(ignored) -> () -> continuation.run(obj));
+      return ((MethodProcedure)ctor).callWith(args,(ignored) -> () -> continuation.run(obj));
     } else if(args.size() > 0) {
       throw new Exceptionf("Class %s construction error: no custom ctor defined for args: %s", readableName(), Exceptionf.profileArgs(args));
     }
@@ -228,14 +218,13 @@ public class EscmClass extends MetaObject implements Callable {
     this.props.put("name",new Symbol(name));
     this.bindMethodsWithName();
     this.bindInstanceMethodsWithName();
-    // @NOTE: No need to re-bind super, since <props> already points to <superClass> as <super>
   }
 
 
   public EscmClass loadWithName(String name) {
     String currentName = name();
     if(currentName.length() > 0) return this;
-    return new EscmClass(name,this.superClass,this.interfaces,MetaObject.copyProps(this.props),MetaObject.copyProps(this.objectProps));
+    return new EscmClass(name,this.superClass,this.interfaces,this.props,this.objectProps);
   }
 
 

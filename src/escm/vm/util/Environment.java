@@ -36,6 +36,14 @@ public class Environment implements Serializable {
   private Environment superEnv;
   private ConcurrentHashMap<String,Datum> bindings;
 
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Field Getters
+  // Used by <MethodProcedure>. Returns <null> if at the topmost environment!
+  public Environment superEnv() {
+    return superEnv;
+  }
+
   public Datum bindingsAsAssocList() {
     Datum alist = Nil.VALUE;
     for(ConcurrentHashMap.Entry<String,Datum> binding : bindings.entrySet())

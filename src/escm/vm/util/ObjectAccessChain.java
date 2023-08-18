@@ -150,25 +150,22 @@ public class ObjectAccessChain extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Define a new value in the object property chain
+  private String invalidObjectAccessChainMessage(String opName, int idx, Datum val) throws Exception {
+    if(value[idx].hasSourceInformation()) {
+      return String.format("ObjectAccessChain: <%s> property #%d \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", opName, idx+1, value[idx], val.profile(), serializeValue(), value[idx].source());
+    } else {
+      return String.format("ObjectAccessChain: <%s> property #%d \"%s\" (%s) isn't <dottable>: %s", opName, idx+1, value[idx], val.profile(), serializeValue());
+    }
+  }
+
+
   public void define(ExecutionState state, Datum newPropValue) throws Exception {
     Datum result = state.env.get(value[0]);
-    if(!(result instanceof Dottable)) {
-      if(value[0].hasSourceInformation()) {
-        throw new Exceptionf("ObjectAccessChain: <define> foremost item \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[0], result.profile(), value, value[0].source());
-      } else {
-        throw new Exceptionf("ObjectAccessChain: <define> foremost item \"%s\" (%s) isn't <dottable>: %s", value[0], result.profile(), value);
-      }
-    }
+    if(!(result instanceof Dottable)) throw new Exceptionf(invalidObjectAccessChainMessage("define",0,result));
     int n = value.length-1;
     for(int i = 1; i < n; ++i) {
       result = ((Dottable)result).get(value[i]);
-      if(!(result instanceof Dottable)) {
-        if(value[i].hasSourceInformation()) {
-          throw new Exceptionf("ObjectAccessChain: <define> property \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[i], result.profile(), value, value[i].source());
-        } else {
-          throw new Exceptionf("ObjectAccessChain: <define> property \"%s\" (%s) isn't <dottable>: %s", value[i], result.profile(), value);
-        }
-      }
+      if(!(result instanceof Dottable)) throw new Exceptionf(invalidObjectAccessChainMessage("define",i,result));
     }
     ((Dottable)result).define(value[n],newPropValue);
   }
@@ -178,23 +175,11 @@ public class ObjectAccessChain extends Datum {
   // Set an existing value in the object property chain
   public void set(ExecutionState state, Datum newPropValue) throws Exception {
     Datum result = state.env.get(value[0]);
-    if(!(result instanceof Dottable)) {
-      if(value[0].hasSourceInformation()) {
-        throw new Exceptionf("ObjectAccessChain: <set!> foremost item \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[0], result.profile(), value, value[0].source());
-      } else {
-        throw new Exceptionf("ObjectAccessChain: <set!> foremost item \"%s\" (%s) isn't <dottable>: %s", value[0], result.profile(), value);
-      }
-    }
+    if(!(result instanceof Dottable)) throw new Exceptionf(invalidObjectAccessChainMessage("set!",0,result));
     int n = value.length-1;
     for(int i = 1; i < n; ++i) {
       result = ((Dottable)result).get(value[i]);
-      if(!(result instanceof Dottable)) {
-        if(value[i].hasSourceInformation()) {
-          throw new Exceptionf("ObjectAccessChain: <set!> property \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[i], result.profile(), value, value[i].source());
-        } else {
-          throw new Exceptionf("ObjectAccessChain: <set!> property \"%s\" (%s) isn't <dottable>: %s", value[i], result.profile(), value);
-        }
-      }
+      if(!(result instanceof Dottable)) throw new Exceptionf(invalidObjectAccessChainMessage("set!",i,result));
     }
     ((Dottable)result).set(value[n],newPropValue);
   }
@@ -204,23 +189,11 @@ public class ObjectAccessChain extends Datum {
   // Check if an object property chain is valid
   public boolean has(ExecutionState state) throws Exception {
     Datum result = state.env.get(value[0]);
-    if(!(result instanceof Dottable)) {
-      if(value[0].hasSourceInformation()) {
-        throw new Exceptionf("ObjectAccessChain: <has?> foremost item \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[0], result.profile(), value, value[0].source());
-      } else {
-        throw new Exceptionf("ObjectAccessChain: <has?> foremost item \"%s\" (%s) isn't <dottable>: %s", value[0], result.profile(), value);
-      }
-    }
+    if(!(result instanceof Dottable)) throw new Exceptionf(invalidObjectAccessChainMessage("has?",0,result));
     int n = value.length-1;
     for(int i = 1; i < n; ++i) {
       result = ((Dottable)result).get(value[i]);
-      if(!(result instanceof Dottable)) {
-        if(value[i].hasSourceInformation()) {
-          throw new Exceptionf("ObjectAccessChain: <has?> property \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", value[i], result.profile(), value, value[i].source());
-        } else {
-          throw new Exceptionf("ObjectAccessChain: <has?> property \"%s\" (%s) isn't <dottable>: %s", value[i], result.profile(), value);
-        }
-      }
+      if(!(result instanceof Dottable)) throw new Exceptionf(invalidObjectAccessChainMessage("has?",i,result));
     }
     return ((Dottable)result).has(value[n]);
   }
@@ -228,21 +201,13 @@ public class ObjectAccessChain extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter (effectively "get")
-  private String invalidObjectAccessChainMessage(int idx, Datum val) throws Exception {
-    if(value[idx].hasSourceInformation()) {
-      return String.format("ObjectAccessChain: <get> property #%d \"%s\" (%s) isn't <dottable>: %s\n>> Location: %s", idx+1, value[idx], val.profile(), serializeValue(), value[idx].source());
-    } else {
-      return String.format("ObjectAccessChain: <get> property #%d \"%s\" (%s) isn't <dottable>: %s", idx+1, value[idx], val.profile(), serializeValue());
-    }
-  }
-
   public Datum loadWithState(Environment env) throws Exception {
     Datum result = env.get(value[0]);
-    if(!(result instanceof Dottable)) throw new Exceptionf(invalidObjectAccessChainMessage(0,result));
+    if(!(result instanceof Dottable)) throw new Exceptionf(invalidObjectAccessChainMessage("get",0,result));
     for(int i = 1, n = value.length; i < n; ++i) {
       result = ((Dottable)result).get(value[i]);
       if(i+1 < n) {
-        if(!(result instanceof Dottable)) throw new Exceptionf(invalidObjectAccessChainMessage(i,result));
+        if(!(result instanceof Dottable)) throw new Exceptionf(invalidObjectAccessChainMessage("get",i,result));
       } else if(result instanceof Procedure && value[i].hasSourceInformation()) {
         result = ((Procedure)result).loadWithInvocationSource(value[i].source());
       }

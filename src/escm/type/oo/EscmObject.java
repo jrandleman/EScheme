@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import escm.util.Trampoline;
 import escm.util.Exceptionf;
 import escm.type.Datum;
+import escm.type.bool.Boolean;
 import escm.type.procedure.MethodProcedure;
 import escm.vm.type.Callable;
 
@@ -52,13 +53,12 @@ public class EscmObject extends MetaObject implements Callable {
   ////////////////////////////////////////////////////////////////////////////
   // Internal Constructor
   // @PRECONDITION: <superObject> MUST ALREADY BE INITIALIZED!
-  // @PRECONDITION: <props> MUST HAVE <self> AND <super> BOUND TO METHODS EXTERNALLY
-  EscmObject(EscmClass escmClass, EscmObject superObject, ConcurrentHashMap<String,Datum> props) {
+  EscmObject(EscmClass escmClass, EscmObject superObject, ConcurrentHashMap<String,Datum> props) throws Exception {
     this.escmClass = escmClass;
     this.superObject = superObject;
     this.props = props;
     this.props.put("class",this.escmClass);
-    this.bindMethodsWithSuper();
+    this.convertProceduresToMethods();
   }
 
 
@@ -70,7 +70,7 @@ public class EscmObject extends MetaObject implements Callable {
     Datum procedure = get("->procedure");
     if(!(procedure instanceof MethodProcedure))
       throw new Exceptionf("Object of class %s error: \"->procedure\" property %s isn't a method!", escmClass.readableName(),procedure.profile());
-    return ((MethodProcedure)procedure).loadWithSelf(this).callWith(args,continuation);
+    return ((MethodProcedure)procedure).callWith(args,continuation);
   }
 
 
@@ -95,6 +95,16 @@ public class EscmObject extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Update the Super Object (& return the updated super) (equivalent to the "super!" macro)
+  protected void bindMethodsWithNewSelfAndSuper() {
+    for(ConcurrentHashMap.Entry<String,Datum> e : props.entrySet()) {
+      Datum val = e.getValue();
+      if(val instanceof MethodProcedure) {
+        props.put(e.getKey(),((MethodProcedure)val).loadWithNewSelfAndSuper(this,this.superObject));
+      }
+    }
+  }
+
+
   public Trampoline.Bounce updateSuper(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
     if(superObject == null)
       throw new Exceptionf("'super! class %s doesn't have a <super> to initialize!", escmClass.readableName());
@@ -104,9 +114,9 @@ public class EscmObject extends MetaObject implements Callable {
       // @NOTE: This is ONLY thread safe if the user ONLY uses <super!> as the 
       //        1st statement in the constructor (as directed by the README)
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      this.superObject = (EscmObject)newSuperObj;
       
-      this.bindMethodsWithSuper();
+      this.superObject = (EscmObject)newSuperObj;
+      this.bindMethodsWithNewSelfAndSuper();
       return continuation.run(this.superObject);
     });
   }
@@ -226,9 +236,8 @@ public class EscmObject extends MetaObject implements Callable {
       this.superObject = superObject.copy();
     }
     this.props = props;
-    this.bindMethodsWithSuper();
+    this.bindMethodsWithNewSelfAndSuper();
   }
-
 
   public EscmObject copy() {
     return new EscmObject(0,escmClass,superObject,new ConcurrentHashMap<String,Datum>(props));

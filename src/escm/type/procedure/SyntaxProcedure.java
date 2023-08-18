@@ -14,7 +14,7 @@ import escm.vm.util.SourceInformation;
 
 public class SyntaxProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
-  // Internal primitive procedure field
+  // Internal expansion procedure field
   private Callable macro;
 
 

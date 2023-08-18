@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.type.Datum;
 import escm.type.Symbol;
+import escm.type.bool.Boolean;
 
 public class EscmInterface extends MetaObject {
   ////////////////////////////////////////////////////////////////////////////
@@ -68,7 +69,7 @@ public class EscmInterface extends MetaObject {
     this.interfaces = interfaces;
     this.props = props;
     this.requiredProps = requiredProps;
-    this.convertProceduresToMethodsAndBindSuper();
+    this.convertProceduresToMethods();
   }
 
 
@@ -202,17 +203,16 @@ public class EscmInterface extends MetaObject {
   private EscmInterface(String name, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) {
     this.interfaces = interfaces;
     this.props = props;
-    this.requiredProps = requiredProps;
     this.props.put("name",new Symbol(name));
+    this.requiredProps = requiredProps;
     this.bindMethodsWithName();
-    // @NOTE: Don't need to bind <super> since it's #f for interfaces & already bound as such in <props>.
   }
 
 
   public EscmInterface loadWithName(String name) {
     String currentName = name();
     if(currentName.length() > 0) return this;
-    return new EscmInterface(name,this.interfaces,MetaObject.copyProps(this.props),this.requiredProps);
+    return new EscmInterface(name,this.interfaces,this.props,this.requiredProps);
   }
 
 
