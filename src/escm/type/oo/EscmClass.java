@@ -202,9 +202,9 @@ public class EscmClass extends MetaObject implements Callable {
   private void bindInstanceMethodsWithName() {
     for(ConcurrentHashMap.Entry<String,Datum> e : this.objectProps.entrySet()) {
       Datum val = e.getValue();
-      if(val instanceof MethodProcedure) {
+      if(val instanceof CompoundProcedure) {
         String key = e.getKey();
-        this.objectProps.put(key,((MethodProcedure)val).loadWithForcedName(generateInstanceMethodName(key)));
+        this.objectProps.put(key,((CompoundProcedure)val).loadWithName(generateInstanceMethodName(key)));
       }
     }
   }
@@ -222,6 +222,7 @@ public class EscmClass extends MetaObject implements Callable {
 
 
   public EscmClass loadWithName(String name) {
+    if(name.equals("self") || name.equals("super")) return this;
     String currentName = name();
     if(currentName.length() > 0) return this;
     return new EscmClass(name,this.superClass,this.interfaces,this.props,this.objectProps);

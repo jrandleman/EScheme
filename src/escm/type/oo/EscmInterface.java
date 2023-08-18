@@ -210,6 +210,7 @@ public class EscmInterface extends MetaObject {
 
 
   public EscmInterface loadWithName(String name) {
+    if(name.equals("self") || name.equals("super")) return this;
     String currentName = name();
     if(currentName.length() > 0) return this;
     return new EscmInterface(name,this.interfaces,this.props,this.requiredProps);
