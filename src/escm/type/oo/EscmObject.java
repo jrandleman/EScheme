@@ -226,16 +226,16 @@ public class EscmObject extends MetaObject implements Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Copying
+  // Copying (performs a shallow copy up the inheritance chain)
   // <ignore> is used to distinguish this ctor from the above public one
-  private EscmObject(int ignore, EscmClass escmClass, EscmObject superObject, ConcurrentHashMap<String,Datum> props) {
+  private EscmObject(int ignore, EscmClass escmClass, EscmObject superObject, ConcurrentHashMap<String,Datum> propsCopy) {
     this.escmClass = escmClass;
     if(superObject == null) {
       this.superObject = null;
     } else {
       this.superObject = superObject.copy();
     }
-    this.props = props;
+    this.props = propsCopy;
     this.bindMethodsWithNewSelfAndSuper();
   }
 

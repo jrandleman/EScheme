@@ -81,7 +81,7 @@ public class MethodProcedure extends CompoundProcedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // <self> Binding (done updon method invocation)
+  // <self> Binding (done updon dynamic method invocation)
   public MethodProcedure loadWithDynamicSelf(MetaObject selfObj) throws Exception {
     Environment methodEnvironment = new Environment(state.definitionEnvironment.superEnv());
     methodEnvironment.define(SELF_SYMBOL,selfObj);
