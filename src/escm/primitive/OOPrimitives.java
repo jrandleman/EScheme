@@ -33,10 +33,10 @@ public class OOPrimitives {
       return "escm-oo-class";
     }
 
-    // Returns <null> if <name-string> DNE
+    // Returns <null> if <name-keyword> DNE
     public static String parseOptionalClassOrInterfaceName(ArrayList<Datum> parameters) {
       Datum nameString = parameters.get(0);
-      if(nameString instanceof escm.type.String) return ((escm.type.String)nameString).value();
+      if(nameString instanceof Keyword) return ((Keyword)nameString).value().substring(1);
       return null;
     }
 
@@ -93,7 +93,7 @@ public class OOPrimitives {
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 8) 
-        throw new Exceptionf("'(escm-oo-class <name-string> <super> <interface-list> <ctor> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list> <instance-prop-value-list>) expects exactly 8 args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(escm-oo-class <name-keyword> <super> <interface-list> <ctor> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list> <instance-prop-value-list>) expects exactly 8 args: %s", Exceptionf.profileArgs(parameters));
       // Parse components
       String className = parseOptionalClassOrInterfaceName(parameters);
       EscmClass supr = parseSuper(parameters);
@@ -165,7 +165,7 @@ public class OOPrimitives {
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 5) 
-        throw new Exceptionf("'(escm-oo-interface <name-string> <interface-list> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list>) expects exactly 5 args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(escm-oo-interface <name-keyword> <interface-list> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list>) expects exactly 5 args: %s", Exceptionf.profileArgs(parameters));
       // Parse components
       String interfaceName = EscmOoClass.parseOptionalClassOrInterfaceName(parameters);
       ArrayList<EscmInterface> interfaces = parseInterfaces(parameters);

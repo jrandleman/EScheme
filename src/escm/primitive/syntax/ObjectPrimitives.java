@@ -42,7 +42,7 @@ public class ObjectPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (class <optional-name-string> (:extends <super>) (:implements <interface> ...) <prop> ...)
+  // (class <optional-name-keyword> (:extends <super>) (:implements <interface> ...) <prop> ...)
   //
   // <prop> ::= (<name> <value>)
   //          | ((<method-name> <param> ...) <body> ...)
@@ -52,7 +52,7 @@ public class ObjectPrimitives {
   // <super> MUST be an expression that evals to a class type.
   // <interface> MUST be an expression that evals to an interface type.
   // 
-  // NOTE: The EScheme code below doesn't account for parsing <name-string>: a new
+  // NOTE: The EScheme code below doesn't account for parsing <name-keyword>: a new
   // ===== internal preemptive-naming trick used by <define-class>, it allows us to 
   //       pre-bind our method names upon initial class construction, rather than
   //       only later when we bind a symbol to the class object in the environment. 
@@ -173,11 +173,11 @@ public class ObjectPrimitives {
       return "class";
     }
 
-    // Extract <name-string> if exists, else #f
+    // Extract <name-keyword> if exists, else #f
     public static Datum parseOptionalClassOrInterfaceName(ArrayList<Datum> parameters) {
       if(parameters.size() > 0) {
         Datum d = parameters.get(0);
-        if(d instanceof escm.type.String) {
+        if(d instanceof Keyword) {
           parameters.remove(0);
           return d;
         }
@@ -343,7 +343,7 @@ public class ObjectPrimitives {
   // <super> MUST be an expression that evals to a class type.
   // <interface> MUST be an expression that evals to an interface type.
   // 
-  // NOTE: The EScheme code below doesn't account for generating the <name-string>
+  // NOTE: The EScheme code below doesn't account for generating the <name-keyword>
   // ===== argument passed to <class>. See <class>'s comment description above for
   //       more details.
   //
@@ -371,13 +371,13 @@ public class ObjectPrimitives {
       return Pair.List(CorePrimitives.BEGIN,
         Pair.List(CorePrimitives.DEFINE,Pair.List(new Symbol(name.value()+"?"),obj),
           Pair.List(AND,Pair.List(IS_OBJECTP,obj),Pair.List(OO_ISP,obj,name))), // predicate generation!
-        Pair.List(CorePrimitives.DEFINE,name,new Pair(CLASS,new Pair(new escm.type.String(name.value()),classComponents))));
+        Pair.List(CorePrimitives.DEFINE,name,new Pair(CLASS,new Pair(new Keyword(name.value()),classComponents))));
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (interface <optional-name-string> (:extends <interface> ...) <prop> ...)
+  // (interface <optional-name-keyword> (:extends <interface> ...) <prop> ...)
   //
   // <prop> ::= <name>
   //          | (:static <name> <value>)
@@ -385,7 +385,7 @@ public class ObjectPrimitives {
   //
   // <interface> MUST be an expression that evals to an interface type.
   // 
-  // NOTE: The EScheme code below doesn't account for parsing <name-string>: a new
+  // NOTE: The EScheme code below doesn't account for parsing <name-keyword>: a new
   // ===== internal preemptive-naming trick used by <define-interface>, it allows us
   //       to pre-bind our method names upon initial interface construction, rather
   //       than only later when we bind a symbol to the interface object in the 
@@ -498,7 +498,7 @@ public class ObjectPrimitives {
   //
   // <interface> MUST be an expression that evals to an interface type.
   // 
-  // NOTE: The EScheme code below doesn't account for generating the <name-string>
+  // NOTE: The EScheme code below doesn't account for generating the <name-keyword>
   // ===== argument passed to <interface>. See <interface>'s comment description
   //       above for more details.
   //
@@ -526,7 +526,7 @@ public class ObjectPrimitives {
       return Pair.List(CorePrimitives.BEGIN,
         Pair.List(CorePrimitives.DEFINE,Pair.List(new Symbol(name.value()+"?"),obj),
           Pair.List(AND,Pair.List(IS_OBJECTP,obj),Pair.List(OO_ISP,obj,name))), // predicate generation!
-        Pair.List(CorePrimitives.DEFINE,name,new Pair(INTERFACE,new Pair(new escm.type.String(name.value()),classComponents))));
+        Pair.List(CorePrimitives.DEFINE,name,new Pair(INTERFACE,new Pair(new Keyword(name.value()),classComponents))));
     }
   }
 
