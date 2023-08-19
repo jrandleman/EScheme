@@ -27,20 +27,20 @@ public class MethodProcedure extends CompoundProcedure {
     return superObj;
   }
 
-  private static State getMethodState(MetaObject selfObj, MetaObject superObj, State rootProcedureState) {
-    Environment methodEnvironment = new Environment(rootProcedureState.definitionEnvironment);
+  private static Environment getMethodEnvironment(MetaObject selfObj, MetaObject superObj, Environment rootProcedureEnvironment) {
+    Environment methodEnvironment = new Environment(rootProcedureEnvironment);
     methodEnvironment.define(SELF_SYMBOL,selfObj);
     methodEnvironment.define(SUPER_SYMBOL,superAsDatum(superObj));
-    return new State(methodEnvironment,rootProcedureState.compileTime);
+    return methodEnvironment;
   }
 
   public MethodProcedure(MetaObject selfObj, MetaObject superObj, CompoundProcedure rootProcedure) {
-    super(rootProcedure.name,rootProcedure.invocationSource,getMethodState(selfObj,superObj,rootProcedure.state));
+    super(rootProcedure.name,rootProcedure.invocationSource,getMethodEnvironment(selfObj,superObj,rootProcedure.definitionEnvironment),rootProcedure.compileTime);
     if(superObj != null) this.superObj = superObj;
   }
 
   public MethodProcedure(MetaObject selfObj, MetaObject superObj, CompoundProcedure rootProcedure, String name) {
-    super(name,rootProcedure.invocationSource,getMethodState(selfObj,superObj,rootProcedure.state));
+    super(name,rootProcedure.invocationSource,getMethodEnvironment(selfObj,superObj,rootProcedure.definitionEnvironment),rootProcedure.compileTime);
     if(superObj != null) this.superObj = superObj;
   }
   
@@ -48,7 +48,7 @@ public class MethodProcedure extends CompoundProcedure {
   ////////////////////////////////////////////////////////////////////////////
   // Thunk Querying (unary variadics are considered thunks!)
   public boolean isThunk() {
-    for(ArrayList<Symbol> params : this.state.compileTime.parametersList) {
+    for(ArrayList<Symbol> params : this.compileTime.parametersList) {
       if(params.isEmpty()) return true;
     }
     return false;
@@ -57,35 +57,35 @@ public class MethodProcedure extends CompoundProcedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // Forced Name binding (used by escm.type.oo.MetaObject)
-  private MethodProcedure(String name, SourceInformation invocationSource, State state, Datum superObj) {
-    super(name,invocationSource,state);
+  private MethodProcedure(String name, SourceInformation invocationSource, Environment definitionEnvironment, CompileTime compileTime, Datum superObj) {
+    super(name,invocationSource,definitionEnvironment,compileTime);
     this.superObj = superObj;
   }
 
   public MethodProcedure loadWithForcedName(String name) {
-    return new MethodProcedure(name,invocationSource,state,superObj);
+    return new MethodProcedure(name,invocationSource,definitionEnvironment,compileTime,superObj);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading with new object bindings (for <EscmObject.copy()>):
-  //   => Note that <state.definitionEnvironment.superEnv()> points to the 
+  //   => Note that <definitionEnvironment.superEnv()> points to the 
   //      object's class' original enclosing environment.
   public MethodProcedure loadWithNewSelfAndSuper(MetaObject selfObj, MetaObject superObj) {
     Datum superObjDatum = superAsDatum(superObj);
-    Environment methodEnvironment = new Environment(state.definitionEnvironment.superEnv());
+    Environment methodEnvironment = new Environment(definitionEnvironment.superEnv());
     methodEnvironment.define(SELF_SYMBOL,selfObj);
     methodEnvironment.define(SUPER_SYMBOL,superObjDatum);
-    return new MethodProcedure(name,invocationSource,new State(methodEnvironment,state.compileTime),superObjDatum);
+    return new MethodProcedure(name,invocationSource,methodEnvironment,compileTime,superObjDatum);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // <self> Binding (done updon dynamic method invocation)
   public MethodProcedure loadWithDynamicSelf(MetaObject selfObj) throws Exception {
-    Environment methodEnvironment = new Environment(state.definitionEnvironment.superEnv());
+    Environment methodEnvironment = new Environment(definitionEnvironment.superEnv());
     methodEnvironment.define(SELF_SYMBOL,selfObj);
     methodEnvironment.define(SUPER_SYMBOL,superObj);
-    return new MethodProcedure(name,invocationSource,new State(methodEnvironment,state.compileTime),superObj);
+    return new MethodProcedure(name,invocationSource,methodEnvironment,compileTime,superObj);
   }
 }

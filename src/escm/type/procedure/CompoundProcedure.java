@@ -56,42 +56,31 @@ public class CompoundProcedure extends Procedure {
     }
   };
 
-  protected static class State implements Serializable {
-    public Environment definitionEnvironment;
-    public CompileTime compileTime;
-    public State(CompileTime compileTime) {
-      this.definitionEnvironment = null;
-      this.compileTime = compileTime;
-    }
-    public State(Environment definitionEnvironment, CompileTime compileTime) {
-      this.definitionEnvironment = definitionEnvironment;
-      this.compileTime = compileTime;
-    }
-  };
-
-  protected State state;
+  protected Environment definitionEnvironment = null;
+  protected CompileTime compileTime = null;
   
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
   public CompoundProcedure(ArrayList<ArrayList<Symbol>> parametersList, ArrayList<Symbol> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
-    this.state = new State(new CompileTime(parametersList,variadicParameterList,bodyList));
+    this.compileTime = new CompileTime(parametersList,variadicParameterList,bodyList);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   // => Cloning + super environment binding
-  protected CompoundProcedure(String name, SourceInformation invocationSource, State state) {
+  protected CompoundProcedure(String name, SourceInformation invocationSource, Environment definitionEnvironment, CompileTime compileTime) {
     this.name = name;
     this.invocationSource = invocationSource;
-    this.state = state;
+    this.definitionEnvironment = definitionEnvironment;
+    this.compileTime = compileTime;
   }
 
 
   public CompoundProcedure loadWithState(ExecutionState exeState) {
-    if(state.definitionEnvironment != null) return this;
-    return new CompoundProcedure(name,invocationSource,new State(exeState.env,state.compileTime));
+    if(definitionEnvironment != null) return this;
+    return new CompoundProcedure(name,invocationSource,exeState.env,compileTime);
   }
 
 
@@ -99,21 +88,23 @@ public class CompoundProcedure extends Procedure {
   // Name binding (used by escm.vm.util.Environment)
   public CompoundProcedure loadWithName(String name) {
     if(!this.name.equals(Procedure.DEFAULT_NAME)) return this;
-    return new CompoundProcedure(name,invocationSource,state);
+    return new CompoundProcedure(name,invocationSource,definitionEnvironment,compileTime);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Invocation source binding (used by escm.type.Symbol)
   public CompoundProcedure loadWithInvocationSource(SourceInformation invocationSource) {
-    return new CompoundProcedure(name,invocationSource,state);
+    return new CompoundProcedure(name,invocationSource,definitionEnvironment,compileTime);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Equality
   public boolean eq(Object o) {
-    return (o instanceof CompoundProcedure) && ((CompoundProcedure)o).state == state;
+    if(!(o instanceof CompoundProcedure)) return false;
+    CompoundProcedure c = (CompoundProcedure)o;
+    return c.definitionEnvironment == definitionEnvironment && c.compileTime == compileTime;
   }
 
 
@@ -137,8 +128,8 @@ public class CompoundProcedure extends Procedure {
 
   protected String stringifyParameterSignatures() {
     StringBuilder sb = new StringBuilder("\n>> Available Signatures:");
-    for(int i = 0, n = state.compileTime.parametersList.size(); i < n; ++i) {
-      sb.append(String.format("\n   %2d) ", i+1) + stringifyParameters(state.compileTime.parametersList.get(i),state.compileTime.variadicParameterList.get(i)));
+    for(int i = 0, n = compileTime.parametersList.size(); i < n; ++i) {
+      sb.append(String.format("\n   %2d) ", i+1) + stringifyParameters(compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i)));
     }
     return sb.toString();
   }
@@ -146,22 +137,22 @@ public class CompoundProcedure extends Procedure {
 
   // @RETURN: the clause (param/body) index these args can be processed with
   protected int validateEnvironmentExtension(ArrayList<Datum> arguments) throws Exception {
-    if(state.definitionEnvironment == null)
+    if(definitionEnvironment == null)
       throw new Exceptionf("Can't apply procedure %s with a null definition environment!", name);
     int totalArguments = arguments.size();
-    for(int i = 0, n = state.compileTime.parametersList.size(); i < n; ++i) {
-      int totalParameters = state.compileTime.parametersList.get(i).size();
+    for(int i = 0, n = compileTime.parametersList.size(); i < n; ++i) {
+      int totalParameters = compileTime.parametersList.get(i).size();
       if(totalArguments == totalParameters) return i;
-      if(totalArguments > totalParameters && state.compileTime.variadicParameterList.get(i) != null) return i;
+      if(totalArguments > totalParameters && compileTime.variadicParameterList.get(i) != null) return i;
     }
     throw new Exceptionf("Args (%s) don't match any signatures in procedure \"%s\":%s", Exceptionf.profileArgs(arguments), name, stringifyParameterSignatures());
   }
 
 
   protected Environment getExtendedEnvironment(int clauseNumber, ArrayList<Datum> arguments) throws Exception {
-    Environment extendedEnvironment = new Environment(state.definitionEnvironment);
-    ArrayList<Symbol> parameters = state.compileTime.parametersList.get(clauseNumber);
-    Symbol variadicParameter = state.compileTime.variadicParameterList.get(clauseNumber);
+    Environment extendedEnvironment = new Environment(definitionEnvironment);
+    ArrayList<Symbol> parameters = compileTime.parametersList.get(clauseNumber);
+    Symbol variadicParameter = compileTime.variadicParameterList.get(clauseNumber);
     int n = parameters.size();
     // register non-variadic arguments
     for(int i = 0; i < n; ++i)
@@ -186,7 +177,7 @@ public class CompoundProcedure extends Procedure {
         EscmCallStack.pop(name);
         return continuation.run(value);
       };
-      return Interpreter.run(new ExecutionState(extendedEnvironment,state.compileTime.bodyList.get(clauseNumber)),popContinuation);
+      return Interpreter.run(new ExecutionState(extendedEnvironment,compileTime.bodyList.get(clauseNumber)),popContinuation);
     };
   }
 }
