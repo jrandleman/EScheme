@@ -15,11 +15,8 @@ import escm.vm.util.ExecutionState;
 public class Mutex extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Private Internal Lock, Specific, & Name Field
-  private static class State implements Serializable {
-    private ReentrantLock lock = new ReentrantLock();
-    private Datum specific = Void.VALUE;
-  };
-  private State state = new State();
+  private ReentrantLock lock = new ReentrantLock();
+  private Datum specific = Void.VALUE;
   private String name = null;
 
 
@@ -30,20 +27,20 @@ public class Mutex extends Datum {
   }
 
   public synchronized Datum getSpecific() {
-    return state.specific;
+    return specific;
   }
 
   public synchronized void setSpecific(Datum newValue) {
-    state.specific = newValue;
+    specific = newValue;
   }
 
   public void lock() {
-    state.lock.lock();
+    lock.lock();
   }
 
   public boolean lock(long millis) {
     try {
-      return state.lock.tryLock(millis,TimeUnit.MILLISECONDS);
+      return lock.tryLock(millis,TimeUnit.MILLISECONDS);
     } catch(Exception e) {
       return false;
     }
@@ -51,7 +48,7 @@ public class Mutex extends Datum {
 
   public boolean unlock() {
     try {
-      state.lock.unlock();
+      lock.unlock();
       return true;
     } catch(Exception e) {
       return false;
@@ -59,23 +56,23 @@ public class Mutex extends Datum {
   }
 
   public boolean isLocked() {
-    return state.lock.isLocked();
+    return lock.isLocked();
   }
 
   public int queueLength() {
-    return state.lock.getQueueLength();
+    return lock.getQueueLength();
   }
 
   public boolean isQueued() {
-    return state.lock.hasQueuedThreads();
+    return lock.hasQueuedThreads();
   }
 
   public int holdCount() {
-    return state.lock.getHoldCount();
+    return lock.getHoldCount();
   }
 
   public boolean isHeld() {
-    return state.lock.isHeldByCurrentThread();
+    return lock.isHeldByCurrentThread();
   }
 
 
@@ -83,7 +80,7 @@ public class Mutex extends Datum {
   // Constructor(s)
   public Mutex(String name, Datum specific) {
     this.name = name;
-    this.state.specific = specific;
+    this.specific = specific;
   }
 
 
@@ -93,7 +90,7 @@ public class Mutex extends Datum {
 
 
   public Mutex(Datum specific) {
-    this.state.specific = specific;
+    this.specific = specific;
   }
 
 
@@ -117,7 +114,7 @@ public class Mutex extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Equality
   public boolean eq(Object o) {
-    return o instanceof Mutex && ((Mutex)o).state.lock == this.state.lock;
+    return o instanceof Mutex && ((Mutex)o).lock == this.lock;
   }
 
   public boolean equal(Object o) {
@@ -128,7 +125,7 @@ public class Mutex extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
-    return Objects.hash(type(),state.lock);
+    return Objects.hash(type(),lock);
   }
 
 
@@ -168,14 +165,15 @@ public class Mutex extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
-  private Mutex(String name, State state) {
+  private Mutex(String name, ReentrantLock lock, Datum specific) {
     this.name = name;
-    this.state = state;
+    this.lock = lock;
+    this.specific = specific;
   }
 
   public Mutex loadWithName(String name) {
     if(this.name != null) return this;
-    return new Mutex(name,this.state);
+    return new Mutex(name,this.lock,this.specific);
   }
 
 
