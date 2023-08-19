@@ -8,7 +8,7 @@
   "name": "bind",
   "aliases": null,
   "signatures": ["(bind <callable> <obj> ...)"],
-  "description": "Create a new procedure by binding \"<obj> ...\" as arguments to <callable>.\nAliased by <+> if only given callables.",
+  "description": "Create a new procedure by binding \"<obj> ...\" as arguments to <callable>.\nAliased by <+> if only given non-<associative-collection> callables.",
   "example": null
 }, {
   "name": "id",
