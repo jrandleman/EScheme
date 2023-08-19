@@ -187,7 +187,7 @@ public class OOPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(meta-object? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      if(parameters.get(0) instanceof escm.type.oo.MetaObject) return Boolean.TRUE;
+      if(parameters.get(0) instanceof MetaObject) return Boolean.TRUE;
       return Boolean.FALSE;
     }
   }
@@ -286,51 +286,136 @@ public class OOPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Helper class to abstract <oo-has?> & <oo-get> operations
+  private static class OoGetLastItemInAccessChain {
+    public static interface MissingLogic {
+      public Datum exec(Symbol prop) throws Exception;
+    }
+
+    public static interface NonMetaObjectLogic {
+      public Datum exec(Symbol prop, Datum propValue) throws Exception;
+    }
+
+     public static interface SuccessLogic {
+      public Datum exec(Datum finalValue) throws Exception;
+    }
+
+    private static Symbol parsePropertySymbol(String primitiveSignature, int i, ArrayList<Datum> parameters) throws Exception {
+      Datum d = parameters.get(i);
+      if(!(d instanceof Symbol))
+        throw new Exceptionf("'%s arg #%d isn't a symbol: %s", primitiveSignature, i+1, Exceptionf.profileArgs(parameters));
+      return (Symbol)d;
+    }
+
+    public static Datum logic(String primitiveSignature, MetaObject rootObj, ArrayList<Datum> parameters, MissingLogic missing, NonMetaObjectLogic nonMetaObject, SuccessLogic win) throws Exception {
+      for(int i = 1, n = parameters.size(); i < n; ++i) {
+        Symbol prop = parsePropertySymbol(primitiveSignature,i,parameters);
+        // Process symbols in object-access-chain
+        if(ObjectAccessChain.is(prop)) {
+          Symbol[] parsedProperties = ObjectAccessChain.parse(prop);
+          for(int j = 0; j < parsedProperties.length; ++j) {
+            if(!rootObj.has(parsedProperties[j])) return missing.exec(parsedProperties[j]);
+            Datum value = rootObj.get(parsedProperties[j]);
+            if(i+1 < n || j+1 < parsedProperties.length) {
+              if(!(value instanceof MetaObject)) return nonMetaObject.exec(parsedProperties[j],value);
+              rootObj = (MetaObject)value;
+            } else {
+              return win.exec(value);
+            }
+          }
+        // Process immediate symbol
+        } else {
+          if(!rootObj.has(prop)) return missing.exec(prop);
+          Datum value = rootObj.get(prop);
+          if(i+1 < n) {
+            if(!(value instanceof MetaObject)) return nonMetaObject.exec(prop,value);
+            rootObj = (MetaObject)value;
+          } else {
+            return win.exec(value);
+          }
+        }
+      }
+      // unreachable
+      throw new Exceptionf("INTERNAL ESCM BUG: '%s couldn't execute properly: %s", primitiveSignature, Exceptionf.profileArgs(parameters));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Helper class to abstract <oo-set!> & <oo-define> operations
+  private static class OoMutateLastPropertyInAccessChain {
+    public static interface MissingLogic {
+      public Datum exec(Symbol prop) throws Exception;
+    }
+
+    public static interface NonMetaObjectLogic {
+      public Datum exec(Symbol prop, Datum propValue) throws Exception;
+    }
+
+    public static interface SuccessLogic {
+      public Datum exec(MetaObject obj, Symbol lastProp, Datum newValue) throws Exception;
+    }
+
+    private static Symbol parsePropertySymbol(String primitiveSignature, int i, ArrayList<Datum> parameters) throws Exception {
+      Datum d = parameters.get(i);
+      if(!(d instanceof Symbol))
+        throw new Exceptionf("'%s arg #%d isn't a symbol: %s", primitiveSignature, i+1, Exceptionf.profileArgs(parameters));
+      return (Symbol)d;
+    }
+
+    public static Datum logic(String primitiveSignature, MetaObject rootObj, ArrayList<Datum> parameters, MissingLogic missing, NonMetaObjectLogic nonMetaObject, SuccessLogic win) throws Exception {
+      int totalParameters = parameters.size();
+      Datum lastValue = parameters.get(totalParameters-1);
+      for(int i = 1, n = totalParameters-1; i < n; ++i) {
+        Symbol prop = parsePropertySymbol(primitiveSignature,i,parameters);
+        // Process symbols in object-access-chain
+        if(ObjectAccessChain.is(prop)) {
+          Symbol[] parsedProperties = ObjectAccessChain.parse(prop);
+          for(int j = 0; j < parsedProperties.length; ++j) {
+            if(i+1 < n || j+1 < parsedProperties.length) {
+              if(!rootObj.has(parsedProperties[j])) return missing.exec(parsedProperties[j]);
+              Datum value = rootObj.get(parsedProperties[j]);
+              if(!(value instanceof MetaObject)) return nonMetaObject.exec(parsedProperties[j],value);
+              rootObj = (MetaObject)value;
+            } else {
+              return win.exec(rootObj,parsedProperties[j],lastValue);
+            }
+          }
+        // Process immediate symbol
+        } else {
+          if(i+1 < n) {
+            if(!rootObj.has(prop)) return missing.exec(prop);
+            Datum value = rootObj.get(prop);
+            if(!(value instanceof MetaObject)) return nonMetaObject.exec(prop,value);
+            rootObj = (MetaObject)value;
+          } else {
+            return win.exec(rootObj,prop,lastValue);
+          }
+        }
+      }
+      // unreachable
+      throw new Exceptionf("INTERNAL ESCM BUG: '%s couldn't execute properly: %s", primitiveSignature, Exceptionf.profileArgs(parameters));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // oo-has?
   public static class OoHas extends Primitive {
     public java.lang.String escmName() {
       return "oo-has?";
     }
 
-    public static ArrayList<Symbol> parseAccessChain(String primitiveSignature, int totalAccessChainParams, ArrayList<Datum> parameters) throws Exception {
-      ArrayList<Symbol> accessChain = new ArrayList<Symbol>();
-      for(int i = 1; i < totalAccessChainParams; ++i) {
-        Datum d = parameters.get(i);
-        if(!(d instanceof Symbol))
-          throw new Exceptionf("'%s arg #%d isn't a symbol: %s", primitiveSignature, i+1, Exceptionf.profileArgs(parameters));
-        Symbol prop = (Symbol)d;
-        if(ObjectAccessChain.is(prop)) {
-          for(Symbol p : ObjectAccessChain.parse(prop)) {
-            accessChain.add(p);
-          }
-        } else {
-          accessChain.add(prop);
-        }
-      }
-      return accessChain;
-    }
-
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      // Validate Params
-      int totalParameters = parameters.size();
-      if(totalParameters < 2) 
+      if(parameters.size() < 2) 
         throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum mo = parameters.get(0);
-      if(!(mo instanceof MetaObject))
-        throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<Symbol> accessChain = parseAccessChain("(oo-has? <meta-object> <property-symbol-name> ...)",totalParameters,parameters);
-      // "has?" Logic
-      MetaObject obj = (MetaObject)mo;
-      for(int i = 0, n = accessChain.size(); i < n; ++i) {
-        Symbol prop = accessChain.get(i);
-        if(!obj.has(prop)) return Boolean.FALSE;
-        Datum val = obj.get(prop);
-        if(i+1 < n) {
-          if(!(val instanceof MetaObject)) return Boolean.FALSE;
-          obj = (MetaObject)val;
-        }
-      }
-      return Boolean.TRUE;
+      Datum rootObj = parameters.get(0);
+      if(!(rootObj instanceof MetaObject))
+        throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) 1st arg isn't a <meta-object>: %s", Exceptionf.profileArgs(parameters));
+      OoGetLastItemInAccessChain.MissingLogic missingCase = (badProperty) -> Boolean.FALSE;
+      OoGetLastItemInAccessChain.NonMetaObjectLogic nonDotCase = (badProperty,badValue) -> Boolean.FALSE;
+      OoGetLastItemInAccessChain.SuccessLogic winCase = (finalValue) -> Boolean.TRUE;
+      return OoGetLastItemInAccessChain.logic("(oo-has? <meta-object> <property-symbol-name> ...)",(MetaObject)rootObj,parameters,missingCase,nonDotCase,winCase);
     }
   }
 
@@ -344,24 +429,19 @@ public class OOPrimitives {
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       // Validate Params
-      int totalParameters = parameters.size();
-      if(totalParameters < 2) 
+      if(parameters.size() < 2) 
         throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum mo = parameters.get(0);
-      if(!(mo instanceof MetaObject))
-        throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<Symbol> accessChain = OoHas.parseAccessChain("(oo-get <meta-object> <property-symbol-name> ...)",totalParameters,parameters);
-      // "get" Logic
-      for(int i = 0, n = accessChain.size(); i < n; ++i) {
-        MetaObject obj = (MetaObject)mo;
-        Symbol prop = accessChain.get(i);
-        if(!obj.has(prop))
-          throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) object property '%s doesn't exist: %s", prop, Exceptionf.profileArgs(parameters));
-        mo = obj.get(prop);
-        if(i+1 < n && !(mo instanceof MetaObject))
-          throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) object property '%s isn't a meta-object: %s", prop, Exceptionf.profileArgs(parameters));
-      }
-      return mo;
+      Datum rootObj = parameters.get(0);
+      if(!(rootObj instanceof MetaObject))
+        throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) 1st arg isn't a <meta-object>: %s", Exceptionf.profileArgs(parameters));
+      OoGetLastItemInAccessChain.MissingLogic missingCase = (badProperty) -> {
+        throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) object property '%s doesn't exist: %s", badProperty, Exceptionf.profileArgs(parameters));
+      };
+      OoGetLastItemInAccessChain.NonMetaObjectLogic nonDotCase = (badProperty,badValue) -> {
+        throw new Exceptionf("'(oo-get <meta-object> <property-symbol-name> ...) object property '%s (%s) isn't a <meta-object>: %s", badProperty, badValue.profile(), Exceptionf.profileArgs(parameters));
+      };
+      OoGetLastItemInAccessChain.SuccessLogic winCase = (finalValue) -> finalValue;
+      return OoGetLastItemInAccessChain.logic("(oo-get <meta-object> <property-symbol-name> ...)",(MetaObject)rootObj,parameters,missingCase,nonDotCase,winCase);
     }
   }
 
@@ -373,36 +453,26 @@ public class OOPrimitives {
       return "oo-set!";
     }
 
-    public static Symbol getLastProp(String primitiveName, Datum mo, ArrayList<Symbol> accessChain, ArrayList<Datum> parameters) throws Exception {
-      int n = accessChain.size()-1;
-      for(int i = 0; i < n; ++i) {
-        MetaObject obj = (MetaObject)mo;
-        Symbol prop = accessChain.get(i);
-        if(!obj.has(prop))
-          throw new Exceptionf("'(%s <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", primitiveName, prop, Exceptionf.profileArgs(parameters));
-        mo = obj.get(prop);
-        if(!(mo instanceof MetaObject))
-          throw new Exceptionf("'(%s <meta-object> <property-symbol-name> ... <value>) object property '%s isn't a meta-object: %s", primitiveName, prop, Exceptionf.profileArgs(parameters));
-      }
-      return accessChain.get(n);
-    }
-
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       // Validate Params
-      int totalParameters = parameters.size();
-      if(totalParameters < 3) 
+      if(parameters.size() < 3) 
         throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) expects at least 3 args: %s", Exceptionf.profileArgs(parameters));
-      Datum mo = parameters.get(0);
-      if(!(mo instanceof MetaObject))
-        throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<Symbol> accessChain = OoHas.parseAccessChain("(oo-set! <meta-object> <property-symbol-name> ... <value>)",totalParameters-1,parameters);
-      // "set!" Logic
-      Symbol lastProp = getLastProp("oo-set!",mo,accessChain,parameters);
-      MetaObject obj = (MetaObject)mo;
-      if(!obj.has(lastProp))
-        throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", lastProp, Exceptionf.profileArgs(parameters));
-      obj.set(lastProp,parameters.get(totalParameters-1));
-      return Void.VALUE;
+      Datum rootObj = parameters.get(0);
+      if(!(rootObj instanceof MetaObject))
+        throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) 1st arg isn't a <meta-object>: %s", Exceptionf.profileArgs(parameters));
+      OoMutateLastPropertyInAccessChain.MissingLogic missingCase = (badProperty) -> {
+        throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", badProperty, Exceptionf.profileArgs(parameters));
+      };
+      OoMutateLastPropertyInAccessChain.NonMetaObjectLogic nonDotCase = (badProperty,badValue) -> {
+        throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) object property '%s (%s) isn't a <meta-object>: %s", badProperty, badValue.profile(), Exceptionf.profileArgs(parameters));
+      };
+      OoMutateLastPropertyInAccessChain.SuccessLogic winCase = (obj,lastProp,newValue) -> {
+        if(!obj.has(lastProp))
+          throw new Exceptionf("'(oo-set! <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", lastProp, Exceptionf.profileArgs(parameters));
+        obj.set(lastProp,newValue);
+        return Void.VALUE;
+      };
+      return OoMutateLastPropertyInAccessChain.logic("(oo-set! <meta-object> <property-symbol-name> ... <value>)",(MetaObject)rootObj,parameters,missingCase,nonDotCase,winCase);
     }
   }
 
@@ -415,18 +485,22 @@ public class OOPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      // Validate Params
-      int totalParameters = parameters.size();
-      if(totalParameters < 3) 
+      if(parameters.size() < 3) 
         throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) expects at least 3 args: %s", Exceptionf.profileArgs(parameters));
-      Datum mo = parameters.get(0);
-      if(!(mo instanceof MetaObject))
-        throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) 1st arg isn't a meta-object: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<Symbol> accessChain = OoHas.parseAccessChain("(oo-define <meta-object> <property-symbol-name> ... <value>)",totalParameters-1,parameters);
-      // "define" Logic
-      Symbol definedProp = OoSetBang.getLastProp("oo-define",mo,accessChain,parameters);
-      ((MetaObject)mo).define(definedProp,parameters.get(totalParameters-1));
-      return Void.VALUE;
+      Datum rootObj = parameters.get(0);
+      if(!(rootObj instanceof MetaObject))
+        throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) 1st arg isn't a <meta-object>: %s", Exceptionf.profileArgs(parameters));
+      OoMutateLastPropertyInAccessChain.MissingLogic missingCase = (badProperty) -> {
+        throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) object property '%s doesn't exist: %s", badProperty, Exceptionf.profileArgs(parameters));
+      };
+      OoMutateLastPropertyInAccessChain.NonMetaObjectLogic nonDotCase = (badProperty,badValue) -> {
+        throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) object property '%s (%s) isn't a <meta-object>: %s", badProperty, badValue.profile(), Exceptionf.profileArgs(parameters));
+      };
+      OoMutateLastPropertyInAccessChain.SuccessLogic winCase = (obj,lastProp,newValue) -> {
+        obj.define(lastProp,newValue);
+        return Void.VALUE;
+      };
+      return OoMutateLastPropertyInAccessChain.logic("(oo-define <meta-object> <property-symbol-name> ... <value>)",(MetaObject)rootObj,parameters,missingCase,nonDotCase,winCase);
     }
   }
 
