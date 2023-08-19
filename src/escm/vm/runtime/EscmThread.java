@@ -6,7 +6,7 @@
 
 package escm.vm.runtime;
 import java.util.ArrayList;
-import java.util.Stack;
+import java.util.ArrayDeque;
 import java.math.BigInteger;
 import escm.util.Pair;
 import escm.type.Datum;
@@ -26,7 +26,7 @@ public abstract class EscmThread extends Thread {
 
   ////////////////////////////////////////////////////////////////////////////
   // Thread-local call stack [used by <CallStack>]
-  public Stack<Pair<String,SourceInformation>> callStack = EscmCallStack.newCallStack();
+  public ArrayDeque<Pair<String,SourceInformation>> callStack = EscmCallStack.newCallStack();
 
 
   ////////////////////////////////////////////////////////////////////////////

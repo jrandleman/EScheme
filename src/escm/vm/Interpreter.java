@@ -5,7 +5,7 @@
 
 package escm.vm;
 import java.util.ArrayList;
-import java.util.Stack;
+import java.util.ArrayDeque;
 import java.util.Collections;
 import escm.type.Datum;
 import escm.type.number.Real;
@@ -20,7 +20,7 @@ import escm.vm.util.ObjectAccessChain;
 public class Interpreter {
   ////////////////////////////////////////////////////////////////////////////
   // Application helper
-  private static Trampoline.Bounce executeApplication(Stack<Datum> stack, int applicationItemCount, Trampoline.Continuation continuation) throws Exception {
+  private static Trampoline.Bounce executeApplication(ArrayDeque<Datum> stack, int applicationItemCount, Trampoline.Continuation continuation) throws Exception {
     if(applicationItemCount == 0)
       throw new Exception("VM ERROR: Invalid application count 0 in \"call\" instruction!");
     // Extract application items
@@ -162,7 +162,7 @@ public class Interpreter {
         //////////////////////////////////////////////////////////////////////
         // (pop)
         case Instruction.POP: {
-          if(state.stack.empty())
+          if(state.stack.size() == 0)
             throw new Exception("VM ERROR: Invalid \"pop\" instruction, stack is empty!");
           state.cvr = state.stack.pop();
           ++state.cii;

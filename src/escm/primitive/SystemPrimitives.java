@@ -4,7 +4,7 @@
 
 package escm.primitive;
 import java.util.ArrayList;
-import java.util.Stack;
+import java.util.ArrayDeque;
 import java.util.Calendar;
 import java.util.Map;
 import java.io.File;
@@ -109,7 +109,7 @@ public class SystemPrimitives {
       return addStringPaths(dir,file);
     }
 
-    public static Trampoline.Bounce evalEachExpression(ArrayList<Datum> exprs, int i, Stack<Pair<String,SourceInformation>> originalCallStack, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
+    public static Trampoline.Bounce evalEachExpression(ArrayList<Datum> exprs, int i, ArrayDeque<Pair<String,SourceInformation>> originalCallStack, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
       int n = exprs.size();
       if(i >= n) return continuation.run(Void.VALUE);
       Trampoline.Continuation nextContinuation;

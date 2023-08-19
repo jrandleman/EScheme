@@ -6,7 +6,7 @@
 
 package escm.vm;
 import java.util.ArrayList;
-import java.util.Stack;
+import java.util.ArrayDeque;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.Keyword;
@@ -86,7 +86,7 @@ public class Reader {
 
 
   // @return: pair of parsed reader shorthand literal expansion & position in <sourceCode> after the parsed literal
-  private static Pair<Datum,Integer> parseReaderShorthandLiteralLogic(CharSequence sourceCode, String longhandName, int shorthandStartIdx, int shorthandEndIdx, Stack<Character> containerStack, SourceInformation source, SourceInformation shorthandSource, boolean ignoringIncomplete) throws ReaderException {
+  private static Pair<Datum,Integer> parseReaderShorthandLiteralLogic(CharSequence sourceCode, String longhandName, int shorthandStartIdx, int shorthandEndIdx, ArrayDeque<Character> containerStack, SourceInformation source, SourceInformation shorthandSource, boolean ignoringIncomplete) throws ReaderException {
     Pair<Datum,Integer> parsedItem = readLoop(sourceCode,shorthandEndIdx,containerStack,source,ignoringIncomplete);
     if(parsedItem.first == null)
       throw new IncompleteException(ignoringIncomplete,shorthandStartIdx, sourceCode, shorthandSource, "READ ERROR: Incomplete \"%s\" reader shorthand literal!", longhandName);
@@ -95,7 +95,7 @@ public class Reader {
 
 
   // @return: pair of parsed reader shorthand literal expansion & position in <sourceCode> after the parsed literal
-  private static Pair<Datum,Integer> parseReaderShorthandLiteral(CharSequence sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
+  private static Pair<Datum,Integer> parseReaderShorthandLiteral(CharSequence sourceCode, int i, int n, ArrayDeque<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
     SourceInformation shorthandSource = source.clone();
     char currentChar = sourceCode.charAt(i);
     if(currentChar == '\'') {
@@ -186,7 +186,7 @@ public class Reader {
 
 
   // @return: pair of parsed lambda literal expansion & position in <sourceCode> after the parsed literal
-  private static Pair<Datum,Integer> parseReaderLambdaLiteralLogic(CharSequence sourceCode, int i, Stack<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
+  private static Pair<Datum,Integer> parseReaderLambdaLiteralLogic(CharSequence sourceCode, int i, ArrayDeque<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
     SourceInformation lambdaSource = source.clone();
     source.updatePosition(LAMBDA_LITERAL_PREFIX);
     Pair<Datum,Integer> parsedItem = readLoop(sourceCode,i,containerStack,source,ignoringIncomplete);
@@ -238,7 +238,7 @@ public class Reader {
 
   // @param: <i> is where to start parsing
   // @return: pair of parsed list & position in <sourceCode> after the closing <)>
-  private static Pair<Datum,Integer> parseListLiteral(CharSequence sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
+  private static Pair<Datum,Integer> parseListLiteral(CharSequence sourceCode, int i, int n, ArrayDeque<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
     int listIndex = i-1;
     SourceInformation listSource = source.clone();
     source.updatePosition('(');
@@ -268,7 +268,7 @@ public class Reader {
   // Vector Literal Parsing Helper(s)
   // @param: <i> is where to start parsing
   // @return: pair of parsed vector & position in <sourceCode> after the closing <]>
-  private static Pair<Datum,Integer> parseVectorLiteral(CharSequence sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
+  private static Pair<Datum,Integer> parseVectorLiteral(CharSequence sourceCode, int i, int n, ArrayDeque<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
     int vectorIndex = i-1;
     SourceInformation vectorSource = source.clone();
     source.updatePosition('[');
@@ -292,7 +292,7 @@ public class Reader {
   // Hashmap Literal Parsing Helper(s)
   // @param: <i> is where to start parsing
   // @return: pair of parsed hashmap & position in <sourceCode> after the closing <}>
-  private static Pair<Datum,Integer> parseHashmapLiteral(CharSequence sourceCode, int i, int n, Stack<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
+  private static Pair<Datum,Integer> parseHashmapLiteral(CharSequence sourceCode, int i, int n, ArrayDeque<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
     int hashmapIndex = i-1;
     SourceInformation hashmapSource = source.clone();
     source.updatePosition('{');
@@ -557,7 +557,7 @@ public class Reader {
   ////////////////////////////////////////////////////////////////////////////
   // Main Reader Loop
   // => <.first> is <null> if only read whitespace/comments
-  private static Pair<Datum,Integer> readLoop(CharSequence sourceCode, int startIndex, Stack<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
+  private static Pair<Datum,Integer> readLoop(CharSequence sourceCode, int startIndex, ArrayDeque<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
 
     for(int i = startIndex, n = sourceCode.length(); i < n; ++i) {
       char currentChar = sourceCode.charAt(i);
@@ -566,7 +566,7 @@ public class Reader {
       if(currentChar == '(') {
         containerStack.push('(');
       } else if(currentChar == ')') {
-        if(containerStack.empty())
+        if(containerStack.size() == 0)
           throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid parenthesis: found a ')' prior an associated '('!");
         char opener = containerStack.pop();
         if(opener != '(')
@@ -577,7 +577,7 @@ public class Reader {
       } else if(currentChar == '[') {
         containerStack.push('[');
       } else if(currentChar == ']') {
-        if(containerStack.empty())
+        if(containerStack.size() == 0)
           throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid bracket: found a ']' prior an associated '['!");
         char opener = containerStack.pop();
         if(opener != '[')
@@ -588,7 +588,7 @@ public class Reader {
       } else if(currentChar == '{') {
         containerStack.push('{');
       } else if(currentChar == '}') {
-        if(containerStack.empty())
+        if(containerStack.size() == 0)
           throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid curly-brace: found a '}' prior an associated '{'!");
         char opener = containerStack.pop();
         if(opener != '{')
@@ -690,7 +690,7 @@ public class Reader {
 
   // @return: <.first> is <null> if only read in whitespace/comments!
   public static Pair<Datum,Integer> nullableRead(CharSequence sourceCode, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
-    return readLoop(sourceCode,0,new Stack<Character>(),source,ignoringIncomplete);
+    return readLoop(sourceCode,0,new ArrayDeque<Character>(),source,ignoringIncomplete);
   }
 
 

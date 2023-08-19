@@ -1072,7 +1072,7 @@ public class Pair extends Datum implements OrderedCollection {
     ArrayList<Datum> params = new ArrayList<Datum>(1);
     params.add(plis.car);
     return () -> foldRightIter(c,seed,plis.cdr,(acc) -> () -> {
-      ArrayList<Datum> args = new ArrayList<Datum>(params);
+      ArrayList<Datum> args = (ArrayList<Datum>)params.clone();
       args.add(acc);
       return c.callWith(args,continuation);
     });
@@ -1097,7 +1097,7 @@ public class Pair extends Datum implements OrderedCollection {
       acs[i] = (AssociativeCollection)acs[i].tail(); // can mutate <acs> since never captured in a continuation (unlike <fold>)!
     }
     return () -> FoldRightIter(c,seed,acs,(acc) -> () -> {
-      ArrayList<Datum> args = new ArrayList<Datum>(params);
+      ArrayList<Datum> args = (ArrayList<Datum>)params.clone();
       args.add(acc);
       return c.callWith(args,continuation);
     });
@@ -1239,14 +1239,12 @@ public class Pair extends Datum implements OrderedCollection {
       throw new Exceptionf("PAIR [SORT]: can't sort dotted-list %s with predicate %s", write(), binaryPredicate);
     }
     Callable trueCondPrimitive = (params, cont) -> {
-      ArrayList<Datum> args = new ArrayList<Datum>(params);
-      args.add(car);
-      return binaryPredicate.callWith(args,cont);
+      params.add(car);
+      return binaryPredicate.callWith(params,cont);
     };
     Callable falseCondPrimitive = (params, cont) -> {
-      ArrayList<Datum> args = new ArrayList<Datum>(params);
-      args.add(car);
-      return binaryPredicate.callWith(args,(value) -> () -> cont.run(Boolean.valueOf(!value.isTruthy())));
+      params.add(car);
+      return binaryPredicate.callWith(params,(value) -> () -> cont.run(Boolean.valueOf(!value.isTruthy())));
     };
     PrimitiveProcedure trueCond = new PrimitiveProcedure("escm-sort-in-lhs?", trueCondPrimitive);
     PrimitiveProcedure falseCond = new PrimitiveProcedure("escm-sort-in-rhs?", falseCondPrimitive);
@@ -1301,9 +1299,8 @@ public class Pair extends Datum implements OrderedCollection {
 
   private static Trampoline.Bounce skipWhileHaveDuplicates(Callable binaryPredicate, Datum d, OrderedCollection tail, Trampoline.Continuation continuation) throws Exception {
     Callable matchCondPrimitive = (params, cont) -> {
-      ArrayList<Datum> args = new ArrayList<Datum>(params);
-      args.add(d);
-      return binaryPredicate.callWith(args,cont);
+      params.add(d);
+      return binaryPredicate.callWith(params,cont);
     };
     PrimitiveProcedure matchCond = new PrimitiveProcedure("escm-del-neigh-dups-eq?", matchCondPrimitive);
     return tail.dropWhile(matchCond,continuation);

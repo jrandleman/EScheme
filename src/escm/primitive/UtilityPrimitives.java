@@ -479,10 +479,9 @@ public class UtilityPrimitives {
       Datum callable = parameters.get(0);
       if(!(callable instanceof Callable))
         throw new Exceptionf("'(time <callable> <arg> ...) invalid non-callable 1st arg: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<Datum> args = new ArrayList<Datum>(parameters);
-      args.remove(0);
+      parameters.remove(0);
       long start = Calendar.getInstance().getTimeInMillis();
-      return ((Callable)callable).callWith(args,(result) -> () -> {
+      return ((Callable)callable).callWith(parameters,(result) -> () -> {
         long end = Calendar.getInstance().getTimeInMillis();
         return continuation.run(new Pair(new Exact(end-start),result));
       });

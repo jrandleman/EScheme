@@ -83,7 +83,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   }
 
   public Vector(ArrayList<Datum> arr) {
-    value = new ArrayList<Datum>(arr);
+    value = (ArrayList<Datum>)arr.clone();
   }
 
   public Vector(Datum[] arr) {
@@ -221,7 +221,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
 
   public Vector reversed() {
     synchronized(this) {
-      ArrayList<Datum> copy = new ArrayList<Datum>(value);
+      ArrayList<Datum> copy = (ArrayList<Datum>)value.clone();
       Collections.reverse(copy);
       return new Vector(0,copy);
     }
@@ -393,7 +393,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   // Copying
   public Vector copy() {
     synchronized(this) {
-      return new Vector(0,new ArrayList<Datum>(value));
+      return new Vector(0,(ArrayList<Datum>)value.clone());
     }
   }
 
@@ -651,7 +651,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   public AssociativeCollection append(AssociativeCollection ac) throws Exception {
     ArrayList<Datum> appended = null;
     synchronized(this) {
-      appended = new ArrayList<Datum>(value);
+      appended = (ArrayList<Datum>)value.clone();
     }
     Vector v = (Vector)ac;
     synchronized(v) {
@@ -952,7 +952,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   public OrderedCollection conj(Datum value) throws Exception {
     ArrayList<Datum> conjd;
     synchronized(this) {
-      conjd = new ArrayList<Datum>(this.value);
+      conjd = (ArrayList<Datum>)this.value.clone();
     }
     conjd.add(value);
     return new Vector(0,conjd);
@@ -965,7 +965,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   public OrderedCollection init() throws Exception {
     synchronized(this) {
       if(value.size() == 0) throw new Exceptionf("VECTOR [INIT]: can't get <init> of []!");
-      ArrayList<Datum> initVals = new ArrayList<Datum>(value);
+      ArrayList<Datum> initVals = (ArrayList<Datum>)value.clone();
       initVals.remove(value.size()-1);
       return new Vector(0,initVals);
     }
@@ -1044,7 +1044,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       return predicate.callWith(args,(shouldRemove) -> () -> {
         if(shouldRemove.isTruthy()) {
           synchronized(this) {
-            ArrayList<Datum> removed = new ArrayList<Datum>(value);
+            ArrayList<Datum> removed = (ArrayList<Datum>)value.clone();
             if(i < removed.size()) removed.remove(i);
             return continuation.run(new Vector(0,removed));
           }
@@ -1102,7 +1102,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       params.add(v.value.get(eltIdx));
     }
     return () -> foldRightIter(c,seed,eltIdx+1,v,(acc) -> () -> {
-      ArrayList<Datum> args = new ArrayList<Datum>(params);
+      ArrayList<Datum> args = (ArrayList<Datum>)params.clone();
       args.add(acc);
       return c.callWith(args,continuation);
     });
@@ -1126,7 +1126,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       }
     }
     return () -> FoldRightArray(c,seed,eltIdx+1,acs,(acc) -> () -> {
-      ArrayList<Datum> args = new ArrayList<Datum>(params);
+      ArrayList<Datum> args = (ArrayList<Datum>)params.clone();
       args.add(acc);
       return c.callWith(args,continuation);
     });
@@ -1291,14 +1291,12 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       if(idx >= value.size()) return continuation.run(new Vector());
       Datum hd = value.get(idx);
       Callable trueCondPrimitive = (params, cont) -> {
-        ArrayList<Datum> args = new ArrayList<Datum>(params);
-        args.add(hd);
-        return binaryPredicate.callWith(args,cont);
+        params.add(hd);
+        return binaryPredicate.callWith(params,cont);
       };
       Callable falseCondPrimitive = (params, cont) -> {
-        ArrayList<Datum> args = new ArrayList<Datum>(params);
-        args.add(hd);
-        return binaryPredicate.callWith(args,(value) -> () -> cont.run(Boolean.valueOf(!value.isTruthy())));
+        params.add(hd);
+        return binaryPredicate.callWith(params,(value) -> () -> cont.run(Boolean.valueOf(!value.isTruthy())));
       };
       PrimitiveProcedure trueCond = new PrimitiveProcedure("escm-sort-in-lhs?", trueCondPrimitive);
       PrimitiveProcedure falseCond = new PrimitiveProcedure("escm-sort-in-rhs?", falseCondPrimitive);

@@ -4,7 +4,7 @@
 
 package escm.vm.util;
 import java.util.ArrayList;
-import java.util.Stack;
+import java.util.ArrayDeque;
 import escm.type.Datum;
 import escm.type.Void;
 import escm.vm.util.Environment;
@@ -14,7 +14,7 @@ public class ExecutionState {
   // State fields
   public Environment env;
   public ArrayList<Instruction> instructions;
-  public Stack<Datum> stack;
+  public ArrayDeque<Datum> stack;
   public Datum cvr; // current value register
   public int cii;   // current instruction index
 
@@ -24,7 +24,7 @@ public class ExecutionState {
   public ExecutionState(Environment env, ArrayList<Instruction> instructions) {
     this.env = env;
     this.instructions = instructions;
-    this.stack = new Stack<Datum>();
+    this.stack = new ArrayDeque<Datum>();
     this.cvr = Void.VALUE;
     this.cii = 0;
   }
@@ -32,11 +32,15 @@ public class ExecutionState {
 
   ////////////////////////////////////////////////////////////////////////////
   // Continuation State Copy
+  private ExecutionState(Environment env, ArrayList<Instruction> instructions, ArrayDeque<Datum> stack, Datum cvr, int cii) {
+    this.env = env;
+    this.instructions = instructions;
+    this.stack = stack;
+    this.cvr = cvr;
+    this.cii = cii;
+  }
+
   public ExecutionState getContinuationState(Datum value) {
-    ExecutionState instanceState = new ExecutionState(env,instructions);
-    instanceState.stack.addAll(stack);
-    instanceState.cii = cii;
-    instanceState.cvr = value;
-    return instanceState;
+    return new ExecutionState(env,instructions,(ArrayDeque<Datum>)stack.clone(),value,cii);
   }
 }

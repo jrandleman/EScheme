@@ -124,7 +124,7 @@ public class FunctionalPrimitives {
       Callable p = (Callable)parameters.get(0);
       parameters.remove(0);
       Callable bindPrimitive = (params, cont) -> {
-        ArrayList<Datum> args = new ArrayList<Datum>(parameters);
+        ArrayList<Datum> args = (ArrayList<Datum>)parameters.clone();
         args.addAll(params);
         return p.callWith(args,cont);
       };

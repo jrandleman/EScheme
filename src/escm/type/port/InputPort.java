@@ -24,7 +24,7 @@
 
 package escm.type.port;
 import java.util.Objects;
-import java.util.Stack;
+import java.util.ArrayDeque;
 import java.io.PushbackReader;
 import java.io.InputStreamReader;
 import java.io.FileReader;
@@ -318,17 +318,17 @@ public class InputPort extends Port {
     SourceInformation datumSourceStart = new SourceInformation(name,lineNumber,columnNumber);
     while(true) {
       try {
-        Stack<java.lang.Character> containerStack = new Stack<java.lang.Character>();
+        ArrayDeque<java.lang.Character> containerStack = new ArrayDeque<java.lang.Character>();
         boolean foundLoneAtom = false;
         while(true) {
           int input = pr.read();
           // check for atom
-          if(foundLoneAtom && containerStack.empty() && (input == -1 || Reader.isDelimiter((char)input))) {
+          if(foundLoneAtom && containerStack.size() == 0 && (input == -1 || Reader.isDelimiter((char)input))) {
             if(input != -1) pr.unread(input);
             break;
           }
           if(input == -1) {
-            if(containerStack.empty() == false) {
+            if(containerStack.size() > 0) {
               char c = containerStack.pop();
               if(c == '(') {
                 throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: missing a closing ')' for opening '('!\n>> Location: %s", write(), getPositionString());
@@ -349,38 +349,38 @@ public class InputPort extends Port {
           } else if(input == ')') {
             updatePortPosition(input);
             sb.append((char)input);
-            if(containerStack.empty()) {
+            if(containerStack.size() == 0) {
               throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a ')' prior an associated '('!\n>> Location: %s", write(), getPositionString());
             }
             char opener = containerStack.pop();
             if(opener != '(') {
               throw new Exceptionf("READ ERROR (for %s): Invalid parenthesis: found a closing ')' prior to closing '%c'!\n>> Location: %s", write(), opener, getPositionString());
             }
-            if(containerStack.empty()) break;
+            if(containerStack.size() == 0) break;
           // register close bracket
           } else if(input == ']') {
             updatePortPosition(input);
             sb.append((char)input);
-            if(containerStack.empty()) {
+            if(containerStack.size() == 0) {
               throw new Exceptionf("READ ERROR (for %s): Invalid bracket: found a ']' prior an associated '['!\n>> Location: %s", write(), getPositionString());
             }
             char opener = containerStack.pop();
             if(opener != '[') {
               throw new Exceptionf("READ ERROR (for %s): Invalid bracket: found a closing ']' prior to closing '%c'!\n>> Location: %s", write(), opener, getPositionString());
             }
-            if(containerStack.empty()) break;
+            if(containerStack.size() == 0) break;
           // register close curly-brace
           } else if(input == '}') {
             updatePortPosition(input);
             sb.append((char)input);
-            if(containerStack.empty()) {
+            if(containerStack.size() == 0) {
               throw new Exceptionf("READ ERROR (for %s): Invalid curly-brace: found a '}' prior an associated '{'!\n>> Location: %s", write(), getPositionString());
             }
             char opener = containerStack.pop();
             if(opener != '{') {
               throw new Exceptionf("READ ERROR (for %s): Invalid curly-brace: found a closing '}' prior to closing '%c'!\n>> Location: %s", write(), opener, getPositionString());
             }
-            if(containerStack.empty()) break;
+            if(containerStack.size() == 0) break;
           // account for whitespace
           } else if(java.lang.Character.isWhitespace((char)input)) {
             updatePortPosition(input);
@@ -424,7 +424,7 @@ public class InputPort extends Port {
             if(input == -1) {
               throw new Exceptionf("READ ERROR (for %s): Unterminating string literal detected!\n>> Location: %s", write(), getPositionString());
             }
-            if(containerStack.empty()) break;
+            if(containerStack.size() == 0) break;
           // account for reader shorthands
           } else if(Reader.isReaderShorthand((char)input) || isReaderLambdaLiteral(input)) {
             updatePortPosition(input);

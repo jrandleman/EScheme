@@ -510,9 +510,8 @@ public class FormatPrimitives {
       if(!(parameters.get(0) instanceof escm.type.String))
         throw new StringfException("'(stringf <format-string> <arg> ...) 1st arg %s isn't a string: %s", parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
       String fmtStr = ((escm.type.String)parameters.get(0)).value();
-      ArrayList<Datum> args = new ArrayList<Datum>(parameters);
-      args.remove(0);
-      return new escm.type.String(logic(fmtStr,args));
+      parameters.remove(0);
+      return new escm.type.String(logic(fmtStr,parameters));
     }
   }
 }
