@@ -138,3 +138,45 @@
 (ut o1.class C1)
 (ut o1.class.name 'C1)
 (ut I1.name 'I1)
+
+; Show class <self> & <super> polymorphism works
+; => Note this doesn't apply to <interface>s since they don't have <super>
+(define-class Base
+  (:static sval 0)
+  (val 0)
+  (:static (sf) self.sval)
+  ((f) self.val))
+
+(define-class Middle (:extends Base)
+  (:static sval 1)
+  (val 1)
+  (:static (scheck-super) (super.sf))
+  ((check-super) (super.f)))
+
+(define-class Topmost (:extends Middle)
+  (:static sval 2)
+  (val 2))
+
+(ut (Base.sf) 0)
+(ut (Middle.sf) 1)
+(ut (Topmost.sf) 2)
+
+(ut (Middle.scheck-super) 0)
+(ut (Topmost.scheck-super) 0)
+
+(define obase (Base))
+(define omiddle (Middle))
+(define otopmost (Topmost))
+(ut (obase.f) 0)
+(ut (omiddle.f) 1)
+(ut (otopmost.f) 2)
+
+(ut (omiddle.check-super) 0)
+(ut (otopmost.check-super) 0)
+
+; Show interface static methods can access <self>
+(define-interface I
+  (:static val 0)
+  (:static (f) self.val))
+
+(ut (I.f) 0)
