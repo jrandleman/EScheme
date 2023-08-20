@@ -16,7 +16,7 @@ import escm.type.Datum;
 import escm.type.Void;
 import escm.type.bool.Boolean;
 import escm.type.port.Eof;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.Compiler;
 import escm.vm.Assembler;

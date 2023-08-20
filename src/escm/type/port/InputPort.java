@@ -29,7 +29,7 @@ import java.io.PushbackReader;
 import java.io.InputStreamReader;
 import java.io.FileReader;
 import java.io.File;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.type.Datum;
 import escm.vm.Reader;
 import escm.vm.util.SourceInformation;

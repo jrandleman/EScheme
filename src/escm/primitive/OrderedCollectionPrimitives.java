@@ -8,7 +8,7 @@ import escm.type.Datum;
 import escm.type.bool.Boolean;
 import escm.type.number.Exact;
 import escm.type.number.Real;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.OrderedCollection;
 import escm.vm.type.Callable;

@@ -1,10 +1,10 @@
-// Author: Jordan Randleman - escm.util.Exceptionf
+// Author: Jordan Randleman - escm.util.error.Exceptionf
 // Purpose:
 //    Simple <Exception> wrapper for formatted strings upon construction, and
 //      with a helper static method to profile an argument list (used extensively 
 //      by Java primitives).
 
-package escm.util;
+package escm.util.error;
 import java.util.ArrayList;
 import escm.type.Datum;
 

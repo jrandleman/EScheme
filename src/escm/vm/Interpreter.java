@@ -9,7 +9,7 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import escm.type.Datum;
 import escm.type.number.Real;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.Callable;
 import escm.vm.util.Instruction;

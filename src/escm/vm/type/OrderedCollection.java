@@ -9,7 +9,7 @@ import escm.type.Datum;
 import escm.type.Void;
 import escm.type.bool.Boolean;
 import escm.util.Pair;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 
 public interface OrderedCollection extends AssociativeCollection {

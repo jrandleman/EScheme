@@ -11,7 +11,7 @@ import escm.type.port.OutputPort;
 import escm.type.number.Exact;
 import escm.type.Void;
 import escm.type.bool.Boolean;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;

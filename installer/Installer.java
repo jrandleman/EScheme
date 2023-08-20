@@ -323,7 +323,7 @@ public class Installer {
     javaStdlibLoader.append("package escm.vm.runtime.installerGenerated;\n");
     javaStdlibLoader.append("import java.nio.file.Files;\n");
     javaStdlibLoader.append("import java.nio.file.Path;\n");
-    javaStdlibLoader.append("import escm.util.Exceptionf;\n");
+    javaStdlibLoader.append("import escm.util.error.Exceptionf;\n");
     javaStdlibLoader.append("import escm.vm.type.Primitive;\n");
     javaStdlibLoader.append("import escm.vm.type.PrimitiveCallable;\n");
     javaStdlibLoader.append("import escm.vm.type.PrimitiveSyntax;\n");

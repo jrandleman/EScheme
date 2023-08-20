@@ -15,7 +15,7 @@ import escm.type.Void;
 import escm.type.bool.Boolean;
 import escm.type.Symbol;
 import escm.type.number.Exact;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.primitive.lib.utility.ContinuationProcedure;
 import escm.primitive.MetaPrimitives;

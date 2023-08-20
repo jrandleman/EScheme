@@ -13,7 +13,7 @@ import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.type.number.Inexact;
 import escm.type.number.Complex;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;
 import escm.vm.runtime.GlobalState;

@@ -16,7 +16,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import escm.type.Datum;
 import escm.type.Void;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Pair;
 import escm.util.GetClosestStringMatches;
 import escm.util.json.JsonDatum;

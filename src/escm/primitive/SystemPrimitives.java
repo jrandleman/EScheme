@@ -20,7 +20,7 @@ import escm.type.Hashmap;
 import escm.type.bool.Boolean;
 import escm.type.oo.EscmModule;
 import escm.util.Pair;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.ExecuteSystemCommand;
 import escm.vm.type.Callable;

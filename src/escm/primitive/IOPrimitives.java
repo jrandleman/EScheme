@@ -14,7 +14,7 @@ import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
 import escm.type.port.Eof;
 import escm.type.number.Real;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.vm.Reader;
 import escm.vm.type.Primitive;
 import escm.vm.util.SourceInformation;

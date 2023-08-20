@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.Serializable;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.GetClosestStringMatches;
 import escm.type.Datum;
 import escm.type.Pair;

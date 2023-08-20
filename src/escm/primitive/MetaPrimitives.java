@@ -9,7 +9,7 @@ import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.procedure.SyntaxProcedure;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.UniqueSymbol;
 import escm.vm.Compiler;

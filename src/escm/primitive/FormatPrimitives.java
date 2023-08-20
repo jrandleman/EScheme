@@ -16,7 +16,7 @@ import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.type.number.Inexact;
 import escm.type.number.Number;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.vm.type.Primitive;
 
 public class FormatPrimitives {

@@ -6,7 +6,7 @@ package escm.type.number;
 import java.util.Objects;
 import java.math.BigInteger;
 import java.math.BigDecimal;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 
 public class Exact extends Real {
   ////////////////////////////////////////////////////////////////////////////

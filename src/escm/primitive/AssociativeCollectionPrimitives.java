@@ -12,7 +12,7 @@ import escm.type.Keyword;
 import escm.type.bool.Boolean;
 import escm.type.number.Exact;
 import escm.type.number.Real;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.AssociativeCollection;
 import escm.vm.type.OrderedCollection;

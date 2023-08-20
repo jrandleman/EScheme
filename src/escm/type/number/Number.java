@@ -51,7 +51,7 @@ import java.math.BigInteger;
 import java.nio.CharBuffer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.type.Datum;
 import escm.vm.util.ExecutionState;
 

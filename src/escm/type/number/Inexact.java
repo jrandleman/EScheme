@@ -4,7 +4,7 @@
 
 package escm.type.number;
 import java.util.Objects;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 
 public class Inexact extends Real {
   ////////////////////////////////////////////////////////////////////////////

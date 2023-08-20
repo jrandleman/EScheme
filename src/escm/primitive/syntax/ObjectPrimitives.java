@@ -9,7 +9,7 @@
 package escm.primitive.syntax;
 import java.util.ArrayList;
 import escm.util.UniqueSymbol;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;

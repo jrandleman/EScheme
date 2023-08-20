@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.bool.Boolean;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.vm.type.Primitive;
 
 public class SymbolPrimitives {

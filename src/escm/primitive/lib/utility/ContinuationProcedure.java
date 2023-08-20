@@ -5,7 +5,7 @@
 
 package escm.primitive.lib.utility;
 import java.util.ArrayList;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.Datum;
 import escm.type.procedure.Procedure;

@@ -12,7 +12,7 @@ import escm.type.bool.Boolean;
 import escm.type.procedure.Procedure;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.type.oo.EscmObject;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;

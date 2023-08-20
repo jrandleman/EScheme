@@ -17,7 +17,7 @@ import escm.type.bool.Boolean;
 import escm.type.procedure.CompoundProcedure;
 import escm.type.Void;
 import escm.type.Nil;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Pair;
 import escm.util.Trampoline;
 import escm.vm.type.Primitive;

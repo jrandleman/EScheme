@@ -12,7 +12,7 @@ import escm.type.number.Number;
 import escm.type.number.Exact;
 import escm.type.number.Real;
 import escm.type.procedure.PrimitiveProcedure;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.StringParser;
 import escm.vm.util.ExecutionState;

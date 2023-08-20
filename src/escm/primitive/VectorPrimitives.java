@@ -11,7 +11,7 @@ import escm.type.Void;
 import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.type.procedure.PrimitiveProcedure;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.Callable;
 import escm.vm.type.Primitive;

@@ -12,7 +12,7 @@ import java.io.File;
 import escm.type.Datum;
 import escm.type.number.Real;
 import escm.type.bool.Boolean;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.vm.Reader;
 import escm.vm.type.Primitive;
 import escm.vm.util.SourceInformation;

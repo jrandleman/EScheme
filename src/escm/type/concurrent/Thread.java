@@ -6,12 +6,12 @@ package escm.type.concurrent;
 import java.util.ArrayList;
 import java.util.Objects;
 import escm.util.Trampoline;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
+import escm.util.error.TopLevelError;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.procedure.PrimitiveProcedure;
-import escm.vm.Main;
 import escm.vm.type.Callable;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.Environment;
@@ -170,8 +170,8 @@ public class Thread extends Datum {
       public void run() {
         try {
           Trampoline.resolve(((Callable)thunk).callWith(new ArrayList<Datum>(),terminalContinuation));
-        } catch(Throwable e) {
-          Main.reportTopLevelError(e);
+        } catch(Throwable t) {
+          TopLevelError.report(t);
         }
       }
     };
@@ -185,8 +185,8 @@ public class Thread extends Datum {
       public void run() {
         try {
           Trampoline.resolve(((Callable)thunk).callWith(new ArrayList<Datum>(),terminalContinuation));
-        } catch(Throwable e) {
-          Main.reportTopLevelError(e);
+        } catch(Throwable t) {
+          TopLevelError.report(t);
         }
       }
     };

@@ -9,7 +9,7 @@ import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.bool.Boolean;
 import escm.type.number.Exact;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.vm.type.Primitive;
 
 public class DateTimePrimitives {

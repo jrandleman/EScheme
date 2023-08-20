@@ -9,7 +9,7 @@ import escm.type.Nil;
 import escm.type.number.Number;
 import escm.type.number.Real;
 import escm.type.number.Exact;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.vm.type.Primitive;
 
 public class TypeCoercionPrimitives {

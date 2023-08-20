@@ -47,7 +47,7 @@ import java.util.Objects;
 import java.util.Arrays;
 import escm.type.bool.Boolean;
 import escm.type.procedure.PrimitiveProcedure;
-import escm.util.Exceptionf;
+import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.number.Number;
 import escm.type.number.Exact;
