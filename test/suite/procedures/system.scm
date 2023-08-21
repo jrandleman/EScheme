@@ -66,4 +66,4 @@
   (if (> (length env-vars) 0)
       (ut (string? (getenv (car (hashmap-keys env-vars)))) #t)))
 
-(hint-garbage-collector) ; just check this is callable (no way to verify effects)
+(garbage-collector) ; just check this is callable (no way to verify effects)

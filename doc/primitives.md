@@ -191,7 +191,7 @@
 
 (getenv <optional-var-name-str>)
 
-(hint-garbage-collector)
+(garbage-collector)
 ```
 
 
