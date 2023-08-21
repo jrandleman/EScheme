@@ -56,7 +56,7 @@
 ------------------------
 ## Numbers:
 ```scheme
-(= <num> <num> ...)
+(= <num> <num> ...)    ; aliases <eq?> if given non-numerics
 (< <real> <real> ...)
 (> <real> <real> ...)
 (<= <real> <real> ...)

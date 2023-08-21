@@ -138,12 +138,8 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "=";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) throw new Exceptionf("'(= <number> <number> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum firstParam = parameters.get(0);
-      if(!(firstParam instanceof Number))
-        throw new Exceptionf("'(= <number> <number> ...) invalid non-numeric arg %s recieved!", firstParam.profile());
+
+    public static Datum logic(Datum firstParam, ArrayList<Datum> parameters) throws Exception {
       Number firstValue = (Number)firstParam;
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
@@ -152,6 +148,13 @@ public class NumberPrimitives {
         if(firstValue.eqs((Number)p) == false) return Boolean.FALSE;
       }
       return Boolean.TRUE;
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 2) throw new Exceptionf("'(= <number> <number> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum firstParam = parameters.get(0);
+      if(firstParam instanceof Number) return logic(firstParam,parameters);
+      return EqualityPrimitives.IsEq.logic(parameters);
     }
   }
 

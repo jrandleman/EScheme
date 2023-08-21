@@ -2,7 +2,7 @@
   "name": "=",
   "aliases": null,
   "signatures": ["(= <num> <num> ...)"],
-  "description": "Returns whether \"<num> <num> ...\" are equal to one another.",
+  "description": "Returns whether \"<num> <num> ...\" are equal to one another\nAliases <eq?> if given non-numerics.",
   "example": null
 }, {
   "name": "<",

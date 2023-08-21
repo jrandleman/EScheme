@@ -17,13 +17,16 @@ public class EqualityPrimitives {
       return "eq?";
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      int n = parameters.size();
-      if(n == 0) throw new Exceptionf("'(eq? <obj> ...) expects at least 1 argument: %s", Exceptionf.profileArgs(parameters));
-      for(int i = 0; i < n-1; ++i)
+    public static Datum logic(ArrayList<Datum> parameters) {
+      for(int i = 0, n = parameters.size()-1; i < n; ++i)
         if(!parameters.get(i).eq(parameters.get(i+1)))
           return Boolean.FALSE;
       return Boolean.TRUE;
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() == 0) throw new Exceptionf("'(eq? <obj> ...) expects at least 1 argument: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters);
     }
   }
 
@@ -35,13 +38,16 @@ public class EqualityPrimitives {
       return "equal?";
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      int n = parameters.size();
-      if(n == 0) throw new Exceptionf("'(equal? <obj> ...) expects at least 1 argument: %s", Exceptionf.profileArgs(parameters));
-      for(int i = 0; i < n-1; ++i)
+    public static Datum logic(ArrayList<Datum> parameters) {
+      for(int i = 0, n = parameters.size()-1; i < n; ++i)
         if(!parameters.get(i).equal(parameters.get(i+1)))
           return Boolean.FALSE;
       return Boolean.TRUE;
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() == 0) throw new Exceptionf("'(equal? <obj> ...) expects at least 1 argument: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters);
     }
   }
 }
