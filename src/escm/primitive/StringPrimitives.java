@@ -11,7 +11,7 @@ import escm.type.bool.Boolean;
 import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.util.error.Exceptionf;
-import escm.util.StringParser;
+import escm.util.string.StringParser;
 import escm.util.Trampoline;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;

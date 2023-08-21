@@ -4,7 +4,7 @@
 
 package escm.util.json.util;
 import escm.util.Pair;
-import escm.util.StringParser;
+import escm.util.string.StringParser;
 
 public class JsonException extends Exception {
   // Length of the substring to show for Json parsing errors

@@ -18,7 +18,7 @@ import escm.type.Datum;
 import escm.type.Void;
 import escm.util.error.Exceptionf;
 import escm.util.Pair;
-import escm.util.GetClosestStringMatches;
+import escm.util.string.GetClosestStringMatches;
 import escm.util.json.JsonDatum;
 import escm.util.json.JsonArray;
 import escm.util.json.JsonBoolean;

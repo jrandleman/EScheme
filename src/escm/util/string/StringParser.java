@@ -1,15 +1,15 @@
-// Author: Jordan Randleman - escm.util.StringParser
+// Author: Jordan Randleman - escm.util.string.StringParser
 // Purpose:
 //    String parsing utility to provide string escaping and unescaping via
-//    "escm.util.StringParser.escape" & "escm.util.StringParser.unescape" 
-//    when reading/printing strings in human and machine readable formats.
+//    "StringParser.escape" & "StringParser.unescape" when reading/printing 
+//    strings in human and machine readable formats.
 //
-//    Also provides "escm.util.StringParser.escapeWithCustomUnicodeEscape"
-//    to escape surrogate char pairs using EScheme's custom "U" literal 
-//    syntax.
+//    Also provides "StringParser.escapeWithCustomUnicodeEscape" to escape 
+//    surrogate char pairs using EScheme's custom "U" literal syntax.
 
-package escm.util;
+package escm.util.string;
 import java.util.ArrayList;
+import escm.util.Pair;
 
 public class StringParser {
   ////////////////////////////////////////////////////////////////////////////

@@ -14,7 +14,7 @@ import escm.type.number.Real;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
-import escm.util.StringParser;
+import escm.util.string.StringParser;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.ExecutionState;
 import escm.vm.type.AssociativeCollection;

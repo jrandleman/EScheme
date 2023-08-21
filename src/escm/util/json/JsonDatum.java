@@ -9,7 +9,7 @@ package escm.util.json;
 import java.util.ArrayList;
 import java.util.HashMap;
 import escm.util.Pair;
-import escm.util.StringParser;
+import escm.util.string.StringParser;
 import escm.util.json.util.JsonException;
 
 public abstract class JsonDatum {

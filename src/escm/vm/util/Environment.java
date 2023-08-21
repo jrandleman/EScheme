@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.Serializable;
 import escm.util.error.Exceptionf;
-import escm.util.GetClosestStringMatches;
+import escm.util.string.GetClosestStringMatches;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;

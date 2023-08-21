@@ -28,7 +28,7 @@ import java.io.OutputStreamWriter;
 import java.io.FileWriter;
 import java.io.File;
 import escm.util.error.Exceptionf;
-import escm.util.StringParser;
+import escm.util.string.StringParser;
 import escm.type.Datum;
 import escm.vm.runtime.EscmThread;
 import escm.primitive.FilePrimitives;

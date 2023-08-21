@@ -1,12 +1,13 @@
-// Author: Jordan Randleman - escm.util.GetClosestStringMatches
+// Author: Jordan Randleman - escm.util.string.GetClosestStringMatches
 // Purpose:
 //    Get an ArrayList of Strings that most closely match the given string
 //    from a list of potential alternatives.
 
-package escm.util;
+package escm.util.string;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeSet;
+import escm.util.Pair;
 
 public class GetClosestStringMatches {
   //////////////////////////////////////////////////////////////////////////
