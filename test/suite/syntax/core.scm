@@ -44,6 +44,18 @@
 (ut ((fn (() 99) ((a (b 1)) (+ a b)))) 99)
 (ut ((fn (() 99) ((a (b 1)) (+ a b))) 1) 2)
 (ut ((fn (() 99) ((a (b 1)) (+ a b))) 1 2) 3)
+; optional values + variadic parameter
+(ut ((fn (((a 1) . xs) (+ a (length xs))))) 1)
+(ut ((fn (((a 1) . xs) (+ a (length xs)))) 2) 2)
+(ut ((fn (((a 1) . xs) (+ a (length xs)))) 2 3 4) 4)
+(ut ((fn (((a 1) (b 2) . xs) (+ a b (length xs))))) 3)
+(ut ((fn (((a 1) (b 2) . xs) (+ a b (length xs)))) 2) 4)
+(ut ((fn (((a 1) (b 2) . xs) (+ a b (length xs)))) 2 3) 5)
+(ut ((fn (((a 1) (b 2) . xs) (+ a b (length xs)))) 2 3 4 5 6) 8)
+(ut ((fn (() 99) ((a (b 1) . xs) (+ a b (length xs))))) 99)
+(ut ((fn (() 99) ((a (b 1) . xs) (+ a b (length xs)))) 1) 2)
+(ut ((fn (() 99) ((a (b 1) . xs) (+ a b (length xs)))) 1 2) 3)
+(ut ((fn (() 99) ((a (b 1) . xs) (+ a b (length xs)))) 1 2 3 4 5) 6)
 
 
 ; 1-ary

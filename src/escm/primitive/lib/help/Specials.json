@@ -20,13 +20,13 @@
   "name": "fn",
   "aliases": null,
   "signatures": ["(fn ((<param> ...) <body> ...) ...)", "(fn ((<param> ... . <variadic-param>) <body> ...) ...)", "(fn (<variadic-param> <body> ...) ...)"],
-  "description": "Create a multi-arity procedure, with support for optional parameters.\nDenote variadic parameters via the \"(<param> . <variadic-param>)\"\nor \"<variadic-param>\" syntax.",
+  "description": "Create a multi-arity procedure, with support for optional parameters via the\n\"(<param-name> <default-value>)\" syntax. Denote variadic parameters via the\n\"(<param> . <variadic-param>)\" or \"<variadic-param>\" syntax.",
   "example": "; Using Mult-arity\n(define factorial \n  (fn ((n) (factorial n 1))\n      ((n p)\n        (if (< n 2)\n            p\n            (factorial (- n 1) (* n p))))))\n\n\n; Using optional parameters: p is <1> by default\n(define factorial\n  (fn ((n (p 1))\n        (if (< n 2)\n            p\n            (factorial (- n 1) (* n p))))))\n\n\n; Combine <fn> and <define> via <defn>:\n(defn factorial \n  ((n) (factorial n 1))\n  ((n p)\n    (if (< n 2)\n        p\n        (factorial (- n 1) (* n p)))))"
 }, {
   "name": "lambda",
   "aliases": ["#", "#("],
   "signatures": ["(lambda (<param> ...) <body>)", "(lambda (<param> ... . <variadic-param>) <body>)", "(lambda <variadic-param> <body>)"],
-  "description": "Shorthand for single-arity procedures. Expands to <fn> under the hood.\nSupports optional parameters. Denote variadic parameters via the\n\"(<param> . <variadic-param>)\" or \"<variadic-param>\" syntax.\nReader-shorthand support via the <#(> syntax.",
+  "description": "Shorthand for single-arity procedures. Expands to <fn> under the hood.\nSupports optional parameters via the \"(<param-name> <default-value>)\"\nsyntax. Denote variadic parameters via the \"(<param> . <variadic-param>)\"\nor \"<variadic-param>\" syntax. Reader-shorthand support via the <#(> syntax.",
   "example": "; Using optional parameters: p is <1> by default\n(define factorial\n  (lambda (n (p 1))\n    (if (< n 2)\n        p\n        (factorial (- n 1) (* n p)))))\n\n\n; Combine <lambda> and <define> via:\n(define (factorial n (p 1))\n  (if (< n 2)\n      p\n      (factorial (- n 1) (* n p))))\n\n\n;; Reader-shorthand via <#(>: #<expr> => (lambda () <expr>)\n;; Denote the Nth parameter via %N, with N starting at 1. \n;; Use %% to denote the variadic parameter.\n\n; Add 2:\n(define add2 #(+ %1 2))\n\n; Get the 2nd parameter:\n(define get-2nd #(begin %2))\n\n; The 'id' procedure:\n(define id #(begin %1))\n\n; The 'list' procedure:\n(define list #(begin %%))"
 }, {
   "name": "if",
