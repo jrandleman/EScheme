@@ -620,4 +620,20 @@ public class SystemPrimitives {
       }
     }
   }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // hint-garbage-collector
+  public static class HintGarbageCollector extends Primitive {
+    public java.lang.String escmName() {
+      return "hint-garbage-collector";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 0)
+        throw new Exceptionf("'(hint-garbage-collector) invalid args: %s", Exceptionf.profileArgs(parameters));
+      System.gc();
+      return Void.VALUE;
+    }
+  }
 }

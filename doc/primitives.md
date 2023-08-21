@@ -187,9 +187,11 @@
 
 (system <optional-millisecond-timeout> <command-str> <optional-env-var-str-list> <optional-directory-str>)
 
-(escm <optional-millisecond-timeout> <escm-file> <optional-argv> ...)
+(escm <optional-millisecond-timeout> <escm-file> <optional-argv> ...) ; wrapper around <system>
 
 (getenv <optional-var-name-str>)
+
+(hint-garbage-collector)
 ```
 
 

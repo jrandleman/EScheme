@@ -61,4 +61,10 @@
   "signatures": ["(getenv)", "(getenv <var-name-str>)"],
   "description": "If given no arguments, return a hashmap of name:value string environment \nvariable associations.\n\nIf given an environment variable name string, returns its string value. \nIf the given string is not an accessable environment variable, returns #f",
   "example": null
+}, {
+  "name": "hint-garbage-collector",
+  "aliases": null,
+  "signatures": ["(hint-garbage-collector)"],
+  "description": "Hints the JVM to launch its garbage collector (GC). Does not guarentee\nimmediate GC execution.",
+  "example": null
 }]
