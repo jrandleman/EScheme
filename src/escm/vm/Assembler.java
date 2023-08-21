@@ -17,9 +17,9 @@ import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Symbol;
+import escm.type.Character;
 import escm.type.number.Real;
 import escm.type.procedure.CompoundProcedure;
-import escm.type.number.Inexact;
 import escm.util.error.Exceptionf;
 import escm.vm.util.Instruction;
 import escm.vm.util.ExecutionState;
@@ -61,23 +61,6 @@ public class Assembler {
     if(!instructionIsUnary(instruction))
       throw new Exceptionf("ASM ERROR: %s isn't a valid bytecode instruction!", instruction.profile());
     return ((Pair)instruction.cdr()).car();
-  }
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Bound Branch Instructions
-  private static void boundBranchAmounts(ArrayList<Instruction> instructions) {
-    for(int i = 0, n = instructions.size(); i < n; ++i) {
-      Instruction instruction = instructions.get(i);
-      if(instruction.operation == Instruction.IFN || instruction.operation == Instruction.JUMP) {
-        int branchAmount = ((Inexact)instruction.argument).intValue();
-        if(branchAmount < 0 && Math.abs(branchAmount) > i) {
-          instruction.argument = new Inexact(-i);
-        } else if(branchAmount > 0 && branchAmount > n-i) {
-          instruction.operation = Instruction.RETURN;
-          instruction.argument = null;
-        }
-      }
-    }
   }
 
 
@@ -225,7 +208,7 @@ public class Assembler {
         Real branchAmount = (Real)arg;
         if(branchAmount.isZero())
           throw new Exceptionf("ASM ERROR: \"if\" instruction %s must have a non-0 arg!", instruction.profile());
-        return new Instruction(Instruction.IFN,new Inexact(branchAmount.doubleValue()));
+        return new Instruction(Instruction.IFN,new Character(branchAmount.intValue())); // wrap java <int> in an escm <Character>
       }
 
       ////////////////////////////////////////////////////////////////////////
@@ -237,7 +220,7 @@ public class Assembler {
         Real branchAmount = (Real)arg;
         if(branchAmount.isZero())
           throw new Exceptionf("ASM ERROR: \"jump\" instruction %s must have a non-0 arg!", instruction.profile());
-        return new Instruction(Instruction.JUMP,new Inexact(branchAmount.doubleValue()));
+        return new Instruction(Instruction.JUMP,new Character(branchAmount.intValue())); // wrap java <int> in an escm <Character>
       }
 
       ////////////////////////////////////////////////////////////////////////
@@ -266,9 +249,6 @@ public class Assembler {
       // (load-closure (<arg> ...) <instruction> ...)
       case Instruction.Pseudo.LOAD_CLOSURE: {
         SyntaxComponents components = parseSyntaxComponents(instructionPair);
-        for(ArrayList<Instruction> instructions : components.instructionsList) {
-          boundBranchAmounts(instructions);
-        }
         CompoundProcedure compoundProcedure = new CompoundProcedure(components.paramsList,components.variadicParamList,components.instructionsList);
         return new Instruction(Instruction.LOAD,compoundProcedure);
       }

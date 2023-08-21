@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import escm.type.Datum;
+import escm.type.Character;
 import escm.type.number.Real;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
@@ -59,6 +60,7 @@ public class Interpreter {
   public static Trampoline.Bounce run(ExecutionState state, Trampoline.Continuation continuation) throws Exception {
     int totalInstructions = state.instructions.size();
     while(state.cii < totalInstructions) {
+      if(state.cii < 0) state.cii = 0;
       Instruction instruction = state.instructions.get(state.cii);
       switch(instruction.operation) {
         //////////////////////////////////////////////////////////////////////
@@ -105,7 +107,7 @@ public class Interpreter {
           if(state.cvr.isTruthy()) {
             ++state.cii;
           } else {
-            state.cii += ((Real)instruction.argument).intValue();
+            state.cii += ((Character)instruction.argument).value(); // we wrap java <int>s in escm <Character>s
           }
           break;
         }
@@ -113,7 +115,7 @@ public class Interpreter {
         //////////////////////////////////////////////////////////////////////
         // (jump <integer>)
         case Instruction.JUMP: {
-          state.cii += ((Real)instruction.argument).intValue();
+          state.cii += ((Character)instruction.argument).value(); // we wrap java <int>s in escm <Character>s
           break;
         }
 
