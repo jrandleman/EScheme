@@ -12,30 +12,30 @@ public class GetClosestStringMatches {
   //////////////////////////////////////////////////////////////////////////
   // String Similarity Computation
   //   => Algorithm From: https://www.techiedelight.com/calculate-string-similarity-java/
-  private static int getLevenshteinDistance(String X, String Y) {
-    int m = X.length();
-    int n = Y.length();
-    int[][] T = new int[m+1][n+1];
+  private static int getLevenshteinDistance(String x, String y) {
+    int m = x.length();
+    int n = y.length();
+    int[][] t = new int[m+1][n+1];
     for(int i = 1; i <= m; i++) {
-      T[i][0] = i;
+      t[i][0] = i;
     }
     for(int j = 1; j <= n; j++) {
-      T[0][j] = j;
+      t[0][j] = j;
     }
     for(int i = 1; i <= m; i++) {
       for(int j = 1; j <= n; j++) {
-        int cost = X.charAt(i-1) == Y.charAt(j-1) ? 0 : 1;
-        T[i][j] = Integer.min(Integer.min(T[i-1][j]+1,T[i][j-1]+1),T[i-1][j-1]+cost);
+        int cost = x.charAt(i-1) == y.charAt(j-1) ? 0 : 1;
+        t[i][j] = Integer.min(Integer.min(t[i-1][j]+1,t[i][j-1]+1),t[i-1][j-1]+cost);
       }
     }
-    return T[m][n];
+    return t[m][n];
   }
  
 
-  public static double levenshteinSimilarity(String X, String Y) {
-    double maxLength = Double.max(X.length(),Y.length());
+  public static double levenshteinSimilarity(String x, String y) {
+    double maxLength = Double.max(x.length(),y.length());
     if(maxLength > 0) {
-      return (maxLength-getLevenshteinDistance(X,Y))/maxLength;
+      return (maxLength-getLevenshteinDistance(x,y))/maxLength;
     }
     return 1.0;
   }

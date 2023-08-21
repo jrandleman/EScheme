@@ -54,6 +54,10 @@ public class Trampoline {
     public Bounce bounce() throws Exception;
   }
 
+  public static interface SafeBounce {
+    public SafeBounce bounce();
+  }
+
 
   //////////////////////////////////////////////////////////////////////////
   // Functional "Continuation" interface: bouncing functions should accept
@@ -64,16 +68,26 @@ public class Trampoline {
     public Bounce run(Datum result) throws Exception;
   }
 
+  public static interface SafeContinuation {
+    public SafeBounce run(Datum result);
+  }
+
 
   //////////////////////////////////////////////////////////////////////////
   // Static value to return in a "Bounce"ing procedure (typically a 
   //   Continuation) to denote that the trampoline should stop bouncing.
   public static final Bounce LAST_BOUNCE_SIGNAL = null;
 
+  public static final SafeBounce SAFE_LAST_BOUNCE_SIGNAL = null;
+
 
   //////////////////////////////////////////////////////////////////////////
   // Trampolining logic: bounce <b> until <LAST_BOUNCE_SIGNAL> is detected
   public static void resolve(Bounce b) throws Exception {
     while(b != LAST_BOUNCE_SIGNAL) b = b.bounce();
+  }
+
+  public static void safeResolve(SafeBounce b) {
+    while(b != SAFE_LAST_BOUNCE_SIGNAL) b = b.bounce();
   }
 }

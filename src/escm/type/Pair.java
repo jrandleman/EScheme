@@ -179,13 +179,6 @@ public class Pair extends Datum implements OrderedCollection {
   private static final int PRETTY_PRINT_COLUMN_WIDTH = 80;
 
 
-  // Proper list predicate
-  private static boolean isProperList(Datum d) {
-    while(d instanceof Pair) d = ((Pair)d).cdr();
-    return d instanceof Nil;
-  }
-
-
   // Pprint Datum Storing Stringified Data & Length of Stringified Data
   private static class PPrintDatum {
     // <output_len> Denotes length of <exp> or <datum_str> once ouput
@@ -232,76 +225,125 @@ public class Pair extends Datum implements OrderedCollection {
 
   // Converts Scheme lists of data to an AST list of those data as strings
   // NOTE: the <int> of the pair denotes the length of the <data> once output 
-  private static int stringify_list_data(ArrayList<PPrintDatum> list_as_strs, int length, Pair p) {
-    // Strify car
-    Datum car = p.car();
+  // NOTE: We pass <escm.type.Character> as a thin wrapper around a Java <int>
+  //       as the ultimate return value of this function.
+  private static Trampoline.SafeBounce stringify_list_car_data(ArrayList<PPrintDatum> list_as_strs, int length, Datum car, Trampoline.SafeContinuation continuation) {
     if(!(car instanceof Pair)) {
       list_as_strs.add(new PPrintDatum(car.pprint(),car instanceof Symbol));
-    } else if(!isProperList(car)) {
+    } else if(!isList(car)) {
       list_as_strs.add(new PPrintDatum(car.write()));
     } else {
       ArrayList<PPrintDatum> sub_exp = new ArrayList<PPrintDatum>();
-      int sub_exp_len = stringify_list_data(sub_exp,0,(Pair)car);
-      list_as_strs.add(new PPrintDatum(sub_exp,sub_exp_len));
+      return () -> stringify_list_data(sub_exp,0,(Pair)car,(subExpLenChar) -> () -> {
+        int sub_exp_len = ((Character)subExpLenChar).value();
+        list_as_strs.add(new PPrintDatum(sub_exp,sub_exp_len));
+        return continuation.run(Void.VALUE);
+      });
     }
-    Datum cdr = p.cdr();
-    // Strify cdr
+    return continuation.run(Void.VALUE);
+  }
+
+  private static Trampoline.SafeBounce stringify_list_cdr_data(ArrayList<PPrintDatum> list_as_strs, int length, Datum cdr, Trampoline.SafeContinuation continuation) {
     if(cdr instanceof Nil) {
-      return get_pprint_data_ouput_length(list_as_strs,length); // get length of this stringified list as output (also @ end of list)
+      // get length of this stringified list as output (also @ end of list)
+      return continuation.run(new Character(get_pprint_data_ouput_length(list_as_strs,length)));
     }
     if(!(cdr instanceof Pair)) {
       list_as_strs.add(new PPrintDatum(cdr.pprint(),cdr instanceof Symbol));
-    } else if(!isProperList(cdr)) {
+    } else if(!isList(cdr)) {
       list_as_strs.add(new PPrintDatum(cdr.write()));
     } else {
-      return stringify_list_data(list_as_strs,length,(Pair)cdr);
+      return () -> stringify_list_data(list_as_strs,length,(Pair)cdr,continuation);
     }
-    return length;
+    return continuation.run(new Character(length));
+  }
+
+  private static Trampoline.SafeBounce stringify_list_data(ArrayList<PPrintDatum> list_as_strs, int length, Pair p, Trampoline.SafeContinuation continuation) {
+    return stringify_list_car_data(list_as_strs,length,p.car(),(ignore) -> () -> {
+      return stringify_list_cdr_data(list_as_strs,length,p.cdr(),continuation);
+    });
   }
 
 
   // Stringifies <list_as_strs> w/o any tabs
-  private static void print_pprint_data_as_is(ArrayList<PPrintDatum> list_as_strs, StringBuilder buffer) {
-    buffer.append('(');
-    for(int i = 0, n = list_as_strs.size(); i < n; ++i) {
-      if(list_as_strs.get(i).is_exp) {
-        print_pprint_data_as_is(list_as_strs.get(i).exp,buffer);
-      } else {
-        buffer.append(list_as_strs.get(i).datum_str);
-      }
+  private static Trampoline.SafeBounce print_pprint_data_as_is_iter(ArrayList<PPrintDatum> list_as_strs, StringBuilder buffer, int i, int n, Trampoline.SafeContinuation continuation) {
+    if(i >= n) return continuation.run(Void.VALUE);
+    if(list_as_strs.get(i).is_exp) {
+      return () -> print_pprint_data_as_is(list_as_strs.get(i).exp,buffer,(ignore) -> () -> {
+        if(i+1 != n) buffer.append(' ');
+        return () -> print_pprint_data_as_is_iter(list_as_strs,buffer,i+1,n,continuation);
+      });
+    } else {
+      buffer.append(list_as_strs.get(i).datum_str);
       if(i+1 != n) buffer.append(' ');
+      return () -> print_pprint_data_as_is_iter(list_as_strs,buffer,i+1,n,continuation);
     }
-    buffer.append(')');
+  }
+
+  private static Trampoline.SafeBounce print_pprint_data_as_is(ArrayList<PPrintDatum> list_as_strs, StringBuilder buffer, Trampoline.SafeContinuation continuation) {
+    buffer.append('(');
+    return print_pprint_data_as_is_iter(list_as_strs,buffer,0,list_as_strs.size(),(ignore) -> () -> {
+      buffer.append(')');
+      return continuation.run(Void.VALUE);
+    });
   }
 
 
   // Prints a list beginning w/ a non-symbol atom
-  private static int pretty_print_list_of_data(ArrayList<PPrintDatum> list_as_strs, int depth, StringBuilder buffer, char[] tabs) {
-    tabs[2*depth+1] = 0; // shorten tabs to account for specialized stringification
-    for(int col_length = 2*depth, i = 0, n = list_as_strs.size(); i < n; ++i) {
-      if(i > 0 && list_as_strs.get(i).output_len + col_length > PRETTY_PRINT_COLUMN_WIDTH) {
-        buffer.append('\n');
-        add_chars_to_buffer(buffer,tabs);
-        col_length = 2*depth;
-      }
-      col_length += list_as_strs.get(i).output_len + 1; // +1 accounts for spaces
-      if(list_as_strs.get(i).is_exp) {
-        pretty_print_pprint_data(list_as_strs.get(i).exp,list_as_strs.get(i).output_len,depth+1,buffer);
-      } else {
-        buffer.append(list_as_strs.get(i).datum_str);
-      }
-      if(i+1 != n) buffer.append(' ');
+  private static Trampoline.SafeBounce pretty_print_list_of_data_iter(ArrayList<PPrintDatum> list_as_strs, int depth, StringBuilder buffer, char[] tabs, int col_length, int i, int n, Trampoline.SafeContinuation continuation) {
+    if(i >= n) return continuation.run(Void.VALUE);
+    if(i > 0 && list_as_strs.get(i).output_len + col_length > PRETTY_PRINT_COLUMN_WIDTH) {
+      buffer.append('\n');
+      add_chars_to_buffer(buffer,tabs);
+      col_length = 2*depth;
     }
-    return depth;
+    int new_col_length = col_length + list_as_strs.get(i).output_len + 1; // +1 accounts for spaces
+    if(list_as_strs.get(i).is_exp) {
+      return () -> pretty_print_pprint_data(list_as_strs.get(i).exp,list_as_strs.get(i).output_len,depth+1,buffer,(ignore) -> () -> {
+        if(i+1 != n) buffer.append(' ');
+        return () -> pretty_print_list_of_data_iter(list_as_strs,depth,buffer,tabs,new_col_length,i+1,n,continuation);
+      });
+    } else {
+      buffer.append(list_as_strs.get(i).datum_str);
+      if(i+1 != n) buffer.append(' ');
+      return () -> pretty_print_list_of_data_iter(list_as_strs,depth,buffer,tabs,new_col_length,i+1,n,continuation);
+    }
+  }
+
+  private static Trampoline.SafeBounce pretty_print_list_of_data(ArrayList<PPrintDatum> list_as_strs, int depth, StringBuilder buffer, char[] tabs, Trampoline.SafeContinuation continuation) {
+    tabs[2*depth+1] = 0; // shorten tabs to account for specialized stringification
+    return pretty_print_list_of_data_iter(list_as_strs,depth,buffer,tabs,2*depth,0,list_as_strs.size(),continuation);
   }
 
 
   // Show info on the parsed stringified data
-  private static void pretty_print_pprint_data(ArrayList<PPrintDatum> list_as_strs, int len, int depth, StringBuilder buffer) {
+  private static Trampoline.SafeBounce pretty_print_pprint_data_list_body_iter(ArrayList<PPrintDatum> list_as_strs, int depth, StringBuilder buffer, char[] tabs, int i, int n, Trampoline.SafeContinuation continuation) {
+    if(i >= n) return continuation.run(Void.VALUE);
+    add_chars_to_buffer(buffer,tabs);
+    if(list_as_strs.get(i).is_exp) {
+      return () -> pretty_print_pprint_data(list_as_strs.get(i).exp,list_as_strs.get(i).output_len,depth+1,buffer,(ignore) -> () -> {
+        if(i+1 != n) buffer.append('\n');
+        return () -> pretty_print_pprint_data_list_body_iter(list_as_strs,depth,buffer,tabs,i+1,n,continuation);
+      });
+    } else {
+      buffer.append(list_as_strs.get(i).datum_str);
+      if(i+1 != n) buffer.append('\n');
+      return () -> pretty_print_pprint_data_list_body_iter(list_as_strs,depth,buffer,tabs,i+1,n,continuation);
+    }
+  }
+
+  private static Trampoline.SafeBounce pretty_print_pprint_data_list_body(ArrayList<PPrintDatum> list_as_strs, int depth, StringBuilder buffer, char[] tabs, int i, int n, Trampoline.SafeContinuation continuation) {
+    if(i < n) buffer.append('\n');
+    return pretty_print_pprint_data_list_body_iter(list_as_strs,depth,buffer,tabs,i,n,(ignore) -> () -> {
+      buffer.append(')'); // Free <tabs> & add the closing paren
+      return continuation.run(Void.VALUE);
+    });
+  }
+
+  private static Trampoline.SafeBounce pretty_print_pprint_data(ArrayList<PPrintDatum> list_as_strs, int len, int depth, StringBuilder buffer, Trampoline.SafeContinuation continuation) {
     // Print as is if possible
     if(len + 2*depth <= PRETTY_PRINT_COLUMN_WIDTH || len < 2) {
-      print_pprint_data_as_is(list_as_strs,buffer);
-      return;
+      return () -> print_pprint_data_as_is(list_as_strs,buffer,continuation);
     }
     // Get tab (2 spaces per tab) width as per the depth
     char[] tabs = new char [2*depth+3];
@@ -313,13 +355,17 @@ public class Pair extends Datum implements OrderedCollection {
     int i = 1;
     // If 1st elt is a non-symbol atom, specialize stringification
     if(!list_as_strs.get(0).is_sym && !list_as_strs.get(0).is_exp) {
-      depth = pretty_print_list_of_data(list_as_strs,depth,buffer,tabs);
-      buffer.append(')');
-      return;
+      return () -> pretty_print_list_of_data(list_as_strs,depth,buffer,tabs,(ignore) -> () -> {
+        buffer.append(')');
+        return continuation.run(Void.VALUE);
+      });
     }
     // If 1st elt is a list, hence special stringification case for such applications
     if(list_as_strs.get(0).is_exp) {
-      pretty_print_pprint_data(list_as_strs.get(0).exp,list_as_strs.get(0).output_len,depth+1,buffer);
+      int body_start = i;
+      return () -> pretty_print_pprint_data(list_as_strs.get(0).exp,list_as_strs.get(0).output_len,depth+1,buffer,(ignore) -> () -> {
+        return () -> pretty_print_pprint_data_list_body(list_as_strs,depth,buffer,tabs,body_start,n,continuation);
+      });
     } else {
       buffer.append(list_as_strs.get(0).datum_str);
       buffer.append(' ');
@@ -327,42 +373,48 @@ public class Pair extends Datum implements OrderedCollection {
       if(list_as_strs.get(1).output_len + list_as_strs.get(0).output_len + 2*depth < PRETTY_PRINT_COLUMN_WIDTH){
         i = 2;
         if(list_as_strs.get(1).is_exp) {
-          print_pprint_data_as_is(list_as_strs.get(1).exp,buffer);
+          int body_start = i;
+          return () -> print_pprint_data_as_is(list_as_strs.get(1).exp,buffer,(ignore) -> () -> {
+            return () -> pretty_print_pprint_data_list_body(list_as_strs,depth,buffer,tabs,body_start,n,continuation);
+          });
         } else {
           buffer.append(list_as_strs.get(1).datum_str);
         }
       }
     }
-    if(i < n) buffer.append('\n');
     // Print body of the list
-    for(; i < n; ++i) {
-      add_chars_to_buffer(buffer,tabs);
-      if(list_as_strs.get(i).is_exp) {
-        pretty_print_pprint_data(list_as_strs.get(i).exp,list_as_strs.get(i).output_len,depth+1,buffer);
-      } else {
-        buffer.append(list_as_strs.get(i).datum_str);
-      }
-      if(i+1 != n) buffer.append('\n');
-    }
-    // Free <tabs> & add the closing paren
-    buffer.append(')');
+    int body_start = i;
+    return () -> pretty_print_pprint_data_list_body(list_as_strs,depth,buffer,tabs,body_start,n,continuation);
+  }
+
+
+  // Box class to catch the final value in <pprint>'s continuation closure
+  private static class StringBox {
+    public java.lang.String value = "";
   }
 
 
   // Pretty printer launch
   public java.lang.String pprint() {
     // If non-proper-list-pair, print as-is
-    if(!isProperList(this)) return write();
+    if(!isList(this)) return write();
     // Else check if pair as string is of valid length
     java.lang.String as_string = write();
     if(as_string.length() <= PRETTY_PRINT_COLUMN_WIDTH) return as_string;
     // Otherwise get list as string-ified objects
+    // => Note that we use trampolining to get around recursion depth issues with printing deep lists
     ArrayList<PPrintDatum> list_as_strs = new ArrayList<PPrintDatum>();
-    int output_length = stringify_list_data(list_as_strs,0,this);
-    // Print the list w/ indents
-    StringBuilder buffer = new StringBuilder();
-    pretty_print_pprint_data(list_as_strs,output_length,0,buffer);
-    return buffer.toString();
+    StringBox sb = new StringBox();
+    Trampoline.safeResolve(stringify_list_data(list_as_strs,0,this,(outputLengthChar) -> () -> {
+      int output_length = ((Character)outputLengthChar).value();
+      // Print the list w/ indents
+      StringBuilder buffer = new StringBuilder();
+      return pretty_print_pprint_data(list_as_strs,output_length,0,buffer,(ignore) -> () -> {
+        sb.value = buffer.toString();
+        return Trampoline.SAFE_LAST_BOUNCE_SIGNAL;
+      });
+    }));
+    return sb.value;
   }
 
 
