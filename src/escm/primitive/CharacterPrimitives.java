@@ -254,11 +254,13 @@ public class CharacterPrimitives {
     public java.lang.String escmName() {
       return "char<?";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+
+    // @PRECONDITION: <parameters.size() >= 1>
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
+      Datum fstValue = parameters.get(0);
+      if(!(fstValue instanceof escm.type.Character)) 
         throw new Exceptionf("'(char<? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
-      int lastValue = ((escm.type.Character)parameters.get(0)).value();
+      int lastValue = ((escm.type.Character)fstValue).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
         if(!(p instanceof escm.type.Character))
@@ -269,6 +271,12 @@ public class CharacterPrimitives {
       }
       return Boolean.TRUE;
     }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(char<? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters);
+    }
   }
 
 
@@ -278,11 +286,13 @@ public class CharacterPrimitives {
     public java.lang.String escmName() {
       return "char>?";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+
+    // @PRECONDITION: <parameters.size() >= 1>
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
+      Datum fstValue = parameters.get(0);
+      if(!(fstValue instanceof escm.type.Character)) 
         throw new Exceptionf("'(char>? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
-      int lastValue = ((escm.type.Character)parameters.get(0)).value();
+      int lastValue = ((escm.type.Character)fstValue).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
         if(!(p instanceof escm.type.Character))
@@ -293,6 +303,12 @@ public class CharacterPrimitives {
       }
       return Boolean.TRUE;
     }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(char>? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters);
+    }
   }
 
 
@@ -302,11 +318,13 @@ public class CharacterPrimitives {
     public java.lang.String escmName() {
       return "char<=?";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+
+    // @PRECONDITION: <parameters.size() >= 1>
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
+      Datum fstValue = parameters.get(0);
+      if(!(fstValue instanceof escm.type.Character)) 
         throw new Exceptionf("'(char<=? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
-      int lastValue = ((escm.type.Character)parameters.get(0)).value();
+      int lastValue = ((escm.type.Character)fstValue).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
         if(!(p instanceof escm.type.Character))
@@ -317,6 +335,12 @@ public class CharacterPrimitives {
       }
       return Boolean.TRUE;
     }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(char<=? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters);
+    }
   }
 
 
@@ -326,11 +350,13 @@ public class CharacterPrimitives {
     public java.lang.String escmName() {
       return "char>=?";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+
+    // @PRECONDITION: <parameters.size() >= 1>
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
+      Datum fstValue = parameters.get(0);
+      if(!(fstValue instanceof escm.type.Character)) 
         throw new Exceptionf("'(char>=? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
-      int lastValue = ((escm.type.Character)parameters.get(0)).value();
+      int lastValue = ((escm.type.Character)fstValue).value();
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
         if(!(p instanceof escm.type.Character))
@@ -340,6 +366,12 @@ public class CharacterPrimitives {
         lastValue = currValue;
       }
       return Boolean.TRUE;
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
+        throw new Exceptionf("'(char>=? <char> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters);
     }
   }
 

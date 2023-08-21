@@ -139,8 +139,7 @@ public class NumberPrimitives {
       return "=";
     }
 
-    public static Datum logic(Datum firstParam, ArrayList<Datum> parameters) throws Exception {
-      Number firstValue = (Number)firstParam;
+    public static Datum logic(Number firstValue, ArrayList<Datum> parameters) throws Exception {
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
         if(!(p instanceof Number))
@@ -153,7 +152,7 @@ public class NumberPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 2) throw new Exceptionf("'(= <number> <number> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum firstParam = parameters.get(0);
-      if(firstParam instanceof Number) return logic(firstParam,parameters);
+      if(firstParam instanceof Number) return logic((Number)firstParam,parameters);
       return EqualityPrimitives.IsEq.logic(parameters);
     }
   }
@@ -165,13 +164,8 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "<";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) throw new Exceptionf("'(< <real> <real> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum firstParam = parameters.get(0);
-      if(!(firstParam instanceof Real))
-        throw new Exceptionf("'(< <real> <real> ...) invalid non-real arg %s recieved!", firstParam.profile());
-      Real lastValue = (Real)firstParam;
+
+    public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
         if(!(p instanceof Real))
@@ -182,6 +176,20 @@ public class NumberPrimitives {
       }
       return Boolean.TRUE;
     }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 2) throw new Exceptionf("'(< <real> <real> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum firstParam = parameters.get(0);
+      if(firstParam instanceof Real) {
+        return logic((Real)firstParam,parameters);
+      } else if(firstParam instanceof escm.type.String) {
+        return StringPrimitives.StringLessThan.logic(parameters);
+      } else if(firstParam instanceof escm.type.Character) {
+        return CharacterPrimitives.IsCharLessThan.logic(parameters);
+      } else {
+        throw new Exceptionf("'(< <real> <real> ...) invalid non-real arg %s recieved!", firstParam.profile());
+      }
+    }
   }
 
 
@@ -191,13 +199,8 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return ">";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) throw new Exceptionf("'(> <real> <real> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum firstParam = parameters.get(0);
-      if(!(firstParam instanceof Real))
-        throw new Exceptionf("'(> <real> <real> ...) invalid non-real arg %s recieved!", firstParam.profile());
-      Real lastValue = (Real)firstParam;
+
+    public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
         if(!(p instanceof Real))
@@ -208,6 +211,20 @@ public class NumberPrimitives {
       }
       return Boolean.TRUE;
     }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 2) throw new Exceptionf("'(> <real> <real> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum firstParam = parameters.get(0);
+      if(firstParam instanceof Real) {
+        return logic((Real)firstParam,parameters);
+      } else if(firstParam instanceof escm.type.String) {
+        return StringPrimitives.StringGreaterThan.logic(parameters);
+      } else if(firstParam instanceof escm.type.Character) {
+        return CharacterPrimitives.IsCharGreaterThan.logic(parameters);
+      } else {
+        throw new Exceptionf("'(> <real> <real> ...) invalid non-real arg %s recieved!", firstParam.profile());
+      }
+    }
   }
 
 
@@ -217,13 +234,8 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "<=";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) throw new Exceptionf("'(<= <real> <real> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum firstParam = parameters.get(0);
-      if(!(firstParam instanceof Real))
-        throw new Exceptionf("'(<= <real> <real> ...) invalid non-real arg %s recieved!", firstParam.profile());
-      Real lastValue = (Real)firstParam;
+
+    public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
         if(!(p instanceof Real))
@@ -234,6 +246,20 @@ public class NumberPrimitives {
       }
       return Boolean.TRUE;
     }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 2) throw new Exceptionf("'(<= <real> <real> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum firstParam = parameters.get(0);
+      if(firstParam instanceof Real) {
+        return logic((Real)firstParam,parameters);
+      } else if(firstParam instanceof escm.type.String) {
+        return StringPrimitives.StringLessThanOrEqualTo.logic(parameters);
+      } else if(firstParam instanceof escm.type.Character) {
+        return CharacterPrimitives.IsCharLessThanOrEqual.logic(parameters);
+      } else {
+        throw new Exceptionf("'(<= <real> <real> ...) invalid non-real arg %s recieved!", firstParam.profile());
+      }
+    }
   }
 
 
@@ -243,13 +269,8 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return ">=";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 2) throw new Exceptionf("'(>= <real> <real> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
-      Datum firstParam = parameters.get(0);
-      if(!(firstParam instanceof Real))
-        throw new Exceptionf("'(>= <real> <real> ...) invalid non-real arg %s recieved!", firstParam.profile());
-      Real lastValue = (Real)firstParam;
+
+    public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
         if(!(p instanceof Real))
@@ -259,6 +280,20 @@ public class NumberPrimitives {
         lastValue = pValue;
       }
       return Boolean.TRUE;
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 2) throw new Exceptionf("'(>= <real> <real> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum firstParam = parameters.get(0);
+      if(firstParam instanceof Real) {
+        return logic((Real)firstParam,parameters);
+      } else if(firstParam instanceof escm.type.String) {
+        return StringPrimitives.StringGreaterThanOrEqualTo.logic(parameters);
+      } else if(firstParam instanceof escm.type.Character) {
+        return CharacterPrimitives.IsCharGreaterThanOrEqual.logic(parameters);
+      } else {
+        throw new Exceptionf("'(>= <real> <real> ...) invalid non-real arg %s recieved!", firstParam.profile());
+      }
     }
   }
 

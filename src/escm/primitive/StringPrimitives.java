@@ -384,10 +384,9 @@ public class StringPrimitives {
     public java.lang.String escmName() {
       return "string<?";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1) 
-        throw new Exceptionf("'(string<? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
+
+    // @PRECONDITION: <parameters.size() >= 1>
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string<? <string> ...) invalid non-string arg %s recieved!", p.profile());
@@ -402,6 +401,12 @@ public class StringPrimitives {
       }
       return Boolean.TRUE;
     }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string<? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters);
+    }
   }
 
 
@@ -411,10 +416,9 @@ public class StringPrimitives {
     public java.lang.String escmName() {
       return "string>?";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1) 
-        throw new Exceptionf("'(string>? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
+
+    // @PRECONDITION: <parameters.size() >= 1>
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string>? <string> ...) invalid non-string arg %s recieved!", p.profile());
@@ -429,6 +433,12 @@ public class StringPrimitives {
       }
       return Boolean.TRUE;
     }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string>? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters);
+    }
   }
 
 
@@ -438,10 +448,9 @@ public class StringPrimitives {
     public java.lang.String escmName() {
       return "string<=?";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1) 
-        throw new Exceptionf("'(string<=? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
+
+    // @PRECONDITION: <parameters.size() >= 1>
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string<=? <string> ...) invalid non-string arg %s recieved!", p.profile());
@@ -456,6 +465,12 @@ public class StringPrimitives {
       }
       return Boolean.TRUE;
     }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string<=? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters);
+    }
   }
 
 
@@ -465,10 +480,9 @@ public class StringPrimitives {
     public java.lang.String escmName() {
       return "string>=?";
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1) 
-        throw new Exceptionf("'(string>=? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
+
+    // @PRECONDITION: <parameters.size() >= 1>
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       Datum p = parameters.get(0);
       if(!(p instanceof escm.type.String))
         throw new Exceptionf("'(string>=? <string> ...) invalid non-string arg %s recieved!", p.profile());
@@ -482,6 +496,12 @@ public class StringPrimitives {
         lastValue = strValue;
       }
       return Boolean.TRUE;
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 1) 
+        throw new Exceptionf("'(string>=? <string> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters);
     }
   }
 

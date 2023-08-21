@@ -57,10 +57,10 @@
 ## Numbers:
 ```scheme
 (= <num> <num> ...)    ; aliases <eq?> if given non-numerics
-(< <real> <real> ...)
-(> <real> <real> ...)
-(<= <real> <real> ...)
-(>= <real> <real> ...)
+(< <real> <real> ...)  ; aliases <string<?> and <char<?> too
+(> <real> <real> ...)  ; aliases <string>?> and <char>?> too
+(<= <real> <real> ...) ; aliases <string<=?> and <char<=?> too
+(>= <real> <real> ...) ; aliases <string>=?> and <char>=?> too
 
 (+ <num> <num> ...) ; aliases <append> if given <symbol>/<keyword>/<ac>, or <bind> if given callables
 (* <num> <num> ...) ; aliases <compose> if only given callables
