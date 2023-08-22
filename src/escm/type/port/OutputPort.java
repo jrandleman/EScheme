@@ -1,6 +1,6 @@
 // Author: Jordan Randleman - escm.type.port.OutputPort
 // Purpose:
-//    Output port primitive type, to write to a file.
+//    Output port primitive type, to write to a file/stdout.
 //    Note that ALL write operations also flush automatically.
 //
 //    Provides:

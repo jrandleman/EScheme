@@ -5,7 +5,6 @@
 package escm.primitive;
 import java.util.ArrayList;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;

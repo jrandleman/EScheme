@@ -41,6 +41,7 @@ public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Internal Reader Value
   private PushbackReader pr = null;
+  private FileReader fileReader = null; // track for closing w/ non-stdin files
 
   // To work with codepoints (rather than chars) in files
   private static final int PUSHBACK_READER_SIZE = 2;
@@ -126,7 +127,8 @@ public class InputPort extends Port {
   // Constructor
   public InputPort(String filename) throws Exception {
     try {
-      pr = new PushbackReader(new FileReader(filename),PUSHBACK_READER_SIZE);
+      fileReader = new FileReader(filename);
+      pr = new PushbackReader(fileReader,PUSHBACK_READER_SIZE);
       name = FilePrimitives.AbsolutePath.logic(filename);
     } catch(Exception e) {
       throw new Exceptionf("Can't open port \"%s\" for input: %s", filename, e);
@@ -479,7 +481,10 @@ public class InputPort extends Port {
   // Port Closing Semantics
   public synchronized void close() throws Exception {
     try {
-      if(isClosed() == false) pr.close();
+      if(isClosed() == false) {
+        pr.close();
+        if(fileReader != null) fileReader.close();
+      }
     } catch(Exception e) {
       throw new Exceptionf("Can't close port \"%s\": %s", name, e);
     }
