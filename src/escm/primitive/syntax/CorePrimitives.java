@@ -1736,7 +1736,7 @@ public class CorePrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (get-parameter! <symbol>)
+  // (get-parameter <symbol>)
   //
   // (define-syntax get-parameter
   //   (lambda (sym)
