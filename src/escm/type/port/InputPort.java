@@ -41,7 +41,7 @@ public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Internal Reader Value
   private PushbackReader pr = null;
-  private FileReader fileReader = null; // track for closing w/ non-stdin files
+  private FileReader fileReader = null; // track for closing non-stdin files
 
   // To work with codepoints (rather than chars) in files
   private static final int PUSHBACK_READER_SIZE = 2;
