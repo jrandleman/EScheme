@@ -308,8 +308,8 @@ public class ObjectPrimitives {
         new Pair(Pair.List(CorePrimitives.QUOTE,prop.car()),tails.first),
         new Pair(((Pair)prop.cdr()).car(),tails.second));
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       // Extract optional name (provided by <define-class>)
       Datum className = parseOptionalClassOrInterfaceName(parameters);
       // Extract "is-a"'s
@@ -328,6 +328,10 @@ public class ObjectPrimitives {
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.second),
         new Pair(CorePrimitives.LIST,instancePropNamesAndVals.first),
         new Pair(CorePrimitives.LIST,instancePropNamesAndVals.second));
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      return logic(parameters);
     }
   }
 
@@ -367,11 +371,11 @@ public class ObjectPrimitives {
         throw new Exceptionf("'(define-class <name> <super-expr> <interfaces-expr> <prop> ...) <name> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
       Symbol name = (Symbol)nameDatum;
       Symbol obj = UniqueSymbol.generate(name.value()+"?-obj");
-      Datum classComponents = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
+      parameters.set(0,new Keyword(name.value()));
       return Pair.List(CorePrimitives.BEGIN,
         Pair.List(CorePrimitives.DEFINE,Pair.List(new Symbol(name.value()+"?"),obj),
           Pair.List(AND,Pair.List(IS_OBJECTP,obj),Pair.List(OO_ISP,obj,name))), // predicate generation!
-        Pair.List(CorePrimitives.DEFINE,name,new Pair(CLASS,new Pair(new Keyword(name.value()),classComponents))));
+        Pair.List(CorePrimitives.DEFINE,name,ClassMacro.logic(parameters)));
     }
   }
 
@@ -470,7 +474,7 @@ public class ObjectPrimitives {
       }
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+    public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       // Extract optional name (provided by <define-interface>)
       Datum interfaceName = ClassMacro.parseOptionalClassOrInterfaceName(parameters);
       // Extract "is-a"'s
@@ -485,6 +489,10 @@ public class ObjectPrimitives {
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.first),
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.second),
         new Pair(CorePrimitives.LIST,staticAndNonStaticProps.second));
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      return logic(parameters);
     }
   }
 
@@ -522,11 +530,11 @@ public class ObjectPrimitives {
         throw new Exceptionf("'(define-interface <name> <interfaces-expr> <prop> ...) <name> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
       Symbol name = (Symbol)nameDatum;
       Symbol obj = UniqueSymbol.generate(name.value()+"?-obj");
-      Datum classComponents = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
+      parameters.set(0,new Keyword(name.value()));
       return Pair.List(CorePrimitives.BEGIN,
         Pair.List(CorePrimitives.DEFINE,Pair.List(new Symbol(name.value()+"?"),obj),
           Pair.List(AND,Pair.List(IS_OBJECTP,obj),Pair.List(OO_ISP,obj,name))), // predicate generation!
-        Pair.List(CorePrimitives.DEFINE,name,new Pair(INTERFACE,new Pair(new Keyword(name.value()),classComponents))));
+        Pair.List(CorePrimitives.DEFINE,name,InterfaceMacro.logic(parameters)));
     }
   }
 

@@ -243,16 +243,17 @@ public class CorePrimitives {
       });
     }
 
-    private Trampoline.Bounce compileClauseBody(Datum body, Datum compiledBody, Trampoline.Continuation continuation) throws Exception {
-      return applyAppendMapCompile(this.definitionEnvironment,body,compiledBody,continuation);
+    private static Trampoline.Bounce compileClauseBody(Environment defEnv, Datum body, Datum compiledBody, Trampoline.Continuation continuation) throws Exception {
+      return applyAppendMapCompile(defEnv,body,compiledBody,continuation);
     }
 
     // Generate series of compiled <define> expansions to convert 1 optional-param clause into 2+ required-param clauses
-    private Trampoline.Bounce generateClauseDefineSequences(Datum requiredParams, Pair optionalNames, Pair optionalDefs, Datum compiledBody, int totalOptionalParams, int i, Datum expandedClauses, Trampoline.Continuation continuation) throws Exception {
+    private static Trampoline.Bounce generateClauseDefineSequences(Environment defEnv, Datum requiredParams, Pair optionalNames, Pair optionalDefs, Datum compiledBody, int totalOptionalParams, int i, Datum expandedClauses, Trampoline.Continuation continuation) throws Exception {
       if(i < 0) return continuation.run(expandedClauses);
       if(i == totalOptionalParams) {
         Datum params = Pair.binaryAppend(requiredParams,optionalNames);
         return generateClauseDefineSequences(
+          defEnv,
           requiredParams,
           optionalNames,
           optionalDefs,
@@ -263,8 +264,9 @@ public class CorePrimitives {
           continuation);
       } else {
         Datum params = Pair.binaryAppend(requiredParams,(Datum)optionalNames.slice(0,i));
-        return compileClauseBody((Datum)optionalDefs.slice(i),Nil.VALUE,(compiledDefines) -> () -> {
+        return compileClauseBody(defEnv,(Datum)optionalDefs.slice(i),Nil.VALUE,(compiledDefines) -> () -> {
           return generateClauseDefineSequences(
+            defEnv,
             requiredParams,
             optionalNames,
             optionalDefs,
@@ -278,15 +280,15 @@ public class CorePrimitives {
     }
 
     // Convert 1 optional params clause into 2+ required params clauses
-    private Trampoline.Bounce getExpandedClause(Pair clause, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+    private static Trampoline.Bounce getExpandedClause(Environment defEnv, Pair clause, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       PairBox optionalParams = new PairBox();
       Datum requiredParams = parseClauseParameters((Pair)clause.car(),optionalParams,parameters);
       escm.util.Pair<Datum,Datum> namesAndDefs = parseOptionalNamesAndDefs(optionalParams.value);
       Pair optionalNames = (Pair)namesAndDefs.first;
       Pair optionalDefs = (Pair)namesAndDefs.second;
       int totalOptionalParams = optionalDefs.length();
-      return compileClauseBody(getClauseBody(clause.cdr()),Nil.VALUE,(compiledBody) -> () -> {
-        return generateClauseDefineSequences(requiredParams,optionalNames,optionalDefs,compiledBody,totalOptionalParams,totalOptionalParams,Nil.VALUE,continuation);
+      return compileClauseBody(defEnv,getClauseBody(clause.cdr()),Nil.VALUE,(compiledBody) -> () -> {
+        return generateClauseDefineSequences(defEnv,requiredParams,optionalNames,optionalDefs,compiledBody,totalOptionalParams,totalOptionalParams,Nil.VALUE,continuation);
       });
     }
 
@@ -329,24 +331,24 @@ public class CorePrimitives {
     }
 
     // Compile a clause w/o optional parameters
-    private Trampoline.Bounce compileSingleClause(Pair clause, Trampoline.Continuation continuation) throws Exception {
-      return compileClauseBody(clause.cdr(),Nil.VALUE,(compiledBody) -> () -> {
+    private static Trampoline.Bounce compileSingleClause(Environment defEnv, Pair clause, Trampoline.Continuation continuation) throws Exception {
+      return compileClauseBody(defEnv,clause.cdr(),Nil.VALUE,(compiledBody) -> () -> {
         return continuation.run(new Pair(clause.car(),compiledBody));
       });
     }
 
     // Convert all of the function's clauses w/ optional params to clauses w/ required params.
     // Also compile each clause's body.
-    private Trampoline.Bounce getExpandedClauses(ArrayList<Datum> parameters, int i, int n, Datum expandedClauses, Trampoline.Continuation continuation) throws Exception {
+    private static Trampoline.Bounce getExpandedClauses(Environment defEnv, ArrayList<Datum> parameters, int i, int n, Datum expandedClauses, Trampoline.Continuation continuation) throws Exception {
       if(i >= n) return continuation.run(expandedClauses);
       Datum clause = parameters.get(i);
       if(clauseHasOptionalParam(clause,parameters)) {
-        return getExpandedClause((Pair)clause,parameters,(expandedClause) -> () -> {
-          return getExpandedClauses(parameters,i+1,n,new Pair(expandedClause,expandedClauses),continuation);
+        return getExpandedClause(defEnv,(Pair)clause,parameters,(expandedClause) -> () -> {
+          return getExpandedClauses(defEnv,parameters,i+1,n,new Pair(expandedClause,expandedClauses),continuation);
         });
       } else {
-        return compileSingleClause((Pair)clause,(compiledClause) -> () -> {
-          return getExpandedClauses(parameters,i+1,n,new Pair(Pair.List(compiledClause),expandedClauses),continuation);
+        return compileSingleClause(defEnv,(Pair)clause,(compiledClause) -> () -> {
+          return getExpandedClauses(defEnv,parameters,i+1,n,new Pair(Pair.List(compiledClause),expandedClauses),continuation);
         });
       }
     }
@@ -362,12 +364,16 @@ public class CorePrimitives {
       return appended;
     }
 
-    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+    public static Trampoline.Bounce logic(Environment defEnv, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() < 1)
         throw new Exceptionf("'(fn ((<param> ...) <body> ...) ...) needs at least 1 arg: %s", Exceptionf.profileArgs(parameters));
-      return getExpandedClauses(parameters,0,parameters.size(),Nil.VALUE,(expandedCompiledClauses) -> () -> {
+      return getExpandedClauses(defEnv,parameters,0,parameters.size(),Nil.VALUE,(expandedCompiledClauses) -> () -> {
         return continuation.run(Pair.List(BYTECODE,new Pair(LOAD_CLOSURE,applyAppend(expandedCompiledClauses))));
       });
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      return logic(this.definitionEnvironment,parameters,continuation);
     }
   }
 
@@ -379,7 +385,7 @@ public class CorePrimitives {
   // (define-syntax lambda
   //   (fn ((params . body)
   //         (list (quote fn) (cons params body)))))
-  public static class Lambda extends PrimitiveSyntax {
+  public static class Lambda extends PrimitiveSyntaxCallable {
     public java.lang.String escmName() {
       return "lambda";
     }
@@ -391,14 +397,20 @@ public class CorePrimitives {
       }
       return body;
     }
-    
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+
+    public static Trampoline.Bounce logic(Environment defEnv, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() < 1)
         throw new Exceptionf("'(lambda (<param> ...) <body> ...) didn't receive (<param> ...): %s", Exceptionf.profileArgs(parameters));
       Datum params = parameters.get(0);
       Datum body = getAllExpressionsAfter(parameters,0);
-      if(body instanceof Nil) body = new Pair(Void.VALUE,body);
-      return Pair.List(FN,new Pair(params,body));
+      if(body instanceof Nil) body = new Pair(Void.VALUE,Nil.VALUE);
+      parameters.clear();
+      parameters.add(new Pair(params,body));
+      return Fn.logic(defEnv,parameters,continuation);
+    }
+    
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      return logic(this.definitionEnvironment,parameters,continuation);
     }
   }
 
@@ -572,10 +584,9 @@ public class CorePrimitives {
       Datum functionName = bindingsPair.car();
       if(!(functionName instanceof Symbol))
         throw new Exceptionf("'(define (<fcn-name> <param> ...) <body> ...) <fcn-name> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
-      Datum body = Lambda.getAllExpressionsAfter(parameters,0);
-      if(body instanceof Nil) body = new Pair(Void.VALUE,body);
-      return Compiler.run(new Pair(LAMBDA,new Pair(bindingsPair.cdr(),body)),this.definitionEnvironment,(compiledValue) -> () -> {
-        return continuation.run(Pair.binaryAppend(new Pair(BYTECODE,compiledValue),Pair.List(Pair.List(DEFINE,functionName))));
+      parameters.set(0,bindingsPair.cdr());
+      return Lambda.logic(this.definitionEnvironment,parameters,(expandedLambda) -> () -> {
+        return continuation.run(Pair.binaryAppend(expandedLambda,Pair.List(Pair.List(DEFINE,functionName))));
       });
     }
     
