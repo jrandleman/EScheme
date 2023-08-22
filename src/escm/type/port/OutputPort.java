@@ -35,7 +35,7 @@ import escm.primitive.FilePrimitives;
 
 public class OutputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
-  // Internal Reader Value
+  // Internal Writer Value
   private Writer writer = null;
 
 
