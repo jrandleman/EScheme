@@ -393,4 +393,34 @@ public class PortPrimitives {
       return new escm.type.Character(codepoint.intValue());
     }
   }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // stdin?
+  public static class IsStdinP extends Primitive {
+    public java.lang.String escmName() {
+      return "stdin?";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof InputPort))
+        throw new Exceptionf("'(stdin? <input-port>) didn't receive 1 input-port: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(((InputPort)parameters.get(0)).isStdin());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // stdin?
+  public static class IsStdoutP extends Primitive {
+    public java.lang.String escmName() {
+      return "stdout?";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof OutputPort))
+        throw new Exceptionf("'(stdout? <output-port>) didn't receive 1 input-port: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(((OutputPort)parameters.get(0)).isStdout());
+    }
+  }
 }

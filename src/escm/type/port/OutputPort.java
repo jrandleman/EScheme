@@ -104,7 +104,7 @@ public class OutputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Whether Writing to STDOUT
   public boolean isStdout() {
-    return this == STDOUT;
+    return writer.equals(STDOUT.writer);
   }
 
 

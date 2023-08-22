@@ -124,4 +124,16 @@
   "signatures": ["(peek-port <input-port>)"],
   "description": "Peek the first character in <input-port>. Returns #eof if empty.",
   "example": null
+}, {
+  "name": "stdin?",
+  "aliases": null,
+  "signatures": ["(stdin? <input-port>)"],
+  "description": "Returns whether <input-port> handles the program's standard input.",
+  "example": null
+}, {
+  "name": "stdout?",
+  "aliases": null,
+  "signatures": ["(stdout? <output-port>)"],
+  "description": "Returns whether <output-port> handles the program's standard output.",
+  "example": null
 }]

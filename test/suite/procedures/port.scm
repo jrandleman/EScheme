@@ -203,3 +203,8 @@
   (ut (eof? (peek-port ip)) #t)
   (ut (eof? (peek-port ip)) #t)
   (ut (eof? (peek-port ip)) #t))
+
+(ut (stdin? (current-input-port)) #t)
+(ut (stdout? (current-output-port)) #t)
+(ut (stdin? ip) #f)
+(ut (stdout? op3) #f)

@@ -281,6 +281,9 @@
 (with-output-to-file+ <filename-string> <thunk-callable>)
 
 (peek-port <input-port>)
+
+(stdin? <input-port>)
+(stdout? <input-port>)
 ```
 
 

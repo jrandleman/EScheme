@@ -137,7 +137,7 @@ public class InputPort extends Port {
   ////////////////////////////////////////////////////////////////////////////
   // Whether Reading from STDIN
   public boolean isStdin() {
-    return this == STDIN;
+    return pr.equals(STDIN.pr);
   }
 
 
