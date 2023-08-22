@@ -275,6 +275,7 @@ public class InputPort extends Port {
 
 
   public synchronized Datum readReplDatum() throws Exception {
+    if(isClosed()) return null; // closing the input stream is equivalent to reading EOF
     printReplPrompt();
     StringBuilder sb = new StringBuilder();
     SourceInformation replDatumSourceStart = new SourceInformation(name,lineNumber,columnNumber);
