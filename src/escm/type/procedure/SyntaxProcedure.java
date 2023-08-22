@@ -11,6 +11,7 @@ import escm.vm.type.Callable;
 import escm.vm.type.PrimitiveSyntax;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.SourceInformation;
+import escm.vm.runtime.EscmCallStack;
 
 public class SyntaxProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
@@ -77,11 +78,7 @@ public class SyntaxProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
   // Invocation source binding (used by escm.type.Symbol)
   public SyntaxProcedure loadWithInvocationSource(SourceInformation invocationSource) {
-    if(macro instanceof Procedure) {
-      return new SyntaxProcedure(name,invocationSource,(Callable)((Procedure)macro).loadWithInvocationSource(invocationSource));
-    } else {
-      return new SyntaxProcedure(name,invocationSource,macro);
-    }
+    return new SyntaxProcedure(name,invocationSource,macro);
   }
 
 
@@ -110,6 +107,13 @@ public class SyntaxProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
   // Application Abstraction
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
-    return () -> macro.callWith(arguments,continuation);
+    return () -> {
+      EscmCallStack.push(name,invocationSource);
+      Trampoline.Continuation popContinuation = (value) -> () -> {
+        EscmCallStack.pop(name);
+        return continuation.run(value);
+      };
+      return macro.callWith(arguments,popContinuation);
+    };
   }
 }
