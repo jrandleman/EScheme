@@ -37,7 +37,7 @@
 (define-class Tree
   ((new . vals)
     (def self.root #f)
-    (for-each #(self.insert! %1) vals))
+    (for-each self.insert! vals))
   ((insert! v)
     (if self.root
         (self.root.insert! v)

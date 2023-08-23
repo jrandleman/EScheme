@@ -23,8 +23,8 @@ public abstract class EscmThread extends Thread {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Thread-local call stack [used by <CallStack>]
-  public EscmCallStack.Entry callStack = null;
+  // Thread-local call stack [used by <EscmCallStack>]
+  public EscmCallStack.Frame callStack = null;
 
 
   ////////////////////////////////////////////////////////////////////////////

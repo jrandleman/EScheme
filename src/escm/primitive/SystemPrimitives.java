@@ -106,7 +106,7 @@ public class SystemPrimitives {
       return addStringPaths(dir,file);
     }
 
-    public static Trampoline.Bounce evalEachExpression(ArrayList<Datum> exprs, int i, EscmCallStack.Entry originalCallStack, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
+    public static Trampoline.Bounce evalEachExpression(ArrayList<Datum> exprs, int i, EscmCallStack.Frame originalCallStack, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
       int n = exprs.size();
       if(i >= n) return continuation.run(Void.VALUE);
       Trampoline.Continuation nextContinuation;
@@ -130,7 +130,7 @@ public class SystemPrimitives {
       } else {
         String buffer = FilePrimitives.FileRead.slurpFile(filename,primitiveName);
         ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(filename,buffer);
-        return evalEachExpression(exprs,0,EscmCallStack.currentCallStack(),definitionEnvironment,continuation);
+        return evalEachExpression(exprs,0,EscmCallStack.currentStackFrame(),definitionEnvironment,continuation);
       }
     }
 

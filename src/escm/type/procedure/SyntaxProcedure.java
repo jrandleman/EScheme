@@ -108,7 +108,7 @@ public class SyntaxProcedure extends Procedure {
   // Application Abstraction
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
     return () -> {
-      EscmCallStack.Entry originalCallStack = EscmCallStack.currentCallStack();
+      EscmCallStack.Frame originalCallStack = EscmCallStack.currentStackFrame();
       EscmCallStack.push(name,invocationSource);
       Trampoline.Continuation popContinuation = (value) -> () -> {
         EscmCallStack.restore(originalCallStack);

@@ -15,12 +15,12 @@ import escm.vm.util.SourceInformation;
 
 public class EscmCallStack {
   ////////////////////////////////////////////////////////////////////////////
-  // Internal Entry class
-  public static class Entry {
-    final Entry parent;
+  // Internal Frame class
+  public static class Frame {
+    final Frame parent;
     final String name;
     final SourceInformation source;
-    Entry(String name, SourceInformation source, Entry parent) {
+    Frame(String name, SourceInformation source, Frame parent) {
       this.name = name;
       this.source = source;
       this.parent = parent;
@@ -31,7 +31,7 @@ public class EscmCallStack {
   // Registering a call
   public static void push(String calledFunctionName, SourceInformation invocationSource) {
     EscmThread ct = (EscmThread)Thread.currentThread();
-    ct.callStack = new Entry(calledFunctionName,invocationSource,ct.callStack);
+    ct.callStack = new Frame(calledFunctionName,invocationSource,ct.callStack);
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -42,26 +42,26 @@ public class EscmCallStack {
 
   ////////////////////////////////////////////////////////////////////////////
   // Get the the callstack (done by loader to preserve pre-load state)
-  public static Entry currentCallStack() {
+  public static Frame currentStackFrame() {
     return ((EscmThread)Thread.currentThread()).callStack;
   }
 
   ////////////////////////////////////////////////////////////////////////////
   // Restoring the callstack (done by loader to restore pre-load state)
-  public static void restore(Entry restored) {
+  public static void restore(Frame restored) {
     ((EscmThread)Thread.currentThread()).callStack = restored;
   }
 
   ////////////////////////////////////////////////////////////////////////////
   // Printing (& clearing!) the current thread's callstack
-  private static boolean shouldSkipEntry(Entry callStack) {
+  private static boolean shouldSkipFrame(Frame callStack) {
     return callStack != null && callStack.parent == null && callStack.name.equals("runnable");
   }
 
   // @PRECONDITION: callStack != null
-  private static Entry popReadableCallableName(StringBuilder sb, Entry callStack) {
+  private static Frame popReadableCallableName(StringBuilder sb, Frame callStack) {
     // ignore first "runnable" on the stack from the main thread.
-    if(shouldSkipEntry(callStack)) return callStack.parent; 
+    if(shouldSkipFrame(callStack)) return callStack.parent; 
     if(callStack.source == null) {
       sb.append(callStack.name);
     } else {
@@ -85,23 +85,23 @@ public class EscmCallStack {
   ////////////////////////////////////////////////////////////////////////////
   // Getting the call-stack as an EScheme associative-list
   public static Datum toDatum() {
-    Entry callStack = ((EscmThread)Thread.currentThread()).callStack;
+    Frame callStack = ((EscmThread)Thread.currentThread()).callStack;
     if(callStack == null) return Nil.VALUE;
     // ignore first "runnable" on the stack from the main thread.
-    ArrayDeque<Entry> values = new ArrayDeque<Entry>();
+    ArrayDeque<Frame> frames = new ArrayDeque<Frame>();
     while(callStack.parent != null) {
-      values.push(callStack);
+      frames.push(callStack);
       callStack = callStack.parent;
     }
-    if(!shouldSkipEntry(callStack)) values.push(callStack);
+    if(!shouldSkipFrame(callStack)) frames.push(callStack);
     Datum alist = Nil.VALUE;
-    while(values.size() > 0) {
-      Entry value = values.pop();
-      escm.type.String functionName = new escm.type.String(value.name);
-      if(value.source != null) {
-        Datum src = Pair.List(new escm.type.String(value.source.fileName()),
-                              new Exact(value.source.lineNumber()),
-                              new Exact(value.source.columnNumber()));
+    while(frames.size() > 0) {
+      Frame frame = frames.pop();
+      escm.type.String functionName = new escm.type.String(frame.name);
+      if(frame.source != null) {
+        Datum src = Pair.List(new escm.type.String(frame.source.fileName()),
+                              new Exact(frame.source.lineNumber()),
+                              new Exact(frame.source.columnNumber()));
         alist = new Pair(Pair.List(functionName,src),alist);
       } else {
         alist = new Pair(Pair.List(functionName,Boolean.FALSE),alist);
