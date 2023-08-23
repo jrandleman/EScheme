@@ -67,4 +67,11 @@
   "signatures": ["(garbage-collector)"],
   "description": "Hints the JVM to launch its garbage collector (GC). Does not guarentee\nimmediate GC execution.",
   "example": null
+}, {
+  "name": "call-stack",
+  "aliases": null,
+  "signatures": ["(call-stack)"],
+  // "description": "Returns the current call-stack (prior to calling the primitive) as an\nassociative list:\n\n  (<function-name-string> <source-information>)\n\n  <source-information> ::= #f ; if doesn't exist\n                         | (<filename-string> <line-number> <column-number>) ; otherwise",
+  "description": "Returns the current call-stack (prior to calling the primitive) as an\nassociative list: ((<function-name-string> <source-information>) ...)\n  * <source-information> := #f ; if doesn't exist, else:\n                          | (<filename-string> <line-number> <column-number>)",
+  "example": null
 }]

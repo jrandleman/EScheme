@@ -192,6 +192,8 @@
 (getenv <optional-var-name-str>)
 
 (garbage-collector)
+
+(call-stack)
 ```
 
 

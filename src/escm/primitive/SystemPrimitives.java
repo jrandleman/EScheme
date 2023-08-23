@@ -636,4 +636,24 @@ public class SystemPrimitives {
       return Void.VALUE;
     }
   }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // call-stack
+  public static class CallStack extends Primitive {
+    public java.lang.String escmName() {
+      return "call-stack";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 0)
+        throw new Exceptionf("'(call-stack) invalid args: %s", Exceptionf.profileArgs(parameters));
+      Datum callStack = EscmCallStack.toDatum();
+      // don't include this call to <call-stack>
+      if(callStack instanceof escm.type.Pair) {
+        return ((escm.type.Pair)callStack).cdr();
+      }
+      return callStack;
+    }
+  }
 }

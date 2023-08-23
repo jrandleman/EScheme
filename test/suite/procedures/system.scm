@@ -66,4 +66,12 @@
   (if (> (length env-vars) 0)
       (ut (string? (getenv (car (hashmap-keys env-vars)))) #t)))
 
-(garbage-collector) ; just check this is callable (no way to verify effects)
+(ut (begin 'testing-garbage-collector (garbage-collector) #t) #t) ; just check this is callable (no way to verify effects)
+
+(ut (list? (call-stack)) #t)
+(define call-stack (call-stack))
+(when (pair? call-stack)
+  (define call-stack-1st-function (caar call-stack))
+  (define call-stack-1st-source-info (cadar call-stack))
+  (ut (begin 'testing-call-stack (string? call-stack-1st-function)) #t)
+  (ut (begin 'testing-call-stack (or (boolean? call-stack-1st-source-info) (list? call-stack-1st-source-info))) #t))

@@ -6,7 +6,12 @@
 
 package escm.vm.runtime;
 import java.util.ArrayDeque;
+import java.util.Iterator;
 import escm.util.Pair;
+import escm.type.Datum;
+import escm.type.Nil;
+import escm.type.bool.Boolean;
+import escm.type.number.Exact;
 import escm.vm.util.SourceInformation;
 
 public class EscmCallStack {
@@ -75,5 +80,24 @@ public class EscmCallStack {
       sb.append(popReadableCallableName(callStack));
     }
     System.err.println(sb.toString());
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Getting the call-stack as an EScheme associative-list
+  public static Datum toDatum() {
+    ArrayDeque<Pair<String,SourceInformation>> callStack = ((EscmThread)Thread.currentThread()).callStack;
+    Datum alist = Nil.VALUE;
+    Iterator<Pair<String,SourceInformation>> reverseIterator = callStack.descendingIterator();
+    while(reverseIterator.hasNext()) {
+      Pair<String,SourceInformation> inst = reverseIterator.next();
+      escm.type.String functionName = new escm.type.String(inst.first);
+      if(inst.second != null) {
+        Datum src = escm.type.Pair.List(new escm.type.String(inst.second.fileName()),new Exact(inst.second.lineNumber()),new Exact(inst.second.columnNumber()));
+        alist = new escm.type.Pair(escm.type.Pair.List(functionName,src),alist);
+      } else {
+        alist = new escm.type.Pair(escm.type.Pair.List(functionName,Boolean.FALSE),alist);
+      }
+    }
+    return alist;
   }
 };
