@@ -54,10 +54,14 @@ public class EscmCallStack {
 
   ////////////////////////////////////////////////////////////////////////////
   // Printing (& clearing!) the current thread's callstack
+  private static boolean shouldSkipEntry(Entry callStack) {
+    return callStack != null && callStack.parent == null && callStack.name.equals("runnable");
+  }
+
   // @PRECONDITION: callStack != null
   private static Entry popReadableCallableName(StringBuilder sb, Entry callStack) {
     // ignore first "runnable" on the stack from the main thread.
-    if(callStack.parent == null) return callStack.parent; 
+    if(shouldSkipEntry(callStack)) return callStack.parent; 
     if(callStack.source == null) {
       sb.append(callStack.name);
     } else {
@@ -89,6 +93,7 @@ public class EscmCallStack {
       values.push(callStack);
       callStack = callStack.parent;
     }
+    if(!shouldSkipEntry(callStack)) values.push(callStack);
     Datum alist = Nil.VALUE;
     while(values.size() > 0) {
       Entry value = values.pop();
