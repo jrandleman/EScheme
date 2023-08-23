@@ -20,7 +20,7 @@ public class EscmCallStack {
     final Entry parent;
     final String name;
     final SourceInformation source;
-    public Entry(String name, SourceInformation source, Entry parent) {
+    Entry(String name, SourceInformation source, Entry parent) {
       this.name = name;
       this.source = source;
       this.parent = parent;
