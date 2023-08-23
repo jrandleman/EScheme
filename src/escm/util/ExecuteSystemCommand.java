@@ -33,19 +33,42 @@ public class ExecuteSystemCommand {
     public boolean status = false;
   }
 
+  private static class ClosureString {
+    public String value = "";
+  }
+
   private static long preprocessMillisecondTimeout(long millisecondTimeout) {
     if(millisecondTimeout < 0) millisecondTimeout = 0;
     if(Long.MAX_VALUE - TIMEOUT_MS_BUFFER <= millisecondTimeout) return Long.MAX_VALUE;
     return millisecondTimeout+TIMEOUT_MS_BUFFER;
   }
 
-  private static String getInputStreamLines(InputStream ins) throws Exception {
-    String line = null;
-    StringBuilder buffer = new StringBuilder();
-    BufferedReader in = new BufferedReader(new InputStreamReader(ins));
-    while((line = in.readLine()) != null) buffer.append('\n'+line);
-    if(buffer.length() == 0) return "";
-    return buffer.substring(1);
+  private static void getInputStreamLines(Result res, Process pro) throws Exception {
+    ClosureString output = new ClosureString();
+    ClosureString error = new ClosureString();
+    Thread outputThread = new Thread(() -> {
+      try {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(pro.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while(pro.isAlive() && (line = reader.readLine()) != null) sb.append('\n'+line);
+        output.value = sb.toString();
+      } catch(Throwable e) { /* do nothing */ }
+    });
+    Thread errorThread = new Thread(() -> {
+      try {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(pro.getErrorStream()));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while(pro.isAlive() && (line = reader.readLine()) != null) sb.append('\n'+line);
+        error.value = sb.toString();
+      } catch(Throwable e) { /* do nothing */ }
+    });
+    outputThread.start();
+    errorThread.start();
+    pro.waitFor();
+    res.out = output.value.length() == 0 ? "" : output.value.substring(1);
+    res.err = error.value.length() == 0 ? "" : error.value.substring(1);
   }
 
   public static Result run(long millisecondTimeout, String command, String[] environmentVariableSettings, File workingDirectory) throws Exception {
@@ -55,9 +78,7 @@ public class ExecuteSystemCommand {
     ClosureBoolean finished = new ClosureBoolean();
     Thread processThread = new Thread(() -> {
       try {
-        res.out = getInputStreamLines(pro.getInputStream());
-        res.err = getInputStreamLines(pro.getErrorStream());
-        pro.waitFor();
+        getInputStreamLines(res,pro);
         finished.status = true;
       } catch(Throwable e) {}
     });
@@ -79,9 +100,7 @@ public class ExecuteSystemCommand {
   public static Result run(String command, String[] environmentVariableSettings, File workingDirectory) throws Exception {
     Process pro = Runtime.getRuntime().exec(command,environmentVariableSettings,workingDirectory);
     Result res = new Result();
-    res.out = getInputStreamLines(pro.getInputStream());
-    res.err = getInputStreamLines(pro.getErrorStream());
-    pro.waitFor();
+    getInputStreamLines(res,pro);
     res.exit = pro.exitValue();
     return res;
   }
