@@ -101,6 +101,11 @@ public class Installer {
   };
 
 
+  private static class ClosureString {
+    public String value = "";
+  };
+
+
   private static void readStream(StringBuilder buffer, BufferedReader in) throws Exception {
     String line = null;
     while((line = in.readLine()) != null) buffer.append('\n'+line);
@@ -123,16 +128,34 @@ public class Installer {
   }
 
 
-  private static String getInputStreamLines(InputStream ins, boolean reportLive) throws Exception {
-    StringBuilder buffer = new StringBuilder();
-    BufferedReader in = new BufferedReader(new InputStreamReader(ins));
-    if(reportLive) {
-      readStreamAndReportLive(buffer,in);
-    } else {
-      readStream(buffer,in);
-    }
-    if(buffer.length() == 0) return "";
-    return buffer.substring(1);
+  private static void getInputStreamLines(ExecuteCommandResult res, Process pro, boolean reportLive) throws Exception {
+    ClosureString output = new ClosureString();
+    ClosureString error = new ClosureString();
+    Thread outputThread = new Thread(() -> {
+      try {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(pro.getInputStream()));
+        StringBuilder buffer = new StringBuilder();
+        if(reportLive) {
+          readStreamAndReportLive(buffer,reader);
+        } else {
+          readStream(buffer,reader);
+        }
+        output.value = buffer.toString();
+      } catch(Throwable e) { /* do nothing */ }
+    });
+    Thread errorThread = new Thread(() -> {
+      try {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(pro.getErrorStream()));
+        StringBuilder buffer = new StringBuilder();
+        readStream(buffer,reader);
+        error.value = buffer.toString();
+      } catch(Throwable e) { /* do nothing */ }
+    });
+    outputThread.start();
+    errorThread.start();
+    pro.waitFor();
+    res.out = output.value.length() == 0 ? "" : output.value.substring(1);
+    res.err = error.value.length() == 0 ? "" : error.value.substring(1);
   }
 
 
@@ -143,8 +166,7 @@ public class Installer {
     }
     Process pro = Runtime.getRuntime().exec(command);
     ExecuteCommandResult res = new ExecuteCommandResult();
-    res.out = getInputStreamLines(pro.getInputStream(),reportLive);
-    res.err = getInputStreamLines(pro.getErrorStream(),false);
+    getInputStreamLines(res,pro,reportLive);
     pro.waitFor();
     res.exit = pro.exitValue();
     return res;

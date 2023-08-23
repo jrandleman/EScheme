@@ -49,19 +49,19 @@ public class ExecuteSystemCommand {
     Thread outputThread = new Thread(() -> {
       try {
         BufferedReader reader = new BufferedReader(new InputStreamReader(pro.getInputStream()));
-        StringBuilder sb = new StringBuilder();
+        StringBuilder buffer = new StringBuilder();
         String line = null;
-        while(pro.isAlive() && (line = reader.readLine()) != null) sb.append('\n'+line);
-        output.value = sb.toString();
+        while(pro.isAlive() && (line = reader.readLine()) != null) buffer.append('\n'+line);
+        output.value = buffer.toString();
       } catch(Throwable e) { /* do nothing */ }
     });
     Thread errorThread = new Thread(() -> {
       try {
         BufferedReader reader = new BufferedReader(new InputStreamReader(pro.getErrorStream()));
-        StringBuilder sb = new StringBuilder();
+        StringBuilder buffer = new StringBuilder();
         String line = null;
-        while(pro.isAlive() && (line = reader.readLine()) != null) sb.append('\n'+line);
-        error.value = sb.toString();
+        while(pro.isAlive() && (line = reader.readLine()) != null) buffer.append('\n'+line);
+        error.value = buffer.toString();
       } catch(Throwable e) { /* do nothing */ }
     });
     outputThread.start();
