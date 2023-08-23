@@ -6,8 +6,7 @@
 
 package escm.vm.runtime;
 import java.util.ArrayDeque;
-import java.util.Iterator;
-import escm.util.Pair;
+import escm.type.Pair;
 import escm.type.Datum;
 import escm.type.Nil;
 import escm.type.bool.Boolean;
@@ -16,68 +15,65 @@ import escm.vm.util.SourceInformation;
 
 public class EscmCallStack {
   ////////////////////////////////////////////////////////////////////////////
-  // Getting an empty callstack (used by <load>)
-  public static ArrayDeque<Pair<String,SourceInformation>> newCallStack() {
-    return new ArrayDeque<Pair<String,SourceInformation>>();
+  // Internal Entry class
+  public static class Entry {
+    final Entry parent;
+    final String name;
+    final SourceInformation source;
+    public Entry(String name, SourceInformation source, Entry parent) {
+      this.name = name;
+      this.source = source;
+      this.parent = parent;
+    }
   }
-
 
   ////////////////////////////////////////////////////////////////////////////
   // Registering a call
   public static void push(String calledFunctionName, SourceInformation invocationSource) {
-    ((EscmThread)Thread.currentThread()).callStack.push(new Pair<String,SourceInformation>(calledFunctionName,invocationSource));
-  }
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Deregistering a specific call (prevents double-pops when using call/cc)
-  //   => NOTE: <nameToPop> uses SHALLOW EQUALITY (not string contents) !!!
-  public static void pop(String nameToPop) {
-    ArrayDeque<Pair<String,SourceInformation>> callStack = ((EscmThread)Thread.currentThread()).callStack;
-    if(callStack.size() > 0 && callStack.peek().first == nameToPop) callStack.pop();
+    EscmThread ct = (EscmThread)Thread.currentThread();
+    ct.callStack = new Entry(calledFunctionName,invocationSource,ct.callStack);
   }
 
   ////////////////////////////////////////////////////////////////////////////
   // Clearing the callstack (done by the repl after a top-level evaluation)
   public static void clear() {
-    ((EscmThread)Thread.currentThread()).callStack.clear();
+    ((EscmThread)Thread.currentThread()).callStack = null;
   }
 
   ////////////////////////////////////////////////////////////////////////////
-  // Copying the callstack (done by loader to preserve pre-load state)
-  public static ArrayDeque<Pair<String,SourceInformation>> copy() {
-    return (ArrayDeque<Pair<String,SourceInformation>>)((EscmThread)Thread.currentThread()).callStack.clone();
+  // Get the the callstack (done by loader to preserve pre-load state)
+  public static Entry currentCallStack() {
+    return ((EscmThread)Thread.currentThread()).callStack;
   }
 
   ////////////////////////////////////////////////////////////////////////////
   // Restoring the callstack (done by loader to restore pre-load state)
-  public static void restore(ArrayDeque<Pair<String,SourceInformation>> restored) {
-    ((EscmThread)Thread.currentThread()).callStack = (ArrayDeque<Pair<String,SourceInformation>>)restored.clone();
+  public static void restore(Entry restored) {
+    ((EscmThread)Thread.currentThread()).callStack = restored;
   }
 
   ////////////////////////////////////////////////////////////////////////////
   // Printing (& clearing!) the current thread's callstack
-  // @PRECONDITION: callStack.size() > 0
-  private static String popReadableCallableName(ArrayDeque<Pair<String,SourceInformation>> callStack) {
-    Pair<String,SourceInformation> nameSourcePair = callStack.pop();
-    String name = null;
-    if(nameSourcePair.first.length() == 0) { 
-      name = "#<ANONYMOUS-CALLABLE>";
+  // @PRECONDITION: callStack != null
+  private static Entry popReadableCallableName(StringBuilder sb, Entry callStack) {
+    // ignore first "runnable" on the stack from the main thread.
+    if(callStack.parent == null) return callStack.parent; 
+    if(callStack.source == null) {
+      sb.append(callStack.name);
     } else {
-      name = nameSourcePair.first;
+      sb.append(callStack.name + " (" + callStack.source.toString() + ")");
     }
-    if(nameSourcePair.second == null) return name;
-    return name + " (" + nameSourcePair.second.toString() + ")";
+    return callStack.parent;
   }
 
-
   public static void print() {
-    ArrayDeque<Pair<String,SourceInformation>> callStack = ((EscmThread)Thread.currentThread()).callStack;
-    int n = callStack.size();
-    if(n == 0) return;
-    StringBuilder sb = new StringBuilder(">> Escm Call Stack: " + popReadableCallableName(callStack));
-    for(int i = 1; i < n; ++i) {
+    EscmThread ct = (EscmThread)Thread.currentThread();
+    if(ct.callStack == null) return;
+    StringBuilder sb = new StringBuilder(">> Escm Call Stack: ");
+    ct.callStack = popReadableCallableName(sb,ct.callStack);
+    while(ct.callStack != null) {
       sb.append("\n                    ");
-      sb.append(popReadableCallableName(callStack));
+      ct.callStack = popReadableCallableName(sb,ct.callStack);
     }
     System.err.println(sb.toString());
   }
@@ -85,17 +81,25 @@ public class EscmCallStack {
   ////////////////////////////////////////////////////////////////////////////
   // Getting the call-stack as an EScheme associative-list
   public static Datum toDatum() {
-    ArrayDeque<Pair<String,SourceInformation>> callStack = ((EscmThread)Thread.currentThread()).callStack;
+    Entry callStack = ((EscmThread)Thread.currentThread()).callStack;
+    if(callStack == null) return Nil.VALUE;
+    // ignore first "runnable" on the stack from the main thread.
+    ArrayDeque<Entry> values = new ArrayDeque<Entry>();
+    while(callStack.parent != null) {
+      values.push(callStack);
+      callStack = callStack.parent;
+    }
     Datum alist = Nil.VALUE;
-    Iterator<Pair<String,SourceInformation>> reverseIterator = callStack.descendingIterator();
-    while(reverseIterator.hasNext()) {
-      Pair<String,SourceInformation> inst = reverseIterator.next();
-      escm.type.String functionName = new escm.type.String(inst.first);
-      if(inst.second != null) {
-        Datum src = escm.type.Pair.List(new escm.type.String(inst.second.fileName()),new Exact(inst.second.lineNumber()),new Exact(inst.second.columnNumber()));
-        alist = new escm.type.Pair(escm.type.Pair.List(functionName,src),alist);
+    while(values.size() > 0) {
+      Entry value = values.pop();
+      escm.type.String functionName = new escm.type.String(value.name);
+      if(value.source != null) {
+        Datum src = Pair.List(new escm.type.String(value.source.fileName()),
+                              new Exact(value.source.lineNumber()),
+                              new Exact(value.source.columnNumber()));
+        alist = new Pair(Pair.List(functionName,src),alist);
       } else {
-        alist = new escm.type.Pair(escm.type.Pair.List(functionName,Boolean.FALSE),alist);
+        alist = new Pair(Pair.List(functionName,Boolean.FALSE),alist);
       }
     }
     return alist;

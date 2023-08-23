@@ -1,5 +1,5 @@
 ; print-pascal-triangle.scm 
-; => may be executed with or without a positive integer cmd-line argument (defaults to 20)
+; => May be executed with or without a positive integer cmd-line argument (defaults to 20)
 
 (define (generate-next-row row)
   (cons 0 (map + row (append (cdr row) (quote (0))))))

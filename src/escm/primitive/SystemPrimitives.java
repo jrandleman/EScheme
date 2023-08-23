@@ -4,7 +4,6 @@
 
 package escm.primitive;
 import java.util.ArrayList;
-import java.util.ArrayDeque;
 import java.util.Calendar;
 import java.util.Map;
 import java.io.File;
@@ -19,7 +18,6 @@ import escm.type.Symbol;
 import escm.type.Hashmap;
 import escm.type.bool.Boolean;
 import escm.type.oo.EscmModule;
-import escm.util.Pair;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.ExecuteSystemCommand;
@@ -28,7 +26,6 @@ import escm.vm.util.ExecutionState;
 import escm.vm.util.Environment;
 import escm.vm.type.Primitive;
 import escm.vm.type.PrimitiveCallable;
-import escm.vm.util.SourceInformation;
 import escm.vm.util.ObjectAccessChain;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.EscmCallStack;
@@ -109,7 +106,7 @@ public class SystemPrimitives {
       return addStringPaths(dir,file);
     }
 
-    public static Trampoline.Bounce evalEachExpression(ArrayList<Datum> exprs, int i, ArrayDeque<Pair<String,SourceInformation>> originalCallStack, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
+    public static Trampoline.Bounce evalEachExpression(ArrayList<Datum> exprs, int i, EscmCallStack.Entry originalCallStack, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
       int n = exprs.size();
       if(i >= n) return continuation.run(Void.VALUE);
       Trampoline.Continuation nextContinuation;
@@ -133,7 +130,7 @@ public class SystemPrimitives {
       } else {
         String buffer = FilePrimitives.FileRead.slurpFile(filename,primitiveName);
         ArrayList<Datum> exprs = FilePrimitives.FileRead.readBufferAsArrayList(filename,buffer);
-        return evalEachExpression(exprs,0,EscmCallStack.copy(),definitionEnvironment,continuation);
+        return evalEachExpression(exprs,0,EscmCallStack.currentCallStack(),definitionEnvironment,continuation);
       }
     }
 

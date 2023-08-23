@@ -6,7 +6,6 @@
 
 package escm.vm.runtime;
 import java.util.ArrayList;
-import java.util.ArrayDeque;
 import java.math.BigInteger;
 import escm.util.Pair;
 import escm.type.Datum;
@@ -16,7 +15,6 @@ import escm.type.port.OutputPort;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.primitive.UtilityPrimitives;
 import escm.vm.util.Environment;
-import escm.vm.util.SourceInformation;
 
 public abstract class EscmThread extends Thread {
   ////////////////////////////////////////////////////////////////////////////
@@ -26,7 +24,7 @@ public abstract class EscmThread extends Thread {
 
   ////////////////////////////////////////////////////////////////////////////
   // Thread-local call stack [used by <CallStack>]
-  public ArrayDeque<Pair<String,SourceInformation>> callStack = EscmCallStack.newCallStack();
+  public EscmCallStack.Entry callStack = null;
 
 
   ////////////////////////////////////////////////////////////////////////////

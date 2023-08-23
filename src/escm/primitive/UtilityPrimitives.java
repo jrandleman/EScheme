@@ -154,7 +154,7 @@ public class UtilityPrimitives {
           });
         };
         ArrayList<Datum> args = new ArrayList<Datum>(1);
-        args.add(convertCallableToProcedure(lambda2,"callcc-withDynamicWind-lambda2"));
+        args.add(convertCallableToProcedure(lambda2,"call/cc-continuation"));
         return procedure.callWith(args,cont1);
       };
       return r4rs(lambda1,continuation);

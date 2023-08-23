@@ -172,9 +172,10 @@ public class CompoundProcedure extends Procedure {
     return () -> {
       int clauseNumber = validateEnvironmentExtension(arguments);
       Environment extendedEnvironment = getExtendedEnvironment(clauseNumber,arguments);
+      EscmCallStack.Entry originalCallStack = EscmCallStack.currentCallStack();
       EscmCallStack.push(name,invocationSource);
       Trampoline.Continuation popContinuation = (value) -> () -> {
-        EscmCallStack.pop(name);
+        EscmCallStack.restore(originalCallStack);
         return continuation.run(value);
       };
       return Interpreter.run(new ExecutionState(extendedEnvironment,compileTime.bodyList.get(clauseNumber)),popContinuation);
