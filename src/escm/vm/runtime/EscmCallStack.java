@@ -40,17 +40,13 @@ public class EscmCallStack {
   ////////////////////////////////////////////////////////////////////////////
   // Copying the callstack (done by loader to preserve pre-load state)
   public static ArrayDeque<Pair<String,SourceInformation>> copy() {
-    ArrayDeque<Pair<String,SourceInformation>> cloned = new ArrayDeque<Pair<String,SourceInformation>>();
-    cloned.addAll(((EscmThread)Thread.currentThread()).callStack);
-    return cloned;
+    return (ArrayDeque<Pair<String,SourceInformation>>)((EscmThread)Thread.currentThread()).callStack.clone();
   }
 
   ////////////////////////////////////////////////////////////////////////////
   // Restoring the callstack (done by loader to restore pre-load state)
   public static void restore(ArrayDeque<Pair<String,SourceInformation>> restored) {
-    ArrayDeque<Pair<String,SourceInformation>> callStack = ((EscmThread)Thread.currentThread()).callStack;
-    callStack.clear();
-    callStack.addAll(restored);
+    ((EscmThread)Thread.currentThread()).callStack = (ArrayDeque<Pair<String,SourceInformation>>)restored.clone();
   }
 
   ////////////////////////////////////////////////////////////////////////////
