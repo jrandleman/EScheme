@@ -26,6 +26,6 @@
   "name": "callable?",
   "aliases": null,
   "signatures": ["(callable? <obj>)"],
-  "description": "Returns whether <obj> is applicable. Equivalent to:\n  (or (procedure? <obj>) (functor? <obj>) (class? <obj>))",
+  "description": "Returns whether <obj> is applicable. Equivalent to:\n  (or (procedure? <obj>)\n      (functor? <obj>)\n      (class? <obj>)\n      (string? <obj>)\n      (vector? <obj>)\n      (hashmap? <obj>))",
   "example": null
 }]
