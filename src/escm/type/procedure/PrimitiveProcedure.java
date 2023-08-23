@@ -4,6 +4,7 @@
 //    Wraps a "escm.vm.type.Callable" object under the hood.
 
 package escm.type.procedure;
+import java.util.Objects;
 import java.util.ArrayList;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
@@ -70,6 +71,13 @@ public class PrimitiveProcedure extends Procedure {
   // Equality
   public boolean eq(Object o) {
     return o instanceof PrimitiveProcedure && ((PrimitiveProcedure)o).prm == prm;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Hash code
+  public int hashCode() {
+    return Objects.hash("primitive-"+type(),prm);
   }
 
 

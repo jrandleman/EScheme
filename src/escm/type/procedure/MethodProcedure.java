@@ -3,6 +3,7 @@
 //    Extension to <CompoundProcedure> to support internal method-specific operations.
 
 package escm.type.procedure;
+import java.util.Objects;
 import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Symbol;
@@ -52,6 +53,13 @@ public class MethodProcedure extends CompoundProcedure {
       if(params.isEmpty()) return true;
     }
     return false;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Hash code
+  public int hashCode() {
+    return Objects.hash("method-"+type(),System.identityHashCode(definitionEnvironment),System.identityHashCode(compileTime));
   }
 
 

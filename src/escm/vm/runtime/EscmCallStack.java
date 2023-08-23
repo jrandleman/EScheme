@@ -11,6 +11,7 @@ import escm.type.Datum;
 import escm.type.Nil;
 import escm.type.bool.Boolean;
 import escm.type.number.Exact;
+import escm.type.procedure.Procedure;
 import escm.vm.util.SourceInformation;
 
 public class EscmCallStack {
@@ -60,24 +61,33 @@ public class EscmCallStack {
 
   // @PRECONDITION: callStack != null
   private static Frame popReadableCallableName(StringBuilder sb, Frame callStack) {
-    // ignore first "runnable" on the stack from the main thread.
-    if(shouldSkipFrame(callStack)) return callStack.parent; 
-    if(callStack.source == null) {
-      sb.append(callStack.name);
+    String name;
+    if(callStack.name.equals(Procedure.DEFAULT_NAME)) {
+      name = "#<ANONYMOUS-PROCEDURE>";
     } else {
-      sb.append(callStack.name + " (" + callStack.source.toString() + ")");
+      name = callStack.name;
+    }
+    if(callStack.source == null) {
+      sb.append(name);
+    } else {
+      sb.append(name + " (" + callStack.source.toString() + ")");
     }
     return callStack.parent;
   }
 
   public static void print() {
     EscmThread ct = (EscmThread)Thread.currentThread();
-    if(ct.callStack == null) return;
+    if(ct.callStack == null || shouldSkipFrame(ct.callStack)) return;
     StringBuilder sb = new StringBuilder(">> Escm Call Stack: ");
     ct.callStack = popReadableCallableName(sb,ct.callStack);
     while(ct.callStack != null) {
-      sb.append("\n                    ");
-      ct.callStack = popReadableCallableName(sb,ct.callStack);
+      // ignore first "runnable" on the stack from the main thread.
+      if(shouldSkipFrame(ct.callStack)) {
+        ct.callStack = ct.callStack.parent;
+      } else {
+        sb.append("\n                    ");
+        ct.callStack = popReadableCallableName(sb,ct.callStack);
+      }
     }
     System.err.println(sb.toString());
   }

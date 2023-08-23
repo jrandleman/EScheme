@@ -31,7 +31,6 @@
 package escm.type;
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.type.bool.Boolean;
 import escm.type.number.Number;

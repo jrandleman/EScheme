@@ -4,6 +4,7 @@
 //    Wraps a "escm.util.Trampoline.Continuation" object under the hood.
 
 package escm.primitive.lib.utility;
+import java.util.Objects;
 import java.util.ArrayList;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
@@ -58,6 +59,13 @@ public class ContinuationProcedure extends Procedure {
   // Equality
   public boolean eq(Object o) {
     return o instanceof ContinuationProcedure && ((ContinuationProcedure)o).continuation == continuation;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Hash code
+  public int hashCode() {
+    return Objects.hash("continuation-"+type(),continuation);
   }
 
 

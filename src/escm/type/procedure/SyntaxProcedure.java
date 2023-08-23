@@ -4,6 +4,7 @@
 //    Wraps a "escm.vm.type.Callable" object under the hood.
 
 package escm.type.procedure;
+import java.util.Objects;
 import java.util.ArrayList;
 import escm.util.Trampoline;
 import escm.type.Datum;
@@ -86,6 +87,13 @@ public class SyntaxProcedure extends Procedure {
   // Equality
   public boolean eq(Object o) {
     return o instanceof SyntaxProcedure && ((SyntaxProcedure)o).macro == macro;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Hash code
+  public int hashCode() {
+    return Objects.hash("syntax-"+type(),macro);
   }
 
 

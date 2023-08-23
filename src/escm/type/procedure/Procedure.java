@@ -12,7 +12,6 @@
 
 package escm.type.procedure;
 import java.util.ArrayList;
-import java.util.Objects;
 import escm.util.Trampoline;
 import escm.type.Datum;
 import escm.vm.util.ExecutionState;
@@ -66,6 +65,11 @@ public abstract class Procedure extends Datum implements Callable {
   public boolean equal(Object o) {
     return eq(o);
   }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Hash code
+  public abstract int hashCode();
 
 
   ////////////////////////////////////////////////////////////////////////////

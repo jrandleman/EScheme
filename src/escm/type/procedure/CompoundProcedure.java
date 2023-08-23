@@ -27,6 +27,7 @@
 //    signatures and associated function bodies.
 
 package escm.type.procedure;
+import java.util.Objects;
 import java.util.ArrayList;
 import java.io.Serializable;
 import escm.util.error.Exceptionf;
@@ -105,6 +106,13 @@ public class CompoundProcedure extends Procedure {
     if(!(o instanceof CompoundProcedure)) return false;
     CompoundProcedure c = (CompoundProcedure)o;
     return c.definitionEnvironment == definitionEnvironment && c.compileTime == compileTime;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Hash code
+  public int hashCode() {
+    return Objects.hash("compound-"+type(),System.identityHashCode(definitionEnvironment),System.identityHashCode(compileTime));
   }
 
 
