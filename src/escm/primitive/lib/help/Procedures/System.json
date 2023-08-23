@@ -72,6 +72,6 @@
   "aliases": null,
   "signatures": ["(call-stack)"],
   // "description": "Returns the current call-stack (prior to calling the primitive) as an\nassociative list:\n\n  (<function-name-string> <source-information>)\n\n  <source-information> ::= #f ; if doesn't exist\n                         | (<filename-string> <line-number> <column-number>) ; otherwise",
-  "description": "Returns the current call-stack (prior to calling the primitive) as an\nassociative list: ((<function-name-string> <source-information>) ...)\n  * <source-information> := #f ; if doesn't exist, else:\n                          | (<filename-string> <line-number> <column-number>)",
+  "description": "Returns the current call-stack (prior to calling the primitive) as an\nassociative list: ((<function-name-string> <source-information>) ...)\n  * <function-name-string> is \"\" if called an anonymous function\n  * <source-information> := #f ; if doesn't exist, else:\n                          | (<filename-string> <line-number> <column-number>)",
   "example": null
 }]
