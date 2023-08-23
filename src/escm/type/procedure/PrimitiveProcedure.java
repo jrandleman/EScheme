@@ -86,7 +86,7 @@ public class PrimitiveProcedure extends Procedure {
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
     return () -> {
       EscmCallStack.Frame originalCallStack = EscmCallStack.currentStackFrame();
-      EscmCallStack.push(name,invocationSource);
+      EscmCallStack.push(readableName(),invocationSource);
       Trampoline.Continuation popContinuation = (value) -> () -> {
         EscmCallStack.restore(originalCallStack);
         return continuation.run(value);

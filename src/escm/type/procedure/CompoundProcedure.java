@@ -146,14 +146,14 @@ public class CompoundProcedure extends Procedure {
   // @RETURN: the clause (param/body) index these args can be processed with
   protected int validateEnvironmentExtension(ArrayList<Datum> arguments) throws Exception {
     if(definitionEnvironment == null)
-      throw new Exceptionf("Can't apply procedure %s with a null definition environment!", name);
+      throw new Exceptionf("Can't apply procedure %s with a null definition environment!", readableName());
     int totalArguments = arguments.size();
     for(int i = 0, n = compileTime.parametersList.size(); i < n; ++i) {
       int totalParameters = compileTime.parametersList.get(i).size();
       if(totalArguments == totalParameters) return i;
       if(totalArguments > totalParameters && compileTime.variadicParameterList.get(i) != null) return i;
     }
-    throw new Exceptionf("Args (%s) don't match any signatures in procedure \"%s\":%s", Exceptionf.profileArgs(arguments), name, stringifyParameterSignatures());
+    throw new Exceptionf("Args (%s) don't match any signatures in procedure \"%s\":%s", Exceptionf.profileArgs(arguments), readableName(), stringifyParameterSignatures());
   }
 
 
@@ -181,7 +181,7 @@ public class CompoundProcedure extends Procedure {
       int clauseNumber = validateEnvironmentExtension(arguments);
       Environment extendedEnvironment = getExtendedEnvironment(clauseNumber,arguments);
       EscmCallStack.Frame originalCallStack = EscmCallStack.currentStackFrame();
-      EscmCallStack.push(name,invocationSource);
+      EscmCallStack.push(readableName(),invocationSource);
       Trampoline.Continuation popContinuation = (value) -> () -> {
         EscmCallStack.restore(originalCallStack);
         return continuation.run(value);

@@ -107,8 +107,7 @@ public class SyntaxProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public java.lang.String display() {
-    if(name.equals(DEFAULT_NAME)) return "#<syntax>";
-    return "#<syntax " + name + '>';
+    return "#<syntax " + readableName() + '>';
   }
 
 
@@ -117,7 +116,7 @@ public class SyntaxProcedure extends Procedure {
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
     return () -> {
       EscmCallStack.Frame originalCallStack = EscmCallStack.currentStackFrame();
-      EscmCallStack.push(name,invocationSource);
+      EscmCallStack.push(readableName(),invocationSource);
       Trampoline.Continuation popContinuation = (value) -> () -> {
         EscmCallStack.restore(originalCallStack);
         return continuation.run(value);

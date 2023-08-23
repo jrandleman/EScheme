@@ -88,9 +88,13 @@ public abstract class Procedure extends Datum implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
+  public java.lang.String readableName() {
+    if(name.equals(DEFAULT_NAME)) return "lambda:"+hashCode();
+    return name;
+  }
+
   public java.lang.String display() {
-    if(name.equals(DEFAULT_NAME)) return "#<procedure>";
-    return "#<procedure " + name + '>';
+    return "#<procedure " + readableName() + '>';
   }
 
   public java.lang.String write() {

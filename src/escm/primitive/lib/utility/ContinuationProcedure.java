@@ -74,7 +74,7 @@ public class ContinuationProcedure extends Procedure {
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation ignored) throws Exception {
     return () -> {
       if(arguments.size() != 1)
-        throw new Exceptionf("ContinuationProcedure %s wasn't given exactly 1 argument!", name);
+        throw new Exceptionf("ContinuationProcedure %s wasn't given exactly 1 argument!", readableName());
       return continuation.run(arguments.get(0));
     };
   }

@@ -61,16 +61,10 @@ public class EscmCallStack {
 
   // @PRECONDITION: callStack != null
   private static Frame popReadableCallableName(StringBuilder sb, Frame callStack) {
-    String name;
-    if(callStack.name.equals(Procedure.DEFAULT_NAME)) {
-      name = "#<ANONYMOUS-PROCEDURE>";
-    } else {
-      name = callStack.name;
-    }
     if(callStack.source == null) {
-      sb.append(name);
+      sb.append(callStack.name + " ()");
     } else {
-      sb.append(name + " (" + callStack.source.toString() + ")");
+      sb.append(callStack.name + " (" + callStack.source.toString() + ")");
     }
     return callStack.parent;
   }
