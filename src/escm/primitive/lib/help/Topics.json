@@ -26,7 +26,7 @@
   "name": "command-line",
   "aliases": ["cmd-line", "cmdline", "commandline"],
   "signatures": null,
-  "description": "Command-line flags may be used to modify EScheme's behavior:\n  1. -v, --version                  | Print EScheme version information\n  2. -h, --help                     | Print this information\n  3. -q, --quiet                    | Launch the REPL without ASCII art\n  4. -l, --load <script> <arg1> ... | Load <script> with <arg> ... as *argv* into the REPL\n  5. <script> <arg1> ...            | Interpret <script> with <arg> ... as *argv*\n  6. [no arguments]                 | Launch the REPL",
+  "description": "Command-line flags may be used to modify EScheme's behavior:\n  1. -v, --version                  | Print EScheme version information\n  2. -h, --help                     | Print this information\n  3. -q, --quiet                    | Launch the REPL without ASCII art\n  4. -l, --load <script> <arg1> ... | Load <script> with <arg> ... as *argv* into the REPL\n  5. -i, --import <module> <arg1> ... | Import <module> with <arg> ... as *argv* into the REPL\n  6. <script> <arg1> ...            | Interpret <script> with <arg> ... as *argv*\n  7. [no arguments]                 | Launch the REPL",
   "example": null
 }, {
   "name": "continuation-passing-style",

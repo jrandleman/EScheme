@@ -1,4 +1,4 @@
-<!-- primitives.md (tasnim) -->
+<!-- primitives.md -->
 
 # Primitive Procedures
 ### Functions implemented in Java accessible by EScheme source code!
