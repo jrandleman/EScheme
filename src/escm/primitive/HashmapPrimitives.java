@@ -206,8 +206,7 @@ public class HashmapPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1)
         throw new Exceptionf("'(hashcode <obj> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
-      int n = parameters.size();
-      if(n == 1) return new Exact(parameters.get(0).hashCode());
+      if(parameters.size() == 1) return new Exact(parameters.get(0).hashCode());
       return new Exact(Objects.hash(parameters.toArray()));
     }
   }

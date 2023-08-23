@@ -38,6 +38,7 @@
 ------------------------
 ## Named Class Syntax:
 ### Also generates a `(<class-name>? <obj>)` predicate procedure!
+### May use `defclass` to alias `define-class`!
 
 ```scheme
 (define-class <class-name> 
@@ -63,6 +64,7 @@
 ------------------------
 ## Named Interface Syntax:
 ### Also generates an `(<interface-name>? <obj>)` predicate procedure!
+### May use `definterface` to alias `define-interface`!
 
 ```scheme
 (define-interface <interface-name> 

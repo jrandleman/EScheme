@@ -58,3 +58,6 @@
 (ut (powers-of-2) 8)
 (ut (powers-of-2) 16)
 (ut (powers-of-2) 32)
+
+; verify alias
+(eq? defgen define-generator)

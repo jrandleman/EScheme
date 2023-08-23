@@ -116,3 +116,7 @@
 
 (define sc2 (SuperClass2 2))
 (ut sc2.x 6)
+
+; verify aliases
+(eq? defclass define-class)
+(eq? definterface define-interface)

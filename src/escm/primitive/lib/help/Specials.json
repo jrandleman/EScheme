@@ -216,9 +216,9 @@
   "example": null
 }, {
   "name": "define-generator",
-  "aliases": null,
+  "aliases": ["defgen"],
   "signatures": ["(define-generator (<generator-constructor-name> <param> ...) <body> ...)"],
-  "description": "Define a generator constructor! Calling <generator-constructor-name>\nreturns a generator thunk, which can suspend its operation\n(until it gets invoked again) via the <yield> macro.\n\nNote that due to being a \"generator-constructor\", <generator-constructor-name>\nshould not be called recursively to emulate looping.\nInstead, define an inner procedure or use the \"named let\" construct.",
+  "description": "Define a generator constructor! Calling <generator-constructor-name>\nreturns a generator thunk, which can suspend its operation\n(until it gets invoked again) via the <yield> macro.\n\nNote that due to being a \"generator-constructor\", <generator-constructor-name>\nshould not be called recursively to emulate looping.\nInstead, define an inner procedure or use the \"named let\" construct.\n\nAliased by <defgen>.",
   "example": ";; Printing Numbers and Strings:\n(define-generator (print-numbers start total)\n  (let loop ((i start))\n    (if (< i total)\n          (begin \n            (write i)\n            (display \" \")\n            (yield) ; pause execution until re-invoked\n            (loop (+ i 1))))))\n\n(define-generator (print-strings start total)\n  (let loop ((i start))\n    (if (< i total)\n          (begin \n            (write (number->string i))\n            (display \" \")\n            (yield) ; pause execution until re-invoked\n            (loop (+ i 1))))))\n\n(complete-all-generators! (print-numbers 0 10) (print-strings 0 10))\n(newline)\n\n\n;; Creating a stream of integers from a starting number (0 by default):\n(define-generator (ints-from (start 0))\n  (let loop ((n start))\n    (yield n)\n    (loop (+ n 1))))\n\n(define ints (ints-from 42))\n(display (ints)) \n(newline)\n(display (ints)) \n(newline)\n(display (ints)) \n(newline)"
 }, {
   "name": "yield",
@@ -236,7 +236,7 @@
   "name": "define-class",
   "aliases": ["defclass"],
   "signatures": ["(define-class <class-name> (:extends <super>) (:implements <interface> ...) <prop> ...)", "<prop> ::= (<name> <value>)", "         | ((<method-name> <param> ...) <body> ...)", "         | (:static <name> <value>)", "         | (:static (<method-name> <param> ...) <body> ...)"],
-  "description": "Simple wrapper macro combining <define> and <class> to bind <class-name>.\nAlso generates a (<class-name>? <obj>) predicate procedure!\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.",
+  "description": "Simple wrapper macro combining <define> and <class> to bind <class-name>.\nAlso generates a (<class-name>? <obj>) predicate procedure!\n\nAliased by <defclass>.\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.",
   "example": null
 }, {
   "name": "interface",
@@ -248,7 +248,7 @@
   "name": "define-interface",
   "aliases": ["definterface"],
   "signatures": ["(define-interface <interface-name> (:extends <interface> ...) <prop> ...)", "<prop> ::= <name>", "         | (:static <name> <value>)", "         | (:static (<method-name> <param> ...) <body> ...)"],
-  "description": "Simple wrapper macro combining <define> and <interface> to bind <interface-name>.\nAlso generates a (<interface-name>? <obj>) predicate procedure!\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.",
+  "description": "Simple wrapper macro combining <define> and <interface> to bind <interface-name>.\nAlso generates a (<interface-name>? <obj>) predicate procedure!\n\nAliased by <definterface>.\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.",
   "example": null
 }, {
   "name": "super!",

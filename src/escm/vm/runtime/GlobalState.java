@@ -129,6 +129,15 @@ public class GlobalState {
   private static final Symbol DEFP = new Symbol("def?");
   private static final Symbol DEFINEDP = new Symbol("defined?");
 
+  private static final Symbol DEFGEN = new Symbol("defgen");
+  private static final Symbol DEFINE_GENERATOR = new Symbol("define-generator");
+
+  private static final Symbol DEFCLASS = new Symbol("defclass");
+  private static final Symbol DEFINE_CLASS = new Symbol("define-class");
+
+  private static final Symbol DEFINTERFACE = new Symbol("definterface");
+  private static final Symbol DEFINE_INTERFACE = new Symbol("define-interface");
+
   private static final Symbol CALLCC = new Symbol("call/cc");
   private static final Symbol CALL_WITH_CURRENT_CONTINUATION = new Symbol("call-with-current-continuation");
 
@@ -187,6 +196,9 @@ public class GlobalState {
     JavaStdLibLoader.load(definitionEnvironment);
     definitionEnvironment.define(DEF,definitionEnvironment.get(DEFINE));
     definitionEnvironment.define(DEFP,definitionEnvironment.get(DEFINEDP));
+    definitionEnvironment.define(DEFGEN,definitionEnvironment.get(DEFINE_GENERATOR));
+    definitionEnvironment.define(DEFCLASS,definitionEnvironment.get(DEFINE_CLASS));
+    definitionEnvironment.define(DEFINTERFACE,definitionEnvironment.get(DEFINE_INTERFACE));
     definitionEnvironment.define(CALLCC,definitionEnvironment.get(CALL_WITH_CURRENT_CONTINUATION));
     definitionEnvironment.define(PPRINT,definitionEnvironment.get(PRETTY_PRINT));
     definitionEnvironment.define(PPRINTF,definitionEnvironment.get(PRETTY_PRINTF));
