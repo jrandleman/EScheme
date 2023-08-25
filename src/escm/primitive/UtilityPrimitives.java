@@ -15,13 +15,15 @@ import escm.type.Void;
 import escm.type.bool.Boolean;
 import escm.type.Symbol;
 import escm.type.number.Exact;
+import escm.type.procedure.PrimitiveProcedure;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.primitive.lib.utility.ContinuationProcedure;
 import escm.primitive.MetaPrimitives;
-import escm.vm.type.Callable;
-import escm.vm.type.Primitive;
-import escm.vm.type.PrimitiveCallable;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
+import escm.vm.type.callable.Signature;
 import escm.vm.runtime.EscmThread;
 
 public class UtilityPrimitives {
@@ -30,6 +32,10 @@ public class UtilityPrimitives {
   public static class Typeof extends Primitive {
     public java.lang.String escmName() {
       return "typeof";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("typeof"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -45,6 +51,10 @@ public class UtilityPrimitives {
   public static class Error extends Primitive {
     public java.lang.String escmName() {
       return "error";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("error"),new Symbol("<reason>"),new Symbol("<arg>"),Signature.VARIADIC);
     }
     
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {
@@ -69,15 +79,19 @@ public class UtilityPrimitives {
     public java.lang.String escmName() {
       return "errorf";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("errorf"),new Symbol("<format-string>"),new Symbol("<arg>"),Signature.VARIADIC);
+    }
     
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 0) 
-        throw new Exceptionf("'(errorf <format-string> <args> ...) expects at least 1 string: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(errorf <format-string> <arg> ...) expects at least 1 string: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof escm.type.String))
-        throw new Exceptionf("'(errorf <format-string> <args> ...) 1st arg isn't a string: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(errorf <format-string> <arg> ...) 1st arg isn't a string: %s", Exceptionf.profileArgs(parameters));
       String formatString = ((escm.type.String)parameters.get(0)).value();
       ArrayList<Datum> args = IOPrimitives.PrettyPrintf.getStringfArgs(parameters,1);
-      String formatted = FormatPrimitives.Stringf.logic(formatString,args,"(errorf <format-string> <args> ...)");
+      String formatted = FormatPrimitives.Stringf.logic(formatString,args,"(errorf <format-string> <arg> ...)");
       throw new Exception("'error: " + formatted);
     }
 
@@ -93,6 +107,10 @@ public class UtilityPrimitives {
     public java.lang.String escmName() {
       return "copy";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("copy"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
@@ -107,6 +125,10 @@ public class UtilityPrimitives {
   public static class Force extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "force";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("force"),new Symbol("<delayed>"));
     }
 
     public static Trampoline.Bounce logic(Datum delayed, Trampoline.Continuation continuation) throws Exception {
@@ -129,9 +151,13 @@ public class UtilityPrimitives {
     public java.lang.String escmName() {
       return "call-with-current-continuation";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("call-with-current-continuation"),new Symbol("<unary-callable>"));
+    }
     
     public static Datum convertCallableToProcedure(Callable c, String name) {
-      return new escm.type.procedure.PrimitiveProcedure(name,c);
+      return new PrimitiveProcedure(name,c);
     }
 
     public static Trampoline.Bounce r4rs(Callable procedure, Trampoline.Continuation continuation) throws Exception {
@@ -144,18 +170,28 @@ public class UtilityPrimitives {
     public static Trampoline.Bounce r5rs(Callable procedure, Trampoline.Continuation continuation) throws Exception {
       EscmThread ct = (EscmThread)Thread.currentThread();
       Datum winds = ct.dynamicWinds;
-      Callable lambda1 = (params1, cont1) -> {
-        Datum cont = params1.get(0);
-        Callable lambda2 = (params2, cont2) -> {
-          return DynamicWind.doWinds(ct.dynamicWinds,winds,(ignored) -> () -> {
-            ArrayList<Datum> args = new ArrayList<Datum>(1);
-            args.add(Values.logic(params2));
-            return ((Callable)cont).callWith(args,cont2);
-          });
-        };
-        ArrayList<Datum> args = new ArrayList<Datum>(1);
-        args.add(convertCallableToProcedure(lambda2,"call/cc-continuation"));
-        return procedure.callWith(args,cont1);
+      Callable lambda1 = new Callable() {
+        public Datum signature() {
+          return Pair.List(new Symbol("call/cc-continuation-lambda1"),new Symbol("<continuation-name>"));
+        }
+        public Trampoline.Bounce callWith(ArrayList<Datum> params1, Trampoline.Continuation cont1) throws Exception {
+          Datum cont = params1.get(0);
+          Callable lambda2 = new Callable() {
+            public Datum signature() {
+              return Pair.List(new Symbol("call/cc-continuation"),new Symbol("<continuation-name>"));
+            }
+            public Trampoline.Bounce callWith(ArrayList<Datum> params2, Trampoline.Continuation cont2) throws Exception {
+              return DynamicWind.doWinds(ct.dynamicWinds,winds,(ignored) -> () -> {
+                ArrayList<Datum> args = new ArrayList<Datum>(1);
+                args.add(Values.logic(params2));
+                return ((Callable)cont).callWith(args,cont2);
+              });
+            }
+          };
+          ArrayList<Datum> args = new ArrayList<Datum>(1);
+          args.add(convertCallableToProcedure(lambda2,"call/cc-continuation"));
+          return procedure.callWith(args,cont1);
+        }
       };
       return r4rs(lambda1,continuation);
     }
@@ -211,6 +247,10 @@ public class UtilityPrimitives {
     public java.lang.String escmName() {
       return "dynamic-wind";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("dynamic-wind"),new Symbol("<enter-thunk-callable>"),new Symbol("<body-thunk-callable>"),new Symbol("<exit-thunk-callable>"));
+    }
     
     // used by CallWithCurrentContinuation.r5rs
     public static Trampoline.Bounce doWinds(Datum from, Datum to, Trampoline.Continuation continuation) throws Exception {
@@ -253,16 +293,16 @@ public class UtilityPrimitives {
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 3)
-        throw new Exceptionf("'(dynamic-wind <thunk1> <thunk2> <thunk3>) didn't receive exactly 3 callable thunks: %s", 
+        throw new Exceptionf("'(dynamic-wind <enter-thunk> <body-thunk> <exit-thunk>) didn't receive exactly 3 callable thunks: %s", 
           Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof Callable))
-        throw new Exceptionf("'(dynamic-wind <thunk1> <thunk2> <thunk3>) 1st arg %s isn't a callable thunk: %s", 
+        throw new Exceptionf("'(dynamic-wind <enter-thunk> <body-thunk> <exit-thunk>) 1st arg %s isn't a callable thunk: %s", 
           parameters.get(0).profile(), Exceptionf.profileArgs(parameters));
       if(!(parameters.get(1) instanceof Callable))
-        throw new Exceptionf("'(dynamic-wind <thunk1> <thunk2> <thunk3>) 2nd arg %s isn't a callable thunk: %s", 
+        throw new Exceptionf("'(dynamic-wind <enter-thunk> <body-thunk> <exit-thunk>) 2nd arg %s isn't a callable thunk: %s", 
           parameters.get(1).profile(), Exceptionf.profileArgs(parameters));
       if(!(parameters.get(2) instanceof Callable))
-        throw new Exceptionf("'(dynamic-wind <thunk1> <thunk2> <thunk3>) 3rd arg %s isn't a callable thunk: %s", 
+        throw new Exceptionf("'(dynamic-wind <enter-thunk> <body-thunk> <exit-thunk>) 3rd arg %s isn't a callable thunk: %s", 
           parameters.get(2).profile(), Exceptionf.profileArgs(parameters));
       return logic((Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),continuation);
     }
@@ -296,6 +336,10 @@ public class UtilityPrimitives {
   public static class Values extends Primitive {
     public java.lang.String escmName() {
       return "values";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("values"),new Symbol("<obj>"),Signature.VARIADIC);
     }
 
     private static Datum convertArrayListToList(ArrayList<Datum> vals) {
@@ -337,6 +381,10 @@ public class UtilityPrimitives {
   public static class CallWithValues extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "call-with-values";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("call-with-values"),new Symbol("<producer-thunk-callable>"),new Symbol("<consumer-callable>"));
     }
     
     public static Trampoline.Bounce logic(Callable producer, Callable consumer, Trampoline.Continuation continuation) throws Exception {
@@ -389,17 +437,31 @@ public class UtilityPrimitives {
     public java.lang.String escmName() {
       return "with-exception-handler";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("with-exception-handler"),new Symbol("<unary-callable-handler>"),new Symbol("<thunk-callable>"));
+    }
     
     public static Trampoline.Bounce WithExceptionHandlers(Datum newHandlers, Callable thunk2, Trampoline.Continuation continuation) throws Exception {
       EscmThread ct = (EscmThread)Thread.currentThread();
       Datum previousHandles = ct.currentExceptionHandlers;
-      Callable thunk1 = (params, cont) -> {
-        ct.currentExceptionHandlers = newHandlers;
-        return cont.run(Void.VALUE);
+      Callable thunk1 = new Callable() {
+        public Datum signature() {
+          return Pair.List(new Symbol("dynamic-wind-thunk1"));
+        }
+        public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+          ct.currentExceptionHandlers = newHandlers;
+          return cont.run(Void.VALUE);
+        }
       };
-      Callable thunk3 = (params, cont) -> {
-        ct.currentExceptionHandlers = previousHandles;
-        return cont.run(Void.VALUE);
+      Callable thunk3 = new Callable() {
+        public Datum signature() {
+          return Pair.List(new Symbol("dynamic-wind-thunk2"));
+        }
+        public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+          ct.currentExceptionHandlers = previousHandles;
+          return cont.run(Void.VALUE);
+        }
       };
       return DynamicWind.logic(thunk1,thunk2,thunk3,continuation);
     }
@@ -440,22 +502,31 @@ public class UtilityPrimitives {
     public java.lang.String escmName() {
       return "raise";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("raise"),new Symbol("<obj>"));
+    }
     
     public static Trampoline.Bounce logic(Datum obj, Trampoline.Continuation continuation) throws Exception {
       EscmThread ct = (EscmThread)Thread.currentThread();
       Pair handlers = (Pair)ct.currentExceptionHandlers;
-      Callable lambda = (params, cont) -> {
-        ArrayList<Datum> args1 = new ArrayList<Datum>(1);
-        args1.add(obj);
-        return ((Callable)handlers.car()).callWith(args1,(ignore) -> () -> {
-          ArrayList<Datum> args2 = new ArrayList<Datum>(3);
-          args2.add(new escm.type.String("handler returned:"));
-          args2.add(handlers.car());
-          args2.add(obj);
-          return cont.run(Error.logic(args2));
-        });
+      Callable lambda = new Callable() {
+        public Datum signature() {
+          return Pair.List(new Symbol("raise-lambda"));
+        }
+        public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+          ArrayList<Datum> args1 = new ArrayList<Datum>(1);
+          args1.add(obj);
+          return ((Callable)handlers.car()).callWith(args1,(ignore) -> () -> {
+            ArrayList<Datum> args2 = new ArrayList<Datum>(3);
+            args2.add(new escm.type.String("handler returned:"));
+            args2.add(handlers.car());
+            args2.add(obj);
+            return cont.run(Error.logic(args2));
+          });
+        }
       };
-      return WithExceptionHandler.WithExceptionHandlers(handlers.cdr(),new escm.type.procedure.PrimitiveProcedure("raise-lambda",lambda),continuation);
+      return WithExceptionHandler.WithExceptionHandlers(handlers.cdr(),new PrimitiveProcedure("raise-lambda",lambda),continuation);
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -471,6 +542,10 @@ public class UtilityPrimitives {
   public static class Time extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "time";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("time"),new Symbol("<callable>"),new Symbol("<arg>"),Signature.VARIADIC);
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

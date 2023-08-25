@@ -16,9 +16,9 @@ import escm.type.procedure.PrimitiveProcedure;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.util.ExecutionState;
-import escm.vm.type.AssociativeCollection;
-import escm.vm.type.OrderedCollection;
-import escm.vm.type.Callable;
+import escm.vm.type.collection.AssociativeCollection;
+import escm.vm.type.collection.OrderedCollection;
+import escm.vm.type.callable.Callable;
 
 public class Pair extends Datum implements OrderedCollection {
   ////////////////////////////////////////////////////////////////////////////
@@ -67,6 +67,15 @@ public class Pair extends Datum implements OrderedCollection {
     Datum d = Nil.VALUE;
     for(int i = listContents.length-1; i >= 0; --i)
       d = new Pair(listContents[i],d);
+    return d;
+  }
+
+  public static Datum DottedList(Datum value, Datum ... listContents) {
+    if(listContents.length == 0) return value;
+    Datum d = listContents[listContents.length-1];
+    for(int i = listContents.length-2; i >= 0; --i)
+      d = new Pair(listContents[i],d);
+    d = new Pair(value,d);
     return d;
   }
 
@@ -1028,12 +1037,12 @@ public class Pair extends Datum implements OrderedCollection {
   // reversing
   //////////////////////////////////////
 
-  private OrderedCollection reverse(OrderedCollection acc) throws Exception {
+  private OrderedCollection reverse(OrderedCollection acc) {
     if(!(cdr instanceof Pair)) return new Pair(car,(Datum)acc);
     return ((Pair)cdr).reverse(new Pair(car,(Datum)acc));
   }
 
-  public OrderedCollection reverse() throws Exception {
+  public OrderedCollection reverse() {
     return reverse(Nil.VALUE);
   }
 
@@ -1047,7 +1056,14 @@ public class Pair extends Datum implements OrderedCollection {
   }
 
   private static Datum alwaysFalseCallable() {
-    return new PrimitiveProcedure(Procedure.DEFAULT_NAME,(params,cont) -> cont.run(Boolean.FALSE));
+    return new PrimitiveProcedure(Procedure.DEFAULT_NAME,new Callable() {
+      public Datum signature() { 
+        return Pair.List(new Symbol(Procedure.DEFAULT_NAME)); 
+      }
+      public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception { 
+        return cont.run(Boolean.FALSE); 
+      }
+    });
   }
 
   private static Trampoline.Bounce removeLastIter(Datum predicate, Datum lis, Trampoline.Continuation continuation) throws Exception {
@@ -1290,13 +1306,23 @@ public class Pair extends Datum implements OrderedCollection {
       }
       throw new Exceptionf("PAIR [SORT]: can't sort dotted-list %s with predicate %s", write(), binaryPredicate);
     }
-    Callable trueCondPrimitive = (params, cont) -> {
-      params.add(car);
-      return binaryPredicate.callWith(params,cont);
+    Callable trueCondPrimitive = new Callable() {
+      public Datum signature() { 
+        return Pair.List(new Symbol("escm-sort-in-lhs?"),new Symbol("<obj>"),new Symbol("<obj>")); 
+      }
+      public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+        params.add(car);
+        return binaryPredicate.callWith(params,cont);
+      }
     };
-    Callable falseCondPrimitive = (params, cont) -> {
-      params.add(car);
-      return binaryPredicate.callWith(params,(value) -> () -> cont.run(Boolean.valueOf(!value.isTruthy())));
+    Callable falseCondPrimitive = new Callable() {
+      public Datum signature() { 
+        return Pair.List(new Symbol("escm-sort-in-rhs?"),new Symbol("<obj>"),new Symbol("<obj>")); 
+      }
+      public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+        params.add(car);
+        return binaryPredicate.callWith(params,(value) -> () -> cont.run(Boolean.valueOf(!value.isTruthy())));
+      }
     };
     PrimitiveProcedure trueCond = new PrimitiveProcedure("escm-sort-in-lhs?", trueCondPrimitive);
     PrimitiveProcedure falseCond = new PrimitiveProcedure("escm-sort-in-rhs?", falseCondPrimitive);
@@ -1350,11 +1376,16 @@ public class Pair extends Datum implements OrderedCollection {
   //////////////////////////////////////
 
   private static Trampoline.Bounce skipWhileHaveDuplicates(Callable binaryPredicate, Datum d, OrderedCollection tail, Trampoline.Continuation continuation) throws Exception {
-    Callable matchCondPrimitive = (params, cont) -> {
-      params.add(d);
-      return binaryPredicate.callWith(params,cont);
+    Callable matchCondPrimitive = new Callable() {
+      public Datum signature() { 
+        return Pair.List(new Symbol("escm-del-neigh-dups-eq?"),new Symbol("<obj>"),new Symbol("<obj>")); 
+      }
+      public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+        params.add(d);
+        return binaryPredicate.callWith(params,cont);
+      }
     };
-    PrimitiveProcedure matchCond = new PrimitiveProcedure("escm-del-neigh-dups-eq?", matchCondPrimitive);
+    PrimitiveProcedure matchCond = new PrimitiveProcedure("escm-del-neigh-dups-eq?",matchCondPrimitive);
     return tail.dropWhile(matchCond,continuation);
   }
 

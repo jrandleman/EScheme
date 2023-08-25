@@ -12,7 +12,7 @@ import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.procedure.PrimitiveProcedure;
-import escm.vm.type.Callable;
+import escm.vm.type.callable.Callable;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.Environment;
 import escm.vm.runtime.EscmThread;
@@ -21,9 +21,14 @@ import escm.vm.runtime.GlobalState;
 public class Thread extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Static min/max thread priority values
-  public static int MIN_PRIORITY = java.lang.Thread.MIN_PRIORITY;
+  public static final int MIN_PRIORITY = java.lang.Thread.MIN_PRIORITY;
 
-  public static int MAX_PRIORITY = java.lang.Thread.MAX_PRIORITY;
+  public static final int MAX_PRIORITY = java.lang.Thread.MAX_PRIORITY;
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Static default runnable callable thunk name
+  public static final String DEFAULT_RUNNABLE_NAME = "runnable";
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -194,7 +199,7 @@ public class Thread extends Datum {
 
 
   private Datum generateDatumFromCallable(Callable c) {
-    return new PrimitiveProcedure("runnable",c);
+    return new PrimitiveProcedure(DEFAULT_RUNNABLE_NAME,c);
   }
 
 

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.Datum;
+import escm.type.Pair;
+import escm.type.Symbol;
 import escm.type.procedure.Procedure;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.SourceInformation;
@@ -71,6 +73,10 @@ public class ContinuationProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // Application Abstraction
+  public Datum signature() {
+    return Pair.List(new Symbol(readableName()),new Symbol("<obj>"));
+  }
+
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation ignored) throws Exception {
     return () -> {
       if(arguments.size() != 1)

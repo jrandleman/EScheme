@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import escm.type.Datum;
 import escm.type.Pair;
+import escm.type.Symbol;
 import escm.type.Vector;
 import escm.type.Hashmap;
 import escm.type.number.Complex;
@@ -17,7 +18,8 @@ import escm.type.number.Exact;
 import escm.type.number.Inexact;
 import escm.type.number.Number;
 import escm.util.error.Exceptionf;
-import escm.vm.type.Primitive;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.callable.Signature;
 
 public class FormatPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -25,6 +27,10 @@ public class FormatPrimitives {
   public static class Stringf extends Primitive {
     public java.lang.String escmName() {
       return "stringf";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stringf"),new Symbol("<format-string>"),new Symbol("<arg>"),Signature.VARIADIC);
     }
 
 

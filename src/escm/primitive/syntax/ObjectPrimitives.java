@@ -16,7 +16,8 @@ import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.Keyword;
 import escm.type.bool.Boolean;
-import escm.vm.type.PrimitiveSyntax;
+import escm.vm.type.primitive.PrimitiveSyntax;
+import escm.vm.type.callable.Signature;
 
 public class ObjectPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -171,6 +172,23 @@ public class ObjectPrimitives {
   public static class ClassMacro extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "class";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("class")),
+        Pair.List(new Symbol("class"),Pair.List(new Keyword("extends"),new Symbol("<super-class>"))),
+        Pair.List(new Symbol("class"),Pair.List(new Keyword("implements"),new Symbol("<interface>"),Signature.VARIADIC)),
+        Pair.List(new Symbol("class"),
+          Pair.List(new Keyword("extends"),new Symbol("<super-class>")),Pair.List(new Keyword("implements"),new Symbol("<interface>"),Signature.VARIADIC)),
+        Pair.List(new Symbol("class"),
+          Pair.List(new Keyword("extends"),new Symbol("<super-class>")),Pair.List(new Keyword("implements"),new Symbol("<interface>"),Signature.VARIADIC),
+          Pair.List(new Symbol("<field-name>"),new Symbol("<default-value>")),
+          Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+          Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
+          Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+          Signature.VARIADIC
+        ));
     }
 
     // Extract <name-keyword> if exists, else #f
@@ -362,6 +380,23 @@ public class ObjectPrimitives {
     public java.lang.String escmName() {
       return "define-class";
     }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("define-class"),new Symbol("<class-name>")),
+        Pair.List(new Symbol("define-class"),new Symbol("<class-name>"),Pair.List(new Keyword("extends"),new Symbol("<super-class>"))),
+        Pair.List(new Symbol("define-class"),new Symbol("<class-name>"),Pair.List(new Keyword("implements"),new Symbol("<interface>"),Signature.VARIADIC)),
+        Pair.List(new Symbol("define-class"),new Symbol("<class-name>"),
+          Pair.List(new Keyword("extends"),new Symbol("<super-class>")),Pair.List(new Keyword("implements"),new Symbol("<interface>"),Signature.VARIADIC)),
+        Pair.List(new Symbol("define-class"),new Symbol("<class-name>"),
+          Pair.List(new Keyword("extends"),new Symbol("<super-class>")),Pair.List(new Keyword("implements"),new Symbol("<interface>"),Signature.VARIADIC),
+          Pair.List(new Symbol("<field-name>"),new Symbol("<default-value>")),
+          Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+          Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
+          Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+          Signature.VARIADIC
+        ));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1)
@@ -432,6 +467,19 @@ public class ObjectPrimitives {
   public static class InterfaceMacro extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "interface";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("interface")),
+        Pair.List(new Symbol("interface"),Pair.List(new Keyword("extends"),new Symbol("<interface>"),Signature.VARIADIC)),
+        Pair.List(new Symbol("interface"),
+          Pair.List(new Keyword("extends"),new Symbol("<interface>"),Signature.VARIADIC),
+          new Symbol("<field-name>"),
+          Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
+          Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+          Signature.VARIADIC
+        ));
     }
 
     // Returns the list of implemented interfaces if exists, else NIL
@@ -521,6 +569,19 @@ public class ObjectPrimitives {
     public java.lang.String escmName() {
       return "define-interface";
     }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("define-interface"),new Symbol("<interface-name>")),
+        Pair.List(new Symbol("define-interface"),new Symbol("<interface-name>"),Pair.List(new Keyword("extends"),new Symbol("<interface>"),Signature.VARIADIC)),
+        Pair.List(new Symbol("define-interface"),new Symbol("<interface-name>"),
+          Pair.List(new Keyword("extends"),new Symbol("<interface>"),Signature.VARIADIC),
+          new Symbol("<field-name>"),
+          Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
+          Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+          Signature.VARIADIC
+        ));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1)
@@ -555,6 +616,10 @@ public class ObjectPrimitives {
     public java.lang.String escmName() {
       return "super!";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("super!"),new Symbol("<parameter>"),Signature.VARIADIC);
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       Datum params = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
@@ -578,6 +643,10 @@ public class ObjectPrimitives {
   public static class ApplySuperBang extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "apply-super!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("apply-super!"),new Symbol("<parameter>"),Signature.VARIADIC);
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

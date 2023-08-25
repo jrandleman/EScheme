@@ -19,10 +19,10 @@ import escm.type.Symbol;
 import escm.type.procedure.Procedure;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.type.procedure.SyntaxProcedure;
-import escm.vm.type.Primitive;
-import escm.vm.type.PrimitiveCallable;
-import escm.vm.type.PrimitiveSyntax;
-import escm.vm.type.PrimitiveSyntaxCallable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
+import escm.vm.type.primitive.PrimitiveSyntax;
+import escm.vm.type.primitive.PrimitiveSyntaxCallable;
 import escm.vm.runtime.GlobalState;
 
 public class Environment implements Serializable {

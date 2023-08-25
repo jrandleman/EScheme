@@ -1,7 +1,7 @@
 // Author: Jordan Randleman - escm.type.procedure.PrimitiveProcedure
 // Purpose:
 //    Java primitive procedure specialization of "escm.type.procedure.Procedure".
-//    Wraps a "escm.vm.type.Callable" object under the hood.
+//    Wraps a "escm.vm.type.callable.Callable" object under the hood.
 
 package escm.type.procedure;
 import java.util.Objects;
@@ -9,8 +9,12 @@ import java.util.ArrayList;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.Datum;
-import escm.vm.type.Callable;
-import escm.vm.type.Primitive;
+import escm.type.Pair;
+import escm.type.Nil;
+import escm.type.Symbol;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.collection.OrderedCollection;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.SourceInformation;
 import escm.vm.runtime.EscmCallStack;
@@ -31,6 +35,9 @@ public class PrimitiveProcedure extends Procedure {
   public PrimitiveProcedure(java.lang.String name, Primitive prm) {
     this.name = name;
     this.prm = new Callable() {
+      public Datum signature() {
+        return prm.signature();
+      }
       public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
         return continuation.run(prm.callWith(parameters));
       }
@@ -83,6 +90,44 @@ public class PrimitiveProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // Application Abstraction
+  private boolean signatureShouldBindName(Datum name) {
+    return name instanceof Symbol && ((Symbol)name).value().equals(Procedure.DEFAULT_NAME);
+  }
+
+  public Datum signature() {
+    Datum sig = prm.signature();
+    if(!(sig instanceof Pair)) return sig;
+    Pair psig = (Pair)sig;
+    Datum head = psig.car();
+    if(signatureShouldBindName(head)) {
+      return new Pair(new Symbol(readableName()),psig.cdr());
+    } else if(head instanceof Pair) {
+      Datum sigs = Nil.VALUE;
+      while(sig instanceof Pair) {
+        Pair sigp = (Pair)sig;
+        Datum signature = sigp.car();
+        if(signature instanceof Pair) {
+          Pair psignature = (Pair)signature;
+          if(signatureShouldBindName(psignature.car())) {
+            sigs = new Pair(new Pair(new Symbol(readableName()),psignature.cdr()),sigs);
+          } else {
+            sigs = new Pair(signature,sigs);
+          }
+        } else {
+          sigs = new Pair(signature,sigs);
+        }
+        sig = sigp.cdr();
+      }
+      if(sigs instanceof Pair) {
+        return (Datum)((Pair)sigs).reverse();
+      } else { // if(sigs instanceof Nil)
+        return Nil.VALUE;
+      }
+    } else {
+      return sig;
+    }
+  }
+
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
     return () -> {
       EscmCallStack.Frame originalCallStack = EscmCallStack.currentStackFrame();

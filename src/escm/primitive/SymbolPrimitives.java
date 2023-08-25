@@ -5,10 +5,11 @@
 package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
+import escm.type.Pair;
 import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.util.error.Exceptionf;
-import escm.vm.type.Primitive;
+import escm.vm.type.primitive.Primitive;
 
 public class SymbolPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -16,6 +17,10 @@ public class SymbolPrimitives {
   public static class IsSymbol extends Primitive {
     public java.lang.String escmName() {
       return "symbol?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("symbol?"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

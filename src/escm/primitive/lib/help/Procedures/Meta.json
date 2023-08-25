@@ -1,4 +1,16 @@
 [{
+  "name": "callable-signature",
+  "aliases": ["signature"],
+  "signatures": ["(callable-signature <callable>)"],
+  "description": "Get the <callable> call signature as EScheme data, or #f if unavailable.\n\nFor unary parameter lists: returns the parameter clause as a list of symbols.\nFor binary+ parameter lists: returns a list of parameter clauses.\n\nNote that the symbol '... denotes a variadic parameter, and '. denotes a\npair/dotted-list in syntax arguments.\n\nAn argument list may be used to denote a default argument value.",
+  "example": null
+}, {
+  "name": "callable-name",
+  "aliases": null,
+  "signatures": ["(callable-name <callable>)"],
+  "description": "Get the <callable>'s name as EScheme data, or #f if unavailable.",
+  "example": null
+}, {
   "name": "apply",
   "aliases": null,
   "signatures": ["(apply <callable> <obj-argument-list>)"],

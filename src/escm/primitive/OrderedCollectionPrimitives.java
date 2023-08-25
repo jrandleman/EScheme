@@ -5,15 +5,18 @@
 package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
+import escm.type.Pair;
+import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.number.Exact;
 import escm.type.number.Real;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
-import escm.vm.type.OrderedCollection;
-import escm.vm.type.Callable;
-import escm.vm.type.Primitive;
-import escm.vm.type.PrimitiveCallable;
+import escm.vm.type.collection.OrderedCollection;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
+import escm.vm.type.callable.Signature;
 
 public class OrderedCollectionPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -21,6 +24,10 @@ public class OrderedCollectionPrimitives {
   public static class IsOrderedCollection extends Primitive {
     public java.lang.String escmName() {
       return "ordered-collection?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("ordered-collection?"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -37,6 +44,10 @@ public class OrderedCollectionPrimitives {
     public java.lang.String escmName() {
       return "init";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("init"),new Symbol("<ordered-collection>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof OrderedCollection)) 
@@ -52,6 +63,10 @@ public class OrderedCollectionPrimitives {
     public java.lang.String escmName() {
       return "last";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("last"),new Symbol("<ordered-collection>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof OrderedCollection)) 
@@ -66,6 +81,13 @@ public class OrderedCollectionPrimitives {
   public static class Slice extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "slice";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("slice"),new Symbol("<ordered-collection>"),new Symbol("<index>")),
+        Pair.List(new Symbol("slice"),new Symbol("<ordered-collection>"),new Symbol("<index>"),new Symbol("<length>")),
+        Pair.List(new Symbol("slice"),new Symbol("<ordered-collection>"),new Symbol("<index>"),new Symbol("<continue?-callable>")));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -95,6 +117,10 @@ public class OrderedCollectionPrimitives {
     public java.lang.String escmName() {
       return "reverse";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("reverse"),new Symbol("<ordered-collection>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof OrderedCollection)) 
@@ -109,6 +135,10 @@ public class OrderedCollectionPrimitives {
   public static class RemoveFirst extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "remove-first";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("remove-first"),new Symbol("<elt=?-callable>"),new Symbol("<ordered-collection>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -125,6 +155,10 @@ public class OrderedCollectionPrimitives {
     public java.lang.String escmName() {
       return "remove-last";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("remove-last"),new Symbol("<elt=?-callable>"),new Symbol("<ordered-collection>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
@@ -139,6 +173,10 @@ public class OrderedCollectionPrimitives {
   public static class Skip extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "skip";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("skip"),new Symbol("<elt=?-callable>"),new Symbol("<ordered-collection>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -155,6 +193,10 @@ public class OrderedCollectionPrimitives {
     public java.lang.String escmName() {
       return "skip-right";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("skip-right"),new Symbol("<elt=?-callable>"),new Symbol("<ordered-collection>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
@@ -169,6 +211,10 @@ public class OrderedCollectionPrimitives {
   public static class FoldRight extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "fold-right";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("fold-right"),new Symbol("<callable>"),new Symbol("<seed>"),new Symbol("<ordered-collection>"),Signature.VARIADIC);
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -195,6 +241,10 @@ public class OrderedCollectionPrimitives {
     public java.lang.String escmName() {
       return "key-right";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("key-right"),new Symbol("<elt=?-callable>"),new Symbol("<ordered-collection>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
@@ -209,6 +259,10 @@ public class OrderedCollectionPrimitives {
   public static class DropRight extends Primitive {
     public java.lang.String escmName() {
       return "drop-right";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("drop-right"),new Symbol("<ordered-collection>"),new Symbol("<length>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -225,6 +279,10 @@ public class OrderedCollectionPrimitives {
     public java.lang.String escmName() {
       return "drop-while";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("drop-while"),new Symbol("<continue?-callable>"),new Symbol("<ordered-collection>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
@@ -239,6 +297,10 @@ public class OrderedCollectionPrimitives {
   public static class DropRightWhile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "drop-right-while";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("drop-right-while"),new Symbol("<continue?-callable>"),new Symbol("<ordered-collection>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -255,6 +317,10 @@ public class OrderedCollectionPrimitives {
     public java.lang.String escmName() {
       return "take-right";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("take-right"),new Symbol("<ordered-collection>"),new Symbol("<length>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof OrderedCollection) || !ListPrimitives.isValidSize(parameters.get(1)))
@@ -269,6 +335,10 @@ public class OrderedCollectionPrimitives {
   public static class TakeWhile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "take-while";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("take-while"),new Symbol("<continue?-callable>"),new Symbol("<ordered-collection>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -285,6 +355,10 @@ public class OrderedCollectionPrimitives {
     public java.lang.String escmName() {
       return "take-right-while";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("take-right-while"),new Symbol("<continue?-callable>"),new Symbol("<ordered-collection>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
@@ -299,6 +373,10 @@ public class OrderedCollectionPrimitives {
   public static class Sort extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "sort";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("sort"),new Symbol("<binary-predicate?-callable>"),new Symbol("<ordered-collection>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -315,6 +393,10 @@ public class OrderedCollectionPrimitives {
     public java.lang.String escmName() {
       return "sorted?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("sorted?"),new Symbol("<binary-predicate?-callable>"),new Symbol("<ordered-collection>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
@@ -329,6 +411,10 @@ public class OrderedCollectionPrimitives {
   public static class Merge extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "merge";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("merge"),new Symbol("<binary-predicate?-callable>"),new Symbol("<ordered-collection>"),new Symbol("<ordered-collection>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -346,6 +432,10 @@ public class OrderedCollectionPrimitives {
   public static class DeleteNeighborDuplicates extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "delete-neighbor-duplicates";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("delete-neighbor-duplicates"),new Symbol("<elt=?-callable>"),new Symbol("<ordered-collection>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

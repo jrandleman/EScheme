@@ -5,18 +5,21 @@
 package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
-import escm.type.bool.Boolean;
+import escm.type.Symbol;
+import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Void;
+import escm.type.bool.Boolean;
 import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
-import escm.vm.type.Callable;
-import escm.vm.type.Primitive;
-import escm.vm.type.PrimitiveCallable;
-import escm.vm.type.AssociativeCollection;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
+import escm.vm.type.collection.AssociativeCollection;
+import escm.vm.type.callable.Signature;
 
 public class VectorPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -24,6 +27,10 @@ public class VectorPrimitives {
   public static class Vector extends Primitive {
     public java.lang.String escmName() {
       return "vector";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("vector"),new Symbol("<obj>"),Signature.VARIADIC);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -37,6 +44,10 @@ public class VectorPrimitives {
   public static class MakeVector extends Primitive {
     public java.lang.String escmName() {
       return "make-vector";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("make-vector"),new Symbol("<length>"),new Symbol("<fill-value>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -56,6 +67,10 @@ public class VectorPrimitives {
   public static class VectorSetBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-set!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-set!"),new Symbol("<vector>"),new Symbol("<index>"),new Symbol("<obj>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -81,6 +96,10 @@ public class VectorPrimitives {
       return "vector-fill!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-fill!"),new Symbol("<vector>"),new Symbol("<fill-value>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.Vector))
         throw new Exceptionf("'(vector-fill! <vector> <fill-value>) invalid args: %s", Exceptionf.profileArgs(parameters));
@@ -95,6 +114,10 @@ public class VectorPrimitives {
   public static class VectorGrowBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-grow!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-grow!"),new Symbol("<vector>"),new Symbol("<length>"),new Symbol("<fill-value>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -120,6 +143,10 @@ public class VectorPrimitives {
       return "vector-insert!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-insert!"),new Symbol("<vector>"),new Symbol("<index>"),new Symbol("<obj>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 3)
         throw new Exceptionf("'(vector-insert! <vector> <index> <obj>) expects exactly 3 args: %s", Exceptionf.profileArgs(parameters));
@@ -143,6 +170,10 @@ public class VectorPrimitives {
       return "vector-delete!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-delete!"),new Symbol("<vector>"),new Symbol("<index>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(vector-delete! <vector> <index>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -162,6 +193,10 @@ public class VectorPrimitives {
   public static class VectorPushBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-push!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-push!"),new Symbol("<vector>"),new Symbol("<obj>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -184,6 +219,10 @@ public class VectorPrimitives {
       return "vector-push-front!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-push-front!"),new Symbol("<vector>"),new Symbol("<obj>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(vector-push-front! <vector> <obj>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -204,6 +243,10 @@ public class VectorPrimitives {
       return "vector-pop!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-pop!"),new Symbol("<vector>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector))
         throw new Exceptionf("'(vector-pop! <vector>) expects exactly 1 vector: %s", Exceptionf.profileArgs(parameters));
@@ -219,6 +262,10 @@ public class VectorPrimitives {
       return "vector-pop-front!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-pop-front!"),new Symbol("<vector>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector))
         throw new Exceptionf("'(vector-pop-front! <vector>) expects exactly 1 vector: %s", Exceptionf.profileArgs(parameters));
@@ -232,6 +279,10 @@ public class VectorPrimitives {
   public static class VectorAppendBang extends Primitive {
     public java.lang.String escmName() {
       return "vector-append!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-append!"),new Symbol("<vector>"),Signature.VARIADIC);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -260,15 +311,19 @@ public class VectorPrimitives {
       return "vector-unfold";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-unfold"),new Symbol("<break?-callable>"),new Symbol("<mapper-callable>"),new Symbol("<update-callable>"),new Symbol("<seed>"));
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 4) 
-        throw new Exceptionf("'(vector-unfold <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(vector-unfold <break?-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof Callable))
-        throw new Exceptionf("'(vector-unfold <break-condition> <map-callable> <successor-callable> <seed>) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(vector-unfold <break?-condition> <map-callable> <successor-callable> <seed>) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(1) instanceof Callable))
-        throw new Exceptionf("'(vector-unfold <break-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(vector-unfold <break?-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(2) instanceof Callable))
-        throw new Exceptionf("'(vector-unfold <break-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(vector-unfold <break?-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       return ListPrimitives.Unfold.logic(Nil.VALUE,(Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),parameters.get(3),(resultList) -> () -> {
         return continuation.run(((AssociativeCollection)resultList).toACVector());
       });
@@ -283,15 +338,19 @@ public class VectorPrimitives {
       return "vector-unfold-right";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-unfold-right"),new Symbol("<break?-callable>"),new Symbol("<mapper-callable>"),new Symbol("<update-callable>"),new Symbol("<seed>"));
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 4) 
-        throw new Exceptionf("'(vector-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(vector-unfold-right <break?-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(0) instanceof Callable))
-        throw new Exceptionf("'(vector-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(vector-unfold-right <break?-condition> <map-callable> <successor-callable> <seed>) 1st arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(1) instanceof Callable))
-        throw new Exceptionf("'(vector-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(vector-unfold-right <break?-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(2) instanceof Callable))
-        throw new Exceptionf("'(vector-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(vector-unfold-right <break?-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       return ListPrimitives.UnfoldRight.logic(Nil.VALUE,(Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),parameters.get(3),(resultList) -> () -> {
         return continuation.run(((AssociativeCollection)resultList).toACVector());
       });
@@ -304,6 +363,10 @@ public class VectorPrimitives {
   public static class VectorMemq extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "vector-memq";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-memq"),new Symbol("<vector>"),new Symbol("<obj>"));
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -325,6 +388,10 @@ public class VectorPrimitives {
       return "vector-member";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("vector-member"),new Symbol("<vector>"),new Symbol("<obj>"));
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(vector-member <vector> <obj>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -342,6 +409,10 @@ public class VectorPrimitives {
   public static class IsVector extends Primitive {
     public java.lang.String escmName() {
       return "vector?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("vector?"),new Symbol("<obj>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

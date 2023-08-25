@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Random;
 import escm.type.Datum;
 import escm.type.Nil;
+import escm.type.Pair;
+import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.number.Number;
 import escm.type.number.Real;
@@ -14,8 +16,9 @@ import escm.type.number.Exact;
 import escm.type.number.Inexact;
 import escm.type.number.Complex;
 import escm.util.error.Exceptionf;
-import escm.vm.type.Callable;
-import escm.vm.type.Primitive;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.callable.Signature;
 import escm.vm.runtime.GlobalState;
 import escm.primitive.FunctionalPrimitives;
 import escm.primitive.AssociativeCollectionPrimitives;
@@ -26,6 +29,17 @@ public class NumberPrimitives {
   public static class Plus extends Primitive {
     public java.lang.String escmName() {
       return "+";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("+")),
+        Pair.List(new Symbol("+"),new Symbol("<obj>")),
+        Pair.List(new Symbol("+"),new Symbol("<symbol>"),Signature.VARIADIC),
+        Pair.List(new Symbol("+"),new Symbol("<keyword>"),Signature.VARIADIC),
+        Pair.List(new Symbol("+"),new Symbol("<associative-collection>"),Signature.VARIADIC),
+        Pair.List(new Symbol("+"),new Symbol("<callable>"),new Symbol("<arg>"),Signature.VARIADIC),
+        Pair.List(new Symbol("+"),new Symbol("<number>"),Signature.VARIADIC));
     }
 
     private static Datum logic(ArrayList<Datum> parameters) throws Exception {
@@ -63,6 +77,12 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "-";
     }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("-"),new Symbol("<number>")),
+        Pair.List(new Symbol("-"),new Symbol("<number>"),new Symbol("<number>"),Signature.VARIADIC));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 0) throw new Exceptionf("'(- <number> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -91,6 +111,12 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "*";
     }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("*"),new Symbol("<callable>"),Signature.VARIADIC),
+        Pair.List(new Symbol("*"),new Symbol("<number>"),Signature.VARIADIC));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 0) throw new Exceptionf("'(* <number> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -111,6 +137,12 @@ public class NumberPrimitives {
   public static class Divide extends Primitive {
     public java.lang.String escmName() {
       return "/";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("/"),new Symbol("<number>")),
+        Pair.List(new Symbol("/"),new Symbol("<number>"),new Symbol("<number>"),Signature.VARIADIC));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -139,6 +171,12 @@ public class NumberPrimitives {
       return "=";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("="),new Symbol("<number>"),new Symbol("<number>"),Signature.VARIADIC),
+        Pair.List(new Symbol("="),new Symbol("<obj>"),new Symbol("<obj>"),Signature.VARIADIC));
+    }
+
     public static Datum logic(Number firstValue, ArrayList<Datum> parameters) throws Exception {
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
@@ -163,6 +201,13 @@ public class NumberPrimitives {
   public static class LessThan extends Primitive {
     public java.lang.String escmName() {
       return "<";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("<"),new Symbol("<real>"),new Symbol("<real>"),Signature.VARIADIC),
+        Pair.List(new Symbol("<"),new Symbol("<string>"),new Symbol("<string>"),Signature.VARIADIC),
+        Pair.List(new Symbol("<"),new Symbol("<char>"),new Symbol("<char>"),Signature.VARIADIC));
     }
 
     public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
@@ -200,6 +245,13 @@ public class NumberPrimitives {
       return ">";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol(">"),new Symbol("<real>"),new Symbol("<real>"),Signature.VARIADIC),
+        Pair.List(new Symbol(">"),new Symbol("<string>"),new Symbol("<string>"),Signature.VARIADIC),
+        Pair.List(new Symbol(">"),new Symbol("<char>"),new Symbol("<char>"),Signature.VARIADIC));
+    }
+
     public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
@@ -233,6 +285,13 @@ public class NumberPrimitives {
   public static class LessThanOrEqualTo extends Primitive {
     public java.lang.String escmName() {
       return "<=";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("<="),new Symbol("<real>"),new Symbol("<real>"),Signature.VARIADIC),
+        Pair.List(new Symbol("<="),new Symbol("<string>"),new Symbol("<string>"),Signature.VARIADIC),
+        Pair.List(new Symbol("<="),new Symbol("<char>"),new Symbol("<char>"),Signature.VARIADIC));
     }
 
     public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
@@ -270,6 +329,13 @@ public class NumberPrimitives {
       return ">=";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol(">="),new Symbol("<real>"),new Symbol("<real>"),Signature.VARIADIC),
+        Pair.List(new Symbol(">="),new Symbol("<string>"),new Symbol("<string>"),Signature.VARIADIC),
+        Pair.List(new Symbol(">="),new Symbol("<char>"),new Symbol("<char>"),Signature.VARIADIC));
+    }
+
     public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
@@ -304,6 +370,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "expt";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("expt"),new Symbol("<number>"),new Symbol("<number>"),Signature.VARIADIC);
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 2) throw new Exceptionf("'(expt <number> <number> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -328,6 +398,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "exp";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("exp"),new Symbol("<number>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(exp <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -344,6 +418,12 @@ public class NumberPrimitives {
   public static class Log extends Primitive {
     public java.lang.String escmName() {
       return "log";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("log"),new Symbol("<number>")),
+        Pair.List(new Symbol("log"),new Symbol("<number>"),new Symbol("<log-base-number>")));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -368,6 +448,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "sqrt";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("sqrt"),new Symbol("<number>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(sqrt <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -385,6 +469,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "abs";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("abs"),new Symbol("<real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(abs <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -401,6 +489,10 @@ public class NumberPrimitives {
   public static class ExptMod extends Primitive {
     public java.lang.String escmName() {
       return "expt-mod";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("expt-mod"),new Symbol("<base-real>"),new Symbol("<power-real>"),new Symbol("<mod-real>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -426,6 +518,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "min";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("min"),new Symbol("<real>"),new Symbol("<real>"),Signature.VARIADIC);
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 0) throw new Exceptionf("'(min <real> <real> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -446,6 +542,10 @@ public class NumberPrimitives {
   public static class Max extends Primitive {
     public java.lang.String escmName() {
       return "max";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("max"),new Symbol("<real>"),new Symbol("<real>"),Signature.VARIADIC);
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -468,6 +568,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "exact->inexact";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("exact->inexact"),new Symbol("<number>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Number)) 
@@ -482,6 +586,10 @@ public class NumberPrimitives {
   public static class InexactToExact extends Primitive {
     public java.lang.String escmName() {
       return "inexact->exact";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("inexact->exact"),new Symbol("<number>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -498,6 +606,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "numerator";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("numerator"),new Symbol("<real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Real)) 
@@ -513,6 +625,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "denominator";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("denominator"),new Symbol("<real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Real)) 
@@ -527,6 +643,10 @@ public class NumberPrimitives {
   public static class Quotient extends Primitive {
     public java.lang.String escmName() {
       return "quotient";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("quotient"),new Symbol("<dividend-real>"),new Symbol("<divisor-real>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -548,6 +668,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "remainder";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("remainder"),new Symbol("<dividend-real>"),new Symbol("<divisor-real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) throw new Exceptionf("'(remainder <dividend> <divisor>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -568,6 +692,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "modulo";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("modulo"),new Symbol("<dividend-real>"),new Symbol("<divisor-real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) throw new Exceptionf("'(modulo <real1> <real2>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -587,6 +715,10 @@ public class NumberPrimitives {
   public static class Divrem extends Primitive {
     public java.lang.String escmName() {
       return "divrem";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("divrem"),new Symbol("<dividend-real>"),new Symbol("<divisor-real>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -609,6 +741,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "modf";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("modf"),new Symbol("<real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(modf <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -627,6 +763,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "integral";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("integral"),new Symbol("<real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Real)) 
@@ -642,6 +782,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "fractional";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("fractional"),new Symbol("<real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Real)) 
@@ -656,6 +800,10 @@ public class NumberPrimitives {
   public static class Gcd extends Primitive {
     public java.lang.String escmName() {
       return "gcd";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("gcd"),new Symbol("<integer>"),new Symbol("<integer>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -677,6 +825,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "lcm";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("lcm"),new Symbol("<integer>"),new Symbol("<integer>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) throw new Exceptionf("'(lcm <integer1> <integer2>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -697,6 +849,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "round";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("round"),new Symbol("<real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(round <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -713,6 +869,10 @@ public class NumberPrimitives {
   public static class Floor extends Primitive {
     public java.lang.String escmName() {
       return "floor";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("floor"),new Symbol("<real>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -731,6 +891,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "ceiling";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("ceiling"),new Symbol("<real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(ceiling <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -747,6 +911,10 @@ public class NumberPrimitives {
   public static class Truncate extends Primitive {
     public java.lang.String escmName() {
       return "truncate";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("truncate"),new Symbol("<real>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -765,6 +933,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "number?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("number?"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(number? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -778,6 +950,10 @@ public class NumberPrimitives {
   public static class IsComplex extends Primitive {
     public java.lang.String escmName() {
       return "complex?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("complex?"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -793,6 +969,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "real?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("real?"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(real? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -806,6 +986,10 @@ public class NumberPrimitives {
   public static class IsInexact extends Primitive {
     public java.lang.String escmName() {
       return "inexact?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("inexact?"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -821,6 +1005,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "exact?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("exact?"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(exact? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -834,6 +1022,10 @@ public class NumberPrimitives {
   public static class IsInteger extends Primitive {
     public java.lang.String escmName() {
       return "integer?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("integer?"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -850,6 +1042,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "finite?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("finite?"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(finite? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -864,6 +1060,10 @@ public class NumberPrimitives {
   public static class IsInfinite extends Primitive {
     public java.lang.String escmName() {
       return "infinite?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("infinite?"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -880,6 +1080,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "nan?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("nan?"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(nan? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -894,6 +1098,10 @@ public class NumberPrimitives {
   public static class IsOdd extends Primitive {
     public java.lang.String escmName() {
       return "odd?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("odd?"),new Symbol("<real>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -912,6 +1120,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "even?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("even?"),new Symbol("<real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(even? <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -928,6 +1140,10 @@ public class NumberPrimitives {
   public static class IsPositive extends Primitive {
     public java.lang.String escmName() {
       return "positive?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("positive?"),new Symbol("<real>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -946,6 +1162,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "negative?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("negative?"),new Symbol("<real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(negative? <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -962,6 +1182,10 @@ public class NumberPrimitives {
   public static class IsZero extends Primitive {
     public java.lang.String escmName() {
       return "zero?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("zero?"),new Symbol("<real>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -980,6 +1204,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "sin";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("sin"),new Symbol("<number>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(sin <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -996,6 +1224,10 @@ public class NumberPrimitives {
   public static class Cos extends Primitive {
     public java.lang.String escmName() {
       return "cos";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cos"),new Symbol("<number>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1014,6 +1246,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "tan";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("tan"),new Symbol("<number>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(tan <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1030,6 +1266,10 @@ public class NumberPrimitives {
   public static class Asin extends Primitive {
     public java.lang.String escmName() {
       return "asin";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("asin"),new Symbol("<number>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1048,6 +1288,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "acos";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("acos"),new Symbol("<number>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(acos <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1064,6 +1308,12 @@ public class NumberPrimitives {
   public static class Atan extends Primitive {
     public java.lang.String escmName() {
       return "atan";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("atan"),new Symbol("<number>")),
+        Pair.List(new Symbol("atan"),new Symbol("<real>"),new Symbol("<real>")));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1089,6 +1339,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "sinh";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("sinh"),new Symbol("<number>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(sinh <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1105,6 +1359,10 @@ public class NumberPrimitives {
   public static class Cosh extends Primitive {
     public java.lang.String escmName() {
       return "cosh";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cosh"),new Symbol("<number>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1123,6 +1381,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "tanh";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("tanh"),new Symbol("<number>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(tanh <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1139,6 +1401,10 @@ public class NumberPrimitives {
   public static class Asinh extends Primitive {
     public java.lang.String escmName() {
       return "asinh";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("asinh"),new Symbol("<number>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1157,6 +1423,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "acosh";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("acosh"),new Symbol("<number>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(acosh <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1174,6 +1444,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "atanh";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("atanh"),new Symbol("<number>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(atanh <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1190,6 +1464,10 @@ public class NumberPrimitives {
   public static class Npr extends Primitive {
     public java.lang.String escmName() {
       return "npr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("npr"),new Symbol("<n-integer>"),new Symbol("<r-integer>"));
     }
 
     private static final Exact ONE = new Exact(1);
@@ -1229,6 +1507,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "ncr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("ncr"),new Symbol("<n-integer>"),new Symbol("<r-integer>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
@@ -1250,6 +1532,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "random";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("random"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) throw new Exceptionf("'(random) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
@@ -1263,6 +1549,10 @@ public class NumberPrimitives {
   public static class MakeRectangular extends Primitive {
     public java.lang.String escmName() {
       return "make-rectangular";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("make-rectangular"),new Symbol("<real-real>"),new Symbol("<imag-real>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1284,6 +1574,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "make-polar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("make-polar"),new Symbol("<magnitude-real>"),new Symbol("<angle-real>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) throw new Exceptionf("'(make-polar <magnitude-real> <angle-real>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -1304,6 +1598,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "real-part";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("real-part"),new Symbol("<number>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Number)) 
@@ -1320,6 +1618,10 @@ public class NumberPrimitives {
   public static class ImagPart extends Primitive {
     public java.lang.String escmName() {
       return "imag-part";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("imag-part"),new Symbol("<number>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1339,6 +1641,10 @@ public class NumberPrimitives {
     public java.lang.String escmName() {
       return "magnitude";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("magnitude"),new Symbol("<number>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Number)) 
@@ -1355,6 +1661,10 @@ public class NumberPrimitives {
   public static class Angle extends Primitive {
     public java.lang.String escmName() {
       return "angle";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("angle"),new Symbol("<number>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1373,6 +1683,10 @@ public class NumberPrimitives {
   public static class Conjugate extends Primitive {
     public java.lang.String escmName() {
       return "conjugate";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("conjugate"),new Symbol("<number>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

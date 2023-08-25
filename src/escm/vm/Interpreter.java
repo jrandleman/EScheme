@@ -12,7 +12,7 @@ import escm.type.Character;
 import escm.type.number.Real;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
-import escm.vm.type.Callable;
+import escm.vm.type.callable.Callable;
 import escm.vm.util.Instruction;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.Environment;

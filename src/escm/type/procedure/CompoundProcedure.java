@@ -117,6 +117,32 @@ public class CompoundProcedure extends Procedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Signature
+  private static final Symbol DOT = new Symbol(".");
+
+  // returns parameter clause with this procedure's name at the front
+  private Datum clauseSignature(ArrayList<Symbol> parameters, Symbol variadic) {
+    Datum sig = variadic == null ? Nil.VALUE : Pair.List(DOT,variadic);
+    for(int i = parameters.size()-1; i >= 0; --i) {
+      sig = new Pair(parameters.get(i),sig);
+    }
+    return new Pair(new Symbol(readableName()),sig);
+  }
+
+  public Datum signature() {
+    int n = compileTime.parametersList.size();
+    if(n == 1) {
+      return clauseSignature(compileTime.parametersList.get(0),compileTime.variadicParameterList.get(0));
+    }
+    Datum sigs = Nil.VALUE;
+    for(int i = n-1; i >= 0; --i) {
+      sigs = new Pair(clauseSignature(compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i)),sigs);
+    }
+    return sigs;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Application Abstraction
   protected String stringifyParameters(ArrayList<Symbol> params, Symbol variadic) {
     int n = params.size();

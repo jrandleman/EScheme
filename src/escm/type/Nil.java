@@ -14,9 +14,9 @@ import escm.type.number.Exact;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.util.ExecutionState;
-import escm.vm.type.AssociativeCollection;
-import escm.vm.type.OrderedCollection;
-import escm.vm.type.Callable;
+import escm.vm.type.collection.AssociativeCollection;
+import escm.vm.type.collection.OrderedCollection;
+import escm.vm.type.callable.Callable;
 
 public class Nil extends Datum implements OrderedCollection {
   ////////////////////////////////////////////////////////////////////////////

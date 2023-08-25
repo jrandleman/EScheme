@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import escm.type.Datum;
 import escm.type.Pair;
+import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.number.Exact;
 import escm.util.error.Exceptionf;
-import escm.vm.type.Primitive;
+import escm.vm.type.primitive.Primitive;
 
 public class DateTimePrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -18,6 +19,10 @@ public class DateTimePrimitives {
   public static class CurrentTime extends Primitive {
     public java.lang.String escmName() {
       return "current-time";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("current-time"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -38,6 +43,10 @@ public class DateTimePrimitives {
     public java.lang.String escmName() {
       return "current-date";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("current-date"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) 
@@ -56,6 +65,10 @@ public class DateTimePrimitives {
     public java.lang.String escmName() {
       return "epoch-time";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("epoch-time"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) 
@@ -71,6 +84,10 @@ public class DateTimePrimitives {
     public java.lang.String escmName() {
       return "time-zone";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("time-zone"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) 
@@ -85,6 +102,10 @@ public class DateTimePrimitives {
   public static class Day extends Primitive {
     public java.lang.String escmName() {
       return "day";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("day"));
     }
 
     public static final escm.type.String SUNDAY = new escm.type.String("Sunday");
@@ -117,6 +138,10 @@ public class DateTimePrimitives {
   public static class Month extends Primitive {
     public java.lang.String escmName() {
       return "month";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("month"));
     }
 
     public static final escm.type.String JANUARY = new escm.type.String("January");
@@ -161,6 +186,10 @@ public class DateTimePrimitives {
   public static class Year extends Primitive {
     public java.lang.String escmName() {
       return "year";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("year"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

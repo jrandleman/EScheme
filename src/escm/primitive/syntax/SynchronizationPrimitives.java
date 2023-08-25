@@ -15,7 +15,8 @@ import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.concurrent.Mutex;
-import escm.vm.type.PrimitiveSyntax;
+import escm.vm.type.primitive.PrimitiveSyntax;
+import escm.vm.type.callable.Signature;
 
 public class SynchronizationPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -44,6 +45,10 @@ public class SynchronizationPrimitives {
     public java.lang.String escmName() {
       return "dosync";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("dosync"),new Symbol("<expr>"),Signature.VARIADIC);
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       Datum exprs = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
@@ -67,6 +72,10 @@ public class SynchronizationPrimitives {
   public static class DosyncModule extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "dosync-module";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("dosync-module"),new Symbol("<expr>"),Signature.VARIADIC);
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -95,6 +104,10 @@ public class SynchronizationPrimitives {
     public java.lang.String escmName() {
       return "dosync-with";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("dosync-with"),new Symbol("<mutex>"),new Symbol("<expr>"),Signature.VARIADIC);
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1)
@@ -121,6 +134,12 @@ public class SynchronizationPrimitives {
   public static class ThreadDefine extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "thread-define";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("thread-define"),new Symbol("<symbol>"),new Symbol("<value>")),
+        Pair.List(new Symbol("thread-define"),new Symbol("<thread>"),new Symbol("<symbol>"),new Symbol("<value>")));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -150,6 +169,12 @@ public class SynchronizationPrimitives {
     public java.lang.String escmName() {
       return "thread-set!";
     }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("thread-set!"),new Symbol("<symbol>"),new Symbol("<value>")),
+        Pair.List(new Symbol("thread-set!"),new Symbol("<thread>"),new Symbol("<symbol>"),new Symbol("<value>")));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
@@ -178,6 +203,12 @@ public class SynchronizationPrimitives {
     public java.lang.String escmName() {
       return "thread-get";
     }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("thread-get"),new Symbol("<symbol>")),
+        Pair.List(new Symbol("thread-get"),new Symbol("<thread>"),new Symbol("<symbol>")));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
@@ -205,6 +236,12 @@ public class SynchronizationPrimitives {
   public static class ThreadIsDefinedP extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "thread-defined?";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("thread-defined?"),new Symbol("<symbol>")),
+        Pair.List(new Symbol("thread-defined?"),new Symbol("<thread>"),new Symbol("<symbol>")));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

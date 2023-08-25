@@ -7,14 +7,18 @@
 package escm.vm.runtime;
 import java.util.ArrayList;
 import java.math.BigInteger;
-import escm.util.Pair;
+import escm.util.Trampoline;
 import escm.type.Datum;
+import escm.type.Pair;
 import escm.type.Nil;
+import escm.type.Symbol;
 import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.primitive.UtilityPrimitives;
 import escm.vm.util.Environment;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.callable.Signature;
 
 public abstract class EscmThread extends Thread {
   ////////////////////////////////////////////////////////////////////////////
@@ -37,11 +41,16 @@ public abstract class EscmThread extends Thread {
   public Datum currentExceptionHandlers = escm.type.Pair.List(
     new PrimitiveProcedure(
       "unhandled-exception-handler",
-      (params, cont) -> {
-        ArrayList<Datum> args = new ArrayList<Datum>(1+params.size());
-        args.add(new escm.type.String("unhandled exception:"));
-        args.addAll(params);
-        return cont.run(UtilityPrimitives.Error.logic(args));
+      new Callable() { 
+        public Datum signature() {
+          return Pair.List(new Symbol("unhandled-exception-handler"),new Symbol("<obj>"),Signature.VARIADIC);
+        }
+        public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+          ArrayList<Datum> args = new ArrayList<Datum>(1+params.size());
+          args.add(new escm.type.String("unhandled exception:"));
+          args.addAll(params);
+          return cont.run(UtilityPrimitives.Error.logic(args));
+        }
       }));
 
 

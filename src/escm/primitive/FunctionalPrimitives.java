@@ -8,14 +8,16 @@ import java.util.Collections;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
+import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.procedure.Procedure;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.type.oo.EscmObject;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
-import escm.vm.type.Callable;
-import escm.vm.type.Primitive;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.callable.Signature;
 
 public class FunctionalPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -23,6 +25,10 @@ public class FunctionalPrimitives {
   public static class Id extends Primitive {
     public java.lang.String escmName() {
       return "id";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("id"),new Symbol("<obj>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -40,6 +46,10 @@ public class FunctionalPrimitives {
       return "procedure?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("procedure?"),new Symbol("<obj>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(procedure? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -53,6 +63,10 @@ public class FunctionalPrimitives {
   public static class IsCallable extends Primitive {
     public java.lang.String escmName() {
       return "callable?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("callable?"),new Symbol("<obj>"));
     }
 
     public static boolean logic(Datum d) {
@@ -75,6 +89,10 @@ public class FunctionalPrimitives {
       return "compose";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("compose"),new Symbol("<callable>"),Signature.VARIADIC);
+    }
+
     private static Trampoline.Bounce applyComposedCallables(Datum result, int i, ArrayList<Datum> parameters, Trampoline.Continuation cont) throws Exception {
       if(i < 0) return cont.run(result);
       ArrayList<Datum> params = new ArrayList<Datum>(1);
@@ -93,10 +111,15 @@ public class FunctionalPrimitives {
           throw new Exceptionf("'(compose <callable> <callable> ...) arg %s isn't a callable: %s", param.profile(), Exceptionf.profileArgs(parameters));
       if(totalCallables == 1) return parameters.get(0);
       Callable fstFcn = (Callable)parameters.get(totalCallables-1);
-      Callable composedProcedures = (params, cont) -> {
-        return fstFcn.callWith(params,(result) -> () -> {
-          return applyComposedCallables(result,totalCallables-2,parameters,cont);
-        });
+      Callable composedProcedures = new Callable() {
+        public Datum signature() {
+          return Pair.List(new Symbol(Procedure.DEFAULT_NAME),new Symbol("<arg>"),Signature.VARIADIC);
+        }
+        public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+          return fstFcn.callWith(params,(result) -> () -> {
+            return applyComposedCallables(result,totalCallables-2,parameters,cont);
+          });
+        }
       };
       return new PrimitiveProcedure(Procedure.DEFAULT_NAME,composedProcedures);
     }
@@ -114,6 +137,10 @@ public class FunctionalPrimitives {
       return "bind";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("bind"),new Symbol("<callable>"),new Symbol("<arg>"),Signature.VARIADIC);
+    }
+
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       int totalCallables = parameters.size();
       if(totalCallables < 1) 
@@ -123,10 +150,15 @@ public class FunctionalPrimitives {
       if(totalCallables == 1) return parameters.get(0);
       Callable p = (Callable)parameters.get(0);
       parameters.remove(0);
-      Callable bindPrimitive = (params, cont) -> {
-        ArrayList<Datum> args = (ArrayList<Datum>)parameters.clone();
-        args.addAll(params);
-        return p.callWith(args,cont);
+      Callable bindPrimitive = new Callable() {
+        public Datum signature() {
+          return Pair.List(new Symbol(Procedure.DEFAULT_NAME),new Symbol("<arg>"),Signature.VARIADIC);
+        }
+        public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+          ArrayList<Datum> args = (ArrayList<Datum>)parameters.clone();
+          args.addAll(params);
+          return p.callWith(args,cont);
+        }
       };
       return new PrimitiveProcedure(Procedure.DEFAULT_NAME,bindPrimitive);
     }

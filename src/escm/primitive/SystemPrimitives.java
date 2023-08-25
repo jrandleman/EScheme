@@ -10,22 +10,24 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import escm.type.Datum;
-import escm.type.number.Real;
-import escm.type.number.Exact;
-import escm.type.number.Inexact;
+import escm.type.Pair;
 import escm.type.Void;
 import escm.type.Symbol;
 import escm.type.Hashmap;
+import escm.type.number.Real;
+import escm.type.number.Exact;
+import escm.type.number.Inexact;
 import escm.type.bool.Boolean;
 import escm.type.oo.EscmModule;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.ExecuteSystemCommand;
-import escm.vm.type.Callable;
+import escm.vm.type.callable.Callable;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.Environment;
-import escm.vm.type.Primitive;
-import escm.vm.type.PrimitiveCallable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
+import escm.vm.type.callable.Signature;
 import escm.vm.util.ObjectAccessChain;
 import escm.vm.runtime.GlobalState;
 import escm.vm.runtime.EscmCallStack;
@@ -65,6 +67,12 @@ public class SystemPrimitives {
     public java.lang.String escmName() {
       return "exit";
     }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("exit")),
+        Pair.List(new Symbol("exit"),new Symbol("<integer-code>")));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() > 1) throw new Exceptionf("'(exit <optional-code>) received more than 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -91,6 +99,12 @@ public class SystemPrimitives {
   public static class Load extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "load";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("load"),new Symbol("<filename-string>")),
+        Pair.List(new Symbol("load"),new Symbol("<directory-string>"),new Symbol("<filename-string>")));
     }
 
     public static String addStringPaths(String path1, String path2) {
@@ -169,6 +183,12 @@ public class SystemPrimitives {
       return "load-once";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("load-once"),new Symbol("<filename-string>")),
+        Pair.List(new Symbol("load-once"),new Symbol("<directory-string>"),new Symbol("<filename-string>")));
+    }
+
     private static Symbol loadOnceFiles = new Symbol("*load-once-files*");
 
     public static void registerLoadedFile(Environment definitionEnvironment, String filePath) throws Exception {
@@ -187,16 +207,16 @@ public class SystemPrimitives {
       int n = parameters.size();
       String directory = "", filename = "";
       if(n < 1 || n > 2)
-        throw new Exceptionf("'(load <optional-directory> <filename>) invalid args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(load-once <optional-directory> <filename>) invalid args: %s", Exceptionf.profileArgs(parameters));
       if(n == 1) {
         if(!(parameters.get(0) instanceof escm.type.String)) 
-          throw new Exceptionf("'(load <optional-directory> <filename>) <filename> isn't a string: %s", Exceptionf.profileArgs(parameters));
+          throw new Exceptionf("'(load-once <optional-directory> <filename>) <filename> isn't a string: %s", Exceptionf.profileArgs(parameters));
         filename = ((escm.type.String)parameters.get(0)).value();
       } else {
         if(!(parameters.get(0) instanceof escm.type.String)) 
-          throw new Exceptionf("'(load <optional-directory> <filename>) <directory> isn't a string: %s", Exceptionf.profileArgs(parameters));
+          throw new Exceptionf("'(load-once <optional-directory> <filename>) <directory> isn't a string: %s", Exceptionf.profileArgs(parameters));
         if(!(parameters.get(1) instanceof escm.type.String)) 
-          throw new Exceptionf("'(load <optional-directory> <filename>) <filename> isn't a string: %s", Exceptionf.profileArgs(parameters));
+          throw new Exceptionf("'(load-once <optional-directory> <filename>) <filename> isn't a string: %s", Exceptionf.profileArgs(parameters));
         directory = ((escm.type.String)parameters.get(0)).value();
         filename = ((escm.type.String)parameters.get(1)).value();
       }
@@ -213,6 +233,18 @@ public class SystemPrimitives {
   public static class ExecuteCommand extends Primitive {
     public java.lang.String escmName() {
       return "system";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("system"),new Symbol("<command-str>")),
+        Pair.List(new Symbol("system"),new Symbol("<command-str>"),new Symbol("<env-var-str-list>")),
+        Pair.List(new Symbol("system"),new Symbol("<command-str>"),new Symbol("<directory-str>")),
+        Pair.List(new Symbol("system"),new Symbol("<command-str>"),new Symbol("<env-var-str-list>"),new Symbol("<directory-str>")),
+        Pair.List(new Symbol("system"),new Symbol("<millisecond-timeout>"),new Symbol("<command-str>")),
+        Pair.List(new Symbol("system"),new Symbol("<millisecond-timeout>"),new Symbol("<command-str>"),new Symbol("<env-var-str-list>")),
+        Pair.List(new Symbol("system"),new Symbol("<millisecond-timeout>"),new Symbol("<command-str>"),new Symbol("<directory-str>")),
+        Pair.List(new Symbol("system"),new Symbol("<millisecond-timeout>"),new Symbol("<command-str>"),new Symbol("<env-var-str-list>"),new Symbol("<directory-str>")));
     }
     
     private static String[] convertStringListToStringArray(Datum list, String listContentType, ArrayList<Datum> parameters) throws Exception {
@@ -290,6 +322,14 @@ public class SystemPrimitives {
       return "escm";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("escm"),new Symbol("<escm-file>")),
+        Pair.List(new Symbol("escm"),new Symbol("<escm-file>"),new Symbol("<argv>"),Signature.VARIADIC),
+        Pair.List(new Symbol("escm"),new Symbol("<millisecond-timeout>"),new Symbol("<escm-file>")),
+        Pair.List(new Symbol("escm"),new Symbol("<millisecond-timeout>"),new Symbol("<escm-file>"),new Symbol("<argv>"),Signature.VARIADIC));
+    }
+
     private static String parseEscmProgramCommand(Long timeout, ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
       int cmdIdx = timeout == null ? 0 : 1;
@@ -328,6 +368,10 @@ public class SystemPrimitives {
       return "escm-get-module-name";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-get-module-name"),new Symbol("<module-path-symbol>"));
+    }
+
     public static Symbol logic(Symbol modulePath) throws Exception {
       if(ObjectAccessChain.is(modulePath)) {
         Symbol[] path = ObjectAccessChain.parse(modulePath);
@@ -349,6 +393,12 @@ public class SystemPrimitives {
   public static class EscmLoadModule extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "escm-load-module";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("escm-load-module"),new Symbol("<module-path-symbol>")),
+        Pair.List(new Symbol("escm-load-module"),new Symbol("<filepath-string>"),new Symbol("<module-path-symbol>")));
     }
 
     public static class InvalidModuleException extends Exceptionf {
@@ -469,6 +519,10 @@ public class SystemPrimitives {
       return "escm-reload-module";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-reload-module"),new Symbol("<module>"));
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof EscmModule)) 
         throw new Exceptionf("'(escm-reload-module <module>) didn't receive exactly 1 module: %s", Exceptionf.profileArgs(parameters));
@@ -483,6 +537,10 @@ public class SystemPrimitives {
   public static class IsModuleP extends Primitive {
     public java.lang.String escmName() {
       return "module?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("module?"),new Symbol("<obj>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -500,6 +558,10 @@ public class SystemPrimitives {
       return "module-path";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("module-path"),new Symbol("<module>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof EscmModule)) 
         throw new Exceptionf("'(module-path <module>) didn't receive exactly 1 module: %s", Exceptionf.profileArgs(parameters));
@@ -515,6 +577,10 @@ public class SystemPrimitives {
       return "module-bindings";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("module-bindings"),new Symbol("<module>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof EscmModule)) 
         throw new Exceptionf("'(module-bindings <module>) didn't receive exactly 1 module: %s", Exceptionf.profileArgs(parameters));
@@ -528,6 +594,10 @@ public class SystemPrimitives {
   public static class EscmDefineParameter extends Primitive {
     public java.lang.String escmName() {
       return "escm-define-parameter";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-define-parameter"),new Symbol("<symbol>"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -545,6 +615,10 @@ public class SystemPrimitives {
     public java.lang.String escmName() {
       return "escm-set-parameter!";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-set-parameter!"),new Symbol("<symbol>"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Symbol)) 
@@ -561,6 +635,10 @@ public class SystemPrimitives {
     public java.lang.String escmName() {
       return "escm-get-parameter";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-get-parameter"),new Symbol("<symbol>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol)) 
@@ -576,6 +654,10 @@ public class SystemPrimitives {
     public java.lang.String escmName() {
       return "escm-parameter?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-parameter?"),new Symbol("<symbol>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol)) 
@@ -590,6 +672,12 @@ public class SystemPrimitives {
   public static class GetEnv extends Primitive {
     public java.lang.String escmName() {
       return "getenv";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("getenv")),
+        Pair.List(new Symbol("getenv"),new Symbol("<variable-name-string>")));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -625,6 +713,10 @@ public class SystemPrimitives {
     public java.lang.String escmName() {
       return "garbage-collector";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("garbage-collector"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0)
@@ -640,6 +732,10 @@ public class SystemPrimitives {
   public static class CallStack extends Primitive {
     public java.lang.String escmName() {
       return "call-stack";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("call-stack"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

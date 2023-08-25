@@ -18,10 +18,11 @@ import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.number.Real;
 import escm.util.Trampoline;
-import escm.vm.type.Callable;
-import escm.vm.type.Primitive;
-import escm.vm.type.PrimitiveCallable;
-import escm.vm.type.PrimitiveSyntax;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
+import escm.vm.type.primitive.PrimitiveSyntax;
+import escm.vm.type.callable.Signature;
 import escm.vm.runtime.GlobalState;
 
 public class GeneratorPrimitives {
@@ -46,6 +47,10 @@ public class GeneratorPrimitives {
   public static class EscmIsGeneratorP extends Primitive {
     public java.lang.String escmName() {
       return "escm-generator?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-generator?"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -87,6 +92,12 @@ public class GeneratorPrimitives {
   public static class Yield extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "yield";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("yield")),
+        Pair.List(new Symbol("yield"),new Symbol("<obj>")));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -133,6 +144,12 @@ public class GeneratorPrimitives {
     public java.lang.String escmName() {
       return "define-generator";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("define-generator"),
+        Pair.List(new Symbol("<generator-name>"), new Symbol("<parameter>"),Signature.VARIADIC),
+        new Symbol("<body>"),Signature.VARIADIC);
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       Symbol generatorObject = UniqueSymbol.generate("define-generator-object");
@@ -170,6 +187,10 @@ public class GeneratorPrimitives {
   public static class CompleteAllGeneratorsBang extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "complete-all-generators!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("complete-all-generators!"),new Symbol("<generator-object>"),Signature.VARIADIC);
     }
 
     private Trampoline.Bounce iterate(ArrayList<Datum> parameters, int finishedCount, int n, Pair generatorObjects, Datum remainingObjects, Trampoline.Continuation continuation) throws Exception {
@@ -212,6 +233,10 @@ public class GeneratorPrimitives {
   public static class CompleteNGeneratorsBang extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "complete-n-generators!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("complete-n-generators!"),new Symbol("<count>"),new Symbol("<generator-object>"),Signature.VARIADIC);
     }
 
     private Trampoline.Bounce iterate(ArrayList<Datum> parameters, int finishedCount, int n, Pair generatorObjects, Datum remainingObjects, Trampoline.Continuation continuation) throws Exception {

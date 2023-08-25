@@ -6,10 +6,11 @@ package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Pair;
+import escm.type.Symbol;
 import escm.type.Void;
 import escm.type.bool.Boolean;
 import escm.util.error.Exceptionf;
-import escm.vm.type.Primitive;
+import escm.vm.type.primitive.Primitive;
 
 public class PairPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -17,6 +18,10 @@ public class PairPrimitives {
   public static class Cons extends Primitive {
     public java.lang.String escmName() {
       return "cons";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cons"),new Symbol("<car-obj>"),new Symbol("<cdr-obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -31,6 +36,10 @@ public class PairPrimitives {
   public static class Car extends Primitive {
     public java.lang.String escmName() {
       return "car";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("car"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -47,6 +56,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "cdr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cdr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -61,6 +74,10 @@ public class PairPrimitives {
   public static class Caar extends Primitive {
     public java.lang.String escmName() {
       return "caar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("caar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -80,6 +97,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "cadr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cadr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -97,6 +118,10 @@ public class PairPrimitives {
   public static class Cdar extends Primitive {
     public java.lang.String escmName() {
       return "cdar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cdar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -116,6 +141,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "cddr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cddr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -133,6 +162,10 @@ public class PairPrimitives {
   public static class Caaar extends Primitive {
     public java.lang.String escmName() {
       return "caaar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("caaar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -155,6 +188,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "caadr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("caadr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -175,6 +212,10 @@ public class PairPrimitives {
   public static class Cadar extends Primitive {
     public java.lang.String escmName() {
       return "cadar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cadar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -197,6 +238,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "caddr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("caddr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -217,6 +262,10 @@ public class PairPrimitives {
   public static class Cdaar extends Primitive {
     public java.lang.String escmName() {
       return "cdaar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cdaar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -239,6 +288,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "cdadr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cdadr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -259,6 +312,10 @@ public class PairPrimitives {
   public static class Cddar extends Primitive {
     public java.lang.String escmName() {
       return "cddar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cddar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -281,6 +338,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "cdddr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cdddr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -301,6 +362,10 @@ public class PairPrimitives {
   public static class Caaaar extends Primitive {
     public java.lang.String escmName() {
       return "caaaar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("caaaar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -326,6 +391,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "caaadr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("caaadr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -350,6 +419,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "caadar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("caadar"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -373,6 +446,10 @@ public class PairPrimitives {
   public static class Caaddr extends Primitive {
     public java.lang.String escmName() {
       return "caaddr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("caaddr"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -400,6 +477,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "tasnim";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("tasnim"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       StringBuilder sb = new StringBuilder();
@@ -415,6 +496,10 @@ public class PairPrimitives {
   public static class Cadaar extends Primitive {
     public java.lang.String escmName() {
       return "cadaar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cadaar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -440,6 +525,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "cadadr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cadadr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -463,6 +552,10 @@ public class PairPrimitives {
   public static class Caddar extends Primitive {
     public java.lang.String escmName() {
       return "caddar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("caddar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -488,6 +581,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "cadddr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cadddr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -511,6 +608,10 @@ public class PairPrimitives {
   public static class Cdaaar extends Primitive {
     public java.lang.String escmName() {
       return "cdaaar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cdaaar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -536,6 +637,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "cdaadr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cdaadr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -559,6 +664,10 @@ public class PairPrimitives {
   public static class Cdadar extends Primitive {
     public java.lang.String escmName() {
       return "cdadar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cdadar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -584,6 +693,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "cdaddr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cdaddr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -607,6 +720,10 @@ public class PairPrimitives {
   public static class Cddaar extends Primitive {
     public java.lang.String escmName() {
       return "cddaar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cddaar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -632,6 +749,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "cddadr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cddadr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -655,6 +776,10 @@ public class PairPrimitives {
   public static class Cdddar extends Primitive {
     public java.lang.String escmName() {
       return "cdddar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cdddar"),new Symbol("<pair>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -680,6 +805,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "cddddr";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cddddr"),new Symbol("<pair>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -704,6 +833,10 @@ public class PairPrimitives {
     public java.lang.String escmName() {
       return "pair?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("pair?"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(pair? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -717,6 +850,10 @@ public class PairPrimitives {
   public static class IsAtom extends Primitive {
     public java.lang.String escmName() {
       return "atom?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("atom?"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

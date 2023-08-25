@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import escm.type.Datum;
+import escm.type.Symbol;
 import escm.type.Void;
 import escm.util.error.Exceptionf;
 import escm.util.Pair;
@@ -26,7 +27,7 @@ import escm.util.json.JsonNull;
 import escm.util.json.JsonNumber;
 import escm.util.json.JsonObject;
 import escm.util.json.JsonString;
-import escm.vm.type.Primitive;
+import escm.vm.type.primitive.Primitive;
 import escm.vm.runtime.installerGenerated.EscmPath;
 
 public class HelpPrimitive {
@@ -405,6 +406,14 @@ public class HelpPrimitive {
     }
 
 
+    public Datum signature() {
+      return escm.type.Pair.List(
+        escm.type.Pair.List(new Symbol("help")),
+        escm.type.Pair.List(new Symbol("help"),new Symbol("<query-symbol>")),
+        escm.type.Pair.List(new Symbol("help"),new Symbol("<query-obj>")));
+    }
+
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       cacheHelpDB(); // only caches upon first invocation!
       if(parameters.size() > 1)
@@ -414,8 +423,8 @@ public class HelpPrimitive {
           launchInteractiveMenu();
         } else {
           Datum query = parameters.get(0);
-          if(query instanceof escm.type.Symbol) {
-            executeQuery(((escm.type.Symbol)query).value());
+          if(query instanceof Symbol) {
+            executeQuery(((Symbol)query).value());
           } else {
             describeObject(query);
           }

@@ -14,8 +14,8 @@ package escm.type.procedure;
 import java.util.ArrayList;
 import escm.util.Trampoline;
 import escm.type.Datum;
+import escm.vm.type.callable.Callable;
 import escm.vm.util.ExecutionState;
-import escm.vm.type.Callable;
 import escm.vm.util.SourceInformation;
 
 public abstract class Procedure extends Datum implements Callable {
@@ -32,6 +32,11 @@ public abstract class Procedure extends Datum implements Callable {
     return name;
   }
 
+  public java.lang.String readableName() {
+    if(name.equals(DEFAULT_NAME)) return "lambda:"+hashCode();
+    return name;
+  }
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Invocation Source (to be printed by escm.vm.runtime.EscmCallStack)
@@ -40,6 +45,7 @@ public abstract class Procedure extends Datum implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Application Abstraction
+  public abstract Datum signature(); // <#f> on failure
   public abstract Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception;
 
 
@@ -88,11 +94,6 @@ public abstract class Procedure extends Datum implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
-  public java.lang.String readableName() {
-    if(name.equals(DEFAULT_NAME)) return "lambda:"+hashCode();
-    return name;
-  }
-
   public java.lang.String display() {
     return "#<procedure " + readableName() + '>';
   }

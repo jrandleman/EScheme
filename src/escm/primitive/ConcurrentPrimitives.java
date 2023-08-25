@@ -14,8 +14,9 @@ import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
-import escm.vm.type.Callable;
-import escm.vm.type.Primitive;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.callable.Signature;
 import escm.vm.util.Environment;
 import escm.vm.runtime.EscmThread;
 import escm.vm.runtime.GlobalState;
@@ -26,6 +27,12 @@ public class ConcurrentPrimitives {
   public static class Thread extends Primitive {
     public java.lang.String escmName() {
       return "thread";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("thread"),new Symbol("<thunk-callable>")),
+        Pair.List(new Symbol("thread"),new Symbol("<name-string>"),new Symbol("<thunk-callable>")));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -59,6 +66,10 @@ public class ConcurrentPrimitives {
       return "thread?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("thread?"),new Symbol("<obj>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1)
         throw new Exceptionf("'(thread? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -72,6 +83,10 @@ public class ConcurrentPrimitives {
   public static class ThreadName extends Primitive {
     public java.lang.String escmName() {
       return "thread-name";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("thread-name"),new Symbol("<thread>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -89,6 +104,10 @@ public class ConcurrentPrimitives {
       return "thread-id";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("thread-id"),new Symbol("<thread>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-id <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
@@ -102,6 +121,10 @@ public class ConcurrentPrimitives {
   public static class ThreadRunnable extends Primitive {
     public java.lang.String escmName() {
       return "thread-runnable";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("thread-runnable"),new Symbol("<thread>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -119,6 +142,10 @@ public class ConcurrentPrimitives {
       return "thread-status";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("thread-status"),new Symbol("<thread>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-status <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
@@ -132,6 +159,10 @@ public class ConcurrentPrimitives {
   public static class ThreadYield extends Primitive {
     public java.lang.String escmName() {
       return "thread-yield";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("thread-yield"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -150,6 +181,10 @@ public class ConcurrentPrimitives {
       return "thread-set-daemon!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("thread-set-daemon!"),new Symbol("<thread>"),new Symbol("<status-boolean>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.concurrent.Thread) || !(parameters.get(1) instanceof Boolean))
         throw new Exceptionf("'(thread-set-daemon! <thread> <status>) didn't receive exactly 1 thread & 1 boolean: %s", Exceptionf.profileArgs(parameters));
@@ -163,6 +198,10 @@ public class ConcurrentPrimitives {
   public static class ThreadIsDaemon extends Primitive {
     public java.lang.String escmName() {
       return "thread-daemon?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("thread-daemon?"),new Symbol("<thread>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -180,6 +219,10 @@ public class ConcurrentPrimitives {
       return "thread-priority";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("thread-priority"),new Symbol("<thread>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-priority <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
@@ -193,6 +236,10 @@ public class ConcurrentPrimitives {
   public static class ThreadSetPriorityBang extends Primitive {
     public java.lang.String escmName() {
       return "thread-set-priority!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("thread-set-priority!"),new Symbol("<thread>"),new Symbol("<priority-integer>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -218,6 +265,10 @@ public class ConcurrentPrimitives {
       return "thread-start!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("thread-start!"),new Symbol("<thread>"),Signature.VARIADIC);
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1)
         throw new Exceptionf("'(thread-start! <thread> ...) expects at least 1 thread: %s", Exceptionf.profileArgs(parameters));
@@ -241,6 +292,12 @@ public class ConcurrentPrimitives {
   public static class ThreadJoinBang extends Primitive {
     public java.lang.String escmName() {
       return "thread-join!";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("thread-join!"),new Symbol("<thread>")),
+        Pair.List(new Symbol("thread-join!"),new Symbol("<thread>"),new Symbol("<milliseconds-timeout>")));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -274,6 +331,10 @@ public class ConcurrentPrimitives {
       return "thread-interrupted?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("thread-interrupted?"),new Symbol("<thread>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-interrupted? <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
@@ -287,6 +348,10 @@ public class ConcurrentPrimitives {
   public static class ThreadInterruptBang extends Primitive {
     public java.lang.String escmName() {
       return "thread-interrupt!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("thread-interrupt!"),new Symbol("<thread>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -304,6 +369,10 @@ public class ConcurrentPrimitives {
       return "interrupted?!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("interrupted?!"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0)
         throw new Exceptionf("'(interrupted?!) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
@@ -317,6 +386,10 @@ public class ConcurrentPrimitives {
   public static class Sleep extends Primitive {
     public java.lang.String escmName() {
       return "sleep";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("sleep"),new Symbol("<millisecond-integer>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -334,6 +407,10 @@ public class ConcurrentPrimitives {
       return "current-thread";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("current-thread"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0)
         throw new Exceptionf("'(current-thread) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
@@ -347,6 +424,10 @@ public class ConcurrentPrimitives {
   public static class Parallel extends Primitive {
     public java.lang.String escmName() {
       return "parallel";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("parallel"),new Symbol("<callable>"),Signature.VARIADIC);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -369,6 +450,12 @@ public class ConcurrentPrimitives {
   public static class ThreadDefineApostrophe extends Primitive {
     public java.lang.String escmName() {
       return "thread-define'";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("thread-define'"),new Symbol("<symbol>"),new Symbol("<value>")),
+        Pair.List(new Symbol("thread-define'"),new Symbol("<thread>"),new Symbol("<symbol>"),new Symbol("<value>")));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -400,6 +487,12 @@ public class ConcurrentPrimitives {
   public static class ThreadSetBangApostrophe extends Primitive {
     public java.lang.String escmName() {
       return "thread-set!'";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("thread-set!'"),new Symbol("<symbol>"),new Symbol("<value>")),
+        Pair.List(new Symbol("thread-set!'"),new Symbol("<thread>"),new Symbol("<symbol>"),new Symbol("<value>")));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -437,6 +530,12 @@ public class ConcurrentPrimitives {
       return "thread-get'";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("thread-get'"),new Symbol("<symbol>")),
+        Pair.List(new Symbol("thread-get'"),new Symbol("<thread>"),new Symbol("<symbol>")));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int totalParams = parameters.size();
       if(totalParams != 1 && totalParams != 2)
@@ -471,6 +570,12 @@ public class ConcurrentPrimitives {
       return "thread-defined?'";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("thread-defined?'"),new Symbol("<symbol>")),
+        Pair.List(new Symbol("thread-defined?'"),new Symbol("<thread>"),new Symbol("<symbol>")));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int totalParams = parameters.size();
       if(totalParams != 1 && totalParams != 2)
@@ -501,6 +606,12 @@ public class ConcurrentPrimitives {
       return "thread-dynamic-environment";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("thread-dynamic-environment")),
+        Pair.List(new Symbol("thread-dynamic-environment"),new Symbol("<thread>")));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int totalParams = parameters.size();
       if(totalParams != 0 && totalParams != 1)
@@ -523,6 +634,12 @@ public class ConcurrentPrimitives {
   public static class Mutex extends Primitive {
     public java.lang.String escmName() {
       return "mutex";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("mutex")),
+        Pair.List(new Symbol("mutex"),new Symbol("<name-string>")));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -548,6 +665,10 @@ public class ConcurrentPrimitives {
       return "mutex?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("mutex?"),new Symbol("<obj>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1)
         throw new Exceptionf("'(mutex? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -561,6 +682,10 @@ public class ConcurrentPrimitives {
   public static class MutexName extends Primitive {
     public java.lang.String escmName() {
       return "mutex-name";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("mutex-name"),new Symbol("<mutex>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -580,6 +705,10 @@ public class ConcurrentPrimitives {
       return "mutex-specific";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("mutex-specific"),new Symbol("<mutex>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-specific <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
@@ -592,6 +721,10 @@ public class ConcurrentPrimitives {
   public static class MutexSetSpecificBang extends Primitive {
     public java.lang.String escmName() {
       return "mutex-set-specific!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("mutex-set-specific!"),new Symbol("<mutex>"),new Symbol("<obj>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -607,6 +740,12 @@ public class ConcurrentPrimitives {
   public static class MutexLockBang extends Primitive {
     public java.lang.String escmName() {
       return "mutex-lock!";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("mutex-lock!"),new Symbol("<mutex>")),
+        Pair.List(new Symbol("mutex-lock!"),new Symbol("<mutex>"),new Symbol("<milliseconds-timeout>")));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -635,6 +774,10 @@ public class ConcurrentPrimitives {
       return "mutex-unlock!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("mutex-unlock!"),new Symbol("<mutex>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-unlock! <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
@@ -648,6 +791,10 @@ public class ConcurrentPrimitives {
   public static class MutexIsLocked extends Primitive {
     public java.lang.String escmName() {
       return "mutex-locked?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("mutex-locked?"),new Symbol("<mutex>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -665,6 +812,10 @@ public class ConcurrentPrimitives {
       return "mutex-queue-length";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("mutex-queue-length"),new Symbol("<mutex>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-queue-length <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
@@ -678,6 +829,10 @@ public class ConcurrentPrimitives {
   public static class MutexIsQueued extends Primitive {
     public java.lang.String escmName() {
       return "mutex-queued?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("mutex-queued?"),new Symbol("<mutex>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -695,6 +850,10 @@ public class ConcurrentPrimitives {
       return "mutex-hold-count";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("mutex-hold-count"),new Symbol("<mutex>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-hold-count <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
@@ -708,6 +867,10 @@ public class ConcurrentPrimitives {
   public static class MutexIsHeld extends Primitive {
     public java.lang.String escmName() {
       return "mutex-held?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("mutex-held?"),new Symbol("<mutex>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

@@ -17,9 +17,9 @@ import escm.util.Trampoline;
 import escm.util.string.StringParser;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.ExecutionState;
-import escm.vm.type.AssociativeCollection;
-import escm.vm.type.OrderedCollection;
-import escm.vm.type.Callable;
+import escm.vm.type.collection.AssociativeCollection;
+import escm.vm.type.collection.OrderedCollection;
+import escm.vm.type.callable.Callable;
 
 public class String extends Datum implements OrderedCollection, Callable {
   ////////////////////////////////////////////////////////////////////////////
@@ -160,6 +160,10 @@ public class String extends Datum implements OrderedCollection, Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Callable (unary index getter)
+  public Datum signature() {
+    return Pair.List(this,new Symbol("<index>"));
+  }
+
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
     if(arguments.size() != 1)
       throw new Exceptionf("STRING [CALLABLE-GET]: Expects exactly 1 integer index arg for string %s: %s", write(), Exceptionf.profileArgs(arguments));
@@ -1186,13 +1190,23 @@ public class String extends Datum implements OrderedCollection, Callable {
     int codepoint = value.codePointAt(offset);
     int increment = java.lang.Character.charCount(codepoint);
     escm.type.Character hd = new escm.type.Character(codepoint);
-    Callable trueCondPrimitive = (params, cont) -> {
-      params.add(hd);
-      return binaryPredicate.callWith(params,cont);
+    Callable trueCondPrimitive = new Callable() {
+      public Datum signature() { 
+        return Pair.List(new Symbol("escm-sort-in-lhs?"),new Symbol("<obj>"),new Symbol("<obj>")); 
+      }
+      public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+        params.add(hd);
+        return binaryPredicate.callWith(params,cont);
+      }
     };
-    Callable falseCondPrimitive = (params, cont) -> {
-      params.add(hd);
-      return binaryPredicate.callWith(params,(value) -> () -> cont.run(Boolean.valueOf(!value.isTruthy())));
+    Callable falseCondPrimitive = new Callable() {
+      public Datum signature() { 
+        return Pair.List(new Symbol("escm-sort-in-rhs?"),new Symbol("<obj>"),new Symbol("<obj>")); 
+      }
+      public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+        params.add(hd);
+        return binaryPredicate.callWith(params,(value) -> () -> cont.run(Boolean.valueOf(!value.isTruthy())));
+      }
     };
     PrimitiveProcedure trueCond = new PrimitiveProcedure("escm-sort-in-lhs?", trueCondPrimitive);
     PrimitiveProcedure falseCond = new PrimitiveProcedure("escm-sort-in-rhs?", falseCondPrimitive);

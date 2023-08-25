@@ -15,9 +15,10 @@ import escm.type.bool.Boolean;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
-import escm.vm.type.Callable;
-import escm.vm.type.Primitive;
-import escm.vm.type.PrimitiveCallable;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
+import escm.vm.type.callable.Signature;
 import escm.vm.util.Environment;
 import escm.vm.runtime.GlobalState;
 
@@ -36,6 +37,10 @@ public class ListPrimitives {
       return "list";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("list"),new Symbol("<obj>"),Signature.VARIADIC);
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       Datum d = Nil.VALUE;
       for(int i = parameters.size()-1; i >= 0; --i)
@@ -50,6 +55,10 @@ public class ListPrimitives {
   public static class ListStar extends Primitive {
     public java.lang.String escmName() {
       return "list*";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("list*"),new Symbol("<obj>"),new Symbol("<obj>"),Signature.VARIADIC);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -68,6 +77,10 @@ public class ListPrimitives {
   public static class Unfold extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "unfold";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("unfold"),new Symbol("<break?-condition>"),new Symbol("<mapper-callable>"),new Symbol("<update-callable>"),new Symbol("<seed>"));
     }
 
     public static Trampoline.Bounce logic(Datum acc, Callable breakCond, Callable mapper, Callable successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
@@ -110,6 +123,10 @@ public class ListPrimitives {
       return "unfold-right";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("unfold-right"),new Symbol("<break?-condition>"),new Symbol("<mapper-callable>"),new Symbol("<update-callable>"),new Symbol("<seed>"));
+    }
+
     public static Trampoline.Bounce logic(Datum acc, Callable breakCond, Callable mapper, Callable successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
       ArrayList<Datum> breakArgs = new ArrayList<Datum>(1);
       breakArgs.add(seed);
@@ -146,6 +163,10 @@ public class ListPrimitives {
   public static class Memq extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "memq";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("memq"),new Symbol("<obj>"),new Symbol("<list>"));
     }
 
     private static Symbol EQP_SYMBOL = new Symbol("eq?");
@@ -185,6 +206,10 @@ public class ListPrimitives {
       return "member";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("member"),new Symbol("<obj>"),new Symbol("<list>"));
+    }
+
     private static Symbol EQUALP_SYMBOL = new Symbol("equal?");
 
     public static Callable getEqualpProcedure(Environment definitionEnvironment) throws Exception {
@@ -208,6 +233,10 @@ public class ListPrimitives {
   public static class Assq extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "assq";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("assq"),new Symbol("<key>"),new Symbol("<associative-list>"));
     }
 
     public static Trampoline.Bounce logic(Callable eqp, String fcnName, Datum originalList, Datum key, Datum iterator, Trampoline.Continuation continuation) throws Exception {
@@ -242,6 +271,10 @@ public class ListPrimitives {
       return "assoc";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("assoc"),new Symbol("<key>"),new Symbol("<associative-list>"));
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(assoc <key> <alist>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -259,6 +292,10 @@ public class ListPrimitives {
       return "list?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("list?"),new Symbol("<obj>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(list? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -274,6 +311,10 @@ public class ListPrimitives {
       return "list*?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("list*?"),new Symbol("<obj>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(list*? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -287,6 +328,10 @@ public class ListPrimitives {
   public static class IsAlist extends Primitive {
     public java.lang.String escmName() {
       return "alist?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("alist?"),new Symbol("<obj>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -309,6 +354,10 @@ public class ListPrimitives {
   public static class IsNull extends Primitive {
     public java.lang.String escmName() {
       return "null?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("null?"),new Symbol("<obj>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

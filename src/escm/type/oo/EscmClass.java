@@ -1,6 +1,6 @@
 // Author: Jordan Randleman - escm.type.oo.EscmClass
 // Purpose:
-//    Escm Class class, implements "escm.vm.type.Callable" to double as a ctor!
+//    Escm Class class, implements "escm.vm.type.callable.Callable" to double as a ctor!
 //
 // Includes:
 //    - String name()         // returns <""> if an anonymous class
@@ -17,11 +17,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.Datum;
+import escm.type.Pair;
+import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.procedure.CompoundProcedure;
 import escm.type.procedure.MethodProcedure;
-import escm.vm.type.Callable;
+import escm.vm.type.collection.OrderedCollection;
+import escm.vm.type.callable.Callable;
 
 public class EscmClass extends MetaObject implements Callable {
   ////////////////////////////////////////////////////////////////////////////
@@ -136,6 +139,36 @@ public class EscmClass extends MetaObject implements Callable {
     for(String prop : objectProps.keySet()) {
       if(!ipp.exec(prop)) return;
     }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Constructor Signature
+  public Datum tagContructorWithClassName(Datum signatureHead, Datum ctorSignature) {
+    if(!(ctorSignature instanceof Pair)) return Pair.List(signatureHead);
+    Pair ctorSignaturePair = (Pair)ctorSignature;
+    Datum fst = ctorSignaturePair.car();
+    if(!(fst instanceof Pair)) return new Pair(signatureHead,ctorSignaturePair.cdr());
+    Datum sigs = Nil.VALUE;
+    while(ctorSignature instanceof Pair) {
+      Pair p = (Pair)ctorSignature;
+      if(p.car() instanceof Pair) {
+        sigs = new Pair(new Pair(signatureHead,((Pair)p.car()).cdr()),sigs);
+      }
+      ctorSignature = p.cdr();
+    }
+    if(sigs instanceof Nil) return sigs;
+    return (Datum)((Pair)sigs).reverse();
+  }
+
+  public Datum signature() {
+    String name = name();
+    Datum signatureHead = name.length() == 0 ? this : new Symbol(name);
+    Datum ctor = objectProps.get("new");
+    if(ctor != null && ctor instanceof CompoundProcedure) {
+      return tagContructorWithClassName(signatureHead,((CompoundProcedure)ctor).signature());
+    }
+    return Pair.List(signatureHead);
   }
 
 

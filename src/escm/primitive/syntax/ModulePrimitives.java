@@ -16,7 +16,8 @@ import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.Keyword;
 import escm.type.bool.Boolean;
-import escm.vm.type.PrimitiveSyntax;
+import escm.vm.type.primitive.PrimitiveSyntax;
+import escm.vm.type.callable.Signature;
 import escm.primitive.SystemPrimitives;
 
 public class ModulePrimitives {
@@ -51,6 +52,14 @@ public class ModulePrimitives {
   public static class Import extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "import";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("import"),new Symbol("<module-path-symbol>")),
+        Pair.List(new Symbol("import"),new Symbol("<module-path-symbol>"),new Keyword("as"),new Symbol("<module-alias-symbol>")),
+        Pair.List(new Symbol("import"),new Symbol("<filepath-string>"),new Symbol("<module-path-symbol>")),
+        Pair.List(new Symbol("import"),new Symbol("<filepath-string>"),new Symbol("<module-path-symbol>"),new Keyword("as"),new Symbol("<module-alias-symbol>")));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -103,6 +112,10 @@ public class ModulePrimitives {
   public static class Reload extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "reload";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("reload"),new Symbol("<module-alias-symbol>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -162,6 +175,14 @@ public class ModulePrimitives {
   public static class From extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "from";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("from"),new Symbol("<module-path-symbol>"),new Keyword("import"),new Symbol("<variable-symbol>"),Signature.VARIADIC),
+        Pair.List(new Symbol("from"),new Symbol("<module-path-symbol>"),new Keyword("import"),new Symbol("<variable-symbol>"),Signature.VARIADIC,new Keyword("as"),new Symbol("<alias-symbol>"),Signature.VARIADIC),
+        Pair.List(new Symbol("from"),new Symbol("<filepath-string>"),new Symbol("<module-path-symbol>"),new Keyword("import"),new Symbol("<variable-symbol>"),Signature.VARIADIC),
+        Pair.List(new Symbol("from"),new Symbol("<filepath-string>"),new Symbol("<module-path-symbol>"),new Keyword("import"),new Symbol("<variable-symbol>"),Signature.VARIADIC,new Keyword("as"),new Symbol("<alias-symbol>"),Signature.VARIADIC));
     }
 
     private static ArrayList<Datum> parseArgs(ArrayList<Datum> parameters) {

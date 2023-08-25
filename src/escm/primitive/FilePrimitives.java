@@ -10,11 +10,14 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.StandardCopyOption;
 import java.io.File;
 import escm.type.Datum;
+import escm.type.Symbol;
+import escm.type.Pair;
 import escm.type.number.Real;
 import escm.type.bool.Boolean;
 import escm.util.error.Exceptionf;
 import escm.vm.Reader;
-import escm.vm.type.Primitive;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.callable.Signature;
 import escm.vm.util.SourceInformation;
 
 public class FilePrimitives {
@@ -23,6 +26,10 @@ public class FilePrimitives {
   public static class FileRead extends Primitive {
     public java.lang.String escmName() {
       return "file-read";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("file-read"),new Symbol("<filename-string>"));
     }
     
     private static Datum convertReadExpressionsToReadExpression(ArrayList<Datum> contents) {
@@ -80,6 +87,10 @@ public class FilePrimitives {
     public java.lang.String escmName() {
       return "file-read-string";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("file-read-string"),new Symbol("<filename-string>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
@@ -94,6 +105,10 @@ public class FilePrimitives {
   public static class FileWrite extends Primitive {
     public java.lang.String escmName() {
       return "file-write";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("file-write"),new Symbol("<filename-string>"),new Symbol("<obj>"));
     }
     
     public static void writeStringToFile(String filename, String str, String callerName) throws Exception {
@@ -127,6 +142,10 @@ public class FilePrimitives {
     public java.lang.String escmName() {
       return "file-write+";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("file-write+"),new Symbol("<filename-string>"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String)) 
@@ -142,6 +161,10 @@ public class FilePrimitives {
   public static class FileDisplay extends Primitive {
     public java.lang.String escmName() {
       return "file-display";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("file-display"),new Symbol("<filename-string>"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -159,6 +182,10 @@ public class FilePrimitives {
     public java.lang.String escmName() {
       return "file-display+";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("file-display+"),new Symbol("<filename-string>"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String)) 
@@ -174,6 +201,10 @@ public class FilePrimitives {
   public static class FilePprint extends Primitive {
     public java.lang.String escmName() {
       return "file-pretty-print";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("file-pretty-print"),new Symbol("<filename-string>"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -191,6 +222,10 @@ public class FilePrimitives {
     public java.lang.String escmName() {
       return "file-pretty-print+";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("file-pretty-print+"),new Symbol("<filename-string>"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String)) 
@@ -206,6 +241,10 @@ public class FilePrimitives {
   public static class IsPathP extends Primitive {
     public java.lang.String escmName() {
       return "path?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("path?"),new Symbol("<path-string>"));
     }
 
     public static boolean logic(Path p) {
@@ -231,6 +270,10 @@ public class FilePrimitives {
       return "directory?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("directory?"),new Symbol("<directory-path-string>"));
+    }
+
     public static boolean logic(Path p) {
       try {
         return Files.isDirectory(p);
@@ -252,6 +295,10 @@ public class FilePrimitives {
   public static class IsFileP extends Primitive {
     public java.lang.String escmName() {
       return "file?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("file?"),new Symbol("<file-path-string>"));
     }
 
     public static boolean logic(Path p) {
@@ -277,6 +324,10 @@ public class FilePrimitives {
       return "file-delete!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("file-delete!"),new Symbol("<file-path-string>"));
+    }
+
     public static boolean logic(Path p) {
       try {
         return IsFileP.logic(p) && Files.deleteIfExists(p);
@@ -298,6 +349,10 @@ public class FilePrimitives {
   public static class DirectoryDeleteBang extends Primitive {
     public java.lang.String escmName() {
       return "directory-delete!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("directory-delete!"),new Symbol("<directory-path-string>"));
     }
 
     public static boolean logic(Path p) {
@@ -322,6 +377,10 @@ public class FilePrimitives {
   public static class DirectoryRecursiveDeleteBang extends Primitive {
     public java.lang.String escmName() {
       return "directory-recursive-delete!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("directory-recursive-delete!"),new Symbol("<directory-path-string>"));
     }
 
     private static boolean deleteDirectoryContents(Path dirPath) throws Exception {
@@ -363,6 +422,10 @@ public class FilePrimitives {
       return "path-delete!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("path-delete!"),new Symbol("<path-string>"));
+    }
+
     public static boolean logic(Path p) {
       try {
         return Files.exists(p) && Files.deleteIfExists(p);
@@ -384,6 +447,10 @@ public class FilePrimitives {
   public static class PathRecursiveDeleteBang extends Primitive {
     public java.lang.String escmName() {
       return "path-recursive-delete!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("path-recursive-delete!"),new Symbol("<path-string>"));
     }
 
     public static boolean logic(Path p) {
@@ -414,6 +481,10 @@ public class FilePrimitives {
       return "directory-entries";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("directory-entries"),new Symbol("<directory-path-string>"));
+    }
+
     public static Datum logic(Path p) throws Exception {
       if(IsDirectoryP.logic(p) == false) return Boolean.FALSE;
       Datum lis = escm.type.Nil.VALUE;
@@ -436,6 +507,10 @@ public class FilePrimitives {
   public static class DirectoryEntriesStar extends Primitive {
     public java.lang.String escmName() {
       return "directory-entries*";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("directory-entries*"),new Symbol("<directory-path-string>"));
     }
 
     public static Datum logic(Path p) throws Exception {
@@ -465,6 +540,10 @@ public class FilePrimitives {
       return "current-directory";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("current-directory"));
+    }
+
     public static String logic() throws Exception {
       return Path.of("").toAbsolutePath().toString();
     }
@@ -482,6 +561,10 @@ public class FilePrimitives {
   public static class GeneratePath extends Primitive {
     public java.lang.String escmName() {
       return "path";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("path"),new Symbol("<string>"),Signature.VARIADIC);
     }
 
     private static boolean hasTerminalSeparator(String s) {
@@ -534,6 +617,12 @@ public class FilePrimitives {
       return "path-parent";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("path-parent"),new Symbol("<path-string>")),
+        Pair.List(new Symbol("path-parent"),new Symbol("<path-string>"),new Symbol("<positive-integer>")));
+    }
+
     // Returns <null> on failure
     public static String logic(String pathString) {
       try {
@@ -579,6 +668,10 @@ public class FilePrimitives {
       return "path-file";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("path-file"),new Symbol("<path-string>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(path-file <path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
@@ -596,6 +689,10 @@ public class FilePrimitives {
       return "make-directory";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("make-directory"),new Symbol("<path-string>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(make-directory <path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
@@ -611,6 +708,10 @@ public class FilePrimitives {
       return "make-directory!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("make-directory!"),new Symbol("<path-string>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(make-directory! <path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
@@ -624,6 +725,10 @@ public class FilePrimitives {
   public static class AbsolutePath extends Primitive {
     public java.lang.String escmName() {
       return "absolute-path";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("absolute-path"),new Symbol("<path-string>"));
     }
 
     public static String logic(String pathStr) {
@@ -651,6 +756,10 @@ public class FilePrimitives {
   public static class IsAbsolutePath extends Primitive {
     public java.lang.String escmName() {
       return "absolute-path?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("absolute-path?"),new Symbol("<path-string>"));
     }
 
     public static boolean logic(String path) {
@@ -685,6 +794,10 @@ public class FilePrimitives {
       return "file-extension";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("file-extension"),new Symbol("<path-string>"));
+    }
+
     public static String logic(String pathStr) {
       Path p = Path.of(pathStr).getFileName();
       if(p == null) return null;
@@ -711,6 +824,10 @@ public class FilePrimitives {
       return "file-has-extension?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("file-has-extension?"),new Symbol("<path-string>"),new Symbol("<extension-string>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
         throw new Exceptionf("'(file-has-extension? <path-string> <extension-string>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -732,6 +849,10 @@ public class FilePrimitives {
   public static class SwapFileExtension extends Primitive {
     public java.lang.String escmName() {
       return "swap-file-extension";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("swap-file-extension"),new Symbol("<path-string>"),new Symbol("<new-extension-string>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -762,6 +883,10 @@ public class FilePrimitives {
       return "remove-file-extension";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("remove-file-extension"),new Symbol("<path-string>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(remove-file-extension <path-string>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -786,6 +911,10 @@ public class FilePrimitives {
       return "file-size";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("file-size"),new Symbol("<file-path-string>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
         throw new Exceptionf("'(file-size <file-path-string>) didn't receive exactly 1 string: %s", Exceptionf.profileArgs(parameters));
@@ -803,6 +932,10 @@ public class FilePrimitives {
   public static class MoveFile extends Primitive {
     public java.lang.String escmName() {
       return "move-file";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("move-file"),new Symbol("<old-path-string>"),new Symbol("<new-path-string>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -829,6 +962,10 @@ public class FilePrimitives {
   public static class MoveFileBang extends Primitive {
     public java.lang.String escmName() {
       return "move-file!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("move-file!"),new Symbol("<old-path-string>"),new Symbol("<new-path-string>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -864,6 +1001,10 @@ public class FilePrimitives {
       return "copy-file";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("copy-file"),new Symbol("<old-path-string>"),new Symbol("<new-path-string>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
         throw new Exceptionf("'(copy-file <old-path-string> <new-path-string>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -888,6 +1029,10 @@ public class FilePrimitives {
   public static class CopyFileBang extends Primitive {
     public java.lang.String escmName() {
       return "copy-file!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("copy-file!"),new Symbol("<old-path-string>"),new Symbol("<new-path-string>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

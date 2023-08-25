@@ -18,8 +18,8 @@ import escm.type.procedure.SyntaxProcedure;
 import escm.type.number.Exact;
 import escm.util.Trampoline;
 import escm.primitive.MetaPrimitives;
-import escm.vm.type.Callable;
-import escm.vm.type.OrderedCollection;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.collection.OrderedCollection;
 import escm.vm.util.Environment;
 
 public class Compiler {

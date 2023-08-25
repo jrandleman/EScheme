@@ -383,6 +383,8 @@
 (ut val 10)
 (ut (do ((val 0 (+ val 1))) ((= val 10) val)) 10)
 (ut (do ((i 0 (+ i 1)) (j 1 (* j 2))) ((= i 10) j) (set! i (+ i 1))) 32)
+(def captured-val 0)
+(ut (begin (do ((val 0 (+ val 1))) ((= val 10)) (set! captured-val val)) captured-val) 9)
 
 
 (ut (-<> 42) 42)

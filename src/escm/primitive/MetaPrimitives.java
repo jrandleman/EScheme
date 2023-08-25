@@ -9,25 +9,80 @@ import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.procedure.SyntaxProcedure;
+import escm.type.procedure.Procedure;
+import escm.type.bool.Boolean;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.UniqueSymbol;
 import escm.vm.Compiler;
 import escm.vm.Assembler;
 import escm.vm.Interpreter;
-import escm.vm.type.Callable;
+import escm.vm.type.callable.Callable;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.Environment;
 import escm.vm.util.ObjectAccessChain;
-import escm.vm.type.Primitive;
-import escm.vm.type.PrimitiveCallable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
 
 public class MetaPrimitives {
+  ////////////////////////////////////////////////////////////////////////////
+  // callable-signature
+  public static class CallableSignature extends Primitive {
+    public java.lang.String escmName() {
+      return "callable-signature";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("callable-signature"),new Symbol("<callable>"));
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1) 
+        throw new Exceptionf("'(callable-signature <callable>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      Datum obj = parameters.get(0);
+      if(!FunctionalPrimitives.IsCallable.logic(obj)) return Boolean.FALSE;
+      return ((Callable)obj).signature();
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // callable-name
+  public static class CallableName extends Primitive {
+    public java.lang.String escmName() {
+      return "callable-name";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("callable-name"),new Symbol("<callable>"));
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1) 
+        throw new Exceptionf("'(callable-name <callable>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      Datum obj = parameters.get(0);
+      if(!FunctionalPrimitives.IsCallable.logic(obj)) return Boolean.FALSE;
+      if(obj instanceof Procedure) return new Symbol(((Procedure)obj).readableName());
+      Datum sig = ((Callable)obj).signature();
+      if(sig instanceof Pair) {
+        Datum head = ((Pair)sig).car();
+        if(head instanceof Pair) return ((Pair)head).car();
+        return head;
+      }
+      return sig;
+    }
+  }
+
+
   ////////////////////////////////////////////////////////////////////////////
   // apply
   public static class Apply extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "apply";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("apply"),new Symbol("<callable>"),new Symbol("<arg-list>"));
     }
 
     public static ArrayList<Datum> convertListToArrayList(Datum lis) {
@@ -62,6 +117,10 @@ public class MetaPrimitives {
       return "compile";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("compile"),new Symbol("<escm-code-as-data>"));
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(compile <escm-code-as-data>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -77,6 +136,10 @@ public class MetaPrimitives {
       return "eval-bytecode";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("eval-bytecode"),new Symbol("<escm-bytecode-as-data>"));
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(eval-bytecode <escm-bytecode-as-data>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -90,6 +153,10 @@ public class MetaPrimitives {
   public static class Eval extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "eval";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("eval"),new Symbol("<escm-code-as-data>"));
     }
 
     public static Trampoline.Bounce logic(Datum data, Environment env, Trampoline.Continuation continuation) throws Exception {
@@ -111,6 +178,10 @@ public class MetaPrimitives {
       return "gensym";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("gensym"),new Symbol("<optional-name-symbol>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() > 1)
         throw new Exceptionf("'(gensym <optional-name-symbol>) received more than 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -128,6 +199,10 @@ public class MetaPrimitives {
   public static class IsSyntax extends Primitive {
     public java.lang.String escmName() {
       return "syntax?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("syntax?"),new Symbol("<obj>"));
     }
 
     private static SyntaxProcedure isModuleMacro(Environment definitionEnvironment, Symbol moduleMacro) {
@@ -159,7 +234,7 @@ public class MetaPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1)
         throw new Exceptionf("'(syntax? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      return escm.type.bool.Boolean.valueOf(parameters.get(0) instanceof SyntaxProcedure);
+      return Boolean.valueOf(parameters.get(0) instanceof SyntaxProcedure);
     }
   }
 
@@ -169,6 +244,10 @@ public class MetaPrimitives {
   public static class EscmDefineSyntax extends Primitive {
     public java.lang.String escmName() {
       return "escm-define-syntax";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-define-syntax"),new Symbol("<symbol>"),new Symbol("<callable>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -192,6 +271,10 @@ public class MetaPrimitives {
   public static class ExpandSyntax extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "expand-syntax";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("expand-syntax"),new Symbol("<quoted-macro-expression>"));
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

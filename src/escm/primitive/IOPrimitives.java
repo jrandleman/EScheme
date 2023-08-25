@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
+import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
@@ -14,7 +15,8 @@ import escm.type.port.Eof;
 import escm.type.number.Real;
 import escm.util.error.Exceptionf;
 import escm.vm.Reader;
-import escm.vm.type.Primitive;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.callable.Signature;
 import escm.vm.util.SourceInformation;
 import escm.vm.runtime.GlobalState;
 
@@ -24,6 +26,12 @@ public class IOPrimitives {
   public static class PrettyPrint extends Primitive {
     public java.lang.String escmName() {
       return "pretty-print";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("pretty-print"),new Symbol("<obj>")),
+        Pair.List(new Symbol("pretty-print"),new Symbol("<output-port>"),new Symbol("<obj>")));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -55,6 +63,12 @@ public class IOPrimitives {
       return "write";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("write"),new Symbol("<obj>")),
+        Pair.List(new Symbol("write"),new Symbol("<output-port>"),new Symbol("<obj>")));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 && parameters.size() != 2) 
         throw new Exceptionf("'(write <optional-output-port> <obj>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
@@ -82,6 +96,12 @@ public class IOPrimitives {
   public static class Display extends Primitive {
     public java.lang.String escmName() {
       return "display";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("display"),new Symbol("<obj>")),
+        Pair.List(new Symbol("display"),new Symbol("<output-port>"),new Symbol("<obj>")));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -124,6 +144,12 @@ public class IOPrimitives {
       return "newline";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("newline")),
+        Pair.List(new Symbol("newline"),new Symbol("<output-port>")));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() > 1) 
         throw new Exceptionf("'(newline <optional-output-port>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
@@ -148,6 +174,12 @@ public class IOPrimitives {
   public static class Println extends Primitive {
     public java.lang.String escmName() {
       return "println";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("println"),new Symbol("<obj>")),
+        Pair.List(new Symbol("println"),new Symbol("<output-port>"),new Symbol("<obj>")));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -177,6 +209,12 @@ public class IOPrimitives {
   public static class PrettyPrintf extends Primitive {
     public java.lang.String escmName() {
       return "pretty-printf";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("pretty-printf"),new Symbol("<format-string>"),new Symbol("<arg>"),Signature.VARIADIC),
+        Pair.List(new Symbol("pretty-printf"),new Symbol("<output-port>"),new Symbol("<format-string>"),new Symbol("<arg>"),Signature.VARIADIC));
     }
 
     public static ArrayList<Datum> getStringfArgs(ArrayList<Datum> parameters, int argStartIndex) {
@@ -222,6 +260,12 @@ public class IOPrimitives {
       return "writef";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("writef"),new Symbol("<format-string>"),new Symbol("<arg>"),Signature.VARIADIC),
+        Pair.List(new Symbol("writef"),new Symbol("<output-port>"),new Symbol("<format-string>"),new Symbol("<arg>"),Signature.VARIADIC));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1) 
         throw new Exceptionf("'(writef <optional-output-port> <format-string> <arg> ...) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
@@ -256,6 +300,12 @@ public class IOPrimitives {
   public static class Displayf extends Primitive {
     public java.lang.String escmName() {
       return "displayf";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("displayf"),new Symbol("<format-string>"),new Symbol("<arg>"),Signature.VARIADIC),
+        Pair.List(new Symbol("displayf"),new Symbol("<output-port>"),new Symbol("<format-string>"),new Symbol("<arg>"),Signature.VARIADIC));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -300,6 +350,12 @@ public class IOPrimitives {
       return "read";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("read")),
+        Pair.List(new Symbol("read"),new Symbol("<input-port>")));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() > 1) 
         throw new Exceptionf("'(read <optional-input-port>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
@@ -324,6 +380,10 @@ public class IOPrimitives {
   public static class ReadString extends Primitive {
     public java.lang.String escmName() {
       return "read-string";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("read-string"),new Symbol("<string>"));
     }
 
     private static SourceInformation createPseudoSourceInformation(escm.type.String string) {
@@ -353,6 +413,12 @@ public class IOPrimitives {
       return "read-line";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("read-line")),
+        Pair.List(new Symbol("read-line"),new Symbol("<input-port>")));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() > 1) 
         throw new Exceptionf("'(read-line <optional-input-port>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
@@ -379,6 +445,12 @@ public class IOPrimitives {
       return "read-char";
     }
 
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("read-char")),
+        Pair.List(new Symbol("read-char"),new Symbol("<input-port>")));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() > 1) 
         throw new Exceptionf("'(read-char <optional-input-port>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
@@ -403,6 +475,12 @@ public class IOPrimitives {
   public static class ReadChars extends Primitive {
     public java.lang.String escmName() {
       return "read-chars";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("read-chars"),new Symbol("<integer>")),
+        Pair.List(new Symbol("read-chars"),new Symbol("<integer>"),new Symbol("<input-port>")));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -434,6 +512,10 @@ public class IOPrimitives {
   public static class IsEof extends Primitive {
     public java.lang.String escmName() {
       return "eof?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("eof?"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

@@ -680,6 +680,9 @@
 ------------------------
 ## Meta:
 ```scheme
+(callable-signature <callable>)
+(callable-name <callable>)
+
 (apply <callable> <obj-argument-list>)
 
 (compile <quoted-escm-expression>)

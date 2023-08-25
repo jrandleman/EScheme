@@ -5,17 +5,19 @@
 package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
+import escm.type.Pair;
+import escm.type.Symbol;
+import escm.type.Void;
 import escm.type.port.Port;
 import escm.type.port.InputPort;
 import escm.type.port.OutputPort;
 import escm.type.number.Exact;
-import escm.type.Void;
 import escm.type.bool.Boolean;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
-import escm.vm.type.Callable;
-import escm.vm.type.Primitive;
-import escm.vm.type.PrimitiveCallable;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
 
 public class PortPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -23,6 +25,10 @@ public class PortPrimitives {
   public static class OpenInputFile extends Primitive {
     public java.lang.String escmName() {
       return "open-input-file";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("open-input-file"),new Symbol("<filename-string>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -38,6 +44,12 @@ public class PortPrimitives {
   public static class OpenOutputFile extends Primitive {
     public java.lang.String escmName() {
       return "open-output-file";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("open-output-file")),
+        Pair.List(new Symbol("open-output-file"),new Symbol("<filename-string>")));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -56,6 +68,10 @@ public class PortPrimitives {
     public java.lang.String escmName() {
       return "open-output-file+";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("open-output-file+"),new Symbol("<filename-string>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String))
@@ -70,6 +86,10 @@ public class PortPrimitives {
   public static class ClosePortBang extends Primitive {
     public java.lang.String escmName() {
       return "close-port!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("close-port!"),new Symbol("<port>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -87,6 +107,10 @@ public class PortPrimitives {
     public java.lang.String escmName() {
       return "port-path";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("port-path"),new Symbol("<port>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Port))
@@ -101,6 +125,10 @@ public class PortPrimitives {
   public static class PortPosition extends Primitive {
     public java.lang.String escmName() {
       return "port-position";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("port-position"),new Symbol("<input-port>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -118,6 +146,10 @@ public class PortPrimitives {
     public java.lang.String escmName() {
       return "port?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("port?"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1)
@@ -132,6 +164,10 @@ public class PortPrimitives {
   public static class InputPortP extends Primitive {
     public java.lang.String escmName() {
       return "input-port?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("input-port?"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -148,6 +184,10 @@ public class PortPrimitives {
     public java.lang.String escmName() {
       return "output-port?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("output-port?"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1)
@@ -162,6 +202,10 @@ public class PortPrimitives {
   public static class TempPortP extends Primitive {
     public java.lang.String escmName() {
       return "temp-port?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("temp-port?"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -178,6 +222,10 @@ public class PortPrimitives {
     public java.lang.String escmName() {
       return "open-port?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("open-port?"),new Symbol("<port>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Port))
@@ -192,6 +240,10 @@ public class PortPrimitives {
   public static class ClosedPortP extends Primitive {
     public java.lang.String escmName() {
       return "closed-port?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("closed-port?"),new Symbol("<port>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -208,6 +260,10 @@ public class PortPrimitives {
     public java.lang.String escmName() {
       return "current-input-port";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("current-input-port"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0)
@@ -223,6 +279,10 @@ public class PortPrimitives {
     public java.lang.String escmName() {
       return "current-output-port";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("current-output-port"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0)
@@ -237,6 +297,10 @@ public class PortPrimitives {
   public static class CallWithInputFile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "call-with-input-file";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("call-with-input-file"),new Symbol("<filename-string>"),new Symbol("<unary-callable>"));
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -264,6 +328,10 @@ public class PortPrimitives {
   public static class CallWithOutputFile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "call-with-output-file";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("call-with-output-file"),new Symbol("<filename-string>"),new Symbol("<unary-callable>"));
     }
 
     public static Trampoline.Bounce logic(String primitiveName, boolean append, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -297,6 +365,10 @@ public class PortPrimitives {
       return "call-with-output-file+";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("call-with-output-file+"),new Symbol("<filename-string>"),new Symbol("<unary-callable>"));
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       return CallWithOutputFile.logic(escmName(),true,parameters,continuation);
     }
@@ -308,6 +380,10 @@ public class PortPrimitives {
   public static class WithInputFromFile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "with-input-from-file";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("with-input-from-file"),new Symbol("<filename-string>"),new Symbol("<thunk-callable>"));
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -337,6 +413,10 @@ public class PortPrimitives {
   public static class WithOutputToFile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "with-output-to-file";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("with-output-to-file"),new Symbol("<filename-string>"),new Symbol("<thunk-callable>"));
     }
 
     public static Trampoline.Bounce logic(String primitiveName, boolean append, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -372,6 +452,10 @@ public class PortPrimitives {
       return "with-output-to-file+";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("with-output-to-file+"),new Symbol("<filename-string>"),new Symbol("<thunk-callable>"));
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       return WithOutputToFile.logic(escmName(),true,parameters,continuation);
     }
@@ -383,6 +467,10 @@ public class PortPrimitives {
   public static class PeekPort extends Primitive {
     public java.lang.String escmName() {
       return "peek-port";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("peek-port"),new Symbol("<input-port>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -402,6 +490,10 @@ public class PortPrimitives {
       return "stdin?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("stdin?"),new Symbol("<input-port>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof InputPort))
         throw new Exceptionf("'(stdin? <input-port>) didn't receive 1 input-port: %s", Exceptionf.profileArgs(parameters));
@@ -415,6 +507,10 @@ public class PortPrimitives {
   public static class IsStdoutP extends Primitive {
     public java.lang.String escmName() {
       return "stdout?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stdout?"),new Symbol("<output-port>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

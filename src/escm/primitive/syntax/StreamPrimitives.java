@@ -18,10 +18,11 @@ import escm.type.bool.Boolean;
 import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.util.Trampoline;
-import escm.vm.type.Callable;
-import escm.vm.type.Primitive;
-import escm.vm.type.PrimitiveCallable;
-import escm.vm.type.PrimitiveSyntax;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
+import escm.vm.type.primitive.PrimitiveSyntax;
+import escm.vm.type.callable.Signature;
 import escm.vm.util.Environment;
 import escm.vm.runtime.GlobalState;
 import escm.primitive.UtilityPrimitives;
@@ -60,6 +61,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scons";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scons"),new Symbol("<scar-obj>"),new Symbol("<scdr-obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
@@ -77,6 +82,10 @@ public class StreamPrimitives {
   public static class IsStreamPairP extends Primitive {
     public java.lang.String escmName() {
       return "stream-pair?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-pair?"),new Symbol("<obj>"));
     }
 
     public static boolean logic(Datum d) {
@@ -103,6 +112,10 @@ public class StreamPrimitives {
       return "stream?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("stream?"),new Symbol("<obj>"));
+    }
+
     public static boolean logic(Datum d) {
       return d instanceof Nil || IsStreamPairP.logic(d);
     }
@@ -122,6 +135,10 @@ public class StreamPrimitives {
   public static class Scar extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scar";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scar"),new Symbol("<stream-pair>"));
     }
 
     public static Trampoline.Bounce logic(Datum streamPair, Trampoline.Continuation continuation) throws Exception {
@@ -148,6 +165,10 @@ public class StreamPrimitives {
       return "scdr";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("scdr"),new Symbol("<stream-pair>"));
+    }
+
     public static Trampoline.Bounce logic(Datum streamPair, Trampoline.Continuation continuation) throws Exception {
       if(!IsStreamPairP.logic(streamPair)) 
         throw new Exceptionf("'(scdr <stream-pair>) expects a <stream-pair>, given %s", streamPair.profile());
@@ -171,6 +192,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scaar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scaar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -187,6 +212,10 @@ public class StreamPrimitives {
   public static class Scadr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scadr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scadr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -205,6 +234,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scdar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scdar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -221,6 +254,10 @@ public class StreamPrimitives {
   public static class Scddr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scddr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scddr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -239,6 +276,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scaaar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scaaar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -255,6 +296,10 @@ public class StreamPrimitives {
   public static class Scaadr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scaadr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scaadr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -273,6 +318,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scadar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scadar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -289,6 +338,10 @@ public class StreamPrimitives {
   public static class Scaddr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scaddr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scaddr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -307,6 +360,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scdaar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scdaar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -323,6 +380,10 @@ public class StreamPrimitives {
   public static class Scdadr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scdadr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scdadr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -341,6 +402,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scddar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scddar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -357,6 +422,10 @@ public class StreamPrimitives {
   public static class Scdddr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scdddr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scdddr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -375,6 +444,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scaaaar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scaaaar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -391,6 +464,10 @@ public class StreamPrimitives {
   public static class Scaaadr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scaaadr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scaaadr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -409,6 +486,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scaadar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scaadar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -425,6 +506,10 @@ public class StreamPrimitives {
   public static class Scaaddr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scaaddr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scaaddr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -443,6 +528,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scadaar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scadaar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -459,6 +548,10 @@ public class StreamPrimitives {
   public static class Scadadr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scadadr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scadadr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -477,6 +570,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scaddar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scaddar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -493,6 +590,10 @@ public class StreamPrimitives {
   public static class Scadddr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scadddr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scadddr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -511,6 +612,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scdaaar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scdaaar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -527,6 +632,10 @@ public class StreamPrimitives {
   public static class Scdaadr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scdaadr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scdaadr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -545,6 +654,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scdadar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scdadar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -561,6 +674,10 @@ public class StreamPrimitives {
   public static class Scdaddr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scdaddr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scdaddr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -579,6 +696,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scddaar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scddaar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -595,6 +716,10 @@ public class StreamPrimitives {
   public static class Scddadr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scddadr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scddadr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -613,6 +738,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "scdddar";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scdddar"),new Symbol("<stream-pair>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -629,6 +758,10 @@ public class StreamPrimitives {
   public static class Scddddr extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "scddddr";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("scddddr"),new Symbol("<stream-pair>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -649,6 +782,10 @@ public class StreamPrimitives {
   public static class ConvertStreamToList extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "stream->list";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stream->list"),new Symbol("<stream>"),new Symbol("<list-length>"));
     }
 
     public static boolean isValidStreamIndex(Datum i) {
@@ -690,6 +827,10 @@ public class StreamPrimitives {
       return "stream-val";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-val"),new Symbol("<stream>"),new Symbol("<index>"));
+    }
+
     private static Trampoline.Bounce logic(Datum s, int idx, Trampoline.Continuation continuation) throws Exception {
       if(idx <= 0) return Scar.logic(s,continuation);
       return Scdr.logic(s,(scdrValue) -> () -> logic(scdrValue,idx-1,continuation));
@@ -725,6 +866,10 @@ public class StreamPrimitives {
       return "stream-map";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-map"),new Symbol("<callable>"),new Symbol("<stream>"),Signature.VARIADIC);
+    }
+
     public static Datum compiledAtom(Datum atom) {
       return Pair.List(CorePrimitives.BYTECODE,Pair.List(CorePrimitives.LOAD,atom));
     }
@@ -758,6 +903,10 @@ public class StreamPrimitives {
   public static class StreamFilter extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "stream-filter";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-filter"),new Symbol("<keep?-callable>"),new Symbol("<stream>"));
     }
 
     private Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum c, Datum compiledCallable, Datum stream, Trampoline.Continuation continuation) throws Exception {
@@ -806,6 +955,10 @@ public class StreamPrimitives {
       return "stream-iterate";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-iterate"),new Symbol("<update-callable>"),new Symbol("<obj>"));
+    }
+
     private Datum logic(ArrayList<Datum> parameters, Datum c, Datum seed) throws Exception {
       Datum compiledCallable = StreamMap.compiledAtom(c);
       Datum compiledSeed = StreamMap.compiledAtom(seed);
@@ -842,6 +995,10 @@ public class StreamPrimitives {
       return "escm-stream-constant";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-stream-constant"),new Symbol("<obj>"),Signature.VARIADIC);
+    }
+
     public static Datum logic(Environment env, Datum originalObjs, Datum objs) throws Exception {
       if(!(objs instanceof Pair)) return logic(env,originalObjs,originalObjs);
       Pair objsP = (Pair)objs;
@@ -861,6 +1018,10 @@ public class StreamPrimitives {
   public static class StreamConstant extends Primitive {
     public java.lang.String escmName() {
       return "stream-constant";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-constant"),new Symbol("<obj>"),Signature.VARIADIC);
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -885,6 +1046,10 @@ public class StreamPrimitives {
   public static class StreamAppend extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "stream-append";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-append"),new Symbol("<stream>"),new Symbol("<stream>"),Signature.VARIADIC);
     }
 
     private Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum s, Datum streams, Trampoline.Continuation continuation) throws Exception {
@@ -927,6 +1092,10 @@ public class StreamPrimitives {
       return "stream-interleave";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-interleave"),new Symbol("<stream1>"),new Symbol("<stream2>"));
+    }
+
     private Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum stream1, Datum stream2, Trampoline.Continuation continuation) throws Exception {
       if(!(stream1 instanceof Pair)) return continuation.run(stream2);
       if(!IsStreamP.logic(stream1))
@@ -963,6 +1132,10 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "stream->generator";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stream->generator"),new Symbol("<stream>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1) 
@@ -998,6 +1171,10 @@ public class StreamPrimitives {
       return "stream-member";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-member"),new Symbol("<obj>"),new Symbol("<stream>"));
+    }
+
     private static Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum obj, Datum stream, Trampoline.Continuation continuation) throws Exception {
       if(!IsStreamP.logic(stream))
         throw new Exceptionf("'(stream-member <obj> <stream>) invalid <stream>: %s", Exceptionf.profileArgs(parameters));
@@ -1030,6 +1207,10 @@ public class StreamPrimitives {
       return "stream-memq";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-memq"),new Symbol("<obj>"),new Symbol("<stream>"));
+    }
+
     private static Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum obj, Datum stream, Trampoline.Continuation continuation) throws Exception {
       if(!IsStreamP.logic(stream))
         throw new Exceptionf("'(stream-memq <obj> <stream>) invalid <stream>: %s", Exceptionf.profileArgs(parameters));
@@ -1058,6 +1239,10 @@ public class StreamPrimitives {
   public static class StreamTake extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "stream-take";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-take"),new Symbol("<stream>"),new Symbol("<length>"));
     }
 
     public static Trampoline.Bounce logic(String sig, ArrayList<Datum> parameters, Environment env, Datum stream, int length, Trampoline.Continuation continuation) throws Exception {
@@ -1096,6 +1281,10 @@ public class StreamPrimitives {
   public static class StreamTakeWhile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "stream-take-while";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-take-while"),new Symbol("<continue?-callable>"),new Symbol("<stream>"));
     }
 
     public static Trampoline.Bounce logic(String sig, ArrayList<Datum> parameters, Environment env, Datum contPred, Datum stream, Trampoline.Continuation continuation) throws Exception {
@@ -1145,6 +1334,10 @@ public class StreamPrimitives {
       return "stream-drop";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-drop"),new Symbol("<stream>"),new Symbol("<length>"));
+    }
+
     public static Trampoline.Bounce logic(String sig, ArrayList<Datum> parameters, Datum stream, int length, Trampoline.Continuation continuation) throws Exception {
       if(!IsStreamP.logic(stream))
         throw new Exceptionf("'%s invalid <stream>: %s", sig, Exceptionf.profileArgs(parameters));
@@ -1176,6 +1369,10 @@ public class StreamPrimitives {
   public static class StreamDropWhile extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "stream-drop-while";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-drop-while"),new Symbol("<continue?-callable>"),new Symbol("<stream>"));
     }
 
     public static Trampoline.Bounce logic(String sig, ArrayList<Datum> parameters, Datum contPred, Datum stream, Trampoline.Continuation continuation) throws Exception {
@@ -1219,6 +1416,13 @@ public class StreamPrimitives {
     public java.lang.String escmName() {
       return "stream-slice";
     }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("stream-slice"),new Symbol("<index>")),
+        Pair.List(new Symbol("stream-slice"),new Symbol("<index>"),new Symbol("<length>")),
+        Pair.List(new Symbol("stream-slice"),new Symbol("<index>"),new Symbol("<continue?-callable>")));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() < 2 || parameters.size() > 3) 
@@ -1259,6 +1463,10 @@ public class StreamPrimitives {
   public static class StreamUnfold extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "stream-unfold";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-unfold"),new Symbol("<break?-callable>"),new Symbol("<mapper-callable>"),new Symbol("<update-callable>"),new Symbol("<seed>"));
     }
 
     private Trampoline.Bounce logic(Datum breakCond, Datum mapper, Datum successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
@@ -1307,6 +1515,10 @@ public class StreamPrimitives {
   public static class StreamUnfoldStar extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "stream-unfolds";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("stream-unfold"),new Symbol("<mapper-callable>"),new Symbol("<update-callable>"),new Symbol("<seed>"));
     }
 
     private Trampoline.Bounce logic(Datum mapper, Datum successor, Datum seed, Trampoline.Continuation continuation) throws Exception {

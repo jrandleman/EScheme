@@ -1,16 +1,17 @@
-// Author: Jordan Randleman - escm.vm.type.OrderedCollection
+// Author: Jordan Randleman - escm.vm.type.collection.OrderedCollection
 // Purpose:
 //    Primitive interface that all ordered core containers must implement
 //    to be used by the ordered container primitives.
 
-package escm.vm.type;
+package escm.vm.type.collection;
 import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Void;
 import escm.type.bool.Boolean;
 import escm.util.Pair;
-import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
+import escm.util.error.Exceptionf;
+import escm.vm.type.callable.Callable;
 
 public interface OrderedCollection extends AssociativeCollection {
   //////////////////////////////////////////////////////////////////////

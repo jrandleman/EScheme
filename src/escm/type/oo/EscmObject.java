@@ -1,6 +1,6 @@
 // Author: Jordan Randleman - escm.type.oo.EscmObject
 // Purpose:
-//    Escm Object class, implements "escm.vm.type.Callable" to allow application overloading!
+//    Escm Object class, implements "escm.vm.type.callable.Callable" to allow application overloading!
 //    Create an object instance by invoking <callWith()> on an <EscmClass>.
 //
 // Includes:
@@ -18,7 +18,7 @@ import escm.util.error.Exceptionf;
 import escm.type.Datum;
 import escm.type.bool.Boolean;
 import escm.type.procedure.MethodProcedure;
-import escm.vm.type.Callable;
+import escm.vm.type.callable.Callable;
 
 public class EscmObject extends MetaObject implements Callable {
   ////////////////////////////////////////////////////////////////////////////
@@ -64,6 +64,17 @@ public class EscmObject extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Functor Logic (Application Overload)
+  public Datum signature() {
+    try {
+      if(!has("->procedure")) return Boolean.FALSE;
+      Datum procedure = get("->procedure");
+      if(!(procedure instanceof MethodProcedure)) return Boolean.FALSE;
+      return ((MethodProcedure)procedure).signature();
+    } catch(Exception t) {
+      return Boolean.FALSE;
+    }
+  }
+
   public Trampoline.Bounce callWith(ArrayList<Datum> args, Trampoline.Continuation continuation) throws Exception {
     if(!has("->procedure"))
       throw new Exceptionf("Object of class %s error: can't be applied without a \"->procedure\" method!", escmClass.readableName());

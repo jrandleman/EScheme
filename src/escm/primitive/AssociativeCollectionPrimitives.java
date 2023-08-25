@@ -14,11 +14,12 @@ import escm.type.number.Exact;
 import escm.type.number.Real;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
-import escm.vm.type.AssociativeCollection;
-import escm.vm.type.OrderedCollection;
-import escm.vm.type.Callable;
-import escm.vm.type.Primitive;
-import escm.vm.type.PrimitiveCallable;
+import escm.vm.type.collection.AssociativeCollection;
+import escm.vm.type.collection.OrderedCollection;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
+import escm.vm.type.callable.Signature;
 
 public class AssociativeCollectionPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -26,6 +27,10 @@ public class AssociativeCollectionPrimitives {
   public static class IsAssociativeCollection extends Primitive {
     public java.lang.String escmName() {
       return "associative-collection?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("associative-collection?"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -42,6 +47,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "head";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("head"),new Symbol("<associative-collection>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
@@ -56,6 +65,10 @@ public class AssociativeCollectionPrimitives {
   public static class Tail extends Primitive {
     public java.lang.String escmName() {
       return "tail";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("tail"),new Symbol("<associative-collection>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -72,6 +85,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "empty?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("empty?"),new Symbol("<associative-collection>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
@@ -86,6 +103,10 @@ public class AssociativeCollectionPrimitives {
   public static class Length extends Primitive {
     public java.lang.String escmName() {
       return "length";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("length"),new Symbol("<associative-collection>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -105,6 +126,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "length+";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("length+"),new Symbol("<associative-collection>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
@@ -121,6 +146,10 @@ public class AssociativeCollectionPrimitives {
   public static class Fold extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "fold";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("fold"),new Symbol("<callable>"),new Symbol("<seed>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -147,6 +176,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "map";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("map"),new Symbol("<callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       int n = parameters.size();
@@ -171,6 +204,10 @@ public class AssociativeCollectionPrimitives {
   public static class ForEach extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "for-each";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("for-each"),new Symbol("<callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -197,6 +234,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "filter";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("filter"),new Symbol("<keep?-callable>"),new Symbol("<associative-collection>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2) 
@@ -215,6 +256,10 @@ public class AssociativeCollectionPrimitives {
   public static class Count extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "count";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("count"),new Symbol("<callable>"),new Symbol("<associative-collection>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -235,6 +280,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "remove";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("remove"),new Symbol("<callable>"),new Symbol("<associative-collection>"));
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2) 
@@ -254,6 +303,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "val";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("val"),new Symbol("<associative-collection>"),new Symbol("<key>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
@@ -270,6 +323,10 @@ public class AssociativeCollectionPrimitives {
   public static class Key extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "key";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("key"),new Symbol("<callable>"),new Symbol("<associative-collection>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -289,6 +346,16 @@ public class AssociativeCollectionPrimitives {
   public static class Append extends Primitive {
     public java.lang.String escmName() {
       return "append";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("append")),
+        Pair.List(new Symbol("append"),new Symbol("<obj>")),
+        Pair.List(new Symbol("append"),new Symbol("<symbol>"),Signature.VARIADIC),
+        Pair.List(new Symbol("append"),new Symbol("<keyword>"),Signature.VARIADIC),
+        Pair.List(new Symbol("append"),new Symbol("<list>"),Signature.VARIADIC,new Symbol("<obj>")),
+        Pair.List(new Symbol("append"),new Symbol("<associative-collection>"),Signature.VARIADIC));
     }
 
     private static Symbol appendSymbols(ArrayList<Datum> parameters) throws Exception {
@@ -376,6 +443,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "delete";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("delete"),new Symbol("<associative-collection>"),new Symbol("<key>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
@@ -392,6 +463,12 @@ public class AssociativeCollectionPrimitives {
   public static class Conj extends Primitive {
     public java.lang.String escmName() {
       return "conj";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("conj"),new Symbol("<value>"),new Symbol("<associative-collection>")),
+        Pair.List(new Symbol("conj"),new Symbol("<key>"),new Symbol("<value>"),new Symbol("<associative-collection>")));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -415,6 +492,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "take";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("take"),new Symbol("<associative-collection>"),new Symbol("<length>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
@@ -434,6 +515,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "drop";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("drop"),new Symbol("<associative-collection>"),new Symbol("<length>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
@@ -452,6 +537,10 @@ public class AssociativeCollectionPrimitives {
   public static class AnyP extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "any?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("any?"),new Symbol("<callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
     }
 
     private Trampoline.Bounce iter(Callable predicate, ArrayList<Datum> parameters, int i, int n, Trampoline.Continuation continuation) throws Exception {
@@ -482,6 +571,10 @@ public class AssociativeCollectionPrimitives {
       return "every?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("every?"),new Symbol("<callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
+    }
+
     private Trampoline.Bounce iter(Callable predicate, ArrayList<Datum> parameters, int i, int n, Trampoline.Continuation continuation) throws Exception {
       if(i >= n) return continuation.run(Boolean.TRUE);
       ArrayList<Datum> args = new ArrayList<Datum>();
@@ -509,6 +602,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "ac->string";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("ac->string"),new Symbol("<associative-collection>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
@@ -523,6 +620,10 @@ public class AssociativeCollectionPrimitives {
   public static class ACToList extends Primitive {
     public java.lang.String escmName() {
       return "ac->list";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("ac->list"),new Symbol("<associative-collection>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -539,6 +640,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "ac->vector";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("ac->vector"),new Symbol("<associative-collection>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
@@ -554,6 +659,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "ac->hashmap";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("ac->hashmap"),new Symbol("<associative-collection>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
@@ -568,6 +677,10 @@ public class AssociativeCollectionPrimitives {
   public static class Union extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "union";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("union"),new Symbol("<elt=?-callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -589,6 +702,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "intersection";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("intersection"),new Symbol("<elt=?-callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() < 2) 
@@ -609,6 +726,10 @@ public class AssociativeCollectionPrimitives {
     public java.lang.String escmName() {
       return "difference";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("difference"),new Symbol("<elt=?-callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() < 2) 
@@ -628,6 +749,10 @@ public class AssociativeCollectionPrimitives {
   public static class SymmetricDifference extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "symmetric-difference";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("symmetric-difference"),new Symbol("<elt=?-callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

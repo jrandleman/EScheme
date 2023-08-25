@@ -15,6 +15,7 @@ import escm.util.error.TopLevelError;
 import escm.vm.Assembler;
 import escm.vm.Compiler;
 import escm.vm.Interpreter;
+import escm.vm.type.callable.Callable;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.Environment;
 import escm.vm.runtime.EscmCallStack;
@@ -269,24 +270,29 @@ public class Main {
   public static void main(String[] args) {
     escm.type.concurrent.Thread mainThread = new escm.type.concurrent.Thread(
       "escm-main",
-      (params, cont) -> {
-        ParsedCommandLine parsedCmdLine = parseCommandLine(args);
-        try {
-          if(parsedCmdLine.generateJavaStdLibLoader == true) {
-            generateJavaStdLibLoader();
-          } else if(parsedCmdLine.executeUnitTests == true) {
-            executeUnitTests();
-          } else if(parsedCmdLine.scriptName == null) {
-            GlobalState.inREPL = true; // trigger exit message to be printed
-            launchRepl(parsedCmdLine.launchingQuiet,GlobalState.getDefaultEnvironment());
-          } else {
-            launchScript(parsedCmdLine);
-          }
-        } catch(Throwable t) {
-          TopLevelError.report(t);
-          System.exit(1);
+      new Callable() {
+        public Datum signature() {
+          return Pair.List(new Symbol(escm.type.concurrent.Thread.DEFAULT_RUNNABLE_NAME));
         }
-        return cont.run(escm.type.Void.VALUE);
+        public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+          ParsedCommandLine parsedCmdLine = parseCommandLine(args);
+          try {
+            if(parsedCmdLine.generateJavaStdLibLoader == true) {
+              generateJavaStdLibLoader();
+            } else if(parsedCmdLine.executeUnitTests == true) {
+              executeUnitTests();
+            } else if(parsedCmdLine.scriptName == null) {
+              GlobalState.inREPL = true; // trigger exit message to be printed
+              launchRepl(parsedCmdLine.launchingQuiet,GlobalState.getDefaultEnvironment());
+            } else {
+              launchScript(parsedCmdLine);
+            }
+          } catch(Throwable t) {
+            TopLevelError.report(t);
+            System.exit(1);
+          }
+          return cont.run(escm.type.Void.VALUE);
+        }
       }
     );
     mainThread.start();

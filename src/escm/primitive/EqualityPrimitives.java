@@ -5,9 +5,12 @@
 package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
+import escm.type.Pair;
+import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.util.error.Exceptionf;
-import escm.vm.type.Primitive;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.callable.Signature;
 
 public class EqualityPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -15,6 +18,10 @@ public class EqualityPrimitives {
   public static class IsEq extends Primitive {
     public java.lang.String escmName() {
       return "eq?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("eq?"),new Symbol("<obj>"),Signature.VARIADIC);
     }
 
     public static Datum logic(ArrayList<Datum> parameters) {
@@ -36,6 +43,10 @@ public class EqualityPrimitives {
   public static class IsEqual extends Primitive {
     public java.lang.String escmName() {
       return "equal?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("equal?"),new Symbol("<obj>"),Signature.VARIADIC);
     }
 
     public static Datum logic(ArrayList<Datum> parameters) {

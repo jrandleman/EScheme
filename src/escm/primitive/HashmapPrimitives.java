@@ -6,11 +6,14 @@ package escm.primitive;
 import java.util.ArrayList;
 import java.util.Objects;
 import escm.type.Datum;
-import escm.type.bool.Boolean;
+import escm.type.Pair;
+import escm.type.Symbol;
 import escm.type.Void;
+import escm.type.bool.Boolean;
 import escm.type.number.Exact;
 import escm.util.error.Exceptionf;
-import escm.vm.type.Primitive;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.callable.Signature;
 
 public class HashmapPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -18,6 +21,10 @@ public class HashmapPrimitives {
   public static class Hashmap extends Primitive {
     public java.lang.String escmName() {
       return "hashmap";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("hashmap"),new Symbol("<key>"),new Symbol("<value>"),Signature.VARIADIC);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -39,6 +46,10 @@ public class HashmapPrimitives {
       return "hashmap-keys";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("hashmap-keys"),new Symbol("<hashmap>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Hashmap))
         throw new Exceptionf("'(hashmap-keys <hashmap>) didn't receive exactly 1 hashmap: %s", Exceptionf.profileArgs(parameters));
@@ -54,6 +65,10 @@ public class HashmapPrimitives {
       return "hashmap-values";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("hashmap-values"),new Symbol("<hashmap>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Hashmap))
         throw new Exceptionf("'(hashmap-values <hashmap>) didn't receive exactly 1 hashmap: %s", Exceptionf.profileArgs(parameters));
@@ -67,6 +82,10 @@ public class HashmapPrimitives {
   public static class IsHashmapKey extends Primitive {
     public java.lang.String escmName() {
       return "hashmap-key?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("hashmap-key?"),new Symbol("<hashmap>"),new Symbol("<obj>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -87,6 +106,10 @@ public class HashmapPrimitives {
       return "hashmap-val?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("hashmap-val?"),new Symbol("<hashmap>"),new Symbol("<obj>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(hashmap-val? <hashmap> <obj>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -103,6 +126,10 @@ public class HashmapPrimitives {
   public static class HashmapSetBang extends Primitive {
     public java.lang.String escmName() {
       return "hashmap-set!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("hashmap-set!"),new Symbol("<hashmap>"),new Symbol("<key>"),new Symbol("<obj>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -123,6 +150,10 @@ public class HashmapPrimitives {
       return "hashmap-delete!";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("hashmap-delete!"),new Symbol("<hashmap>"),new Symbol("<key>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(hashmap-delete! <hashmap> <key>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -139,6 +170,10 @@ public class HashmapPrimitives {
   public static class HashmapMerge extends Primitive {
     public java.lang.String escmName() {
       return "hashmap-merge";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("hashmap-merge"),new Symbol("<hashmap>"),Signature.VARIADIC);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -160,6 +195,10 @@ public class HashmapPrimitives {
   public static class HashmapMergeBang extends Primitive {
     public java.lang.String escmName() {
       return "hashmap-merge!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("hashmap-merge!"),new Symbol("<hashmap>"),Signature.VARIADIC);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -188,6 +227,10 @@ public class HashmapPrimitives {
       return "hashmap?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("hashmap?"),new Symbol("<obj>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1)
         throw new Exceptionf("'(hashmap? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -201,6 +244,10 @@ public class HashmapPrimitives {
   public static class Hashcode extends Primitive {
     public java.lang.String escmName() {
       return "hashcode";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("hashcode"),new Symbol("<obj>"),Signature.VARIADIC);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

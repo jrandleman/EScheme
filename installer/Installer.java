@@ -346,10 +346,10 @@ public class Installer {
     javaStdlibLoader.append("import java.nio.file.Files;\n");
     javaStdlibLoader.append("import java.nio.file.Path;\n");
     javaStdlibLoader.append("import escm.util.error.Exceptionf;\n");
-    javaStdlibLoader.append("import escm.vm.type.Primitive;\n");
-    javaStdlibLoader.append("import escm.vm.type.PrimitiveCallable;\n");
-    javaStdlibLoader.append("import escm.vm.type.PrimitiveSyntax;\n");
-    javaStdlibLoader.append("import escm.vm.type.PrimitiveSyntaxCallable;\n");
+    javaStdlibLoader.append("import escm.vm.type.primitive.Primitive;\n");
+    javaStdlibLoader.append("import escm.vm.type.primitive.PrimitiveCallable;\n");
+    javaStdlibLoader.append("import escm.vm.type.primitive.PrimitiveSyntax;\n");
+    javaStdlibLoader.append("import escm.vm.type.primitive.PrimitiveSyntaxCallable;\n");
     for(String prmFileName : prmFileNames) {
       javaStdlibLoader.append("import escm.primitive."+prmFileName+";\n");
     }
@@ -395,10 +395,10 @@ public class Installer {
     javaStdlibLoader.append("    sb.append(\"\\n\");\n");
     javaStdlibLoader.append("    sb.append(\"package escm.vm.runtime.installerGenerated;\\n\");\n");
     javaStdlibLoader.append("    sb.append(\"import escm.type.Symbol;\\n\");\n");
-    javaStdlibLoader.append("    sb.append(\"import escm.vm.type.Primitive;\\n\");\n");
-    javaStdlibLoader.append("    sb.append(\"import escm.vm.type.PrimitiveCallable;\\n\");\n");
-    javaStdlibLoader.append("    sb.append(\"import escm.vm.type.PrimitiveSyntax;\\n\");\n");
-    javaStdlibLoader.append("    sb.append(\"import escm.vm.type.PrimitiveSyntaxCallable;\\n\");\n");
+    javaStdlibLoader.append("    sb.append(\"import escm.vm.type.primitive.Primitive;\\n\");\n");
+    javaStdlibLoader.append("    sb.append(\"import escm.vm.type.primitive.PrimitiveCallable;\\n\");\n");
+    javaStdlibLoader.append("    sb.append(\"import escm.vm.type.primitive.PrimitiveSyntax;\\n\");\n");
+    javaStdlibLoader.append("    sb.append(\"import escm.vm.type.primitive.PrimitiveSyntaxCallable;\\n\");\n");
     javaStdlibLoader.append("    sb.append(\"import escm.vm.util.Environment;\\n\");\n");
     javaStdlibLoader.append("    sb.append(\"\\n\");\n");
     javaStdlibLoader.append("    sb.append(\"public class JavaStdLibLoader {\\n\");\n");

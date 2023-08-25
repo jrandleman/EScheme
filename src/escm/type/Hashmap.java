@@ -39,8 +39,8 @@ import escm.type.number.Real;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.util.ExecutionState;
-import escm.vm.type.AssociativeCollection;
-import escm.vm.type.Callable;
+import escm.vm.type.collection.AssociativeCollection;
+import escm.vm.type.callable.Callable;
 
 public class Hashmap extends Datum implements AssociativeCollection, Callable {
   ////////////////////////////////////////////////////////////////////////////
@@ -162,6 +162,10 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Callable (unary key getter)
+  public Datum signature() {
+    return Pair.List(this,new Symbol("<key>"));
+  }
+
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
     if(arguments.size() != 1)
       throw new Exceptionf("HASHMAP [CALLABLE-GET]: Expects exactly 1 key arg for hashmap %s: %s", write(), Exceptionf.profileArgs(arguments));

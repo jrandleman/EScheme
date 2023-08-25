@@ -24,9 +24,11 @@ import escm.type.procedure.Procedure;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.vm.Compiler;
 import escm.vm.util.Environment;
-import escm.vm.type.OrderedCollection;
-import escm.vm.type.PrimitiveSyntax;
-import escm.vm.type.PrimitiveSyntaxCallable;
+import escm.vm.type.collection.OrderedCollection;
+import escm.vm.type.primitive.PrimitiveSyntax;
+import escm.vm.type.primitive.PrimitiveSyntaxCallable;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.callable.Signature;
 import escm.primitive.MetaPrimitives;
 
 public class CorePrimitives {
@@ -103,6 +105,10 @@ public class CorePrimitives {
     public java.lang.String escmName() {
       return "quote";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("quote"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
@@ -125,6 +131,10 @@ public class CorePrimitives {
   public static class DefineSyntax extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "define-syntax";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("define-syntax"),new Symbol("<name>"),new Symbol("<callable>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -191,6 +201,22 @@ public class CorePrimitives {
   public static class Fn extends PrimitiveSyntaxCallable {
     public java.lang.String escmName() {
       return "fn";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("fn"),
+              Pair.List(Pair.List(),new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(new Symbol("<variadic-parameter>"),new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,new Symbol("."),new Symbol("<variadic-parameter>")),new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
+                                  Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC),
+                new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
+                                  Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC,
+                                  new Symbol("."),new Symbol("<variadic-parameter>")),
+                new Symbol("<body>"),Signature.VARIADIC),
+              Signature.VARIADIC);
     }
 
     private static class PairBox {
@@ -390,6 +416,31 @@ public class CorePrimitives {
       return "lambda";
     }
 
+    public Datum signature() {
+      return Pair.List(
+              Pair.List(new Symbol("lambda"),
+                Pair.List(),
+                new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(new Symbol("lambda"),
+                new Symbol("<variadic-parameter>"),
+                new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(new Symbol("lambda"),
+                Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),
+                new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(new Symbol("lambda"),
+                Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,new Symbol("."),new Symbol("<variadic-parameter>")),
+                new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(new Symbol("lambda"),
+                Pair.List(new Symbol("<param>"),Signature.VARIADIC,
+                          Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC),
+                new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(new Symbol("lambda"),
+                Pair.List(new Symbol("<param>"),Signature.VARIADIC,
+                          Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC,
+                          new Symbol("."),new Symbol("<variadic-parameter>")),
+                new Symbol("<body>"),Signature.VARIADIC));
+    }
+
     public static Datum getAllExpressionsAfter(ArrayList<Datum> parameters, int startingIdx) {
       Datum body = Nil.VALUE;
       for(int i = parameters.size()-1; i > startingIdx; --i) {
@@ -465,6 +516,12 @@ public class CorePrimitives {
       return "if";
     }
 
+    public Datum signature() {
+      return Pair.List(
+              Pair.List(new Symbol("if"),new Symbol("<condition>"),new Symbol("<consequence>")),
+              Pair.List(new Symbol("if"),new Symbol("<condition>"),new Symbol("<consequence>"),new Symbol("<alternative>")));
+    }
+
     private Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum condition, Datum consequence, Datum alternative, Trampoline.Continuation continuation) throws Exception {
       return Compiler.run(condition,this.definitionEnvironment,(compiledCondition) -> () -> {
         return Compiler.run(consequence,this.definitionEnvironment,(compiledConsequence) -> () -> {
@@ -506,6 +563,10 @@ public class CorePrimitives {
       return "begin";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("begin"),new Symbol("<expression>"),Signature.VARIADIC);
+    }
+
     private Trampoline.Bounce iterate(ArrayList<Datum> parameters, int i, Datum compiledExpressions, Trampoline.Continuation continuation) throws Exception {
       if(i < 0) return continuation.run(new Pair(BYTECODE,compiledExpressions));
       return Compiler.run(parameters.get(i),this.definitionEnvironment,(compiledExpression) -> () -> {
@@ -531,6 +592,10 @@ public class CorePrimitives {
   public static class SetBang extends PrimitiveSyntaxCallable {
     public java.lang.String escmName() {
       return "set!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("set!"),new Symbol("<symbol>"),new Symbol("<obj>"));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -569,6 +634,12 @@ public class CorePrimitives {
   public static class Define extends PrimitiveSyntaxCallable {
     public java.lang.String escmName() {
       return "define";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("define"),new Symbol("<symbol>"),new Symbol("<obj>")),
+        Pair.List(new Symbol("define"),Pair.List(new Symbol("<function-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC));
     }
 
     private Trampoline.Bounce compileSimpleDefine(Datum bindings, Datum value, Trampoline.Continuation continuation) throws Exception {
@@ -611,6 +682,10 @@ public class CorePrimitives {
     public java.lang.String escmName() {
       return "defined?";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("defined?"),new Symbol("<symbol>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol))
@@ -629,6 +704,22 @@ public class CorePrimitives {
   public static class Defn extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "defn";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("defn"),new Symbol("<function-name>"),
+              Pair.List(Pair.List(),new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(new Symbol("<variadic-parameter>"),new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,new Symbol("."),new Symbol("<variadic-parameter>")),new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
+                                  Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC),
+                new Symbol("<body>"),Signature.VARIADIC),
+              Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
+                                  Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC,
+                                  new Symbol("."),new Symbol("<variadic-parameter>")),
+                new Symbol("<body>"),Signature.VARIADIC),
+              Signature.VARIADIC);
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -659,6 +750,10 @@ public class CorePrimitives {
     public java.lang.String escmName() {
       return "and";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("and"),new Symbol("<obj>"),Signature.VARIADIC);
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
@@ -686,6 +781,10 @@ public class CorePrimitives {
   public static class Or extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "or";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("or"),new Symbol("<obj>"),Signature.VARIADIC);
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -720,6 +819,10 @@ public class CorePrimitives {
       return "delay";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("delay"),new Symbol("<obj>"));
+    }
+
     private static class DatumBox {
       private Datum value = Boolean.FALSE;
       public synchronized Datum value() {return value;}
@@ -735,13 +838,18 @@ public class CorePrimitives {
     public static Datum valueOf(Datum delayedCode, Environment env) throws Exception {
       DatumBox result = new DatumBox();
       BooleanBox isForced = new BooleanBox();
-      return new PrimitiveProcedure(Procedure.DEFAULT_NAME,(params, cont) -> {
-        if(isForced.value()) return cont.run(result.value());
-        return MetaPrimitives.Eval.logic(delayedCode,env,(codeResult) -> () -> {
-          result.setValue(codeResult);
-          isForced.setValue(true);
-          return cont.run(codeResult);
-        });
+      return new PrimitiveProcedure(Procedure.DEFAULT_NAME,new Callable() {
+        public Datum signature() {
+          return Pair.List(new Symbol(Procedure.DEFAULT_NAME));
+        }
+        public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+          if(isForced.value()) return cont.run(result.value());
+          return MetaPrimitives.Eval.logic(delayedCode,env,(codeResult) -> () -> {
+            result.setValue(codeResult);
+            isForced.setValue(true);
+            return cont.run(codeResult);
+          });
+        }
       });
     }
 
@@ -791,6 +899,14 @@ public class CorePrimitives {
   public static class Cond extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "cond";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("cond"),
+              Pair.List(new Symbol("<condition>"),new Symbol("<expr>"),Signature.VARIADIC),
+              Pair.List(new Symbol("<condition>"),new Symbol("=>"),new Symbol("<callable>")),
+              Pair.List(new Symbol("else"),new Symbol("<expr>"),Signature.VARIADIC),
+              Signature.VARIADIC);
     }
 
     private static Datum makeCondition(Datum condition) {
@@ -859,6 +975,16 @@ public class CorePrimitives {
   public static class Let extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "let";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("let"),
+          Pair.List(Pair.List(new Symbol("<symbol>"),new Symbol("<obj>")),Signature.VARIADIC),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("let"),new Symbol("<function-name>"),
+          Pair.List(Pair.List(new Symbol("<parameter>"),new Symbol("<initial-value>")),Signature.VARIADIC),
+          new Symbol("<body>"),Signature.VARIADIC));
     }
 
     private static escm.util.Pair<Datum,Datum> getParamsAndArgs(Datum bindings, ArrayList<Datum> parameters) throws Exception {
@@ -984,6 +1110,10 @@ public class CorePrimitives {
       return "quasiquote";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("quasiquote"),new Symbol("<obj>"));
+    }
+
     private static boolean isTaggedList(Pair lst, Symbol tag) {
       return lst.car().eq(tag) && !(lst.cdr() instanceof Nil);
     }
@@ -1107,6 +1237,14 @@ public class CorePrimitives {
       return "case";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("case"),new Symbol("<value>"),
+              Pair.List(Pair.List(new Symbol("<key>"),Signature.VARIADIC),new Symbol("<expr>"),Signature.VARIADIC),
+              Pair.List(Pair.List(new Symbol("<key>"),Signature.VARIADIC),new Symbol("=>"),new Symbol("<callable>")),
+              Pair.List(new Symbol("else"),new Symbol("<expr>"),Signature.VARIADIC),
+              Signature.VARIADIC);
+    }
+
     private static Datum restOfClause(Pair clause) throws Exception {
       if(Cond.isArrowClause(clause)) {
         return clause.cdr();
@@ -1154,6 +1292,12 @@ public class CorePrimitives {
       return "let*";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("let*"),
+        Pair.List(Pair.List(new Symbol("<symbol>"),new Symbol("<obj>")),Signature.VARIADIC),
+        new Symbol("<body>"),Signature.VARIADIC);
+    }
+
     private static Datum generateNestedLambdaCalls(Symbol baseLetSymbol, Datum bindings, Datum internalLet, ArrayList<Datum> parameters) throws Exception {
       if(!(bindings instanceof Pair)) return internalLet;
       Pair p = (Pair)bindings;
@@ -1190,6 +1334,12 @@ public class CorePrimitives {
   public static class LetRec extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "letrec";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("letrec"),
+        Pair.List(Pair.List(new Symbol("<symbol>"),new Symbol("<obj>")),Signature.VARIADIC),
+        new Symbol("<body>"),Signature.VARIADIC);
     }
 
     private static escm.util.Pair<Datum,Datum> getParamsDefaultAndActualSettings(Datum bindings, ArrayList<Datum> parameters) throws Exception {
@@ -1237,6 +1387,12 @@ public class CorePrimitives {
       return "letrec*";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("letrec*"),
+        Pair.List(Pair.List(new Symbol("<symbol>"),new Symbol("<obj>")),Signature.VARIADIC),
+        new Symbol("<body>"),Signature.VARIADIC);
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       return LetStar.logic("letrec*",LETREC,parameters);
     }
@@ -1254,6 +1410,10 @@ public class CorePrimitives {
   public static class Unless extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "unless";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("unless"),new Symbol("<body>"),Signature.VARIADIC);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1275,6 +1435,10 @@ public class CorePrimitives {
   public static class When extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "when";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("when"),new Symbol("<body>"),Signature.VARIADIC);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1306,6 +1470,16 @@ public class CorePrimitives {
   public static class While extends PrimitiveSyntaxCallable {
     public java.lang.String escmName() {
       return "while";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("while"),
+          Pair.List(new Symbol("<condition>")),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("while"),
+          Pair.List(new Symbol("<condition>"),new Symbol("<return-expr>"),Signature.VARIADIC),
+          new Symbol("<body>"),Signature.VARIADIC));
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -1362,6 +1536,30 @@ public class CorePrimitives {
   public static class Do extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "do";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("do"),
+          Pair.List(),
+          Pair.List()
+          ,new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("do"),
+          Pair.List(Pair.List(new Symbol("<var>"),new Symbol("<initial-value>")),Signature.VARIADIC),
+          Pair.List(),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("do"),
+          Pair.List(Pair.List(new Symbol("<var>"),new Symbol("<initial-value>"),new Symbol("<update-expression>")),Signature.VARIADIC),
+          Pair.List(),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("do"),
+          Pair.List(Pair.List(new Symbol("<var>"),new Symbol("<initial-value>"),new Symbol("<update-expression>")),Signature.VARIADIC),
+          Pair.List(new Symbol("<break-condition>")),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("do"),
+          Pair.List(Pair.List(new Symbol("<var>"),new Symbol("<initial-value>"),new Symbol("<update-expression>")),Signature.VARIADIC),
+          Pair.List(new Symbol("<break-condition>"),new Symbol("<return-expression>"),Signature.VARIADIC),
+          new Symbol("<body>"),Signature.VARIADIC));
     }
 
     private static escm.util.Pair<Datum,Datum> getVarsAndVals(Datum varBindings, ArrayList<Datum> parameters) throws Exception {
@@ -1449,6 +1647,10 @@ public class CorePrimitives {
     public java.lang.String escmName() {
       return "-<>";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("-<>"),new Symbol("<expression>"),Signature.VARIADIC);
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
@@ -1495,6 +1697,12 @@ public class CorePrimitives {
   public static class Curry extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "curry";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("curry"),
+        Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),
+        new Symbol("<body>"),Signature.VARIADIC);
     }
 
     private static Datum FA = Pair.List(new Symbol("f"),new Symbol("a"));
@@ -1548,6 +1756,12 @@ public class CorePrimitives {
   public static class LetValues extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "let-values";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("let-values"),
+        Pair.List(Pair.List(Pair.List(new Symbol("<variable>"),Signature.VARIADIC),new Symbol("<'values'-expression>")),Signature.VARIADIC),
+        new Symbol("<body>"),Signature.VARIADIC);
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1629,6 +1843,10 @@ public class CorePrimitives {
       return "escm-guard-aux";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-guard-aux"),new Symbol("<reraise>"),new Symbol("<expression>"),Signature.VARIADIC);
+    }
+
     public Datum parseElse(Pair bodyCar) throws Exception {
       return new Pair(BEGIN,bodyCar.cdr());
     }
@@ -1664,6 +1882,21 @@ public class CorePrimitives {
   public static class Guard extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "guard";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("guard"),
+                  Pair.List(new Symbol("<raised-var>"),
+                            Pair.List(new Symbol("<condition>"),new Symbol("<expression>"),Signature.VARIADIC),
+                            Signature.VARIADIC),
+                  new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("guard"),
+                  Pair.List(new Symbol("<raised-var>"),
+                            Pair.List(new Symbol("<condition>"),new Symbol("<expression>"),Signature.VARIADIC),
+                            Signature.VARIADIC,
+                            Pair.List(new Symbol("else"),new Symbol("<expression>"),Signature.VARIADIC)),
+                  new Symbol("<body>"),Signature.VARIADIC));
     }
 
     private static Symbol parseRaisedVar(Datum raisedVarAndClauses, ArrayList<Datum> parameters) throws Exception {
@@ -1718,6 +1951,10 @@ public class CorePrimitives {
     public java.lang.String escmName() {
       return "define-parameter";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("define-parameter"),new Symbol("<symbol>"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Symbol))
@@ -1736,6 +1973,10 @@ public class CorePrimitives {
   public static class SetParameterBang extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "set-parameter!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("set-parameter!"),new Symbol("<symbol>"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1756,6 +1997,10 @@ public class CorePrimitives {
     public java.lang.String escmName() {
       return "get-parameter";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("get-parameter"),new Symbol("<symbol>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol))
@@ -1774,6 +2019,10 @@ public class CorePrimitives {
   public static class IsParameterP extends PrimitiveSyntax {
     public java.lang.String escmName() {
       return "parameter?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("parameter?"),new Symbol("<symbol>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

@@ -13,6 +13,8 @@ import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import escm.type.Datum;
+import escm.type.Pair;
+import escm.type.Symbol;
 import escm.type.Void;
 import escm.type.bool.Boolean;
 import escm.type.port.Eof;
@@ -24,8 +26,8 @@ import escm.vm.Interpreter;
 import escm.vm.util.Instruction;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.Environment;
-import escm.vm.type.Primitive;
-import escm.vm.type.PrimitiveCallable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
 import escm.vm.runtime.GlobalState;
 import escm.primitive.lib.serialization.InstructionSet;
 
@@ -73,6 +75,10 @@ public class SerializationPrimitives {
       return "serialized?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("serialized?"),new Symbol("<file-path-string>"));
+    }
+
     private static boolean hasSerializationHeader(byte[] readHeader, int charsRead) {
       if(charsRead < SERIALIZED_FILE_HEADER.length || charsRead > readHeader.length) return false;
       for(int i = 0; i < SERIALIZED_FILE_HEADER.length; ++i) {
@@ -111,6 +117,10 @@ public class SerializationPrimitives {
   public static class Serialize extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "serialize";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("serialize"),new Symbol("<escm-file-path>"),new Symbol("<serialized-file-path>"));
     }
 
     private static Trampoline.Bounce getDeserializedEscmInstructions(InstructionsList list, int i, int n, ArrayList<Datum> escmExprs, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception { 
@@ -165,6 +175,10 @@ public class SerializationPrimitives {
   public static class SerializeModule extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "serialize-module";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("serialize-module"),new Symbol("<escm-file-path>"),new Symbol("<serialized-file-path>"));
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

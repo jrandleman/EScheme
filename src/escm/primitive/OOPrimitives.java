@@ -11,6 +11,7 @@ import escm.type.oo.MetaObject;
 import escm.type.oo.EscmInterface;
 import escm.type.oo.EscmClass;
 import escm.type.oo.EscmObject;
+import escm.type.Pair;
 import escm.type.Symbol;
 import escm.type.Keyword;
 import escm.type.bool.Boolean;
@@ -18,11 +19,11 @@ import escm.type.procedure.CompoundProcedure;
 import escm.type.Void;
 import escm.type.Nil;
 import escm.util.error.Exceptionf;
-import escm.util.Pair;
 import escm.util.Trampoline;
-import escm.vm.type.Primitive;
-import escm.vm.type.Callable;
-import escm.vm.type.PrimitiveCallable;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.callable.Callable;
+import escm.vm.type.primitive.PrimitiveCallable;
+import escm.vm.type.callable.Signature;
 import escm.vm.util.ObjectAccessChain;
 
 public class OOPrimitives {
@@ -31,6 +32,18 @@ public class OOPrimitives {
   public static class EscmOoClass extends Primitive {
     public java.lang.String escmName() {
       return "escm-oo-class";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-oo-class"),
+                       new Symbol("<name-keyword>"),
+                       new Symbol("<super>"),
+                       new Symbol("<interface-list>"),
+                       new Symbol("<ctor>"),
+                       new Symbol("<static-property-name-list>"),
+                       new Symbol("<static-property-value-list>"),
+                       new Symbol("<instance-property-name-list>"),
+                       new Symbol("<instance-property-value-list>"));
     }
 
     // Returns <null> if <name-keyword> DNE
@@ -115,6 +128,15 @@ public class OOPrimitives {
       return "escm-oo-interface";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-oo-interface"),
+                       new Symbol("<name-keyword>"),
+                       new Symbol("<interface-list>"),
+                       new Symbol("<static-property-name-list>"),
+                       new Symbol("<static-property-value-list>"),
+                       new Symbol("<instance-property-name-list>"));
+    }
+
     // Returns <null> if <super> DNE
     private static ArrayList<EscmInterface> parseInterfaces(ArrayList<Datum> parameters) throws Exception {
       Datum interfaceList = parameters.get(1);
@@ -184,6 +206,10 @@ public class OOPrimitives {
       return "meta-object?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("meta-object?"),new Symbol("<obj>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(meta-object? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -198,6 +224,10 @@ public class OOPrimitives {
   public static class IsInterface extends Primitive {
     public java.lang.String escmName() {
       return "interface?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("interface?"),new Symbol("<obj>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -216,6 +246,10 @@ public class OOPrimitives {
       return "class?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("class?"),new Symbol("<obj>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(class? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -230,6 +264,10 @@ public class OOPrimitives {
   public static class IsObject extends Primitive {
     public java.lang.String escmName() {
       return "object?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("object?"),new Symbol("<obj>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -248,6 +286,10 @@ public class OOPrimitives {
       return "functor?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("functor?"),new Symbol("<obj>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(functor? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -263,6 +305,12 @@ public class OOPrimitives {
   public static class OoIs extends Primitive {
     public java.lang.String escmName() {
       return "oo-is?";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("oo-is?"),new Symbol("<object>"),new Symbol("<class>")),
+        Pair.List(new Symbol("oo-is?"),new Symbol("<object>"),new Symbol("<interface>")));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -406,6 +454,10 @@ public class OOPrimitives {
       return "oo-has?";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("oo-has?"),new Symbol("<meta-object>"),new Symbol("<property-symbol-name>"),Signature.VARIADIC);
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 2) 
         throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -425,6 +477,10 @@ public class OOPrimitives {
   public static class OoGet extends Primitive {
     public java.lang.String escmName() {
       return "oo-get";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("oo-get"),new Symbol("<meta-object>"),new Symbol("<property-symbol-name>"),Signature.VARIADIC);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -451,6 +507,10 @@ public class OOPrimitives {
   public static class OoSetBang extends Primitive {
     public java.lang.String escmName() {
       return "oo-set!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("oo-set!"),new Symbol("<meta-object>"),new Symbol("<property-symbol-name>"),Signature.VARIADIC,new Symbol("<value>"));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -484,6 +544,10 @@ public class OOPrimitives {
       return "oo-define";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("oo-define"),new Symbol("<meta-object>"),new Symbol("<property-symbol-name>"),Signature.VARIADIC,new Symbol("<value>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 3) 
         throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) expects at least 3 args: %s", Exceptionf.profileArgs(parameters));
@@ -510,6 +574,12 @@ public class OOPrimitives {
   public static class OoSuper extends Primitive {
     public java.lang.String escmName() {
       return "oo-super";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("oo-super"),new Symbol("<object>")),
+        Pair.List(new Symbol("oo-super"),new Symbol("<class>")));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -541,6 +611,10 @@ public class OOPrimitives {
       return "oo-interfaces";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("oo-interfaces"),new Symbol("<meta-object>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(oo-interfaces <meta-object>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -562,6 +636,10 @@ public class OOPrimitives {
   public static class OoProperties extends Primitive {
     public java.lang.String escmName() {
       return "oo-properties";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("oo-properties"),new Symbol("<meta-object>"));
     }
 
     private static Keyword STATIC_KEYWORD = new Keyword("static");
@@ -660,6 +738,10 @@ public class OOPrimitives {
   public static class EscmOoSuperBang extends PrimitiveCallable {
     public java.lang.String escmName() {
       return "escm-oo-super!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("escm-oo-super!"),new Symbol("<object>"),new Symbol("<parameter>"),Signature.VARIADIC);
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

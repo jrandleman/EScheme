@@ -5,12 +5,14 @@
 package escm.primitive;
 import java.util.ArrayList;
 import escm.type.Datum;
+import escm.type.Pair;
+import escm.type.Symbol;
 import escm.type.Nil;
 import escm.type.number.Number;
 import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.util.error.Exceptionf;
-import escm.vm.type.Primitive;
+import escm.vm.type.primitive.Primitive;
 
 public class TypeCoercionPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -18,6 +20,12 @@ public class TypeCoercionPrimitives {
   public static class StringToNumber extends Primitive {
     public java.lang.String escmName() {
       return "string->number";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("string->number"),new Symbol("<string>")),
+        Pair.List(new Symbol("string->number"),new Symbol("<string>"),new Symbol("<radix>")));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -54,6 +62,12 @@ public class TypeCoercionPrimitives {
     public java.lang.String escmName() {
       return "number->string";
     }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("number->string"),new Symbol("<number>")),
+        Pair.List(new Symbol("number->string"),new Symbol("<number>"),new Symbol("<radix>")));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1 || parameters.size() > 2) 
@@ -89,6 +103,10 @@ public class TypeCoercionPrimitives {
     public java.lang.String escmName() {
       return "keyword->symbol";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("keyword->symbol"),new Symbol("<keyword>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Keyword)) 
@@ -103,6 +121,10 @@ public class TypeCoercionPrimitives {
   public static class SymbolToKeyword extends Primitive {
     public java.lang.String escmName() {
       return "symbol->keyword";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("symbol->keyword"),new Symbol("<symbol>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -119,6 +141,10 @@ public class TypeCoercionPrimitives {
     public java.lang.String escmName() {
       return "string->symbol";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("string->symbol"),new Symbol("<string>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
@@ -133,6 +159,10 @@ public class TypeCoercionPrimitives {
   public static class SymbolToString extends Primitive {
     public java.lang.String escmName() {
       return "symbol->string";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("symbol->string"),new Symbol("<symbol>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -149,6 +179,10 @@ public class TypeCoercionPrimitives {
     public java.lang.String escmName() {
       return "string->keyword";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("string->keyword"),new Symbol("<string>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
@@ -163,6 +197,10 @@ public class TypeCoercionPrimitives {
   public static class KeywordToString extends Primitive {
     public java.lang.String escmName() {
       return "keyword->string";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("keyword->string"),new Symbol("<keyword>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -179,6 +217,10 @@ public class TypeCoercionPrimitives {
     public java.lang.String escmName() {
       return "write-to-string";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("write-to-string"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
@@ -193,6 +235,10 @@ public class TypeCoercionPrimitives {
   public static class DisplayToString extends Primitive {
     public java.lang.String escmName() {
       return "display-to-string";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("display-to-string"),new Symbol("<obj>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -209,6 +255,10 @@ public class TypeCoercionPrimitives {
     public java.lang.String escmName() {
       return "pretty-print-to-string";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("pretty-print-to-string"),new Symbol("<obj>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
@@ -224,6 +274,10 @@ public class TypeCoercionPrimitives {
     public java.lang.String escmName() {
       return "vector->list";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("vector->list"),new Symbol("<vector>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector)) 
@@ -238,6 +292,10 @@ public class TypeCoercionPrimitives {
   public static class ListToVector extends Primitive {
     public java.lang.String escmName() {
       return "list->vector";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("list->vector"),new Symbol("<list>"));
     }
 
     public static escm.type.Vector logic(Datum l) {
@@ -264,6 +322,10 @@ public class TypeCoercionPrimitives {
     public java.lang.String escmName() {
       return "hashmap->list";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("hashmap->list"),new Symbol("<hashmap>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Hashmap)) 
@@ -279,6 +341,10 @@ public class TypeCoercionPrimitives {
     public java.lang.String escmName() {
       return "hashmap->vector";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("hashmap->vector"),new Symbol("<hashmap>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Hashmap)) 
@@ -293,6 +359,10 @@ public class TypeCoercionPrimitives {
   public static class ListToHashmap extends Primitive {
     public java.lang.String escmName() {
       return "list->hashmap";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("list->hashmap"),new Symbol("<list>"));
     }
 
     private static escm.type.Hashmap logic(Datum lst, ArrayList<Datum> parameters) throws Exception {
@@ -322,6 +392,10 @@ public class TypeCoercionPrimitives {
     public java.lang.String escmName() {
       return "vector->hashmap";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("vector->hashmap"),new Symbol("<vector>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector)) 
@@ -340,6 +414,10 @@ public class TypeCoercionPrimitives {
     public java.lang.String escmName() {
       return "char->integer";
     }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("char->integer"),new Symbol("<character>"));
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -354,6 +432,10 @@ public class TypeCoercionPrimitives {
   public static class IntegerToChar extends Primitive {
     public java.lang.String escmName() {
       return "integer->char";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("integer->char"),new Symbol("<integer>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -372,6 +454,10 @@ public class TypeCoercionPrimitives {
   public static class ListToString extends Primitive {
     public java.lang.String escmName() {
       return "list->string";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("list->string"),new Symbol("<list>"));
     }
 
     private escm.type.String logic(Datum lis, ArrayList<Datum> parameters) throws Exception {
@@ -402,6 +488,10 @@ public class TypeCoercionPrimitives {
       return "string->list";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("string->list"),new Symbol("<string>"));
+    }
+
     private Datum logic(escm.type.String str, ArrayList<Datum> parameters) throws Exception {
       Datum lis = Nil.VALUE;
       escm.type.Character[] chars = str.toChars();
@@ -426,6 +516,10 @@ public class TypeCoercionPrimitives {
       return "vector->string";
     }
 
+    public Datum signature() {
+      return Pair.List(new Symbol("vector->string"),new Symbol("<vector>"));
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Vector)) 
         throw new Exceptionf("'(vector->string <vector>) didn't receive exactly 1 vector: %s", Exceptionf.profileArgs(parameters));
@@ -439,6 +533,10 @@ public class TypeCoercionPrimitives {
   public static class StringToVector extends Primitive {
     public java.lang.String escmName() {
       return "string->vector";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("string->vector"),new Symbol("<string>"));
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
