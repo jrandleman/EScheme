@@ -24,6 +24,10 @@ public class KeywordPrimitives {
       return Pair.List(new Symbol("keyword?"),new Symbol("<obj>"));
     }
 
+    public String docstring() {
+      return "Returns whether <obj> is a keyword.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(keyword? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));

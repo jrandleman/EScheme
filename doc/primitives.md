@@ -683,6 +683,8 @@
 (callable-signature <callable>)
 (callable-name <callable>)
 
+(docstring <obj>) ; returns #f if <obj> has none
+
 (apply <callable> <obj-argument-list>)
 
 (compile <quoted-escm-expression>)

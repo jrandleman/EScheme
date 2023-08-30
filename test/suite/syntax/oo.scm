@@ -120,3 +120,38 @@
 ; verify aliases
 (eq? defclass define-class)
 (eq? definterface define-interface)
+
+; verify <docstring>
+(ut (number? (string-contains (docstring (class "Class <docstring> test.")) "Class <docstring> test.")) #t)
+(ut (number? (string-contains (docstring (class "Class <docstring> test." (field 1))) "Class <docstring> test.")) #t)
+(ut (number? (string-contains (docstring (class (:extends BaseClass1) "Class <docstring> test.")) "Class <docstring> test.")) #t)
+(ut (number? (string-contains (docstring (class (:implements Interface1) "Class <docstring> test.")) "Class <docstring> test.")) #t)
+(ut (number? (string-contains (docstring (class (:extends BaseClass1) (:implements Interface1) "Class <docstring> test.")) "Class <docstring> test.")) #t)
+(ut (number? (string-contains (docstring (class (:extends BaseClass1) (:implements Interface1) "Class <docstring> test." (field 1))) "Class <docstring> test.")) #t)
+
+(define-class DocstringClass "Class <docstring> test.")
+(ut (number? (string-contains (docstring DocstringClass) "Class <docstring> test.")) #t)
+(define-class DocstringClass "Class <docstring> test." (field 1))
+(ut (number? (string-contains (docstring DocstringClass) "Class <docstring> test.")) #t)
+(define-class DocstringClass (:extends BaseClass1) "Class <docstring> test.")
+(ut (number? (string-contains (docstring DocstringClass) "Class <docstring> test.")) #t)
+(define-class DocstringClass (:implements Interface1) "Class <docstring> test.")
+(ut (number? (string-contains (docstring DocstringClass) "Class <docstring> test.")) #t)
+(define-class DocstringClass (:extends BaseClass1) (:implements Interface1) "Class <docstring> test.")
+(ut (number? (string-contains (docstring DocstringClass) "Class <docstring> test.")) #t)
+(define-class DocstringClass (:extends BaseClass1) (:implements Interface1) "Class <docstring> test." (field 1))
+(ut (number? (string-contains (docstring DocstringClass) "Class <docstring> test.")) #t)
+
+(ut (number? (string-contains (docstring (interface "Interface <docstring> test.")) "Interface <docstring> test.")) #t)
+(ut (number? (string-contains (docstring (interface "Interface <docstring> test." field)) "Interface <docstring> test.")) #t)
+(ut (number? (string-contains (docstring (interface (:extends Interface1) "Interface <docstring> test.")) "Interface <docstring> test.")) #t)
+(ut (number? (string-contains (docstring (interface (:extends Interface1) "Interface <docstring> test." field)) "Interface <docstring> test.")) #t)
+
+(define-interface DocstringInterface "Interface <docstring> test.")
+(ut (number? (string-contains (docstring DocstringInterface) "Interface <docstring> test.")) #t)
+(define-interface DocstringInterface "Interface <docstring> test." field)
+(ut (number? (string-contains (docstring DocstringInterface) "Interface <docstring> test.")) #t)
+(define-interface DocstringInterface (:extends Interface1) "Interface <docstring> test.")
+(ut (number? (string-contains (docstring DocstringInterface) "Interface <docstring> test.")) #t)
+(define-interface DocstringInterface (:extends Interface1) "Interface <docstring> test." field)
+(ut (number? (string-contains (docstring DocstringInterface) "Interface <docstring> test.")) #t)

@@ -49,6 +49,10 @@ public class SynchronizationPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("dosync"),new Symbol("<expr>"),Signature.VARIADIC);
     }
+
+    public String docstring() {
+      return "Execute \"<expr> ...\" with a mutex lock around it as a critical section.\nLocks/Unlocks the lock via <dynamic-wind> to ensure that random\ncontinuations don't prevent us from unlocking the lock.\n\n  NOTE: Locks the *dosync-lock* parameter mutex variable (same state across\n        modules).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       Datum exprs = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
@@ -76,6 +80,10 @@ public class SynchronizationPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("dosync-module"),new Symbol("<expr>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Execute \"<expr> ...\" with a mutex lock around it as a critical section.\nLocks/Unlocks the lock via <dynamic-wind> to ensure that random continuations\ndon't prevent us from unlocking the lock.\n\n  NOTE: Locks the *dosync-module-lock* global mutex variable (unique state\n        per module).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -107,6 +115,10 @@ public class SynchronizationPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("dosync-with"),new Symbol("<mutex>"),new Symbol("<expr>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Like <dosync>, but with a lock of your choosing rather than *dosync-lock*.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -140,6 +152,10 @@ public class SynchronizationPrimitives {
       return Pair.List(
         Pair.List(new Symbol("thread-define"),new Symbol("<symbol>"),new Symbol("<value>")),
         Pair.List(new Symbol("thread-define"),new Symbol("<thread>"),new Symbol("<symbol>"),new Symbol("<value>")));
+    }
+
+    public String docstring() {
+      return "Bind <variable-name> to <value> in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -175,6 +191,10 @@ public class SynchronizationPrimitives {
         Pair.List(new Symbol("thread-set!"),new Symbol("<symbol>"),new Symbol("<value>")),
         Pair.List(new Symbol("thread-set!"),new Symbol("<thread>"),new Symbol("<symbol>"),new Symbol("<value>")));
     }
+
+    public String docstring() {
+      return "Set <variable-name> to <value> in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
@@ -209,6 +229,10 @@ public class SynchronizationPrimitives {
         Pair.List(new Symbol("thread-get"),new Symbol("<symbol>")),
         Pair.List(new Symbol("thread-get"),new Symbol("<thread>"),new Symbol("<symbol>")));
     }
+
+    public String docstring() {
+      return "Get <variable-name>'s value in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
@@ -242,6 +266,10 @@ public class SynchronizationPrimitives {
       return Pair.List(
         Pair.List(new Symbol("thread-defined?"),new Symbol("<symbol>")),
         Pair.List(new Symbol("thread-defined?"),new Symbol("<thread>"),new Symbol("<symbol>")));
+    }
+
+    public String docstring() {
+      return "Return whether <variable-name> is defined in <thread>'s\n(defaults to the \"meta-thread\") dynamic environment\n(effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

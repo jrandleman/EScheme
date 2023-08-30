@@ -392,6 +392,13 @@ public class Complex extends Number {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public String docstring() {
+    return "Complex value: "+display();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
     return Objects.hash(type(),real,imag);

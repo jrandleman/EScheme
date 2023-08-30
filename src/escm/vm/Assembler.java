@@ -8,8 +8,7 @@
 //
 //    Performs validation and transformations including:
 //      0. Verify instruction type/structure guarentees
-//      1. Ensure "jump"/"if" branch amounts stay within the instruction set scope
-//      2. Convert "load-closure" syntax into a "load" instruction
+//      1. Convert "load-closure" syntax into a "load" instruction
 
 package escm.vm;
 import java.util.ArrayList;
@@ -66,15 +65,8 @@ public class Assembler {
 
   ////////////////////////////////////////////////////////////////////////////
   // Syntax Pseudo-Instruction Parsing
-  private static class SyntaxComponents {
-    public ArrayList<ArrayList<Symbol>> paramsList;
-    public ArrayList<Symbol> variadicParamList;
-    public ArrayList<ArrayList<Instruction>> instructionsList;
-    public SyntaxComponents(ArrayList<ArrayList<Symbol>> paramsList, ArrayList<Symbol> variadicParamList, ArrayList<ArrayList<Instruction>> instructionsList) {
-      this.paramsList = paramsList;
-      this.variadicParamList = variadicParamList;
-      this.instructionsList = instructionsList;
-    }
+  private static boolean hasDocstring(Datum d) {
+    return d instanceof Pair && ((Pair)d).car() instanceof escm.type.String;
   }
 
 
@@ -125,13 +117,21 @@ public class Assembler {
   }
 
 
-  private static SyntaxComponents parseSyntaxComponents(Pair instruction) throws Exception {
+  private static CompoundProcedure generateCompoundProcedure(Pair instruction) throws Exception {
     if(!(instruction.cdr() instanceof Pair))
       throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
+    String docstring = "";
     ArrayList<ArrayList<Symbol>> paramsList = new ArrayList<ArrayList<Symbol>>();
     ArrayList<Symbol> variadicParamList = new ArrayList<Symbol>();
     ArrayList<ArrayList<Instruction>> instructionsList = new ArrayList<ArrayList<Instruction>>();
     Datum iterator = instruction.cdr();
+    if(hasDocstring(iterator)) {
+      Pair p = (Pair)iterator;
+      docstring = ((escm.type.String)p.car()).value();
+      iterator = p.cdr();
+      if(!(iterator instanceof Pair))
+        throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
+    }
     while(iterator instanceof Pair) {
       Pair iteratorPair = (Pair)iterator;
       Datum clause = iteratorPair.car();
@@ -144,7 +144,7 @@ public class Assembler {
       instructionsList.add(run(clausePair.cdr()));
       iterator = iteratorPair.cdr();
     }
-    return new SyntaxComponents(paramsList,variadicParamList,instructionsList);
+    return new CompoundProcedure(docstring,paramsList,variadicParamList,instructionsList);
   }
 
 
@@ -248,9 +248,7 @@ public class Assembler {
       ////////////////////////////////////////////////////////////////////////
       // (load-closure (<arg> ...) <instruction> ...)
       case Instruction.Pseudo.LOAD_CLOSURE: {
-        SyntaxComponents components = parseSyntaxComponents(instructionPair);
-        CompoundProcedure compoundProcedure = new CompoundProcedure(components.paramsList,components.variadicParamList,components.instructionsList);
-        return new Instruction(Instruction.LOAD,compoundProcedure);
+        return new Instruction(Instruction.LOAD,generateCompoundProcedure(instructionPair));
       }
 
       ////////////////////////////////////////////////////////////////////////

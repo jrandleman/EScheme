@@ -8,8 +8,9 @@
 package escm.type;
 import java.io.Serializable;
 import escm.vm.util.ExecutionState;
+import escm.vm.type.callable.DocString;
 
-public abstract class Datum implements Serializable {
+public abstract class Datum implements Serializable, DocString {
   ////////////////////////////////////////////////////////////////////////////
   // Type
   public abstract java.lang.String type();
@@ -28,6 +29,11 @@ public abstract class Datum implements Serializable {
   public final boolean equals(Object o) {
     return eq(o);
   }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public abstract java.lang.String docstring();
 
 
   ////////////////////////////////////////////////////////////////////////////

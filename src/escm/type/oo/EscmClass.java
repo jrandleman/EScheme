@@ -73,8 +73,156 @@ public class EscmClass extends MetaObject implements Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  private String docstring = null;
+
+  // Print class name + super + interfaces
+  private void accumulateClassSignature(StringBuilder sb) {
+    sb.append("Class "+readableName());
+    if(superClass != null) {
+      sb.append(" (:extends "+superClass.readableName()+")");
+    }
+    if(interfaces.size() > 0) {
+      sb.append(" (:implements");
+      for(EscmInterface iface : interfaces) {
+        sb.append(" "+iface.readableName());
+      }
+      sb.append(")");
+    }
+    sb.append("\n");
+  }
+
+  // Print user docstring
+  private boolean accumulateUserDocstring(StringBuilder sb) {
+    if(docstring.length() > 0) {
+      sb.append("  User Description:\n    ");
+      sb.append(docstring.replaceAll("\n","\n    "));
+      sb.append("\n\n");
+      return true;
+    }
+    return false;
+  }
+
+  // Replaces names of <signature> with <newName>.
+  private Datum tagMethodWithName(Datum newName, Datum signature) {
+    if(!(signature instanceof Pair)) return Pair.List(newName);
+    Pair ctorSignaturePair = (Pair)signature;
+    Datum fst = ctorSignaturePair.car();
+    if(!(fst instanceof Pair)) return new Pair(newName,ctorSignaturePair.cdr());
+    Datum sigs = Nil.VALUE;
+    while(signature instanceof Pair) {
+      Pair p = (Pair)signature;
+      if(p.car() instanceof Pair) {
+        sigs = new Pair(new Pair(newName,((Pair)p.car()).cdr()),sigs);
+      }
+      signature = p.cdr();
+    }
+    if(sigs instanceof Nil) return sigs;
+    return (Datum)((Pair)sigs).reverse();
+  }
+
+  // @PRECONDITION: <signatures instanceof Pair>
+  private void accumulateMethodSignatureAndDocstring(StringBuilder sb, Datum signatures, String docstring) {
+    Pair psig = (Pair)signatures;
+    // print multiple signatures
+    if(psig.car() instanceof Pair) {
+      sb.append("\n   ");
+      while(signatures instanceof Pair) {
+        psig = (Pair)signatures;
+        sb.append(" "+psig.car().write());
+        signatures = psig.cdr();
+      }
+    // print single signatures
+    } else {
+      sb.append("\n    "+psig.write());
+    }
+    // print user docstring (if given)
+    if(docstring.length() > 0) {
+      sb.append("\n      "+docstring.replaceAll("\n","\n      "));
+    }
+    sb.append("\n");
+  }
+
+  // Print constructor (if given)
+  private boolean accumulateConstructor(boolean printed, StringBuilder sb) {
+    Datum ctor = objectProps.get("new");
+    if(ctor != null && ctor instanceof CompoundProcedure) {
+      CompoundProcedure val = (CompoundProcedure)ctor;
+      Datum signatures = tagMethodWithName(new Symbol("new"),val.signature());
+      if(!(signatures instanceof Pair)) return printed;
+      if(printed) sb.append("  ----------------------------------------------------------------------\n\n");
+      sb.append("  Constructor:");
+      accumulateMethodSignatureAndDocstring(sb,signatures,val.docstring());
+      sb.append("\n");
+      printed = true;
+    }
+    return printed;
+  }
+
+  // Print method signature + user docstring (if given)
+  private void accumulateMethod(StringBuilder sb, boolean isStaticProp, String name, CompoundProcedure val) {
+    if(!isStaticProp && name.equals("new")) return;
+    Datum signatures = tagMethodWithName(new Symbol(name),val.signature());
+    if(!(signatures instanceof Pair)) return;
+    accumulateMethodSignatureAndDocstring(sb,signatures,val.docstring());
+  }
+
+  // Print fields & methods
+  private boolean accumulateProperties(boolean printed, StringBuilder sb, boolean isStaticProps, ConcurrentHashMap<String,Datum> baseProps) {
+    if(baseProps.size() == 0) return false;
+    String propType = isStaticProps ? "Static" : "Instance";
+    ConcurrentHashMap<String,Datum> fields = new ConcurrentHashMap<String,Datum>();
+    ConcurrentHashMap<String,CompoundProcedure> methods = new ConcurrentHashMap<String,CompoundProcedure>();
+    for(ConcurrentHashMap.Entry<String,Datum> prop : baseProps.entrySet()) {
+      Datum val = prop.getValue();
+      if(val instanceof CompoundProcedure) {
+        methods.put(prop.getKey(),(CompoundProcedure)val);
+      } else {
+        fields.put(prop.getKey(),val);
+      }
+    }
+    if(fields.size() > 0) {
+      if(printed) sb.append("  ----------------------------------------------------------------------\n\n");
+      sb.append("  "+propType+" Fields:");
+      for(ConcurrentHashMap.Entry<String,Datum> field : fields.entrySet()) {
+        Datum val = field.getValue();
+        sb.append("\n    "+field.getKey()+" [type: <"+val.type()+">, hashcode: "+val.hashCode()+"]\n");
+      }
+      sb.append("\n");
+      printed = true;
+    }
+    if(methods.size() > 0) {
+      if(printed) sb.append("  ----------------------------------------------------------------------\n\n");
+      sb.append("  "+propType+" Methods:");
+      for(ConcurrentHashMap.Entry<String,CompoundProcedure> method : methods.entrySet()) {
+        accumulateMethod(sb,isStaticProps,method.getKey(),method.getValue());
+      }
+      sb.append("\n");
+      printed = true;
+    }
+    return printed;
+  }
+
+  public String docstring() {
+    StringBuilder sb = new StringBuilder();
+    // Print class name + super + interfaces
+    accumulateClassSignature(sb);
+    // Print user docstring
+    boolean printed = accumulateUserDocstring(sb);
+    // Print constructor
+    printed = accumulateConstructor(printed,sb);
+    // Print static properties
+    printed = accumulateProperties(printed,sb,true,props);
+    // Print instance properties
+    printed = accumulateProperties(printed,sb,false,objectProps);
+    return sb.toString();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  public EscmClass(String name, EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) throws Exception {
+  public EscmClass(String name, String docstring, EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) throws Exception {
+    this.docstring = docstring.trim();
     this.superClass = superClass;
     this.interfaces = interfaces;
     this.props = props;
@@ -144,29 +292,12 @@ public class EscmClass extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor Signature
-  public Datum tagContructorWithClassName(Datum signatureHead, Datum ctorSignature) {
-    if(!(ctorSignature instanceof Pair)) return Pair.List(signatureHead);
-    Pair ctorSignaturePair = (Pair)ctorSignature;
-    Datum fst = ctorSignaturePair.car();
-    if(!(fst instanceof Pair)) return new Pair(signatureHead,ctorSignaturePair.cdr());
-    Datum sigs = Nil.VALUE;
-    while(ctorSignature instanceof Pair) {
-      Pair p = (Pair)ctorSignature;
-      if(p.car() instanceof Pair) {
-        sigs = new Pair(new Pair(signatureHead,((Pair)p.car()).cdr()),sigs);
-      }
-      ctorSignature = p.cdr();
-    }
-    if(sigs instanceof Nil) return sigs;
-    return (Datum)((Pair)sigs).reverse();
-  }
-
   public Datum signature() {
     String name = name();
     Datum signatureHead = name.length() == 0 ? this : new Symbol(name);
     Datum ctor = objectProps.get("new");
     if(ctor != null && ctor instanceof CompoundProcedure) {
-      return tagContructorWithClassName(signatureHead,((CompoundProcedure)ctor).signature());
+      return tagMethodWithName(signatureHead,((CompoundProcedure)ctor).signature());
     }
     return Pair.List(signatureHead);
   }
@@ -250,7 +381,8 @@ public class EscmClass extends MetaObject implements Callable {
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
   // We use <ignore> here to distinguish from the <public> ctor
-  private EscmClass(int ignore, String name, EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) {
+  private EscmClass(int ignore, String name, String docstring, EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) {
+    this.docstring = docstring;
     this.superClass = superClass;
     this.interfaces = interfaces;
     this.props = props;
@@ -263,7 +395,7 @@ public class EscmClass extends MetaObject implements Callable {
 
   public EscmClass loadWithName(String name) {
     if(name.equals("self") || name.equals("super") || name().length() > 0) return this;
-    return new EscmClass(0,name,this.superClass,this.interfaces,this.props,this.objectProps);
+    return new EscmClass(0,name,this.docstring,this.superClass,this.interfaces,this.props,this.objectProps);
   }
 
 

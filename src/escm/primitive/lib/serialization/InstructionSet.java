@@ -62,6 +62,13 @@ public class InstructionSet extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public String docstring() {
+    return "Instruction set "+value;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public String display() {
     return String.format("#<instruction-set %s>", value);

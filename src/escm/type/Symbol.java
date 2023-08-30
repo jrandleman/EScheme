@@ -77,6 +77,13 @@ public class Symbol extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public java.lang.String docstring() {
+    return "Symbol value: "+value;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
     return Objects.hash(type(),value);

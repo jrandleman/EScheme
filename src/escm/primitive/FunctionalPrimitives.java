@@ -31,6 +31,10 @@ public class FunctionalPrimitives {
       return Pair.List(new Symbol("id"),new Symbol("<obj>"));
     }
 
+    public String docstring() {
+      return "Returns <obj>. Useful for certain higher-level procedures.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(id <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -50,6 +54,10 @@ public class FunctionalPrimitives {
       return Pair.List(new Symbol("procedure?"),new Symbol("<obj>"));
     }
 
+    public String docstring() {
+      return "Returns whether <obj> is a procedure.\nPrefer <callable?> for more generic code.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(procedure? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -67,6 +75,10 @@ public class FunctionalPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("callable?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is applicable. Equivalent to:\n  (or (procedure? <obj>)\n      (functor? <obj>)\n      (class? <obj>)\n      (string? <obj>)\n      (vector? <obj>)\n      (hashmap? <obj>))";
     }
 
     public static boolean logic(Datum d) {
@@ -93,6 +105,10 @@ public class FunctionalPrimitives {
       return Pair.List(new Symbol("compose"),new Symbol("<callable>"),Signature.VARIADIC);
     }
 
+    public String docstring() {
+      return "Create a new, variadic procedure that is the composition of \"<callable> ...\".\nAliased by <*> if only given callables.";
+    }
+
     private static Trampoline.Bounce applyComposedCallables(Datum result, int i, ArrayList<Datum> parameters, Trampoline.Continuation cont) throws Exception {
       if(i < 0) return cont.run(result);
       ArrayList<Datum> params = new ArrayList<Datum>(1);
@@ -112,6 +128,9 @@ public class FunctionalPrimitives {
       if(totalCallables == 1) return parameters.get(0);
       Callable fstFcn = (Callable)parameters.get(totalCallables-1);
       Callable composedProcedures = new Callable() {
+        public String docstring() {
+          return "Composed series of procedures wrapped up in a single callable.";
+        }
         public Datum signature() {
           return Pair.List(new Symbol(Procedure.DEFAULT_NAME),new Symbol("<arg>"),Signature.VARIADIC);
         }
@@ -141,6 +160,10 @@ public class FunctionalPrimitives {
       return Pair.List(new Symbol("bind"),new Symbol("<callable>"),new Symbol("<arg>"),Signature.VARIADIC);
     }
 
+    public String docstring() {
+      return "Create a new procedure by binding \"<arg> ...\" as arguments to <callable>.\nAliased by <+> if only given non-<associative-collection> callables.";
+    }
+
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       int totalCallables = parameters.size();
       if(totalCallables < 1) 
@@ -151,6 +174,9 @@ public class FunctionalPrimitives {
       Callable p = (Callable)parameters.get(0);
       parameters.remove(0);
       Callable bindPrimitive = new Callable() {
+        public String docstring() {
+          return "Bound set of arguments to a procedure wrapped up in a single callable.";
+        }
         public Datum signature() {
           return Pair.List(new Symbol(Procedure.DEFAULT_NAME),new Symbol("<arg>"),Signature.VARIADIC);
         }

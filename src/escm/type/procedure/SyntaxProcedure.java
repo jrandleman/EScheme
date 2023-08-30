@@ -42,6 +42,9 @@ public class SyntaxProcedure extends Procedure {
   public SyntaxProcedure(java.lang.String name, PrimitiveSyntax prm) {
     this.name = name;
     this.macro = new Callable() {
+      public String docstring() {
+        return prm.docstring();
+      }
       public Datum signature() {
         return prm.signature();
       }
@@ -119,6 +122,10 @@ public class SyntaxProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // Application Abstraction
+  public String docstring() {
+    return macro.docstring();
+  }
+
   private boolean signatureShouldBindName(Datum name) {
     return name instanceof Symbol && ((Symbol)name).value().equals(Procedure.DEFAULT_NAME);
   }

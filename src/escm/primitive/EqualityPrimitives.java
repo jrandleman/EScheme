@@ -24,6 +24,10 @@ public class EqualityPrimitives {
       return Pair.List(new Symbol("eq?"),new Symbol("<obj>"),Signature.VARIADIC);
     }
 
+    public String docstring() {
+      return "Determines shallow equality for objects that maintain state.";
+    }
+
     public static Datum logic(ArrayList<Datum> parameters) {
       for(int i = 0, n = parameters.size()-1; i < n; ++i)
         if(!parameters.get(i).eq(parameters.get(i+1)))
@@ -47,6 +51,10 @@ public class EqualityPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("equal?"),new Symbol("<obj>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Determines deep equality for objects.\nNote that this will infinitely loop for cyclical structures!";
     }
 
     public static Datum logic(ArrayList<Datum> parameters) {

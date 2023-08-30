@@ -22,6 +22,10 @@ public class SymbolPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("symbol?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is a symbol.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 

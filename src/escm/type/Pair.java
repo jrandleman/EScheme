@@ -124,6 +124,14 @@ public class Pair extends Datum implements OrderedCollection {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public java.lang.String docstring() {
+    if(length == DOTTED_LIST_LENGTH) return "Pair that points to a dotted list.";
+    return "Pair that points to a list of length "+length+".";
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
     return Objects.hash(type(),car,cdr);
@@ -1057,6 +1065,9 @@ public class Pair extends Datum implements OrderedCollection {
 
   private static Datum alwaysFalseCallable() {
     return new PrimitiveProcedure(Procedure.DEFAULT_NAME,new Callable() {
+      public java.lang.String docstring() {
+        return "Always returns #f irrespective of arguments.";
+      }
       public Datum signature() { 
         return Pair.List(new Symbol(Procedure.DEFAULT_NAME)); 
       }
@@ -1307,6 +1318,9 @@ public class Pair extends Datum implements OrderedCollection {
       throw new Exceptionf("PAIR [SORT]: can't sort dotted-list %s with predicate %s", write(), binaryPredicate);
     }
     Callable trueCondPrimitive = new Callable() {
+      public java.lang.String docstring() {
+        return "Quicksort: move values to the left of the pivot.";
+      }
       public Datum signature() { 
         return Pair.List(new Symbol("escm-sort-in-lhs?"),new Symbol("<obj>"),new Symbol("<obj>")); 
       }
@@ -1316,6 +1330,9 @@ public class Pair extends Datum implements OrderedCollection {
       }
     };
     Callable falseCondPrimitive = new Callable() {
+      public java.lang.String docstring() {
+        return "Quicksort: move values to the right of the pivot.";
+      }
       public Datum signature() { 
         return Pair.List(new Symbol("escm-sort-in-rhs?"),new Symbol("<obj>"),new Symbol("<obj>")); 
       }
@@ -1377,6 +1394,9 @@ public class Pair extends Datum implements OrderedCollection {
 
   private static Trampoline.Bounce skipWhileHaveDuplicates(Callable binaryPredicate, Datum d, OrderedCollection tail, Trampoline.Continuation continuation) throws Exception {
     Callable matchCondPrimitive = new Callable() {
+      public java.lang.String docstring() {
+        return "Delete neighbor duplicates: check for value equality.";
+      }
       public Datum signature() { 
         return Pair.List(new Symbol("escm-del-neigh-dups-eq?"),new Symbol("<obj>"),new Symbol("<obj>")); 
       }

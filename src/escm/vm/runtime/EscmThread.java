@@ -42,6 +42,9 @@ public abstract class EscmThread extends Thread {
     new PrimitiveProcedure(
       "unhandled-exception-handler",
       new Callable() { 
+        public String docstring() {
+          return "Signals an \"unhandled exception\" error.";
+        }
         public Datum signature() {
           return Pair.List(new Symbol("unhandled-exception-handler"),new Symbol("<obj>"),Signature.VARIADIC);
         }

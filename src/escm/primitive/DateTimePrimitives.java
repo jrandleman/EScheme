@@ -24,6 +24,10 @@ public class DateTimePrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("current-time"));
     }
+
+    public String docstring() {
+      return "Returns a list of the current time components:\n  (<hour> <minute> <second> <millisecond>)";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) 
@@ -47,6 +51,10 @@ public class DateTimePrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("current-date"));
     }
+
+    public String docstring() {
+      return "Returns a list of the current date components:\n  (<year> <month> <day>)";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) 
@@ -69,6 +77,10 @@ public class DateTimePrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("epoch-time"));
     }
+
+    public String docstring() {
+      return "Returns the number of milliseconds since the epoch (1 January 1970).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) 
@@ -88,6 +100,10 @@ public class DateTimePrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("time-zone"));
     }
+
+    public String docstring() {
+      return "Returns the name of the current time-zone as a string (#f if unknown).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) 
@@ -106,6 +122,10 @@ public class DateTimePrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("day"));
+    }
+
+    public String docstring() {
+      return "Returns the name of the current week-day as a string (#f if unknown).";
     }
 
     public static final escm.type.String SUNDAY = new escm.type.String("Sunday");
@@ -142,6 +162,10 @@ public class DateTimePrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("month"));
+    }
+
+    public String docstring() {
+      return "Returns the name of the current month as a string (#f if unknown).";
     }
 
     public static final escm.type.String JANUARY = new escm.type.String("January");
@@ -190,6 +214,10 @@ public class DateTimePrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("year"));
+    }
+
+    public String docstring() {
+      return "Returns the name of the current year as a string (#f if unknown).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

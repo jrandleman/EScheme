@@ -61,3 +61,8 @@
 
 ; verify alias
 (eq? defgen define-generator)
+
+; verify <docstring>
+(ut (docstring (begin 'testing-define-generator-docstring (define-generator (f x) "Test docstring." x) f)) "Test docstring.")
+(ut (docstring (begin 'testing-define-generator-docstring (define-generator (f x) "Test docstring.") f)) #f)
+(ut (docstring (begin 'testing-define-generator-docstring (define-generator (f x) x) f)) #f)

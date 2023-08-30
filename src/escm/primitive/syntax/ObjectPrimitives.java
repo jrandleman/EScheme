@@ -43,7 +43,7 @@ public class ObjectPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (class <optional-name-keyword> (:extends <super>) (:implements <interface> ...) <prop> ...)
+  // (class <optional-name-keyword> (:extends <super>) (:implements <interface> ...) <optional-docstring> <prop> ...)
   //
   // <prop> ::= (<name> <value>)
   //          | ((<method-name> <param> ...) <body> ...)
@@ -58,6 +58,7 @@ public class ObjectPrimitives {
   //       pre-bind our method names upon initial class construction, rather than
   //       only later when we bind a symbol to the class object in the environment. 
   //       * This allows us to reduce the number of method allocations by half!
+  //       It also doesn't parse <optional-docstring>
   //
   //
   // ; Returns the super object if exists, else #f 
@@ -176,19 +177,39 @@ public class ObjectPrimitives {
 
     public Datum signature() {
       return Pair.List(
-        Pair.List(new Symbol("class")),
-        Pair.List(new Symbol("class"),Pair.List(new Keyword("extends"),new Symbol("<super-class>"))),
-        Pair.List(new Symbol("class"),Pair.List(new Keyword("implements"),new Symbol("<interface>"),Signature.VARIADIC)),
-        Pair.List(new Symbol("class"),
-          Pair.List(new Keyword("extends"),new Symbol("<super-class>")),Pair.List(new Keyword("implements"),new Symbol("<interface>"),Signature.VARIADIC)),
-        Pair.List(new Symbol("class"),
-          Pair.List(new Keyword("extends"),new Symbol("<super-class>")),Pair.List(new Keyword("implements"),new Symbol("<interface>"),Signature.VARIADIC),
+        Pair.List(CLASS,
+          Pair.List(EXTENDS,new Symbol("<super-class>")),Pair.List(IMPLEMENTS,new Symbol("<interface>"),Signature.VARIADIC),
+          Pair.List(new Symbol("<field-name>"),new Symbol("<default-value>")),
+          Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+          Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
+          Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+          Signature.VARIADIC
+        ),
+        Pair.List(CLASS,
+          Pair.List(EXTENDS,new Symbol("<super-class>")),Pair.List(IMPLEMENTS,new Symbol("<interface>"),Signature.VARIADIC),
+          new Symbol("<docstring>"),
           Pair.List(new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
           Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
           Signature.VARIADIC
         ));
+    }
+
+    public String docstring() {
+      return "Creates an anonymous class. See <define-class> to bind a name to a class \nin one expression. See <oo> for more high-level object orientation details.\n\nRegarding inter-class/interface relations: \n  1. <super> MUST be an expression that evals to a class type.\n  2. <interface> MUST be an expression that evals to an interface type.\n  3. Both :extends and :implements are optional.\n\nOptionally include <docstring> to detail information on the class in <help>.\n\n\nSimilar to Java, we support single inheritance for classes and multiple\ninheritance for interfaces.\n\nThe \"new\" pseudo-method acts as the class constructor (doesn't correlate \nto a real method). Invoke the class constructor by calling the class \nobject as if it were a procedure.\n\nThe \"->procedure\" method overloads applications for objects, making them\na \"functor\" (function object).\n\nThe \"name\" field is automatically defined for classes and interfaces.\nThe \"class\" field is automatically defined for objects.\n\nUse \"self\" and \"super\" in methods to refer to the calling object and the\nclass's super object respectively. Qualification of \"self.\" is required\nwhen referring to class fields in a method.\n  (define n 0) ; the \"global n\"\n  (define-class C\n    (n 1)      ; the \"local n\"\n    ((method)\n      n        ; refers to the \"global n\"\n      self.n)) ; refers to the \"local n\"\n\n\nRefer to a field via: object.property1.property2\nRefer to a method as: (object.inner-obj.method <arg> ...)\n\nObjects (classes and interfaces for static methods) support the following:\n  (define object.property <value>) ; define <property> as a new field\n  (set! object.property <value>)   ; set the existing <property> field\n\n\nUse the \":static\" keyword qualifier to indicate that the field/method belongs\nto the class, rather than one of its instances.\n  (define-class C (:static VALUE 10))\n  C.VALUE ; 10\n\n\nClass reflection is provided by primtive functions prefixed with \"oo-\".\n\nInitialization of the super object's non-nullary constructor is achieved\nvia the \"(super! <arg> ...)\" macro. Alternatively use the \"apply-super!\"\nmacro to initialize the super object with a list of values.\n\n  =================================================================\n  * NOTE THAT \"super!\", IF USED, MUST BE THE FIRST EXPRESSION IN A \n    CONSTRUCTOR IN ORDER TO AVOID INVOKING UNDEFINED BEHAVIOR !!!!\n  =================================================================\n\n  ((new)\n    (super! 42) ; valid\n    (define self.value 314)) \n\n  ((new)\n    (define self.value 314)\n    (super! 42)) ; undefined behavior\n\n\nSee <meta-object> for more type details.\n\nFor example:\n  (define-class Rectangle\n    (length 0)\n    (width 0)\n    ((new l w)\n      (set! self.length l)\n      (set! self.width w))\n    ((area)\n      (* self.length self.width))\n    ((perimeter)\n      (* 2 (+ self.length self.width))))\n\n\n  (define-class Square (:extends Rectangle)\n    ((new l)\n      (super! l l))) ; init the super object\n\n\n  (define s (Square 5))\n\n  (display (s.area)) ; Square \"inherited\" <area> method. Prints 25";
+    }
+
+    // Helper triplet class
+    public static class Triple<T,U,V> {
+      public T first;
+      public U second;
+      public V third;
+      public Triple(T t, U u, V v) {
+        first = t;
+        second = u;
+        third = v;
+      }
     }
 
     // Extract <name-keyword> if exists, else #f
@@ -210,39 +231,66 @@ public class ObjectPrimitives {
       return p.car().eq(key) && p.cdr() instanceof Pair;
     }
 
-    // Returns the super object (or #f), and list of implemented interfaces (or NIL)
-    public static escm.util.Pair<Datum,Datum> getSuperAndInterfaces(Datum x) {
-      if(!(x instanceof Pair)) return new escm.util.Pair<Datum,Datum>(Boolean.FALSE,Nil.VALUE);
+    // Returns the super object (or #f), list of implemented interfaces (or NIL), and docstring (or #f)
+    public static Triple<Datum,Datum,Datum> getSuperAndInterfacesAndDocstring(Datum x) {
+      if(!(x instanceof Pair)) return new Triple<Datum,Datum,Datum>(Boolean.FALSE,Nil.VALUE,Boolean.FALSE);
       Pair p = (Pair)x;
       Datum superObj = Boolean.FALSE;
       Datum interfacesList = Nil.VALUE;
+      Datum docstring = Boolean.FALSE;
       Datum firstClause = p.car();
       if(validKeywordClause(EXTENDS,firstClause)) {
         superObj = ((Pair)((Pair)firstClause).cdr()).car();
         if(p.cdr() instanceof Pair) {
-          Datum nextClause = ((Pair)p.cdr()).car();
-          if(validKeywordClause(IMPLEMENTS,nextClause))
+          p = (Pair)p.cdr();
+          Datum nextClause = p.car();
+          if(validKeywordClause(IMPLEMENTS,nextClause)) {
             interfacesList = ((Pair)nextClause).cdr();
+            if(p.cdr() instanceof Pair) {
+              Datum thirdClause = ((Pair)p.cdr()).car();
+              if(thirdClause instanceof escm.type.String) {
+                docstring = thirdClause;
+              }
+            }
+          } else if(nextClause instanceof escm.type.String) {
+            docstring = nextClause;
+          }
         }
       } else if(validKeywordClause(IMPLEMENTS,firstClause)) {
         interfacesList = ((Pair)firstClause).cdr();
         if(p.cdr() instanceof Pair) {
-          Datum nextClause = ((Pair)p.cdr()).car();
-          if(validKeywordClause(EXTENDS,nextClause))
+          p = (Pair)p.cdr();
+          Datum nextClause = p.car();
+          if(validKeywordClause(EXTENDS,nextClause)) {
             superObj = ((Pair)((Pair)nextClause).cdr()).car();
+            if(p.cdr() instanceof Pair) {
+              Datum thirdClause = ((Pair)p.cdr()).car();
+              if(thirdClause instanceof escm.type.String) {
+                docstring = thirdClause;
+              }
+            }
+          } else if(nextClause instanceof escm.type.String) {
+            docstring = nextClause;
+          }
         }
+      } else if(firstClause instanceof escm.type.String) {
+        docstring = firstClause;
       }
-      return new escm.util.Pair<Datum,Datum>(superObj,interfacesList);
+      return new Triple<Datum,Datum,Datum>(superObj,interfacesList,docstring);
     }
 
     // Returns the list of static & instance properties
-    public static Datum getProperties(Datum superObj, Datum interfacesList, Datum x) {
+    public static Datum getProperties(Triple<Datum,Datum,Datum> superAndInterfacesAndDocstring, Datum x) {
       if(!(x instanceof Pair)) return Nil.VALUE;
-      boolean hasSuper = superObj.isTruthy();
-      boolean hasInterfaces = interfacesList instanceof Pair;
-      if(hasSuper && hasInterfaces) {
+      int propertyOffset = 0;
+      if(superAndInterfacesAndDocstring.first.isTruthy()) ++propertyOffset;
+      if(superAndInterfacesAndDocstring.second instanceof Pair) ++propertyOffset;
+      if(superAndInterfacesAndDocstring.third.isTruthy()) ++propertyOffset;
+      if(propertyOffset == 3) {
+        return ((Pair)((Pair)((Pair)x).cdr()).cdr()).cdr();
+      } else if(propertyOffset == 2) {
         return ((Pair)((Pair)x).cdr()).cdr();
-      } else if(hasSuper || hasInterfaces) {
+      } else if(propertyOffset == 1) {
         return ((Pair)x).cdr();
       } else {
         return x;
@@ -332,15 +380,16 @@ public class ObjectPrimitives {
       Datum className = parseOptionalClassOrInterfaceName(parameters);
       // Extract "is-a"'s
       Datum x = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
-      escm.util.Pair<Datum,Datum> superAndInterfaces = getSuperAndInterfaces(x);
+      Triple<Datum,Datum,Datum> superAndInterfacesAndDocstring = getSuperAndInterfacesAndDocstring(x);
       // Extract "has-a"'s
-      Datum properties = getProperties(superAndInterfaces.first,superAndInterfaces.second,x);
+      Datum properties = getProperties(superAndInterfacesAndDocstring,x);
       escm.util.Pair<Datum,Datum> staticAndNonStaticProps = getStaticAndNonStaticProperties(properties);
       escm.util.Pair<Datum,Datum> ctorAndInstanceProps = parseConstructorProcedureAndInstanceProperties(staticAndNonStaticProps.second);
       escm.util.Pair<Datum,Datum> staticPropNamesAndVals = parsePropertyNamesAndValues(parameters,staticAndNonStaticProps.first);
       escm.util.Pair<Datum,Datum> instancePropNamesAndVals = parsePropertyNamesAndValues(parameters,ctorAndInstanceProps.second);
       // Generate the call to an internal primitive that makes our class!
-      return Pair.List(ESCM_OO_CLASS,className,superAndInterfaces.first,new Pair(CorePrimitives.LIST,superAndInterfaces.second),
+      return Pair.List(ESCM_OO_CLASS,className,superAndInterfacesAndDocstring.third,
+        superAndInterfacesAndDocstring.first,new Pair(CorePrimitives.LIST,superAndInterfacesAndDocstring.second),
         ctorAndInstanceProps.first,
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.first),
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.second),
@@ -355,7 +404,7 @@ public class ObjectPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (define-class <name> (:extends <super>) (:implements <interface> ...) <prop> ...)
+  // (define-class <name> (:extends <super>) (:implements <interface> ...) <optional-docstring> <prop> ...)
   //
   // <prop> ::= (<name> <value>)
   //          | ((<method-name> <param> ...) <body> ...)
@@ -367,7 +416,7 @@ public class ObjectPrimitives {
   // 
   // NOTE: The EScheme code below doesn't account for generating the <name-keyword>
   // ===== argument passed to <class>. See <class>'s comment description above for
-  //       more details.
+  //       more details. It also doesn't parse <optional-docstring>.
   //
   //
   // (define-syntax define-class
@@ -381,15 +430,23 @@ public class ObjectPrimitives {
       return "define-class";
     }
 
+    public String docstring() {
+      return "Simple wrapper macro combining <define> and <class> to bind <class-name>.\nAlso generates a (<class-name>? <obj>) predicate procedure!\nOptionally include <docstring> to detail information on the class in <help>.\n\nAliased by <defclass>.\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.";
+    }
+
     public Datum signature() {
       return Pair.List(
-        Pair.List(new Symbol("define-class"),new Symbol("<class-name>")),
-        Pair.List(new Symbol("define-class"),new Symbol("<class-name>"),Pair.List(new Keyword("extends"),new Symbol("<super-class>"))),
-        Pair.List(new Symbol("define-class"),new Symbol("<class-name>"),Pair.List(new Keyword("implements"),new Symbol("<interface>"),Signature.VARIADIC)),
         Pair.List(new Symbol("define-class"),new Symbol("<class-name>"),
-          Pair.List(new Keyword("extends"),new Symbol("<super-class>")),Pair.List(new Keyword("implements"),new Symbol("<interface>"),Signature.VARIADIC)),
+          Pair.List(EXTENDS,new Symbol("<super-class>")),Pair.List(IMPLEMENTS,new Symbol("<interface>"),Signature.VARIADIC),
+          Pair.List(new Symbol("<field-name>"),new Symbol("<default-value>")),
+          Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+          Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
+          Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+          Signature.VARIADIC
+        ),
         Pair.List(new Symbol("define-class"),new Symbol("<class-name>"),
-          Pair.List(new Keyword("extends"),new Symbol("<super-class>")),Pair.List(new Keyword("implements"),new Symbol("<interface>"),Signature.VARIADIC),
+          Pair.List(EXTENDS,new Symbol("<super-class>")),Pair.List(IMPLEMENTS,new Symbol("<interface>"),Signature.VARIADIC),
+          new Symbol("<docstring>"),
           Pair.List(new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
           Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
@@ -416,7 +473,7 @@ public class ObjectPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (interface <optional-name-keyword> (:extends <interface> ...) <prop> ...)
+  // (interface <optional-name-keyword> (:extends <interface> ...) <optional-docstring> <prop> ...)
   //
   // <prop> ::= <name>
   //          | (:static <name> <value>)
@@ -430,6 +487,7 @@ public class ObjectPrimitives {
   //       than only later when we bind a symbol to the interface object in the 
   //       environment. 
   //       * This allows us to reduce the number of method allocations by half!
+  //       It also doesn't parse <optional-docstring>.
   //
   //
   // ; Returns the list of implemented interfaces if exists, else NIL
@@ -471,10 +529,16 @@ public class ObjectPrimitives {
 
     public Datum signature() {
       return Pair.List(
-        Pair.List(new Symbol("interface")),
-        Pair.List(new Symbol("interface"),Pair.List(new Keyword("extends"),new Symbol("<interface>"),Signature.VARIADIC)),
         Pair.List(new Symbol("interface"),
-          Pair.List(new Keyword("extends"),new Symbol("<interface>"),Signature.VARIADIC),
+          Pair.List(EXTENDS,new Symbol("<interface>"),Signature.VARIADIC),
+          new Symbol("<field-name>"),
+          Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
+          Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+          Signature.VARIADIC
+        ),
+        Pair.List(new Symbol("interface"),
+          Pair.List(EXTENDS,new Symbol("<interface>"),Signature.VARIADIC),
+          new Symbol("<docstring>"),
           new Symbol("<field-name>"),
           Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
@@ -482,18 +546,40 @@ public class ObjectPrimitives {
         ));
     }
 
+    public String docstring() {
+      return "Creates an anonymous interface. Similar to classes, BUT cannot be instantiated\nvia a constructor. Required property names are denoted by a symbolic property.\n\nOptionally include <docstring> to detail information on the interface in <help>.\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.\n\nFor example:\n  (define-interface IHasName\n    (:static VALUE 10)\n    name)\n\n  (define-interface IHasAge\n    age)\n\n  (define-interface IPerson (:extends IHasName IHasAge))\n\n  (define-class Person (:implements IPerson)\n    (name \"\")\n    (age 0))";
+    }
+
     // Returns the list of implemented interfaces if exists, else NIL
-    public static Datum getInterfaces(Datum x) {
-      if(!(x instanceof Pair)) return Nil.VALUE;
-      Datum firstClause = ((Pair)x).car();
-      if(ClassMacro.validKeywordClause(EXTENDS,firstClause)) return ((Pair)firstClause).cdr();
-      return Nil.VALUE;
+    public static escm.util.Pair<Datum,Datum> getInterfacesAndDocstring(Datum x) {
+      if(!(x instanceof Pair)) return new escm.util.Pair<Datum,Datum>(Nil.VALUE,Boolean.FALSE);
+      Datum interfaces = Nil.VALUE;
+      Datum docstring = Boolean.FALSE;
+      Pair p = (Pair)x;
+      Datum firstClause = p.car();
+      if(ClassMacro.validKeywordClause(EXTENDS,firstClause)) {
+        interfaces = ((Pair)firstClause).cdr();
+        if(p.cdr() instanceof Pair) {
+          Datum nextClause = ((Pair)p.cdr()).car();
+          if(nextClause instanceof escm.type.String) {
+            docstring = nextClause;
+          }
+        }
+      } else if(firstClause instanceof escm.type.String) {
+        docstring = firstClause;
+      }
+      return new escm.util.Pair<Datum,Datum>(interfaces,docstring);
     }
 
     // Returns the list of static & instance properties
-    public static Datum getProperties(Datum interfacesList, Datum x) {
+    public static Datum getProperties(escm.util.Pair<Datum,Datum> interfacesListAndDocstring, Datum x) {
       if(!(x instanceof Pair)) return Nil.VALUE;
-      if(interfacesList instanceof Pair) {
+      int propertyOffset = 0;
+      if(!(interfacesListAndDocstring.first instanceof Nil)) ++propertyOffset;
+      if(interfacesListAndDocstring.second.isTruthy()) ++propertyOffset;
+      if(propertyOffset == 2) {
+        return ((Pair)((Pair)x).cdr()).cdr();
+      } else if(propertyOffset == 1) {
         return ((Pair)x).cdr();
       } else {
         return x;
@@ -527,13 +613,14 @@ public class ObjectPrimitives {
       Datum interfaceName = ClassMacro.parseOptionalClassOrInterfaceName(parameters);
       // Extract "is-a"'s
       Datum x = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
-      Datum interfacesList = getInterfaces(x);
+      escm.util.Pair<Datum,Datum> interfacesListAndDocstring = getInterfacesAndDocstring(x);
       // Extract "has-a"'s
-      Datum properties = getProperties(interfacesList,x);
+      Datum properties = getProperties(interfacesListAndDocstring,x);
       escm.util.Pair<Datum,Datum> staticAndNonStaticProps = getStaticAndNonStaticProperties(parameters,properties);
       escm.util.Pair<Datum,Datum> staticPropNamesAndVals = ClassMacro.parsePropertyNamesAndValues(parameters,staticAndNonStaticProps.first);
       // Generate the call to an internal primitive that makes our interface!
-      return Pair.List(ESCM_OO_INTERFACE,interfaceName,new Pair(CorePrimitives.LIST,interfacesList),
+      return Pair.List(ESCM_OO_INTERFACE,interfaceName,interfacesListAndDocstring.second,
+        new Pair(CorePrimitives.LIST,interfacesListAndDocstring.first),
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.first),
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.second),
         new Pair(CorePrimitives.LIST,staticAndNonStaticProps.second));
@@ -546,7 +633,7 @@ public class ObjectPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (define-interface <name> (:extends <interface> ...) <prop> ...)
+  // (define-interface <name> (:extends <interface> ...) <optional-docstring> <prop> ...)
   //
   // <prop> ::= <name>
   //          | (:static <name> <value>)
@@ -556,7 +643,7 @@ public class ObjectPrimitives {
   // 
   // NOTE: The EScheme code below doesn't account for generating the <name-keyword>
   // ===== argument passed to <interface>. See <interface>'s comment description
-  //       above for more details.
+  //       above for more details. It also doesn't parse <optional-docstring>.
   //
   //
   // (define-syntax define-interface
@@ -572,15 +659,25 @@ public class ObjectPrimitives {
 
     public Datum signature() {
       return Pair.List(
-        Pair.List(new Symbol("define-interface"),new Symbol("<interface-name>")),
-        Pair.List(new Symbol("define-interface"),new Symbol("<interface-name>"),Pair.List(new Keyword("extends"),new Symbol("<interface>"),Signature.VARIADIC)),
         Pair.List(new Symbol("define-interface"),new Symbol("<interface-name>"),
-          Pair.List(new Keyword("extends"),new Symbol("<interface>"),Signature.VARIADIC),
+          Pair.List(EXTENDS,new Symbol("<interface>"),Signature.VARIADIC),
+          new Symbol("<field-name>"),
+          Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
+          Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+          Signature.VARIADIC
+        ),
+        Pair.List(new Symbol("define-interface"),new Symbol("<interface-name>"),
+          Pair.List(EXTENDS,new Symbol("<interface>"),Signature.VARIADIC),
+          new Symbol("<docstring>"),
           new Symbol("<field-name>"),
           Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
           Signature.VARIADIC
         ));
+    }
+
+    public String docstring() {
+      return "Simple wrapper macro combining <define> and <interface> to bind <interface-name>.\nAlso generates a (<interface-name>? <obj>) predicate procedure!\nOptionally include <docstring> to detail information on the interface in <help>.\n\nAliased by <definterface>.\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -620,6 +717,10 @@ public class ObjectPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("super!"),new Symbol("<parameter>"),Signature.VARIADIC);
     }
+
+    public String docstring() {
+      return "Initialize the super object via its non-nullary constructor.\n\nONLY valid as the FIRST expression in a class constructor:\nany other use risks undefined behavior!\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       Datum params = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,-1);
@@ -647,6 +748,10 @@ public class ObjectPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("apply-super!"),new Symbol("<parameter>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Alternative to \"super!\" that initializes the super object by\napplying its <new> constructor to <list-of-args>.\n\nONLY valid as the FIRST expression in a class constructor:\nany other use risks undefined behavior!\n\nSee <oo> for more high-level object orientation details.\nSee <class> for more detailed object orientation details.\nSee <meta-object> for more type details.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

@@ -50,6 +50,17 @@ public abstract class Boolean extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public String docstring() {
+    if(this instanceof TrueBoolean) {
+      return "True boolean.";
+    } else {
+      return "False boolean.";
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
     return Objects.hash(type(),isTruthy());

@@ -507,6 +507,13 @@ public class Inexact extends Real {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public String docstring() {
+    return "Inexact value: "+display();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
     return Objects.hash(type(),value);

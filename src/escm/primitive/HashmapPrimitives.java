@@ -27,6 +27,10 @@ public class HashmapPrimitives {
       return Pair.List(new Symbol("hashmap"),new Symbol("<key>"),new Symbol("<value>"),Signature.VARIADIC);
     }
 
+    public String docstring() {
+      return "Construct a hashmap containing key-value associations of \"<key> <value> ...\".\nCreate hashmap literals via the {<key> <value> ...} syntax.\nHashmaps are applicable to a key to get their entry: (<hashmap> <key>)";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() % 2 != 0)
         throw new Exceptionf("'(hashmap <key> <value> ...) didn't receive an even number of args: %s", Exceptionf.profileArgs(parameters));
@@ -50,6 +54,10 @@ public class HashmapPrimitives {
       return Pair.List(new Symbol("hashmap-keys"),new Symbol("<hashmap>"));
     }
 
+    public String docstring() {
+      return "Get the keys of <hashmap> as a list.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Hashmap))
         throw new Exceptionf("'(hashmap-keys <hashmap>) didn't receive exactly 1 hashmap: %s", Exceptionf.profileArgs(parameters));
@@ -69,6 +77,10 @@ public class HashmapPrimitives {
       return Pair.List(new Symbol("hashmap-values"),new Symbol("<hashmap>"));
     }
 
+    public String docstring() {
+      return "Get the values of <hashmap> as a list.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Hashmap))
         throw new Exceptionf("'(hashmap-values <hashmap>) didn't receive exactly 1 hashmap: %s", Exceptionf.profileArgs(parameters));
@@ -86,6 +98,10 @@ public class HashmapPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("hashmap-key?"),new Symbol("<hashmap>"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is a key in <hashmap>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -110,6 +126,10 @@ public class HashmapPrimitives {
       return Pair.List(new Symbol("hashmap-val?"),new Symbol("<hashmap>"),new Symbol("<obj>"));
     }
 
+    public String docstring() {
+      return "Returns whether <obj> is a value in <hashmap>.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(hashmap-val? <hashmap> <obj>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -130,6 +150,10 @@ public class HashmapPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("hashmap-set!"),new Symbol("<hashmap>"),new Symbol("<key>"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Associate <value> to <key> in <hashmap>.\nReturns whether replaced an existing value.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -154,6 +178,10 @@ public class HashmapPrimitives {
       return Pair.List(new Symbol("hashmap-delete!"),new Symbol("<hashmap>"),new Symbol("<key>"));
     }
 
+    public String docstring() {
+      return "Delete <key>'s association in <hashmap>. Returns whether succeeded.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(hashmap-delete! <hashmap> <key>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -174,6 +202,10 @@ public class HashmapPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("hashmap-merge"),new Symbol("<hashmap>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns a new <hashmap> combining all of the associations in \"<hashmap> ...\".";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -199,6 +231,10 @@ public class HashmapPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("hashmap-merge!"),new Symbol("<hashmap>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Combine all of the associations in \"<merged-hashmap> ...\" into <hashmap>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -231,6 +267,10 @@ public class HashmapPrimitives {
       return Pair.List(new Symbol("hashmap?"),new Symbol("<obj>"));
     }
 
+    public String docstring() {
+      return "Returns whether <obj> is a hashmap.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1)
         throw new Exceptionf("'(hashmap? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -248,6 +288,10 @@ public class HashmapPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("hashcode"),new Symbol("<obj>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns the hashcode of \"<obj> ...\" combined with one another.\nUnused by any of the other hashmap primitives, but hey, it\ncould be useful to expose to users.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

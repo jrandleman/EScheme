@@ -14,6 +14,7 @@ import escm.vm.type.callable.Callable;
 public abstract class PrimitiveSyntaxCallable implements Callable, Serializable {
   public Environment definitionEnvironment;
   public abstract String escmName();
+  public abstract String docstring();
   public abstract Datum signature();
   public abstract Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception;
 }

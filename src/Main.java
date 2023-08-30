@@ -271,6 +271,9 @@ public class Main {
     escm.type.concurrent.Thread mainThread = new escm.type.concurrent.Thread(
       "escm-main",
       new Callable() {
+        public String docstring() {
+          return "EScheme's main thread runnable. Starts the EScheme VM.";
+        }
         public Datum signature() {
           return Pair.List(new Symbol(escm.type.concurrent.Thread.DEFAULT_RUNNABLE_NAME));
         }

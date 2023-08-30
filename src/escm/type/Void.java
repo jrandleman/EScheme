@@ -43,6 +43,13 @@ public class Void extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public java.lang.String docstring() {
+    return "The \"nothing\" type: #void";
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
     return Objects.hash(type());

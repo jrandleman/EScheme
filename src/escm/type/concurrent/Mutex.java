@@ -123,6 +123,25 @@ public class Mutex extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public String docstring() {
+    if(name == null) {
+      if(isLocked()) {
+        return "Mutex (locked)";
+      } else {
+        return "Mutex (unlocked)";
+      }
+    } else {
+      if(isLocked()) {
+        return "Mutex (locked) named \""+name+"\"";
+      } else {
+        return "Mutex (unlocked) named \""+name+"\"";
+      }
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
     return Objects.hash(type(),lock);

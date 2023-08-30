@@ -107,7 +107,11 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("quote"),new Symbol("<obj>"));
+      return Pair.List(QUOTE,new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns <obj> as a data structure.\nNote that the reader will expand \"'<obj>\" to \"(quote <obj>)\".\n\nFor example:\n  (quote a)  ; a\n  (quote 1)  ; 1\n  (quote \"\") ; \"\"\n  (quote #t) ; #t\n  (quote ()) ; #nil\n  (quote (1 2 . 3)) ; (cons 1 (cons 2 3))\n  (quote (1 2 3))   ; (list 1 2 3)";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -136,6 +140,10 @@ public class CorePrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("define-syntax"),new Symbol("<name>"),new Symbol("<callable>"));
     }
+
+    public String docstring() {
+      return "Defines <macro-name> to be a macro that uses to <callable>\nto perform its code expansion.\n\nFor example:\n  (define-syntax and\n    (lambda (. conditions)\n      (fold (lambda (acc item) (list (quote if) acc item #f))\n            #t\n            conditions)))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2)
@@ -149,11 +157,11 @@ public class CorePrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (fn ((<param> ...) <body> ...) ...)
+  // (fn <optional-docstring> ((<param> ...) <body> ...) ...)
   //   => NOTE: Supports optional parameters via "(<param> <dflt-value>)" syntax
   // 
   // NOTE: The EScheme code below doesn't account for allowing mixing optional
-  // ===== parameters with a variadic parameter too!
+  // ===== parameters with a variadic parameter too, nor parsing <optional-docstring>.
   //
   // (define (escm-fn-has-optional-parameters? params)
   //   (if (pair? params) 
@@ -204,30 +212,44 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("fn"),
-              Pair.List(Pair.List(),new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(new Symbol("<variadic-parameter>"),new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,new Symbol("."),new Symbol("<variadic-parameter>")),new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
-                                  Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC),
-                new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
-                                  Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC,
-                                  new Symbol("."),new Symbol("<variadic-parameter>")),
-                new Symbol("<body>"),Signature.VARIADIC),
-              Signature.VARIADIC);
+      Datum fnSignatures = Pair.List(
+        Pair.List(Pair.List(),new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("<variadic-parameter>"),new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,new Symbol("."),new Symbol("<variadic-parameter>")),new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
+                            Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
+                            Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC,
+                            new Symbol("."),new Symbol("<variadic-parameter>")),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Signature.VARIADIC);
+      return Pair.List(new Pair(FN,fnSignatures),new Pair(FN,new Pair(new Symbol("<docstring>"),fnSignatures)));
     }
 
+    public String docstring() {
+      return "Create a multi-arity procedure, with support for optional parameters via the\n\"(<param-name> <default-value>)\" syntax. Denote variadic parameters via the\n\"(<param> ... . <variadic-param>)\" or \"<variadic-param>\" syntax.\n\nOptionally include <docstring> to yield further details on the procedure's\nintended purpose in the <help> menu.\n\nFor example:\n  ; Using Mult-arity\n  (define factorial \n    (fn ((n) (factorial n 1))\n        ((n p)\n          (if (< n 2)\n              p\n              (factorial (- n 1) (* n p))))))\n\n\n  ; Using optional parameters: p is <1> by default\n  (define factorial\n    (fn ((n (p 1))\n          (if (< n 2)\n              p\n              (factorial (- n 1) (* n p))))))\n\n\n  ; Combine <fn> and <define> via <defn>:\n  (defn factorial \n    ((n) (factorial n 1))\n    ((n p)\n      (if (< n 2)\n          p\n          (factorial (- n 1) (* n p)))))";
+    }
+
+    // Extract <docstring> if exists, else <null>
+    public static escm.type.String parseOptionalDocstring(ArrayList<Datum> parameters, int n, int docstringIdx) {
+      if(n > docstringIdx+1) {
+        Datum d = parameters.get(docstringIdx);
+        if(d instanceof escm.type.String) return (escm.type.String)d;
+      }
+      return null;
+    }
+
+    // Parse out required params (returned) & optional params (in <PairBox>)
     private static class PairBox {
       private Pair value = null;
     }
 
-    // Parse out required params (returned) & optional params (in <PairBox>)
     private static Datum parseClauseParameters(Datum params, PairBox optionalParams, ArrayList<Datum> parameters) throws Exception {
       if(!(params instanceof Pair)) {
         // should be unreachable since we know we have some optional args in <params>
-        throw new Exceptionf("'(fn ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
       }
       Pair p = (Pair)params;
       Datum param = p.car();
@@ -328,7 +350,7 @@ public class CorePrimitives {
     // Type-check clause & return if has any optional params
     private static boolean clauseHasOptionalParam(Datum clause, ArrayList<Datum> parameters) throws Exception {
       if(!isValidClause(clause))
-        throw new Exceptionf("'(fn ((<param> ...) <body> ...) ...) invalid clause %s: %s", clause.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid clause %s: %s", clause.profile(), Exceptionf.profileArgs(parameters));
       Datum params = ((Pair)clause).car();
       Datum iter = params;
       if(!(params instanceof Pair)) return false;
@@ -339,20 +361,20 @@ public class CorePrimitives {
         boolean paramIsPair = param instanceof Pair;
         // verify that all optional args are clumped (no more required args)
         if(hasOptional && !paramIsPair)
-          throw new Exceptionf("'(fn ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
+          throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
         if(paramIsPair) {
           hasOptional = true;
           // verify first item in optional arg syntax is an arg name symbol
           if(!(((Pair)param).car() instanceof Symbol))
-            throw new Exceptionf("'(fn ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
+            throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
         } else if(!(param instanceof Symbol)) {
           // verify required arg syntax is an arg name symbol
-          throw new Exceptionf("'(fn ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
+          throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
         }
         iter = p.cdr();
       }
       if(!(iter instanceof Nil) && !(iter instanceof Symbol))
-        throw new Exceptionf("'(fn ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
       return hasOptional;
     }
 
@@ -391,11 +413,20 @@ public class CorePrimitives {
     }
 
     public static Trampoline.Bounce logic(Environment defEnv, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() < 1)
-        throw new Exceptionf("'(fn ((<param> ...) <body> ...) ...) needs at least 1 arg: %s", Exceptionf.profileArgs(parameters));
-      return getExpandedClauses(defEnv,parameters,0,parameters.size(),Nil.VALUE,(expandedCompiledClauses) -> () -> {
-        return continuation.run(Pair.List(BYTECODE,new Pair(LOAD_CLOSURE,applyAppend(expandedCompiledClauses))));
-      });
+      int n = parameters.size();
+      escm.type.String docstring = parseOptionalDocstring(parameters,n,0);
+      int minFnSize = docstring == null ? 1 : 2;
+      if(n < minFnSize)
+        throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) needs at least 1 body clause: %s", Exceptionf.profileArgs(parameters));
+      if(docstring == null) {
+        return getExpandedClauses(defEnv,parameters,0,n,Nil.VALUE,(expandedCompiledClauses) -> () -> {
+          return continuation.run(Pair.List(BYTECODE,new Pair(LOAD_CLOSURE,applyAppend(expandedCompiledClauses))));
+        }); 
+      } else {
+        return getExpandedClauses(defEnv,parameters,1,n,Nil.VALUE,(expandedCompiledClauses) -> () -> {
+          return continuation.run(Pair.List(BYTECODE,new Pair(LOAD_CLOSURE,new Pair(docstring,applyAppend(expandedCompiledClauses)))));
+        });
+      }
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -405,8 +436,11 @@ public class CorePrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (lambda (<param> ...) <body> ...)
+  // (lambda (<param> ...) <optional-docstring> <body> ...)
   //   => NOTE: Supports optional parameters via "(<param> <dflt-value>)" syntax
+  //
+  // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>.
+  // =====
   //
   // (define-syntax lambda
   //   (fn ((params . body)
@@ -417,28 +451,39 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
+      Symbol BODY = new Symbol("<body>");
+      Symbol PARAMETER = new Symbol("<parameter>");
+      Symbol PARAM = new Symbol("<param>");
+      Symbol OPTIONAL_PARAM = new Symbol("<optional-param>");
+      Symbol DEFAULT_VALUE = new Symbol("<default-value>");
+      Symbol DOT = new Symbol(".");
+      Symbol VARIADIC_PARAM = new Symbol("<variadic-parameter>");
+      Symbol DOCSTRING = new Symbol("<docstring>");
       return Pair.List(
-              Pair.List(new Symbol("lambda"),
-                Pair.List(),
-                new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(new Symbol("lambda"),
-                new Symbol("<variadic-parameter>"),
-                new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(new Symbol("lambda"),
-                Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),
-                new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(new Symbol("lambda"),
-                Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,new Symbol("."),new Symbol("<variadic-parameter>")),
-                new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(new Symbol("lambda"),
-                Pair.List(new Symbol("<param>"),Signature.VARIADIC,
-                          Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC),
-                new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(new Symbol("lambda"),
-                Pair.List(new Symbol("<param>"),Signature.VARIADIC,
-                          Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC,
-                          new Symbol("."),new Symbol("<variadic-parameter>")),
-                new Symbol("<body>"),Signature.VARIADIC));
+        Pair.List(LAMBDA,Pair.List(),BODY,Signature.VARIADIC),
+        Pair.List(LAMBDA,Pair.List(),DOCSTRING,BODY,Signature.VARIADIC),
+        Pair.List(LAMBDA,VARIADIC_PARAM,BODY,Signature.VARIADIC),
+        Pair.List(LAMBDA,VARIADIC_PARAM,DOCSTRING,BODY,Signature.VARIADIC),
+        Pair.List(LAMBDA,Pair.List(PARAMETER,Signature.VARIADIC),BODY,Signature.VARIADIC),
+        Pair.List(LAMBDA,Pair.List(PARAMETER,Signature.VARIADIC),DOCSTRING,BODY,Signature.VARIADIC),
+        Pair.List(LAMBDA,Pair.List(PARAMETER,Signature.VARIADIC,DOT,VARIADIC_PARAM),BODY,Signature.VARIADIC),
+        Pair.List(LAMBDA,Pair.List(PARAMETER,Signature.VARIADIC,DOT,VARIADIC_PARAM),DOCSTRING,BODY,Signature.VARIADIC),
+        Pair.List(LAMBDA,
+          Pair.List(PARAM,Signature.VARIADIC,Pair.List(OPTIONAL_PARAM,DEFAULT_VALUE),Signature.VARIADIC),
+          BODY,Signature.VARIADIC),
+        Pair.List(LAMBDA,
+          Pair.List(PARAM,Signature.VARIADIC,Pair.List(OPTIONAL_PARAM,DEFAULT_VALUE),Signature.VARIADIC),
+          DOCSTRING,BODY,Signature.VARIADIC),
+        Pair.List(LAMBDA,
+          Pair.List(PARAM,Signature.VARIADIC,Pair.List(OPTIONAL_PARAM,DEFAULT_VALUE),Signature.VARIADIC,DOT,VARIADIC_PARAM),
+          BODY,Signature.VARIADIC),
+        Pair.List(LAMBDA,
+          Pair.List(PARAM,Signature.VARIADIC,Pair.List(OPTIONAL_PARAM,DEFAULT_VALUE),Signature.VARIADIC,DOT,VARIADIC_PARAM),
+          DOCSTRING,BODY,Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "Shorthand for single-arity procedures. Expands to <fn> under the hood.\nSupports optional parameters via the \"(<param-name> <default-value>)\"\nsyntax. Denote variadic parameters via \"(<param> ... . <variadic-param>)\"\nor \"<variadic-param>\" syntax. Reader-shorthand support via the <#(> syntax.\n\nOptionally include <docstring> to yield further details on the procedure's\nintended purpose in the <help> menu.\n\nFor example:\n  ; Using optional parameters: p is <1> by default\n  (define factorial\n    (lambda (n (p 1))\n      (if (< n 2)\n          p\n          (factorial (- n 1) (* n p)))))\n\n\n  ; Combine <lambda> and <define> via:\n  (define (factorial n (p 1))\n    (if (< n 2)\n        p\n        (factorial (- n 1) (* n p))))\n\n\n  ;; Reader-shorthand via <#(>: #<expr> => (lambda () <expr>)\n  ;; Denote the Nth parameter via %N, with N starting at 1. \n  ;; Use %% to denote the variadic parameter.\n\n  ; Add 2:\n  (define add2 #(+ %1 2))\n\n  ; Get the 2nd parameter:\n  (define get-2nd #(begin %2))\n\n  ; The 'id' procedure:\n  (define id #(begin %1))\n\n  ; The 'list' procedure:\n  (define list #(begin %%))";
     }
 
     public static Datum getAllExpressionsAfter(ArrayList<Datum> parameters, int startingIdx) {
@@ -450,12 +495,16 @@ public class CorePrimitives {
     }
 
     public static Trampoline.Bounce logic(Environment defEnv, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() < 1)
-        throw new Exceptionf("'(lambda (<param> ...) <body> ...) didn't receive (<param> ...): %s", Exceptionf.profileArgs(parameters));
+      int n = parameters.size();
+      if(n < 1)
+        throw new Exceptionf("'(lambda (<param> ...) <optional-docstring> <body> ...) didn't receive (<param> ...): %s", Exceptionf.profileArgs(parameters));
       Datum params = parameters.get(0);
-      Datum body = getAllExpressionsAfter(parameters,0);
+      escm.type.String docstring = Fn.parseOptionalDocstring(parameters,n,1);
+      int priorBodyIdx = docstring == null ? 0 : 1;
+      Datum body = getAllExpressionsAfter(parameters,priorBodyIdx);
       if(body instanceof Nil) body = new Pair(Void.VALUE,Nil.VALUE);
       parameters.clear();
+      if(docstring != null) parameters.add(docstring);
       parameters.add(new Pair(params,body));
       return Fn.logic(defEnv,parameters,continuation);
     }
@@ -518,8 +567,12 @@ public class CorePrimitives {
 
     public Datum signature() {
       return Pair.List(
-              Pair.List(new Symbol("if"),new Symbol("<condition>"),new Symbol("<consequence>")),
-              Pair.List(new Symbol("if"),new Symbol("<condition>"),new Symbol("<consequence>"),new Symbol("<alternative>")));
+              Pair.List(IF,new Symbol("<condition>"),new Symbol("<consequence>")),
+              Pair.List(IF,new Symbol("<condition>"),new Symbol("<consequence>"),new Symbol("<alternative>")));
+    }
+
+    public String docstring() {
+      return "Conditional branching:\n  if (not (eq? #f <condition>)): execute <consequence>\n  else: execute <alternative> (defaults to #void).";
     }
 
     private Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum condition, Datum consequence, Datum alternative, Trampoline.Continuation continuation) throws Exception {
@@ -564,7 +617,11 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("begin"),new Symbol("<expression>"),Signature.VARIADIC);
+      return Pair.List(BEGIN,new Symbol("<expression>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Combines a series of EScheme expressions into a single expression.\nSimilar to how {} is used in C++/Java, BUT <begin> does NOT have\nits own scope (use <let> for such instead).";
     }
 
     private Trampoline.Bounce iterate(ArrayList<Datum> parameters, int i, Datum compiledExpressions, Trampoline.Continuation continuation) throws Exception {
@@ -595,7 +652,11 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("set!"),new Symbol("<symbol>"),new Symbol("<obj>"));
+      return Pair.List(SET_BANG,new Symbol("<symbol>"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Assigns <symbol> to <obj>. <symbol> must have been previously\ndefined. Note that <symbol> may be an object property chain too,\nhence (set! obj.prop 42) is valid syntax!";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -613,7 +674,10 @@ public class CorePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // (define <var> <value>) 
-  // (define (<fcn-name> <param> ...) <body> ...)
+  // (define (<function-name> <param> ...) <optional-docstring> <body> ...)
+  //
+  // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>.
+  // =====
   //
   // (define-syntax define
   //   (lambda (bindings . vals)
@@ -638,8 +702,13 @@ public class CorePrimitives {
 
     public Datum signature() {
       return Pair.List(
-        Pair.List(new Symbol("define"),new Symbol("<symbol>"),new Symbol("<obj>")),
-        Pair.List(new Symbol("define"),Pair.List(new Symbol("<function-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC));
+        Pair.List(DEFINE,new Symbol("<symbol>"),new Symbol("<obj>")),
+        Pair.List(DEFINE,Pair.List(new Symbol("<function-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(DEFINE,Pair.List(new Symbol("<function-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<docstring>"),new Symbol("<body>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "Binds <symbol> to <obj> in the current environment.\nAliased by <def>. The 2nd signature is equivalent to:\n  (define <function-name> (lambda (<parameter> ...) <obj>))\n\nOptionally include <docstring> to yield further details on\nthe procedure's intended purpose in the <help> menu.\n\nNote that <symbol> may be an object property chain too,\nhence (define obj.prop 42) is valid syntax!";
     }
 
     private Trampoline.Bounce compileSimpleDefine(Datum bindings, Datum value, Trampoline.Continuation continuation) throws Exception {
@@ -650,11 +719,11 @@ public class CorePrimitives {
 
     private Trampoline.Bounce compileProcedureDefine(Datum bindings, int n, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(!(bindings instanceof Pair))
-        throw new Exceptionf("'(define (<fcn-name> <param> ...) <body> ...) invalid syntax: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(define (<function-name> <param> ...) <body> ...) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       Pair bindingsPair = (Pair)bindings;
       Datum functionName = bindingsPair.car();
       if(!(functionName instanceof Symbol))
-        throw new Exceptionf("'(define (<fcn-name> <param> ...) <body> ...) <fcn-name> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(define (<function-name> <param> ...) <body> ...) <function-name> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
       parameters.set(0,bindingsPair.cdr());
       return Lambda.logic(this.definitionEnvironment,parameters,(expandedLambda) -> () -> {
         return continuation.run(Pair.binaryAppend(expandedLambda,Pair.List(Pair.List(DEFINE,functionName))));
@@ -684,7 +753,11 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("defined?"),new Symbol("<symbol>"));
+      return Pair.List(DEFINEDP,new Symbol("<symbol>"));
+    }
+
+    public String docstring() {
+      return "Checks if <symbol> is defined in the current environment.\nAliased by <def?>. Note that <symbol> may be an object\nproperty chain too, hence (defined? obj.prop) is valid syntax!";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -696,7 +769,10 @@ public class CorePrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (defn <fcn-name> ((<param> ...) <body> ...) ...)
+  // (defn <function-name> <optional-docstring> ((<param> ...) <body> ...) ...)
+  //
+  // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>.
+  // =====
   //
   // (define-syntax defn
   //   (lambda (name . clauses)
@@ -707,28 +783,37 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("defn"),new Symbol("<function-name>"),
-              Pair.List(Pair.List(),new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(new Symbol("<variadic-parameter>"),new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,new Symbol("."),new Symbol("<variadic-parameter>")),new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
-                                  Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC),
-                new Symbol("<body>"),Signature.VARIADIC),
-              Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
-                                  Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC,
-                                  new Symbol("."),new Symbol("<variadic-parameter>")),
-                new Symbol("<body>"),Signature.VARIADIC),
-              Signature.VARIADIC);
+      Symbol DEFN = new Symbol("defn");
+      Symbol FCN_NAME = new Symbol("<function-name>");
+      Datum defnSignatures = Pair.List(
+        Pair.List(Pair.List(),new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("<variadic-parameter>"),new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,new Symbol("."),new Symbol("<variadic-parameter>")),new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
+                            Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
+                            Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC,
+                            new Symbol("."),new Symbol("<variadic-parameter>")),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Signature.VARIADIC);
+      return Pair.List(
+        new Pair(DEFN,new Pair(FCN_NAME,defnSignatures)),
+        new Pair(DEFN,new Pair(FCN_NAME,new Pair(new Symbol("<docstring>"),defnSignatures))));
+    }
+
+    public String docstring() {
+      return "Combines <define> and <fn> by binding <function-name> to\n(fn (<parameters> <body> ...) ...)\n\nOptionally include <docstring> to yield further details\non the procedure's intended purpose in the <help> menu.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
       if(n < 2)
-        throw new Exceptionf("'(defn <fcn-name> ((<param> ...) <body> ...) ...) invalid syntax: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(defn <function-name> <optional-docstring> ((<param> ...) <body> ...) ...) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       Datum name = parameters.get(0);
       if(!(name instanceof Symbol))
-        throw new Exceptionf("'(defn <fcn-name> ((<param> ...) <body> ...) ...) <fcn-name> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(defn <function-name> <optional-docstring> ((<param> ...) <body> ...) ...) <function-name> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
       Datum clauses = Nil.VALUE;
       for(int i = n-1; i > 0; --i) {
         clauses = new Pair(parameters.get(i),clauses);
@@ -753,6 +838,10 @@ public class CorePrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("and"),new Symbol("<obj>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns whether none of \"<obj> ...\" are #f.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -785,6 +874,10 @@ public class CorePrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("or"),new Symbol("<obj>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns whether any of \"<obj> ...\" are #t.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -820,7 +913,11 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("delay"),new Symbol("<obj>"));
+      return Pair.List(new Symbol("delay"),new Symbol("<expression>"));
+    }
+
+    public String docstring() {
+      return "Delay <expression>'s evaluation until it is forced via <force>.\nFor example: (force (delay (+ 1 2))) ; => 3";
     }
 
     private static class DatumBox {
@@ -839,6 +936,9 @@ public class CorePrimitives {
       DatumBox result = new DatumBox();
       BooleanBox isForced = new BooleanBox();
       return new PrimitiveProcedure(Procedure.DEFAULT_NAME,new Callable() {
+        public String docstring() {
+          return "Generated <delay> expression.";
+        }
         public Datum signature() {
           return Pair.List(new Symbol(Procedure.DEFAULT_NAME));
         }
@@ -902,11 +1002,15 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("cond"),
+      return Pair.List(COND,
               Pair.List(new Symbol("<condition>"),new Symbol("<expr>"),Signature.VARIADIC),
-              Pair.List(new Symbol("<condition>"),new Symbol("=>"),new Symbol("<callable>")),
-              Pair.List(new Symbol("else"),new Symbol("<expr>"),Signature.VARIADIC),
+              Pair.List(new Symbol("<condition>"),ARROW,new Symbol("<callable>")),
+              Pair.List(ELSE,new Symbol("<expr>"),Signature.VARIADIC),
               Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Conditional if-else chains. If <condition> is true, execute <body>.\nWith '=>' syntax, <condition> is passed to <callable> iff <condition> is #t.\n<else> is equivalent to #t.";
     }
 
     private static Datum makeCondition(Datum condition) {
@@ -951,7 +1055,10 @@ public class CorePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // (let ((<var> <value>) ...) <body> ...) 
-  // (let <fcn-name> ((<param> <initial-value>) ...) <body> ...)
+  // (let <function-name> ((<param> <initial-value>) ...) <optional-docstring> <body> ...)
+  //
+  // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>.
+  // =====
   //
   // (define-syntax let
   //   (lambda (bindings . body)
@@ -979,12 +1086,19 @@ public class CorePrimitives {
 
     public Datum signature() {
       return Pair.List(
-        Pair.List(new Symbol("let"),
+        Pair.List(LET,
           Pair.List(Pair.List(new Symbol("<symbol>"),new Symbol("<obj>")),Signature.VARIADIC),
           new Symbol("<body>"),Signature.VARIADIC),
-        Pair.List(new Symbol("let"),new Symbol("<function-name>"),
+        Pair.List(LET,new Symbol("<function-name>"),
           Pair.List(Pair.List(new Symbol("<parameter>"),new Symbol("<initial-value>")),Signature.VARIADIC),
-          new Symbol("<body>"),Signature.VARIADIC));
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(LET,new Symbol("<function-name>"),
+          Pair.List(Pair.List(new Symbol("<parameter>"),new Symbol("<initial-value>")),Signature.VARIADIC),
+          new Symbol("<docstring>"),new Symbol("<body>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "Signature 1 (nameless let):\n  Bind \"(<symbol> <obj>) ...\" in a local scope and execute <body>.\nSignature 2 (named let):\n  Bind <function-name> to (lambda (<parameter> ...) <body> ...) in a temporary\n  scope, and call it with \"<initial-value> ...\". Optionally include <docstring>\n  to yield further details on the procedure's intended purpose via <help>.";
     }
 
     private static escm.util.Pair<Datum,Datum> getParamsAndArgs(Datum bindings, ArrayList<Datum> parameters) throws Exception {
@@ -1004,20 +1118,16 @@ public class CorePrimitives {
         new Pair(bindingValue,paramsAndArgs.second));
     }
 
-    private static Datum getBody(Datum body) {
-      return new Pair(BEGIN,body);
-    }
-
     private static Datum generateNamedLet(Datum functionName, Datum bindings, Datum body, ArrayList<Datum> parameters) throws Exception {
       escm.util.Pair<Datum,Datum> paramsAndArgs = getParamsAndArgs(bindings,parameters);
       return Pair.List(Pair.List(LAMBDA,Nil.VALUE,
-              Pair.List(DEFINE,functionName,Pair.List(LAMBDA,paramsAndArgs.first,getBody(body))),
+              Pair.List(DEFINE,functionName,new Pair(LAMBDA,new Pair(paramsAndArgs.first,body))),
               new Pair(functionName,paramsAndArgs.second)));
     }
 
     private static Datum generateAnonLet(Datum bindings, Datum body, ArrayList<Datum> parameters) throws Exception {
       escm.util.Pair<Datum,Datum> paramsAndArgs = getParamsAndArgs(bindings,parameters);
-      return new Pair(Pair.List(LAMBDA,paramsAndArgs.first,getBody(body)),paramsAndArgs.second);
+      return new Pair(new Pair(LAMBDA,new Pair(paramsAndArgs.first,body)),paramsAndArgs.second);
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1027,7 +1137,7 @@ public class CorePrimitives {
       Datum body = Lambda.getAllExpressionsAfter(parameters,0);
       if(bindings instanceof Symbol) {
         if(!(body instanceof Pair))
-          throw new Exceptionf("'(let <fcn-name> ((<param> <initial-value>) ...) <body> ...) missing parameters: %s", Exceptionf.profileArgs(parameters));
+          throw new Exceptionf("'(let <function-name> ((<param> <initial-value>) ...) <body> ...) missing parameters: %s", Exceptionf.profileArgs(parameters));
         Pair p = (Pair)body;
         return generateNamedLet(bindings,p.car(),p.cdr(),parameters);
       } else {
@@ -1111,7 +1221,11 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("quasiquote"),new Symbol("<obj>"));
+      return Pair.List(QUASIQUOTE,new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns <obj> as a data structure. Any <unquote>d <obj>s will be\nevaluated first, and <unquote-splicing>ed <obj>s will be\nevaluated and spliced into the list.\nNote that the reader will expand:\n  \"`<obj>\" => \"(quasiquote <obj>)\"\n  \",<obj>\" => \"(unquote <obj>)\"\n  \",@<obj>\" => \"(unquote-splicing <obj>)\"";
     }
 
     private static boolean isTaggedList(Pair lst, Symbol tag) {
@@ -1240,9 +1354,13 @@ public class CorePrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("case"),new Symbol("<value>"),
               Pair.List(Pair.List(new Symbol("<key>"),Signature.VARIADIC),new Symbol("<expr>"),Signature.VARIADIC),
-              Pair.List(Pair.List(new Symbol("<key>"),Signature.VARIADIC),new Symbol("=>"),new Symbol("<callable>")),
-              Pair.List(new Symbol("else"),new Symbol("<expr>"),Signature.VARIADIC),
+              Pair.List(Pair.List(new Symbol("<key>"),Signature.VARIADIC),ARROW,new Symbol("<callable>")),
+              Pair.List(ELSE,new Symbol("<expr>"),Signature.VARIADIC),
               Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Conditional \"switch\" dispatch. If <value> matches any key in \"<key> ...\",\nexecute <body>. With '=>' syntax, (member <value> (list <key> ...)) is passed\nto <callable> iff <value> matches any key in \"<key> ...\".\n<else> matches against all <value>s.";
     }
 
     private static Datum restOfClause(Pair clause) throws Exception {
@@ -1298,6 +1416,10 @@ public class CorePrimitives {
         new Symbol("<body>"),Signature.VARIADIC);
     }
 
+    public String docstring() {
+      return "Equivalent to <let>, but later <symbol>s may refer\nto earlier ones.";
+    }
+
     private static Datum generateNestedLambdaCalls(Symbol baseLetSymbol, Datum bindings, Datum internalLet, ArrayList<Datum> parameters) throws Exception {
       if(!(bindings instanceof Pair)) return internalLet;
       Pair p = (Pair)bindings;
@@ -1337,9 +1459,13 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("letrec"),
+      return Pair.List(LETREC,
         Pair.List(Pair.List(new Symbol("<symbol>"),new Symbol("<obj>")),Signature.VARIADIC),
         new Symbol("<body>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Like <let>, but <value> may be a recursive function that\ncalls <symbol>.";
     }
 
     private static escm.util.Pair<Datum,Datum> getParamsDefaultAndActualSettings(Datum bindings, ArrayList<Datum> parameters) throws Exception {
@@ -1393,6 +1519,10 @@ public class CorePrimitives {
         new Symbol("<body>"),Signature.VARIADIC);
     }
 
+    public String docstring() {
+      return "Equivalent to <letrec>, but later <symbol>s may refer\nto earlier ones.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       return LetStar.logic("letrec*",LETREC,parameters);
     }
@@ -1413,7 +1543,11 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("unless"),new Symbol("<body>"),Signature.VARIADIC);
+      return Pair.List(new Symbol("unless"),new Symbol("<condition>"),new Symbol("<body>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Execute \"<body> ...\" if <condition> is not true. Can be combined with the\n'*import*' global variable to mimic Python's \"if __name__=='__main__':\"\npattern:\n\n  (unless *import*\n    <execute-main-escheme-code-here> ...)\n\nOpposite of <when>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1438,7 +1572,11 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("when"),new Symbol("<body>"),Signature.VARIADIC);
+      return Pair.List(new Symbol("when"),new Symbol("<condition>"),new Symbol("<body>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Execute \"<body> ...\" if <condition> is true. Opposite of <unless>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1480,6 +1618,10 @@ public class CorePrimitives {
         Pair.List(new Symbol("while"),
           Pair.List(new Symbol("<condition>"),new Symbol("<return-expr>"),Signature.VARIADIC),
           new Symbol("<body>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "Execute \"<body> ...\" while <condition> is true.\nReturn \"<return-expr> ...\" (defaults to #void) upon completion.\nNote that <while> uses true iteration (not recursion!)";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -1560,6 +1702,10 @@ public class CorePrimitives {
           Pair.List(Pair.List(new Symbol("<var>"),new Symbol("<initial-value>"),new Symbol("<update-expression>")),Signature.VARIADIC),
           Pair.List(new Symbol("<break-condition>"),new Symbol("<return-expression>"),Signature.VARIADIC),
           new Symbol("<body>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "(do ((<var> <initial-val> <update-expr>) ...) \n    (<break-condition> <return-expr> ...) \n    <body> ...)\n\nExecute \"<body> ...\" while <break-condition> is #f. Once <break-condition> is\n#t, return \"<return-expr> ...\". \"<var>\" is set to \"<initial-val>\" at first, then\nto \"<update-expr>\" repeatedly after each iteration.\n\nNote: \n  1. \"<update-expr>\" is optional\n  2. If \"<update-expr>\" is ommited, \"<var> <initial-val>\" is optional\n  3. \"<return-expr> ...\" is optional\n  4. If \"<return-expr> ...\" is ommited, \"<break-condition>\" is optional\n  5. \"<body> ...\" is optional\n\nHence the most minimal form of \"do\" is \"(do () ())\" (an infinite loop).";
     }
 
     private static escm.util.Pair<Datum,Datum> getVarsAndVals(Datum varBindings, ArrayList<Datum> parameters) throws Exception {
@@ -1649,7 +1795,11 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("-<>"),new Symbol("<expression>"),Signature.VARIADIC);
+      return Pair.List(ARROW_WAND,new Symbol("<expression>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Execute each expression, with \"<>\" bound as the result of the last expression.\nFor example:\n  ; The below results in 64:\n  (-<> (* 2 2)\n       (+ <> <>)\n       (* <> <>))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1672,10 +1822,13 @@ public class CorePrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (curry (<param> ...) <body> ...)
+  // (curry (<param> ...) <optional-docstring> <body> ...)
   //   => APPLICATION: Both ((K 1) 2) and (K 1 2) are valid!
   //   => NOTE: It is UNDEFINED BEHAVIOR to have a VARIADIC CURRIED lambda
   //            IE: (curry (x . xs) x) ; INVALID!
+  //
+  // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>.
+  // =====
   //
   // (define-syntax curry 
   //   (lambda (params . body)
@@ -1700,41 +1853,59 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("curry"),
-        Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),
-        new Symbol("<body>"),Signature.VARIADIC);
+      return Pair.List(
+        Pair.List(CURRY,
+          Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(CURRY,
+          Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),
+          new Symbol("<docstring>"),new Symbol("<body>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "<lambda> alternative to create a curried procedure! Suppose\n(define fcn (curry (a b) a)). <fcn> may be invoked as either\n(fcn 1 2) or ((fcn 1) 2).\n\n  => NOTE: It is UNDEFINED BEHAVIOR to have a VARIADIC CURRIED procedure!\n\nOptionally include <docstring> to yield further details on the\nprocedure's intended purpose in the <help> menu.";
     }
 
     private static Datum FA = Pair.List(new Symbol("f"),new Symbol("a"));
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() < 1)
+      int n = parameters.size();
+      if(n < 1)
         throw new Exceptionf("'(curry (<param> ...) <body> ...) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       Datum params = parameters.get(0);
-      Datum body = Lambda.getAllExpressionsAfter(parameters,0);
+      escm.type.String docstring = Fn.parseOptionalDocstring(parameters,n,1);
+      int priorBodyIdx = docstring == null ? 0 : 1;
+      Datum body = Lambda.getAllExpressionsAfter(parameters,priorBodyIdx);
       Symbol curriedLambdas = UniqueSymbol.generate("curry-lambdas");
       Symbol x = UniqueSymbol.generate("curry-x");
       Symbol xs = UniqueSymbol.generate("curry-xs");
       if(!(params instanceof Pair)) {
+        if(docstring != null) body = new Pair(docstring,body);
         return new Pair(LAMBDA,new Pair(Nil.VALUE,body));
       } 
       Pair paramsPair = (Pair)params;
       if(!(paramsPair.cdr() instanceof Pair)) {
-        return Pair.List(LAMBDA,new Pair(x,xs),
-            Pair.List(FOLD,
-              Pair.List(LAMBDA,FA,FA),
-              new Pair(LAMBDA,new Pair(params,body)),
-              Pair.List(CONS,x,xs)));
+        Datum foldExpr = Pair.List(FOLD,Pair.List(LAMBDA,FA,FA),new Pair(LAMBDA,new Pair(params,body)),Pair.List(CONS,x,xs));
+        if(docstring != null) {
+          return Pair.List(LAMBDA,new Pair(x,xs),docstring,foldExpr);
+        } else {
+          return Pair.List(LAMBDA,new Pair(x,xs),foldExpr);
+        }
       } else {
-        return Pair.List(LET,
-          Pair.List(Pair.List(
-            curriedLambdas,
-            Pair.List(LAMBDA,Pair.List(paramsPair.car()),new Pair(CURRY,new Pair(paramsPair.cdr(),body))))),
-          Pair.List(LAMBDA,new Pair(x,xs),
-            Pair.List(FOLD,
-              Pair.List(LAMBDA,FA,FA),
+        Datum foldExpr = Pair.List(FOLD,Pair.List(LAMBDA,FA,FA),curriedLambdas,Pair.List(CONS,x,xs));
+        if(docstring != null) {
+          return Pair.List(LET,
+            Pair.List(Pair.List(
               curriedLambdas,
-              Pair.List(CONS,x,xs))));
+              Pair.List(LAMBDA,Pair.List(paramsPair.car()),new Pair(CURRY,new Pair(paramsPair.cdr(),new Pair(docstring,body)))))),
+            Pair.List(LAMBDA,new Pair(x,xs),docstring,foldExpr));
+        } else {
+          return Pair.List(LET,
+            Pair.List(Pair.List(
+              curriedLambdas,
+              Pair.List(LAMBDA,Pair.List(paramsPair.car()),new Pair(CURRY,new Pair(paramsPair.cdr(),body))))),
+            Pair.List(LAMBDA,new Pair(x,xs),foldExpr));
+        }
       }
     }
   }
@@ -1759,9 +1930,13 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("let-values"),
+      return Pair.List(LET_VALUES,
         Pair.List(Pair.List(Pair.List(new Symbol("<variable>"),Signature.VARIADIC),new Symbol("<'values'-expression>")),Signature.VARIADIC),
         new Symbol("<body>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Wrapper to locally bind results of expressions that yield a <values> object.\nExpands to nested <call-with-values> expressions.\n\nSee the <values> and <call-with-values> <help> entries for more information\nand examples on using <values> expressions.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1847,6 +2022,10 @@ public class CorePrimitives {
       return Pair.List(new Symbol("escm-guard-aux"),new Symbol("<reraise>"),new Symbol("<expression>"),Signature.VARIADIC);
     }
 
+    public String docstring() {
+      return "Used by <guard> to generate a guared clause using <reraise> and \"<expression> ...\".";
+    }
+
     public Datum parseElse(Pair bodyCar) throws Exception {
       return new Pair(BEGIN,bodyCar.cdr());
     }
@@ -1895,8 +2074,12 @@ public class CorePrimitives {
                   Pair.List(new Symbol("<raised-var>"),
                             Pair.List(new Symbol("<condition>"),new Symbol("<expression>"),Signature.VARIADIC),
                             Signature.VARIADIC,
-                            Pair.List(new Symbol("else"),new Symbol("<expression>"),Signature.VARIADIC)),
+                            Pair.List(ELSE,new Symbol("<expression>"),Signature.VARIADIC)),
                   new Symbol("<body>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "Executes \"<body> ...\" while guarding against a <raise>d exception.\nThe <raise>d exception value is bound to <raised-var>, and\n<raised-var> is then passed to the <cond>-style\n\"(<condition> <expression> ...)\" clauses. If a condition is satisfied, then\n\"<expression> ...\" is executed. <else> matches against all exception types.\n\nFor example:\n  (guard (condition\n           (else\n            (display \"condition: \")\n            (write condition)\n            (newline)\n            'exception))\n    (+ 1 (raise 'an-error)))";
     }
 
     private static Symbol parseRaisedVar(Datum raisedVarAndClauses, ArrayList<Datum> parameters) throws Exception {
@@ -1955,6 +2138,10 @@ public class CorePrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("define-parameter"),new Symbol("<symbol>"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Defines a parameter variable. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nSee <set-parameter!> to set pre-existing parameters.\nSee <get-parameter> to explicitely evaluate a parameter variable.\nSee the <parameter?> <help> entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Symbol))
@@ -1977,6 +2164,10 @@ public class CorePrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("set-parameter!"),new Symbol("<symbol>"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Sets an existing parameter variable. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nSee <define-parameter> to create new parameters.\nSee <get-parameter> to explicitely evaluate a parameter variable.\nSee the <parameter?> <help> entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -2001,6 +2192,10 @@ public class CorePrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("get-parameter"),new Symbol("<symbol>"));
     }
+
+    public String docstring() {
+      return "Get a parameter variable's value. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nNote that parameter variables can also just be referenced by name, though\nbeware of shadowing them with a regular <define>!\n\nSee <define-parameter> to create new parameters.\nSee <set-parameter!> to set pre-existing parameters.\nSee the <parameter?> <help> entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol))
@@ -2023,6 +2218,10 @@ public class CorePrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("parameter?"),new Symbol("<symbol>"));
+    }
+
+    public String docstring() {
+      return "Determine if <name> is a parameter variable. See the <define-parameter>\n<help> entry to learn more about what parameter variables are.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

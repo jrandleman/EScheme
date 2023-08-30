@@ -228,6 +228,14 @@ public class OutputPort extends Port {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public String docstring() {
+    if(isClosed()) return "Output Port (closed) named \""+name+"\"";
+    return "Output Port (open) named \""+name+"\"";
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public String display() {
     if(isClosed()) return "#<output-port (closed) "+name+">";

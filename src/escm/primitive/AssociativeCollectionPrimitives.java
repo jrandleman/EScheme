@@ -32,6 +32,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("associative-collection?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is an associative collection:\n    String | List | Vector | Hashmap";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
@@ -50,6 +54,10 @@ public class AssociativeCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("head"),new Symbol("<associative-collection>"));
+    }
+
+    public String docstring() {
+      return "Get the first item in <ac>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -70,6 +78,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("tail"),new Symbol("<associative-collection>"));
     }
+
+    public String docstring() {
+      return "Get everything after the first item in <ac>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
@@ -89,6 +101,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("empty?"),new Symbol("<associative-collection>"));
     }
+
+    public String docstring() {
+      return "Returns whether <ac> is empty.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
@@ -107,6 +123,10 @@ public class AssociativeCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("length"),new Symbol("<associative-collection>"));
+    }
+
+    public String docstring() {
+      return "Returns <ac>'s length. Aliased by <len>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -130,6 +150,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("length+"),new Symbol("<associative-collection>"));
     }
+
+    public String docstring() {
+      return "Returns <ac>'s length. If <ac> is a dotted-list, returns #f.\nThis is instead of triggering an error, as <length> would.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
@@ -150,6 +174,10 @@ public class AssociativeCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("fold"),new Symbol("<callable>"),new Symbol("<seed>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Accumulate the values in \"<ac> ...\" from left to right by applying\n<callable> to \"<previous-result>\" and <item> with <seed-obj> acting\nas the initial \"<previous-result>\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -180,6 +208,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("map"),new Symbol("<callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
     }
+
+    public String docstring() {
+      return "Creates a new associative collection by applying <callable> to each item in\n\"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       int n = parameters.size();
@@ -208,6 +240,10 @@ public class AssociativeCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("for-each"),new Symbol("<callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Applies <callable> to each item in \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -238,6 +274,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("filter"),new Symbol("<keep?-callable>"),new Symbol("<associative-collection>"));
     }
+
+    public String docstring() {
+      return "Creates a new associative collection by filtering items in <ac> that don't\nsatisfy the <keep?-callable> callable.";
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2) 
@@ -259,7 +299,11 @@ public class AssociativeCollectionPrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("count"),new Symbol("<callable>"),new Symbol("<associative-collection>"));
+      return Pair.List(new Symbol("count"),new Symbol("<predicate?-callable>"),new Symbol("<associative-collection>"));
+    }
+
+    public String docstring() {
+      return "Count the number of times <predicate?-callable> is satisfied in <ac>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -282,7 +326,11 @@ public class AssociativeCollectionPrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("remove"),new Symbol("<callable>"),new Symbol("<associative-collection>"));
+      return Pair.List(new Symbol("remove"),new Symbol("<predicate?-callable>"),new Symbol("<associative-collection>"));
+    }
+
+    public String docstring() {
+      return "Creates a new associative collection by removing items in <ac> that\nsatisfy the <predicate?-callable> callable.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -307,6 +355,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("val"),new Symbol("<associative-collection>"),new Symbol("<key>"));
     }
+
+    public String docstring() {
+      return "Get the value in <ac> associated to <key>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
@@ -326,7 +378,11 @@ public class AssociativeCollectionPrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("key"),new Symbol("<callable>"),new Symbol("<associative-collection>"));
+      return Pair.List(new Symbol("key"),new Symbol("<predicate?-callable>"),new Symbol("<associative-collection>"));
+    }
+
+    public String docstring() {
+      return "Get the first key in <ac> who's associated value satisfies <predicate?-callable>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -356,6 +412,10 @@ public class AssociativeCollectionPrimitives {
         Pair.List(new Symbol("append"),new Symbol("<keyword>"),Signature.VARIADIC),
         Pair.List(new Symbol("append"),new Symbol("<list>"),Signature.VARIADIC,new Symbol("<obj>")),
         Pair.List(new Symbol("append"),new Symbol("<associative-collection>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "Aliased by <+>. Given nothing, returns NIL. Given '<obj>', returns <obj>.\n\nGiven '<symbol> ...':\n  Returns a new symbol of '<symbol> ...' concatenated with one another.\n\nGiven '<keyword> ...':\n  Returns a new keyword of '<keyword> ...' concatenated with one another.\n\nGiven '<ac> ...':\n  Creates a new associative collection by appending '<ac> ...' together.\n\n    => Note that the '<ac> ...' values will have their types unified according\n       to the following hierarchy: String < List < Vector < Hashmap";
     }
 
     private static Symbol appendSymbols(ArrayList<Datum> parameters) throws Exception {
@@ -447,6 +507,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("delete"),new Symbol("<associative-collection>"),new Symbol("<key>"));
     }
+
+    public String docstring() {
+      return "Return a copy of <ac> without <key>'s association.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
@@ -469,6 +533,10 @@ public class AssociativeCollectionPrimitives {
       return Pair.List(
         Pair.List(new Symbol("conj"),new Symbol("<value>"),new Symbol("<associative-collection>")),
         Pair.List(new Symbol("conj"),new Symbol("<key>"),new Symbol("<value>"),new Symbol("<associative-collection>")));
+    }
+
+    public String docstring() {
+      return "Given 3 args:\n  Returns a copy of <ac> with <val> associated to <key>.\nGiven 2 args:\n  Returns a copy of <oc> with <val> added as efficiently as possible.\n  <val>'s position will depend on <ac>'s specific collection type.\nNote:\n  <ac> denotes an associative-collection\n  <oc> denotes an ordered-collection";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -496,6 +564,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("take"),new Symbol("<associative-collection>"),new Symbol("<length>"));
     }
+
+    public String docstring() {
+      return "Returns <length> items taken from the left of <ac>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
@@ -519,6 +591,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("drop"),new Symbol("<associative-collection>"),new Symbol("<length>"));
     }
+
+    public String docstring() {
+      return "Returns <ac> with <length> items dropped from its left side.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
@@ -540,7 +616,11 @@ public class AssociativeCollectionPrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("any?"),new Symbol("<callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
+      return Pair.List(new Symbol("any?"),new Symbol("<predicate?-callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns whether any of the <ac>s satisfy <predicate?-callable>.";
     }
 
     private Trampoline.Bounce iter(Callable predicate, ArrayList<Datum> parameters, int i, int n, Trampoline.Continuation continuation) throws Exception {
@@ -572,7 +652,11 @@ public class AssociativeCollectionPrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("every?"),new Symbol("<callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
+      return Pair.List(new Symbol("every?"),new Symbol("<predicate?-callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns whether every one of the <ac>s satisfy <predicate?-callable>.";
     }
 
     private Trampoline.Bounce iter(Callable predicate, ArrayList<Datum> parameters, int i, int n, Trampoline.Continuation continuation) throws Exception {
@@ -606,6 +690,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("ac->string"),new Symbol("<associative-collection>"));
     }
+
+    public String docstring() {
+      return "Convert <ac> to a string (note that its keys must be increasing integers\nstarting from 0, and its values must be characters).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
@@ -624,6 +712,10 @@ public class AssociativeCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("ac->list"),new Symbol("<associative-collection>"));
+    }
+
+    public String docstring() {
+      return "Convert <ac> to a list (note that its keys must be increasing integers starting\nfrom 0).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -644,6 +736,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("ac->vector"),new Symbol("<associative-collection>"));
     }
+
+    public String docstring() {
+      return "Convert <ac> to a vector (note that its keys must be increasing integers\nstarting from 0).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
@@ -663,6 +759,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("ac->hashmap"),new Symbol("<associative-collection>"));
     }
+
+    public String docstring() {
+      return "Convert <ac> to a hashmap.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof AssociativeCollection)) 
@@ -681,6 +781,10 @@ public class AssociativeCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("union"),new Symbol("<elt=?-callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns the set union of values (compared by <elt=?>) in \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -706,6 +810,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("intersection"),new Symbol("<elt=?-callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
     }
+
+    public String docstring() {
+      return "Returns the intersection of values (compared by <elt=?>) between \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() < 2) 
@@ -730,6 +838,10 @@ public class AssociativeCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("difference"),new Symbol("<elt=?-callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
     }
+
+    public String docstring() {
+      return "Returns the set difference of values (compared by <elt=?>) in \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() < 2) 
@@ -753,6 +865,10 @@ public class AssociativeCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("symmetric-difference"),new Symbol("<elt=?-callable>"),new Symbol("<associative-collection>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns the set symmetric-difference of values (compared by <elt=?>) in\n\"<ac> ...\". SymDiff(a,b) = Union(Diff(a,b),Diff(b,a))\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

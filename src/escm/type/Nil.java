@@ -55,6 +55,13 @@ public class Nil extends Datum implements OrderedCollection {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public java.lang.String docstring() {
+    return "The \"nil\" type: #nil and '()";
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
     return Objects.hash(type());

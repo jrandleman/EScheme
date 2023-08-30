@@ -73,6 +73,10 @@ public class SystemPrimitives {
         Pair.List(new Symbol("exit")),
         Pair.List(new Symbol("exit"),new Symbol("<integer-code>")));
     }
+
+    public String docstring() {
+      return "Terminate the current EScheme session with <integer-code> (defaults to 0).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() > 1) throw new Exceptionf("'(exit <optional-code>) received more than 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -105,6 +109,10 @@ public class SystemPrimitives {
       return Pair.List(
         Pair.List(new Symbol("load"),new Symbol("<filename-string>")),
         Pair.List(new Symbol("load"),new Symbol("<directory-string>"),new Symbol("<filename-string>")));
+    }
+
+    public String docstring() {
+      return "Reads and evaluates <filename-str>'s EScheme contents in the global environment.\nWorks for both regular & <serialize>d EScheme files.\nIf given <directory-str>, loads <filename-str> from <directory-str>. Use:\n\n  (load #path <filename-str>)\n\nas a portable alternative to (load <filename-str>) if <filename-str> is a\nrelative path, since <load> only operates relative to (current-directory).\n\nNote that <load-once> should be preferred to prevent cyclic loading.\n";
     }
 
     public static String addStringPaths(String path1, String path2) {
@@ -189,6 +197,10 @@ public class SystemPrimitives {
         Pair.List(new Symbol("load-once"),new Symbol("<directory-string>"),new Symbol("<filename-string>")));
     }
 
+    public String docstring() {
+      return "Works exactly like <load>, but only loads unloaded files. Use:\n\n  (load-once #path <filename-str>)\n\nas a portable alternative to (load-once <filename-str>) if <filename-str> is a\nrelative path, since <load-once> only operates relative to (current-directory).";
+    }
+
     private static Symbol loadOnceFiles = new Symbol("*load-once-files*");
 
     public static void registerLoadedFile(Environment definitionEnvironment, String filePath) throws Exception {
@@ -245,6 +257,10 @@ public class SystemPrimitives {
         Pair.List(new Symbol("system"),new Symbol("<millisecond-timeout>"),new Symbol("<command-str>"),new Symbol("<env-var-str-list>")),
         Pair.List(new Symbol("system"),new Symbol("<millisecond-timeout>"),new Symbol("<command-str>"),new Symbol("<directory-str>")),
         Pair.List(new Symbol("system"),new Symbol("<millisecond-timeout>"),new Symbol("<command-str>"),new Symbol("<env-var-str-list>"),new Symbol("<directory-str>")));
+    }
+
+    public String docstring() {
+      return "Executes a command, using the environment variable bindings in\n<env-var-str-list> (defaults to those of the current environment), \nin the <directory-str> directory (defaults to the current working \ndirectory).\n\nNote that each environment variable string in <env-var-str-list>\nshould follow the \"name=value\" format.\n\nIf <millisecond-timeout> (a real number) is given and exceeded, the\nspawned process will terminate. Note that this is NOT a hard cap \nthough: hence passing 0 as <millisecond-timeout> may still have \nsystem-wide side effects.\n\nUltimately passed to Java's <Runtime.getRuntime().exec()>.\nReferenced by <escm>.\n\nReturns a list:\n  (<command-stdout-str> <command-stderr-str> <command-exit-code>)";
     }
     
     private static String[] convertStringListToStringArray(Datum list, String listContentType, ArrayList<Datum> parameters) throws Exception {
@@ -330,6 +346,10 @@ public class SystemPrimitives {
         Pair.List(new Symbol("escm"),new Symbol("<millisecond-timeout>"),new Symbol("<escm-file>"),new Symbol("<argv>"),Signature.VARIADIC));
     }
 
+    public String docstring() {
+      return "Execute an EScheme program in a seperate process. Effectively a wrapper \naround <system> that references <*escm-execution-command*>. Displays each \n<argv> to generate a single command string with <escm-file>.\n\nIf <millisecond-timeout> (a real number) is given and exceeded, the\nspawned process will terminate. Note that this is NOT a hard cap \nthough: hence passing 0 as <millisecond-timeout> may still have \nsystem-wide side effects.\n\nReturns a list:\n  (<program-stdout-str> <program-stderr-str> <program-exit-code>)";
+    }
+
     private static String parseEscmProgramCommand(Long timeout, ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
       int cmdIdx = timeout == null ? 0 : 1;
@@ -372,6 +392,10 @@ public class SystemPrimitives {
       return Pair.List(new Symbol("escm-get-module-name"),new Symbol("<module-path-symbol>"));
     }
 
+    public String docstring() {
+      return "Extracts the ultimate module name from <module-path-symbol>.\nFor example:\n  * (escm-get-module-name 'Module) ; 'Module\n  * (escm-get-module-name 'Folder1.Folder2.Module) ; 'Module";
+    }
+
     public static Symbol logic(Symbol modulePath) throws Exception {
       if(ObjectAccessChain.is(modulePath)) {
         Symbol[] path = ObjectAccessChain.parse(modulePath);
@@ -399,6 +423,10 @@ public class SystemPrimitives {
       return Pair.List(
         Pair.List(new Symbol("escm-load-module"),new Symbol("<module-path-symbol>")),
         Pair.List(new Symbol("escm-load-module"),new Symbol("<filepath-string>"),new Symbol("<module-path-symbol>")));
+    }
+
+    public String docstring() {
+      return "<import> quotes its <module-path> argument & passes it to this function,\nwhich then returns the generated <module> object to be bound to a name.";
     }
 
     public static class InvalidModuleException extends Exceptionf {
@@ -523,6 +551,10 @@ public class SystemPrimitives {
       return Pair.List(new Symbol("escm-reload-module"),new Symbol("<module>"));
     }
 
+    public String docstring() {
+      return "<reload> quotes its <module-alias-symbol> argument & passes it to this\nfunction, which then returns the generated <module> object to be bound\nto <reload>'s <module-alias-symbol>.";
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof EscmModule)) 
         throw new Exceptionf("'(escm-reload-module <module>) didn't receive exactly 1 module: %s", Exceptionf.profileArgs(parameters));
@@ -541,6 +573,10 @@ public class SystemPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("module?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is a module object.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -562,6 +598,10 @@ public class SystemPrimitives {
       return Pair.List(new Symbol("module-path"),new Symbol("<module>"));
     }
 
+    public String docstring() {
+      return "Returns the absolute file path of <module>'s original location.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof EscmModule)) 
         throw new Exceptionf("'(module-path <module>) didn't receive exactly 1 module: %s", Exceptionf.profileArgs(parameters));
@@ -581,6 +621,10 @@ public class SystemPrimitives {
       return Pair.List(new Symbol("module-bindings"),new Symbol("<module>"));
     }
 
+    public String docstring() {
+      return "Returns a list of the symbols defined in <module>.\nBe warned: every module has its own copy of the standard library defined too!";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof EscmModule)) 
         throw new Exceptionf("'(module-bindings <module>) didn't receive exactly 1 module: %s", Exceptionf.profileArgs(parameters));
@@ -598,6 +642,10 @@ public class SystemPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("escm-define-parameter"),new Symbol("<symbol>"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Internal primitive used by <define-parameter>, which passes its quoted\ntarget variable to this function.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -619,6 +667,10 @@ public class SystemPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("escm-set-parameter!"),new Symbol("<symbol>"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Internal primitive used by <set-parameter!>, which passes its quoted\ntarget variable to this function.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Symbol)) 
@@ -639,6 +691,10 @@ public class SystemPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("escm-get-parameter"),new Symbol("<symbol>"));
     }
+
+    public String docstring() {
+      return "Internal primitive used by <get-parameter>, which passes its quoted\ntarget variable to this function.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol)) 
@@ -657,6 +713,10 @@ public class SystemPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("escm-parameter?"),new Symbol("<symbol>"));
+    }
+
+    public String docstring() {
+      return "Internal primitive used by <parameter?>, which passes its quoted\ntarget variable to this function.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -678,6 +738,10 @@ public class SystemPrimitives {
       return Pair.List(
         Pair.List(new Symbol("getenv")),
         Pair.List(new Symbol("getenv"),new Symbol("<variable-name-string>")));
+    }
+
+    public String docstring() {
+      return "If given no arguments, return a hashmap of name:value string environment \nvariable associations.\n\nIf given an environment variable name string, returns its string value. \nIf the given string is not an accessable environment variable, returns #f";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -717,6 +781,10 @@ public class SystemPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("garbage-collector"));
     }
+
+    public String docstring() {
+      return "Hints the JVM to launch its garbage collector (GC). Does not guarentee\nimmediate GC execution.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0)
@@ -736,6 +804,10 @@ public class SystemPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("call-stack"));
+    }
+
+    public String docstring() {
+      return "Returns the current call-stack (prior to calling the primitive) as an\nassociative list: ((<function-name-string> <source-information>) ...)\n  * <source-information> := #f ; if doesn't exist, else:\n                          | (<filename-string> <line-number> <column-number>)";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

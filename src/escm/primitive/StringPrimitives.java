@@ -32,6 +32,10 @@ public class StringPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("string"),new Symbol("<obj>"),Signature.VARIADIC);
     }
+
+    public java.lang.String docstring() {
+      return "Create a new string by appending each displayed argument together.\n\nRepresents a Java <string> under the hood (hence immutable).\nLiterals are denoted via double-quotes.\n\nStrings support the following control characters:\n  1) \"\\t\": tab,             represented as a char by #\\tab\n  2) \"\\n\": newline,         represented as a char by #\\newline\n  3) \"\\f\": form feed,       represented as a char by #\\page\n  4) \"\\r\": carriage return, represented as a char by #\\return\n  5) \"\\b\": backspace,       represented as a char by #\\backspace\n\nOctal literals may be used by prefixing up to 6 octal digits with \"\\\", ranging from\n\\0-\\177777 (0-65535 in decimal). This range ensures that each value fits neatly\nwithin a single 16bit Java char internally.\n  => Note this extends Java's octals, which only support \\0-\\377 (0-255 in decimal).\n\nJava 16bit unicode literals may be used by prefixing up to 4 hex digits with \"\\u\".\n  => Adjacent unicode literals may be used to create \"surrogate pairs\" that render\n     as a single unicode image for unicode values that require 32bit encoding.\n\nEScheme also extends Java unicode literals with syntax for 32bit unicode values.\nPrefixing up to 8 hex digits with \"\\U\" compiles to 2 seperate \"\\u\" instances.\n  => For example, both \"\\U1f608\" and \"\\ud83d\\ude08\" create the same string, but the\n     former is easier to write out after referencing the \"U+\" code from the internet.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       StringBuilder sb = new StringBuilder();
@@ -50,6 +54,10 @@ public class StringPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("string-java-length"),new Symbol("<string>"));
+    }
+
+    public java.lang.String docstring() {
+      return "Returns the length of <string>, with surrogate pairs counting as 2 chars.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -70,6 +78,10 @@ public class StringPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("string-upcase"),new Symbol("<string>"));
     }
+
+    public java.lang.String docstring() {
+      return "Returns <string> entirely upper-cased.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
@@ -88,6 +100,10 @@ public class StringPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("string-downcase"),new Symbol("<string>"));
+    }
+
+    public java.lang.String docstring() {
+      return "Returns <string> entirely lower-cased.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -108,6 +124,10 @@ public class StringPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("string-escape"),new Symbol("<string>"));
     }
+
+    public java.lang.String docstring() {
+      return "Returns <string> with special characters escaped (like when printing via <write>).\nNote that this escapes surrogate pairs using EScheme's custom \"\\U\" syntax.\n<string-java-escape> should be used to escape such with 2 \"\\u\" instances.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
@@ -126,6 +146,10 @@ public class StringPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("string-java-escape"),new Symbol("<string>"));
+    }
+
+    public java.lang.String docstring() {
+      return "Returns <string> with special characters escaped (like when printing via <write>).\nNote that this escapes surrogate pairs using 2 \"\\u\" instances.\n<string-escape> should be used to escape such with EScheme's custom \"\\U\" syntax.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -146,6 +170,10 @@ public class StringPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("string-unescape"),new Symbol("<string>"));
     }
+
+    public java.lang.String docstring() {
+      return "Returns <string> with special characters unescaped (like when printing via\n<display>). Note that this also unescapes EScheme's custom \"\\U\" syntax.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
@@ -164,6 +192,10 @@ public class StringPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("string-replace"),new Symbol("<string>"),new Symbol("<regex-string>"),new Symbol("<replacement-string>"));
+    }
+
+    public java.lang.String docstring() {
+      return "Replaces all instances of <regex-string> in <string> with <replacement-string>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -188,6 +220,10 @@ public class StringPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("string-trim"),new Symbol("<string>"));
     }
+
+    public java.lang.String docstring() {
+      return "Returns a string with the whitespace removed from both ends of <string>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String)) 
@@ -206,6 +242,10 @@ public class StringPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("string-contains"),new Symbol("<string>"),new Symbol("<substring>"));
+    }
+
+    public java.lang.String docstring() {
+      return "Returns the first index of <substring> in <string> if present, or #f if it isn't.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -228,6 +268,10 @@ public class StringPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("string-contains-right"),new Symbol("<string>"),new Symbol("<substring>"));
     }
+
+    public java.lang.String docstring() {
+      return "Returns the last index of <substring> in <string> if present, or #f if it isn't.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String) || !(parameters.get(1) instanceof escm.type.String)) 
@@ -249,6 +293,10 @@ public class StringPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("string-prefix?"),new Symbol("<string>"),new Symbol("<prefix-string>"));
     }
+
+    public java.lang.String docstring() {
+      return "Returns whether <string> starts with <prefix-string>. Also see <string-suffix?>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof escm.type.String) || !(parameters.get(1) instanceof escm.type.String)) 
@@ -267,6 +315,10 @@ public class StringPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("string-suffix?"),new Symbol("<string>"),new Symbol("<suffix-string>"));
+    }
+
+    public java.lang.String docstring() {
+      return "Returns whether <string> ends with <suffix-string>. Also see <string-prefix?>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -288,6 +340,10 @@ public class StringPrimitives {
       return Pair.List(
         Pair.List(new Symbol("string-join"),new Symbol("<string-list>")),
         Pair.List(new Symbol("string-join"),new Symbol("<string-list>"),new Symbol("<joiner-string>")));
+    }
+
+    public java.lang.String docstring() {
+      return "Returns a string made from joining the strings in <string-list> by splicing\n<joiner-string> (defaults to \"\") between each item.";
     }
     
     private static java.lang.String getJoinerString(ArrayList<Datum> parameters) throws Exception {
@@ -330,7 +386,11 @@ public class StringPrimitives {
     public Datum signature() {
       return Pair.List(
         Pair.List(new Symbol("string-split"),new Symbol("<string>")),
-        Pair.List(new Symbol("string-split"),new Symbol("<string>"),new Symbol("<splitter-string>")));
+        Pair.List(new Symbol("string-split"),new Symbol("<string>"),new Symbol("<splitter-regex-string>")));
+    }
+
+    public java.lang.String docstring() {
+      return "Returns a list of strings made from splitting <string> at each\n<splitter-regex> instance. Defaults to splitting into characters.";
     }
     
     private static java.lang.String getSplitterString(ArrayList<Datum> parameters) throws Exception {
@@ -345,7 +405,7 @@ public class StringPrimitives {
       return lhs.length() == 1 && rhs.length() == 1 && java.lang.Character.isHighSurrogate(lhs.charAt(0)) && java.lang.Character.isLowSurrogate(rhs.charAt(0));
     }
 
-    // We want the result of (string-split <str>), if <str> has surrogate pairs, to split
+    // We want the result of (string-split <string>), if <string> has surrogate pairs, to split
     // the string with those surrogate char pairs preserved in the same string together.
     private static ArrayList<java.lang.String> unifySurrogatePairsIntoOneString(java.lang.String[] splitStrs) {
       ArrayList<java.lang.String> unified = new ArrayList<java.lang.String>();
@@ -383,6 +443,10 @@ public class StringPrimitives {
       return Pair.List(new Symbol("string-unfold"),new Symbol("<break?-callable>"),new Symbol("<mapper-callable>"),new Symbol("<update-callable>"),new Symbol("<seed>"));
     }
 
+    public java.lang.String docstring() {
+      return "Unfolds a string from left to right, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded string, and <update-callable> increments <seed> for the\nnext round of unfolding.\n\nNote that the result of <mapper-callable> must always be a character.";
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 4) 
         throw new Exceptionf("'(string-unfold <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
@@ -410,6 +474,10 @@ public class StringPrimitives {
       return Pair.List(new Symbol("string-unfold"),new Symbol("<break?-callable>"),new Symbol("<mapper-callable>"),new Symbol("<update-callable>"),new Symbol("<seed>"));
     }
 
+    public java.lang.String docstring() {
+      return "Unfolds a string from right to left, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded string, and <update-callable> increments <seed> for the\nnext round of unfolding.\n\nNote that the result of <mapper-callable> must always be a character.";
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 4) 
         throw new Exceptionf("'(string-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
@@ -435,6 +503,10 @@ public class StringPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("string=?"),new Symbol("<string>"),Signature.VARIADIC);
+    }
+
+    public java.lang.String docstring() {
+      return "Returns whether \"<string> <string> ...\" are equal to one another (case-sensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -466,6 +538,10 @@ public class StringPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("string<?"),new Symbol("<string>"),Signature.VARIADIC);
+    }
+
+    public java.lang.String docstring() {
+      return "Returns whether \"<string> <string> ...\" are < one another (case-sensitive).";
     }
 
     // @PRECONDITION: <parameters.size() >= 1>
@@ -504,6 +580,10 @@ public class StringPrimitives {
       return Pair.List(new Symbol("string>?"),new Symbol("<string>"),Signature.VARIADIC);
     }
 
+    public java.lang.String docstring() {
+      return "Returns whether \"<string> <string> ...\" are > one another (case-sensitive).";
+    }
+
     // @PRECONDITION: <parameters.size() >= 1>
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       Datum p = parameters.get(0);
@@ -538,6 +618,10 @@ public class StringPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("string<=?"),new Symbol("<string>"),Signature.VARIADIC);
+    }
+
+    public java.lang.String docstring() {
+      return "Returns whether \"<string> <string> ...\" are <= one another (case-sensitive).";
     }
 
     // @PRECONDITION: <parameters.size() >= 1>
@@ -576,6 +660,10 @@ public class StringPrimitives {
       return Pair.List(new Symbol("string>=?"),new Symbol("<string>"),Signature.VARIADIC);
     }
 
+    public java.lang.String docstring() {
+      return "Returns whether \"<string> <string> ...\" are >= one another (case-sensitive).";
+    }
+
     // @PRECONDITION: <parameters.size() >= 1>
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       Datum p = parameters.get(0);
@@ -611,6 +699,10 @@ public class StringPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("string-ci=?"),new Symbol("<string>"),Signature.VARIADIC);
     }
+
+    public java.lang.String docstring() {
+      return "Returns whether \"<string> <string> ...\" are equal to one another (case-insensitive).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1) 
@@ -641,6 +733,10 @@ public class StringPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("string-ci<?"),new Symbol("<string>"),Signature.VARIADIC);
+    }
+
+    public java.lang.String docstring() {
+      return "Returns whether \"<string> <string> ...\" are < one another (case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -673,6 +769,10 @@ public class StringPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("string-ci>?"),new Symbol("<string>"),Signature.VARIADIC);
     }
+
+    public java.lang.String docstring() {
+      return "Returns whether \"<string> <string> ...\" are > one another (case-insensitive).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1) 
@@ -703,6 +803,10 @@ public class StringPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("string-ci<=?"),new Symbol("<string>"),Signature.VARIADIC);
+    }
+
+    public java.lang.String docstring() {
+      return "Returns whether \"<string> <string> ...\" are <= one another (case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -735,6 +839,10 @@ public class StringPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("string-ci>=?"),new Symbol("<string>"),Signature.VARIADIC);
     }
+
+    public java.lang.String docstring() {
+      return "Returns whether \"<string> <string> ...\" are >= one another (case-insensitive).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1) 
@@ -765,6 +873,10 @@ public class StringPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("string?"),new Symbol("<obj>"));
+    }
+
+    public java.lang.String docstring() {
+      return "Returns whether <obj> is a string.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

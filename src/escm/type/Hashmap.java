@@ -162,6 +162,15 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Callable (unary key getter)
+  public java.lang.String docstring() {
+    int n = value.size();
+    if(n == 0) {
+      return "Hashmap of length 0. Hashcode is "+hashCode();
+    } else {
+      return "Hashmap of length "+n+".\nApply to one of its keys to get an associated value.\nHashcode is "+hashCode()+".";
+    }
+  }
+
   public Datum signature() {
     return Pair.List(this,new Symbol("<key>"));
   }

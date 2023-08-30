@@ -14,7 +14,7 @@
   "name": "errorf",
   "aliases": null,
   "signatures": ["(errorf <format-string> <arg> ...)"],
-  "description": "Triggers a fatal error, with <format-string> displayed & formatted with \"<arg> ...\".",
+  "description": "Triggers a fatal error, with <format-string> displayed & formatted with \"<arg> ...\".\nSee <stringf> for more information on formatting.",
   "example": null
 }, {
   "name": "copy",

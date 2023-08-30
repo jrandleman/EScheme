@@ -56,6 +56,10 @@
 (ut ((fn (() 99) ((a (b 1) . xs) (+ a b (length xs)))) 1) 2)
 (ut ((fn (() 99) ((a (b 1) . xs) (+ a b (length xs)))) 1 2) 3)
 (ut ((fn (() 99) ((a (b 1) . xs) (+ a b (length xs)))) 1 2 3 4 5) 6)
+; <docstring>
+(ut (docstring (fn "Test docstring." ((x) x))) "Test docstring.")
+(ut (begin 'testing-fn-docstring-can-call ((fn "Test docstring." ((x) x)) 42)) 42)
+(ut (docstring (fn ((x) x))) #f)
 
 
 ; 1-ary
@@ -74,6 +78,12 @@
 (ut ((lambda ((a 1) (b 2)) (+ a b)) 2 3) 5)
 (ut ((lambda (a (b 1)) (+ a b)) 1) 2)
 (ut ((lambda (a (b 1)) (+ a b)) 1 2) 3)
+; <docstring>
+(ut (docstring (lambda (x) "Test docstring." x)) "Test docstring.")
+(ut (begin 'testing-lambda-docstring-can-call ((lambda (x) "Test docstring." x) 42)) 42)
+(ut (docstring (lambda (x) "x")) #f) ; need something in the body besides 1st string to trigger <docstring>
+(ut (begin 'testing-lambda-no-docstring-can-call ((lambda (x) "x") 42)) "x")
+(ut (docstring (lambda (x) x)) #f)
 
 
 (ut (if #t 0 1) 0)
@@ -111,6 +121,10 @@
 (ut (begin (define (val (a 1) (b 2)) (+ a b)) (val 2 3)) 5)
 (ut (begin (define (val a (b 1)) (+ a b)) (val 1)) 2)
 (ut (begin (define (val a (b 1)) (+ a b)) (val 1 2)) 3)
+; <docstring>
+(ut (docstring (begin (define (val x) "Test docstring." x) val)) "Test docstring.")
+(ut (begin 'testing-define-docstring-can-call (define (val x) "Test docstring." x) (val 42)) 42)
+(ut (docstring (begin (define (val x) x) val)) #f)
 
 
 (def val 42)
@@ -132,6 +146,10 @@
 (ut (begin (def (val (a 1) (b 2)) (+ a b)) (val 2 3)) 5)
 (ut (begin (def (val a (b 1)) (+ a b)) (val 1)) 2)
 (ut (begin (def (val a (b 1)) (+ a b)) (val 1 2)) 3)
+; <docstring>
+(ut (docstring (begin (def (val x) "Test docstring." x) val)) "Test docstring.")
+(ut (begin 'testing-def-docstring-can-call (def (val x) "Test docstring." x) (val 42)) 42)
+(ut (docstring (begin (def (val x) x) val)) #f)
 
 
 (ut (defined? acb) #f)
@@ -163,6 +181,10 @@
 (ut (begin (defn val (() 99) ((a (b 1)) (+ a b))) (val)) 99)
 (ut (begin (defn val (() 99) ((a (b 1)) (+ a b))) (val 1)) 2)
 (ut (begin (defn val (() 99) ((a (b 1)) (+ a b))) (val 1 2)) 3)
+; <docstring>
+(ut (docstring (begin (defn val "Test docstring." ((x) x)) val)) "Test docstring.")
+(ut (begin 'testing-defn-docstring-can-call (defn val "Test docstring." ((x) x)) (val 42)) 42)
+(ut (docstring (begin (defn val ((x) x)) val)) #f)
 
 
 (ut (and) #t)
@@ -226,6 +248,9 @@
 (ut a 100) ; all `a` changes in `let` were local
 (ut val 0) ; verify `val` was properly mutated by named-let
 (ut (defined? func) #f) ; all `func` definitions in `let` were local
+; <docstring>
+(ut (let loop () "Test docstring." (docstring loop)) "Test docstring.")
+(ut (let loop () "Test docstring." 42 (docstring loop)) "Test docstring.")
 
 
 (ut (quasiquote ()) '())
@@ -397,6 +422,17 @@
 (ut (procedure? ((curry (a b) a) 1)) #t)
 (ut ((curry (a b) a) 1 2) 1)
 (ut (((curry (a b) a) 1) 2) 1)
+; <docstring>
+(ut (docstring (curry () "Test docstring." 42)) "Test docstring.")
+(ut (docstring (curry (a) "Test docstring." a)) "Test docstring.")
+(ut (docstring ((curry (a b) "Test docstring." a) 42)) "Test docstring.")
+(ut (docstring (curry () "Test docstring.")) #f) ; need something in the body besides 1st string to trigger <docstring>
+(ut (docstring (curry (a) "Test docstring.")) #f)
+(ut (docstring ((curry (a b) "Test docstring.") 42)) #f)
+(ut ((curry () "Test docstring." 42)) 42)
+(ut ((curry (a) "Test docstring." a) 42) 42)
+(ut (((curry (a b) "Test docstring." a) 42) 314) 42)
+(ut ((curry (a b) "Test docstring." a) 42 314) 42)
 
 
 (define (vals0) (values))

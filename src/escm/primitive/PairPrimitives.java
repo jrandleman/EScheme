@@ -23,6 +23,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cons"),new Symbol("<car-obj>"),new Symbol("<cdr-obj>"));
     }
+
+    public String docstring() {
+      return "Create a pair containing <car-obj> & <cdr-obj>. Lists are created by nesting\npairs with <nil> terminating the chain. The following are equivalent:\n  (cons 1 (cons 2 (cons 3 (quote ()))))\n  (list 1 2 3)";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) throw new Exceptionf("'(cons <obj> <obj>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -40,6 +44,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("car"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Access the first item in a pair.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -60,6 +68,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cdr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Access the second item in a pair.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -78,6 +90,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("caar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (car (car <pair>))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -101,6 +117,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cadr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (car (cdr <pair>))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -122,6 +142,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("cdar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (car <pair>))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -145,6 +169,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cddr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (cdr <pair>))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -166,6 +194,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("caaar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (car (car (car <pair>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -192,6 +224,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("caadr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (car (car (cdr <pair>)))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -216,6 +252,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("cadar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (car (cdr (car <pair>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -242,6 +282,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("caddr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (car (cdr (cdr <pair>)))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -266,6 +310,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("cdaar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (car (car <pair>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -292,6 +340,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cdadr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (car (cdr <pair>)))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -316,6 +368,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("cddar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (cdr (car <pair>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -342,6 +398,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cdddr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (cdr (cdr <pair>)))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -366,6 +426,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("caaaar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (car (car (car (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -395,6 +459,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("caaadr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (car (car (car (cdr <pair>))))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -423,6 +491,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("caadar"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (car (car (cdr (car <pair>))))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -450,6 +522,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("caaddr"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (car (car (cdr (cdr <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -481,6 +557,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("tasnim"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (car (cdr (car (cr <pair>))))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       StringBuilder sb = new StringBuilder();
@@ -500,6 +580,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("cadaar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (car (cdr (car (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -529,6 +613,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cadadr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (car (cdr (car (cdr <pair>))))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -556,6 +644,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("caddar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (car (cdr (cdr (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -585,6 +677,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cadddr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (car (cdr (cdr (cdr <pair>))))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -612,6 +708,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("cdaaar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (car (car (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -641,6 +741,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cdaadr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (car (car (cdr <pair>))))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -668,6 +772,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("cdadar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (car (cdr (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -697,6 +805,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cdaddr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (car (cdr (cdr <pair>))))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -724,6 +836,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("cddaar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (cdr (car (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -753,6 +869,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cddadr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (cdr (car (cdr <pair>))))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -780,6 +900,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("cdddar"),new Symbol("<pair>"));
+    }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (cdr (cdr (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -809,6 +933,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cddddr"),new Symbol("<pair>"));
     }
+
+    public String docstring() {
+      return "Equivalent to: (cdr (cdr (cdr (cdr <pair>))))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Pair)) 
@@ -837,6 +965,10 @@ public class PairPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("pair?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is a pair.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(pair? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -854,6 +986,10 @@ public class PairPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("atom?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is not a pair.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

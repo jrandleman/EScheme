@@ -36,4 +36,5 @@
 
 ; can't verify these reflections programmatically, just check we can call it.
 (ut (pair? (callable-signature callable-signature)) #t) 
-(ut (callable-name callable-name) 'callable-name) ; can't verify programmatically, just check we can call it.
+(ut (callable-name callable-name) 'callable-name)
+(ut (string? (docstring docstring)) #t)

@@ -41,6 +41,10 @@ public class ListPrimitives {
       return Pair.List(new Symbol("list"),new Symbol("<obj>"),Signature.VARIADIC);
     }
 
+    public String docstring() {
+      return "Return a list containing \"<obj> ...\". Given no args, returns '().\nLists are right-nested pairs ending in nil: '()\nCreate list literals via the (<literal> ...) syntax.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       Datum d = Nil.VALUE;
       for(int i = parameters.size()-1; i >= 0; --i)
@@ -59,6 +63,10 @@ public class ListPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("list*"),new Symbol("<obj>"),new Symbol("<obj>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Return a dotted.list containing \"<obj> <obj> ...\".";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -81,6 +89,10 @@ public class ListPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("unfold"),new Symbol("<break?-condition>"),new Symbol("<mapper-callable>"),new Symbol("<update-callable>"),new Symbol("<seed>"));
+    }
+
+    public String docstring() {
+      return "Unfolds a list from left to right, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded list, and <update-callable> increments <seed> for the\nnext round of unfolding.";
     }
 
     public static Trampoline.Bounce logic(Datum acc, Callable breakCond, Callable mapper, Callable successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
@@ -127,6 +139,10 @@ public class ListPrimitives {
       return Pair.List(new Symbol("unfold-right"),new Symbol("<break?-condition>"),new Symbol("<mapper-callable>"),new Symbol("<update-callable>"),new Symbol("<seed>"));
     }
 
+    public String docstring() {
+      return "Unfolds a list from right to left, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded list, and <update-callable> increments <seed> for the\nnext round of unfolding.";
+    }
+
     public static Trampoline.Bounce logic(Datum acc, Callable breakCond, Callable mapper, Callable successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
       ArrayList<Datum> breakArgs = new ArrayList<Datum>(1);
       breakArgs.add(seed);
@@ -167,6 +183,10 @@ public class ListPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("memq"),new Symbol("<obj>"),new Symbol("<list>"));
+    }
+
+    public String docstring() {
+      return "Returns the sublist in <list> starting with <obj> based on <eq?> item\nequality. Returns #f if <obj> isn't in <list>.";
     }
 
     private static Symbol EQP_SYMBOL = new Symbol("eq?");
@@ -210,6 +230,10 @@ public class ListPrimitives {
       return Pair.List(new Symbol("member"),new Symbol("<obj>"),new Symbol("<list>"));
     }
 
+    public String docstring() {
+      return "Returns the sublist in <list> starting with <obj> based on <equal?> item\nequality. Returns #f if <obj> isn't in <list>.";
+    }
+
     private static Symbol EQUALP_SYMBOL = new Symbol("equal?");
 
     public static Callable getEqualpProcedure(Environment definitionEnvironment) throws Exception {
@@ -237,6 +261,10 @@ public class ListPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("assq"),new Symbol("<key>"),new Symbol("<associative-list>"));
+    }
+
+    public String docstring() {
+      return "Returns the pair in associative-lsit <alist> starting with <key> based\non <eq?> item equality. Returns #f if <obj> isn't a key in in <alist>.";
     }
 
     public static Trampoline.Bounce logic(Callable eqp, String fcnName, Datum originalList, Datum key, Datum iterator, Trampoline.Continuation continuation) throws Exception {
@@ -275,6 +303,10 @@ public class ListPrimitives {
       return Pair.List(new Symbol("assoc"),new Symbol("<key>"),new Symbol("<associative-list>"));
     }
 
+    public String docstring() {
+      return "Returns the pair in associative-lsit <alist> starting with <key> based\non <equal?> item equality. Returns #f if <obj> isn't a key in in <alist>.";
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2)
         throw new Exceptionf("'(assoc <key> <alist>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -296,6 +328,10 @@ public class ListPrimitives {
       return Pair.List(new Symbol("list?"),new Symbol("<obj>"));
     }
 
+    public String docstring() {
+      return "Returns whether <obj> is a proper list.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(list? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -315,6 +351,10 @@ public class ListPrimitives {
       return Pair.List(new Symbol("list*?"),new Symbol("<obj>"));
     }
 
+    public String docstring() {
+      return "Returns whether <obj> is a dotted-list.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(list*? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -332,6 +372,10 @@ public class ListPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("alist?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is an associative list (list of pairs).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -358,6 +402,10 @@ public class ListPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("null?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is nill (a.k.a. '() and #nil).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

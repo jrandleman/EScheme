@@ -107,6 +107,13 @@ public class EscmModule extends Dottable {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public String docstring() {
+    return "Module named \""+name+"\" imported from \""+absoluteFilePath+"\"";
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public String display() {
     return "#<module " + name  + " (" + absoluteFilePath + ")>";

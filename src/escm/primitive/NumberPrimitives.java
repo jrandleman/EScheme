@@ -42,6 +42,10 @@ public class NumberPrimitives {
         Pair.List(new Symbol("+"),new Symbol("<number>"),Signature.VARIADIC));
     }
 
+    public String docstring() {
+      return "Returns the sum of \"<number> <number> ...\".\n\nAliases <append> if given a <symbol>, <keyword>, <associative-collection>,\nor 0-1 args. Aliases <bind> if give a non-<associative-collection> callable.";
+    }
+
     private static Datum logic(ArrayList<Datum> parameters) throws Exception {
       Number sum = new Exact();
       for(Datum p : parameters) {
@@ -83,6 +87,10 @@ public class NumberPrimitives {
         Pair.List(new Symbol("-"),new Symbol("<number>")),
         Pair.List(new Symbol("-"),new Symbol("<number>"),new Symbol("<number>"),Signature.VARIADIC));
     }
+
+    public String docstring() {
+      return "Returns the difference of \"<number> <number> ...\".\nIf given one <number>, returns its negative value.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 0) throw new Exceptionf("'(- <number> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -117,6 +125,10 @@ public class NumberPrimitives {
         Pair.List(new Symbol("*"),new Symbol("<callable>"),Signature.VARIADIC),
         Pair.List(new Symbol("*"),new Symbol("<number>"),Signature.VARIADIC));
     }
+
+    public String docstring() {
+      return "Returns the product of \"<number> <number> ...\".\nNote that EScheme defines (* <n> 0) to be 0 for all numeric <n>.\nAliases <compose> if only given callables.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 0) throw new Exceptionf("'(* <number> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -143,6 +155,10 @@ public class NumberPrimitives {
       return Pair.List(
         Pair.List(new Symbol("/"),new Symbol("<number>")),
         Pair.List(new Symbol("/"),new Symbol("<number>"),new Symbol("<number>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "Returns the division of \"<number> <number> ...\".\nIf given one <number>, returns its inverse value.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -177,6 +193,10 @@ public class NumberPrimitives {
         Pair.List(new Symbol("="),new Symbol("<obj>"),new Symbol("<obj>"),Signature.VARIADIC));
     }
 
+    public String docstring() {
+      return "Returns whether \"<number> <number> ...\" are equal to one another\nAliases <eq?> if given non-numerics.";
+    }
+
     public static Datum logic(Number firstValue, ArrayList<Datum> parameters) throws Exception {
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
@@ -208,6 +228,10 @@ public class NumberPrimitives {
         Pair.List(new Symbol("<"),new Symbol("<real>"),new Symbol("<real>"),Signature.VARIADIC),
         Pair.List(new Symbol("<"),new Symbol("<string>"),new Symbol("<string>"),Signature.VARIADIC),
         Pair.List(new Symbol("<"),new Symbol("<char>"),new Symbol("<char>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "Returns whether \"<real> <real> ...\" are < one another.\nAliases <string<?> and <char<?> too!";
     }
 
     public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
@@ -252,6 +276,10 @@ public class NumberPrimitives {
         Pair.List(new Symbol(">"),new Symbol("<char>"),new Symbol("<char>"),Signature.VARIADIC));
     }
 
+    public String docstring() {
+      return "Returns whether \"<real> <real> ...\" are > one another.\nAliases <string>?> and <char>?> too!";
+    }
+
     public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
@@ -292,6 +320,10 @@ public class NumberPrimitives {
         Pair.List(new Symbol("<="),new Symbol("<real>"),new Symbol("<real>"),Signature.VARIADIC),
         Pair.List(new Symbol("<="),new Symbol("<string>"),new Symbol("<string>"),Signature.VARIADIC),
         Pair.List(new Symbol("<="),new Symbol("<char>"),new Symbol("<char>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "Returns whether \"<real> <real> ...\" are <= one another.\nAliases <string<=?> and <char<=?> too!";
     }
 
     public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
@@ -336,6 +368,10 @@ public class NumberPrimitives {
         Pair.List(new Symbol(">="),new Symbol("<char>"),new Symbol("<char>"),Signature.VARIADIC));
     }
 
+    public String docstring() {
+      return "Returns whether \"<real> <real> ...\" are >= one another.\nAliases <string>=?> and <char>=?> too!";
+    }
+
     public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
       for(int i = 1, n = parameters.size(); i < n; ++i) {
         Datum p = parameters.get(i);
@@ -374,6 +410,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("expt"),new Symbol("<number>"),new Symbol("<number>"),Signature.VARIADIC);
     }
+
+    public String docstring() {
+      return "Returns the exponentiation of \"<number> <number> ...\".\nRemember that exponentiation is right-associative!\nAliased by <**>.\n\nNote that EScheme defines the following to be true for all numeric <n>:\n  (expt <n> 0) ; 1\n  (expt 0 <positive-n>) ; 0\n  (expt 0 <negative-n>) ; Infinity\n  (expt 1 <infinite-n>) ; (expt -1 <infinite-n>) ; 1";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 2) throw new Exceptionf("'(expt <number> <number> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -402,6 +442,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("exp"),new Symbol("<number>"));
     }
+
+    public String docstring() {
+      return "Returns Euler's number raised to the power of <number>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(exp <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -424,6 +468,10 @@ public class NumberPrimitives {
       return Pair.List(
         Pair.List(new Symbol("log"),new Symbol("<number>")),
         Pair.List(new Symbol("log"),new Symbol("<number>"),new Symbol("<log-base-number>")));
+    }
+
+    public String docstring() {
+      return "Returns the log base-<base> of <number>. <base> defaults to (exp 1).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -452,6 +500,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("sqrt"),new Symbol("<number>"));
     }
+
+    public String docstring() {
+      return "Returns the square-root of <number>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(sqrt <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -473,6 +525,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("abs"),new Symbol("<real>"));
     }
+
+    public String docstring() {
+      return "Returns the absolute value of <real>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(abs <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -493,6 +549,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("expt-mod"),new Symbol("<base-real>"),new Symbol("<power-real>"),new Symbol("<mod-real>"));
+    }
+
+    public String docstring() {
+      return "Efficiently performs (modulo (expt <base-real> <power-real>) <mod-real>).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -522,6 +582,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("min"),new Symbol("<real>"),new Symbol("<real>"),Signature.VARIADIC);
     }
+
+    public String docstring() {
+      return "Returns the min value of \"<real> ...\".";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() == 0) throw new Exceptionf("'(min <real> <real> ...) expects at least 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -546,6 +610,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("max"),new Symbol("<real>"),new Symbol("<real>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns the max value of \"<real> ...\".";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -572,6 +640,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("exact->inexact"),new Symbol("<number>"));
     }
+
+    public String docstring() {
+      return "Coerces <number> to be inexact.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Number)) 
@@ -590,6 +662,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("inexact->exact"),new Symbol("<number>"));
+    }
+
+    public String docstring() {
+      return "Coerces <number> to be exact.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -610,6 +686,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("numerator"),new Symbol("<real>"));
     }
+
+    public String docstring() {
+      return "Returns the numerator of <real> as an exact number.\nSee <denominator>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Real)) 
@@ -629,6 +709,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("denominator"),new Symbol("<real>"));
     }
+
+    public String docstring() {
+      return "Returns the denominator of <real> as an exact number.\nSee <numerator>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Real)) 
@@ -647,6 +731,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("quotient"),new Symbol("<dividend-real>"),new Symbol("<divisor-real>"));
+    }
+
+    public String docstring() {
+      return "Returns the quotient of (/ <dividend-real> <divisor-real>).\nSee <remainder>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -672,6 +760,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("remainder"),new Symbol("<dividend-real>"),new Symbol("<divisor-real>"));
     }
+
+    public String docstring() {
+      return "Returns the remainder of (/ <dividend-real> <divisor-real>).\nSee <quotient>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) throw new Exceptionf("'(remainder <dividend> <divisor>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -696,6 +788,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("modulo"),new Symbol("<dividend-real>"),new Symbol("<divisor-real>"));
     }
+
+    public String docstring() {
+      return "Returns <dividend-real> modulo <divisor-real>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) throw new Exceptionf("'(modulo <real1> <real2>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -719,6 +815,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("divrem"),new Symbol("<dividend-real>"),new Symbol("<divisor-real>"));
+    }
+
+    public String docstring() {
+      return "Returns a pair: the quotient & remainder of (/ <dividend-real> <divisor-real>).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -745,6 +845,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("modf"),new Symbol("<real>"));
     }
+
+    public String docstring() {
+      return "Returns a pair: the integral & factional components of <real> as an inexact.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(modf <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -767,6 +871,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("integral"),new Symbol("<real>"));
     }
+
+    public String docstring() {
+      return "Get the integral exact value of <real> as an inexact.\nFor Example:\n  (integral 0.5) ; 0\n  (integral 5.2) ; 5\n  (integral NaN) ; ERROR\n  (integral Infinity) ; ERROR";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Real)) 
@@ -786,6 +894,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("fractional"),new Symbol("<real>"));
     }
+
+    public String docstring() {
+      return "Get the fractional exact value of <real> as an inexact.\nFor example:\n  (fractional 5.0) ; 0\n  (fractional 5.2) ; 2\n  (fractional NaN) ; ERROR\n  (fractional Infinity) ; ERROR";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Real)) 
@@ -804,6 +916,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("gcd"),new Symbol("<integer>"),new Symbol("<integer>"));
+    }
+
+    public String docstring() {
+      return "Returns the greatest common denominator of <integer> & <integer>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -829,6 +945,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("lcm"),new Symbol("<integer>"),new Symbol("<integer>"));
     }
+
+    public String docstring() {
+      return "Returns the least common multiple of <integer> & <integer>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) throw new Exceptionf("'(lcm <integer1> <integer2>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -853,6 +973,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("round"),new Symbol("<real>"));
     }
+
+    public String docstring() {
+      return "Returns the rounded value of <real>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(round <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -873,6 +997,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("floor"),new Symbol("<real>"));
+    }
+
+    public String docstring() {
+      return "Returns the floored value of <real>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -895,6 +1023,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("ceiling"),new Symbol("<real>"));
     }
+
+    public String docstring() {
+      return "Returns the ceiling value of <real>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(ceiling <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -915,6 +1047,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("truncate"),new Symbol("<real>"));
+    }
+
+    public String docstring() {
+      return "Returns the truncated value of <real>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -937,6 +1073,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("number?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is a number.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(number? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -954,6 +1094,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("complex?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is a complex number. Equivalent to <number?>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -973,6 +1117,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("real?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is a real (non-complex) number.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(real? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -990,6 +1138,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("inexact?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is an inexact number.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1009,6 +1161,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("exact?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is an exact number.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(exact? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1026,6 +1182,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("integer?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is an integer.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1046,6 +1206,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("finite?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is a finite value.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(finite? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1064,6 +1228,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("infinite?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is <Infinite>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1084,6 +1252,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("nan?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is <NaN>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(nan? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1103,6 +1275,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("odd?"),new Symbol("<real>"));
     }
+
+    public String docstring() {
+      return "Returns whether <real> is odd.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(odd? <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1119,6 +1295,10 @@ public class NumberPrimitives {
   public static class IsEven extends Primitive {
     public java.lang.String escmName() {
       return "even?";
+    }
+
+    public String docstring() {
+      return "Returns whether <real> is even.";
     }
 
     public Datum signature() {
@@ -1145,6 +1325,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("positive?"),new Symbol("<real>"));
     }
+
+    public String docstring() {
+      return "Returns whether <real> is positive.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(positive? <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1165,6 +1349,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("negative?"),new Symbol("<real>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <real> is negative.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1187,6 +1375,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("zero?"),new Symbol("<real>"));
     }
+
+    public String docstring() {
+      return "Returns whether <real> is zero.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(zero? <real>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1207,6 +1399,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("sin"),new Symbol("<number>"));
+    }
+
+    public String docstring() {
+      return "Returns the sin of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1229,6 +1425,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("cos"),new Symbol("<number>"));
     }
+
+    public String docstring() {
+      return "Returns the cos of <number>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(cos <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1249,6 +1449,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("tan"),new Symbol("<number>"));
+    }
+
+    public String docstring() {
+      return "Returns the tan of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1271,6 +1475,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("asin"),new Symbol("<number>"));
     }
+
+    public String docstring() {
+      return "Returns the asin of <number>.\nNote that asin yields a complex number if <number> exceeds its domain.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(asin <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1291,6 +1499,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("acos"),new Symbol("<number>"));
+    }
+
+    public String docstring() {
+      return "Returns the acos of <number>.\nNote that acos yields a complex number if <number> exceeds its domain.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1314,6 +1526,10 @@ public class NumberPrimitives {
       return Pair.List(
         Pair.List(new Symbol("atan"),new Symbol("<number>")),
         Pair.List(new Symbol("atan"),new Symbol("<real>"),new Symbol("<real>")));
+    }
+
+    public String docstring() {
+      return "Returns the atan of <number>. If given 2 arguments, returns the atan in\nradians of (/ <real> <real>) based on the signs of both values\nto determine the correct quadrant.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1343,6 +1559,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("sinh"),new Symbol("<number>"));
     }
+
+    public String docstring() {
+      return "Returns the sinh of <number>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(sinh <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1363,6 +1583,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("cosh"),new Symbol("<number>"));
+    }
+
+    public String docstring() {
+      return "Returns the cosh of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1385,6 +1609,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("tanh"),new Symbol("<number>"));
     }
+
+    public String docstring() {
+      return "Returns the tanh of <number>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(tanh <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1405,6 +1633,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("asinh"),new Symbol("<number>"));
+    }
+
+    public String docstring() {
+      return "Returns the asinh of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1427,6 +1659,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("acosh"),new Symbol("<number>"));
     }
+
+    public String docstring() {
+      return "Returns the acosh of <number>.\nNote that acosh yields a complex number if <number> exceeds its domain.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(acosh <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1448,6 +1684,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("atanh"),new Symbol("<number>"));
     }
+
+    public String docstring() {
+      return "Returns the atanh of <number>.\nNote that atanh yields a complex number if <number> exceeds its domain.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) throw new Exceptionf("'(atanh <number>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -1468,6 +1708,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("npr"),new Symbol("<n-integer>"),new Symbol("<r-integer>"));
+    }
+
+    public String docstring() {
+      return "Returns the number of ways in which <r> different things\ncan be selected and arranged out of <n> different things.\nBoth integers must be non-negative.";
     }
 
     private static final Exact ONE = new Exact(1);
@@ -1511,6 +1755,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("ncr"),new Symbol("<n-integer>"),new Symbol("<r-integer>"));
     }
+
+    public String docstring() {
+      return "Returns the number of ways in which <r> different things\ncan be selected out of <n> different things.\nBoth integers must be non-negative.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) 
@@ -1536,6 +1784,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("random"));
     }
+
+    public String docstring() {
+      return "Returns a random number between 0.0 and 1.0.\nGuarenteed to be unique across threads.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0) throw new Exceptionf("'(random) doesn't accept any args: %s", Exceptionf.profileArgs(parameters));
@@ -1553,6 +1805,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("make-rectangular"),new Symbol("<real-real>"),new Symbol("<imag-real>"));
+    }
+
+    public String docstring() {
+      return "Returns a complex number with <real> & <imag> as real & imaginary components.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1578,6 +1834,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("make-polar"),new Symbol("<magnitude-real>"),new Symbol("<angle-real>"));
     }
+
+    public String docstring() {
+      return "Returns a complex number with <magnitude> & <angle> as its magnitude & angle.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2) throw new Exceptionf("'(make-polar <magnitude-real> <angle-real>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -1602,6 +1862,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("real-part"),new Symbol("<number>"));
     }
+
+    public String docstring() {
+      return "Returns the real component of <number>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Number)) 
@@ -1622,6 +1886,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("imag-part"),new Symbol("<number>"));
+    }
+
+    public String docstring() {
+      return "Returns the imaginary component of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1645,6 +1913,10 @@ public class NumberPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("magnitude"),new Symbol("<number>"));
     }
+
+    public String docstring() {
+      return "Returns the magnitude of <number>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Number)) 
@@ -1665,6 +1937,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("angle"),new Symbol("<number>"));
+    }
+
+    public String docstring() {
+      return "Returns the angle of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1687,6 +1963,10 @@ public class NumberPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("conjugate"),new Symbol("<number>"));
+    }
+
+    public String docstring() {
+      return "Returns the conjugate of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

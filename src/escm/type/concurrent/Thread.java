@@ -307,6 +307,13 @@ public class Thread extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public String docstring() {
+    return "Thread: id=" + thread.getId() + ", name=" + thread.getName();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
     return Objects.hash(type(),thread);

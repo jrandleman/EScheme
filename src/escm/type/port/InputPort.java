@@ -517,6 +517,14 @@ public class InputPort extends Port {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public String docstring() {
+    if(isClosed()) return "Input Port (closed) named \""+name+"\"";
+    return "Input Port (open) named \""+name+"\"";
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public String display() {
     if(isClosed()) return "#<input-port (closed) "+name+">";

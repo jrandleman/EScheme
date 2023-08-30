@@ -25,6 +25,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is a character value.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
@@ -43,6 +47,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char-alphabetic?"),new Symbol("<char>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <char> is alphabetic.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -63,6 +71,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-numeric?"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns whether <char> is numeric.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -81,6 +93,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char-whitespace?"),new Symbol("<char>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <char> is whitespace.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -101,6 +117,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-upper-case?"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns whether <char> is uppercase.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -120,6 +140,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-lower-case?"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns whether <char> is lowercase.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -138,6 +162,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char-alphanumeric?"),new Symbol("<char>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <char> is alphabetic or numeric.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -159,6 +187,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-control?"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns whether <char> is a control character.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -178,6 +210,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-punctuation?"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns whether <char> is a punctuation character.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -196,6 +232,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char-graph?"),new Symbol("<char>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <char> is a graph character, equivalent to:\n  (or (char-alphanumeric? <char>) (char-punctuation? <char>))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -217,6 +257,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-print?"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns whether <char> is printable, equivalent to:\n  (or (char-graph? <char>) (eq? #\\space <char>))";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -236,6 +280,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char-xdigit?"),new Symbol("<char>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <char> is a hexadecimal digit.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -257,6 +305,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-upcase"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns the upper-case version of <char>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -276,6 +328,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-downcase"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns the upper-case version of <char>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -294,6 +350,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char=?"),new Symbol("<char>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns whether \"<char> ...\" are equal to one another.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -320,6 +380,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char<?"),new Symbol("<char>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns whether \"<char> ...\" are less than one another.";
     }
 
     // @PRECONDITION: <parameters.size() >= 1>
@@ -358,6 +422,10 @@ public class CharacterPrimitives {
       return Pair.List(new Symbol("char>?"),new Symbol("<char>"),Signature.VARIADIC);
     }
 
+    public String docstring() {
+      return "Returns whether \"<char> ...\" are greater than one another.";
+    }
+
     // @PRECONDITION: <parameters.size() >= 1>
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       Datum fstValue = parameters.get(0);
@@ -392,6 +460,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char<=?"),new Symbol("<char>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns whether \"<char> ...\" are less than or equal to one another.";
     }
 
     // @PRECONDITION: <parameters.size() >= 1>
@@ -430,6 +502,10 @@ public class CharacterPrimitives {
       return Pair.List(new Symbol("char>=?"),new Symbol("<char>"),Signature.VARIADIC);
     }
 
+    public String docstring() {
+      return "Returns whether \"<char> ...\" are greater than or equal to one another.";
+    }
+
     // @PRECONDITION: <parameters.size() >= 1>
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {
       Datum fstValue = parameters.get(0);
@@ -465,6 +541,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-ci=?"),new Symbol("<char>"),Signature.VARIADIC);
     }
+
+    public String docstring() {
+      return "Returns whether \"<char> ...\" are equal to one another (case-insensitive).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -490,6 +570,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char-ci<?"),new Symbol("<char>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns whether \"<char> ...\" are less than one another (case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -519,6 +603,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-ci>?"),new Symbol("<char>"),Signature.VARIADIC);
     }
+
+    public String docstring() {
+      return "Returns whether \"<char> ...\" are greater than one another (case-insensitive).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -546,6 +634,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char-ci<=?"),new Symbol("<char>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns whether \"<char> ...\" are less than or equal to one another\n(case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -575,6 +667,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-ci>=?"),new Symbol("<char>"),Signature.VARIADIC);
     }
+
+    public String docstring() {
+      return "Returns whether \"<char> ...\" are greater than or equal to one another\n(case-insensitive).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -603,6 +699,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-pair?"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns whether <char> is a 32bit surrogate java char pair. Used to represent\n32bit unicode values, such codepoints become 2 java chars once stringified.\nNote that all EScheme string operations are codepoint-relative though! Hence a\nstring with a single surrogate java char pair in it will have a <length> of 1.\n\nSee <java-char?> to determine if a <char> is a 16bit unicode value, and\nsee <ascii-char?> to determine if a <char> is an ASCII value.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -621,6 +721,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("java-char?"),new Symbol("<char>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <char> is a 16bit java char, correlating to exactly 1 char\nwithin strings under the hood. Note that all EScheme string operations are\ncodepoint-relative though! Hence a string with a single surrogate java\nchar pair in it will have a <length> of 1.\n\nSee <char-pair?> to determine if a <char> is a 32bit unicode value, and\nsee <ascii-char?> to determine if a <char> is an ASCII value.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -641,6 +745,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("ascii-char?"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns whether <char> is an 8bit ascii char, correlating to exactly 1 char\nwithin strings under the hood. Note that all EScheme string operations are\ncodepoint-relative though! Hence a string with a single surrogate java\nchar pair in it will have a <length> of 1.\n\nSee <char-pair?> to determine if a <char> is a 32bit unicode value, and\nsee <java-char?> to determine if a <char> is a 16bit unicode value.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -659,6 +767,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char-count"),new Symbol("<char>"));
+    }
+
+    public String docstring() {
+      return "Returns the number of java chars <char> stringifies to.\nReturns 2 if (char-pair? <char>), else returns 1.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -680,6 +792,10 @@ public class CharacterPrimitives {
       return Pair.List(
         Pair.List(new Symbol("char-digit"),new Symbol("<char>")),
         Pair.List(new Symbol("char-digit"),new Symbol("<char>"),new Symbol("<radix>")));
+    }
+
+    public String docstring() {
+      return "Returns the digit represented by <char> in <radix> (defaults to 36).\nReturns #f if <radix> is an invalid non-negative int or <char> isn't a digit.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -712,6 +828,10 @@ public class CharacterPrimitives {
         Pair.List(new Symbol("char-for-digit"),new Symbol("<non-negative-integer>")),
         Pair.List(new Symbol("char-for-digit"),new Symbol("<non-negative-integer>"),new Symbol("<radix>")));
     }
+
+    public String docstring() {
+      return "Returns the char representing digit <integer> in <radix> (defaults to 36).\nReturns #f if <radix> is an invalid non-negative int or <integer> isn't a digit.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 1 || parameters.size() > 2 || !ListPrimitives.isValidSize(parameters.get(0))) 
@@ -741,6 +861,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-name"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns <char>'s name as a string, or #f if its an unassigned unicode value.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -762,6 +886,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-defined?"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns whether <char> is an unassigned unicode value.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -780,6 +908,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char-high?"),new Symbol("<char>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <char> is the high portion of a 32bit surrogate char pair.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -801,6 +933,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-low?"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns whether <char> is the low portion of a 32bit surrogate char pair.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -820,6 +956,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char-high"),new Symbol("<char>"));
+    }
+
+    public String docstring() {
+      return "Returns the high portion of <char> if it's a 32 surrogate pair.\nIf (java-char? <char>), returns #f.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -842,6 +982,10 @@ public class CharacterPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("char-low"),new Symbol("<char>"));
     }
+
+    public String docstring() {
+      return "Returns the low portion of <char> if it's a 32 surrogate pair.\nIf (java-char? <char>), returns #f.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.Character)) 
@@ -862,6 +1006,10 @@ public class CharacterPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("char-codepoint"),new Symbol("<high-char>"),new Symbol("<low-char>"));
+    }
+
+    public String docstring() {
+      return "Returns a new character formed by combining <high-char> & <low-char> into\na single 32bit surrogate char pair.\nReturns #f if (not (and (char-high? <high-char>) (char-low? <low-char>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

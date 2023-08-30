@@ -52,6 +52,13 @@ public class Keyword extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public java.lang.String docstring() {
+    return "Keyword value: "+value;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Hash code
   public int hashCode() {
     return Objects.hash(type(),value);

@@ -37,6 +37,7 @@ public class OOPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("escm-oo-class"),
                        new Symbol("<name-keyword>"),
+                       new Symbol("<docstring>"),
                        new Symbol("<super>"),
                        new Symbol("<interface-list>"),
                        new Symbol("<ctor>"),
@@ -46,6 +47,10 @@ public class OOPrimitives {
                        new Symbol("<instance-property-value-list>"));
     }
 
+    public String docstring() {
+      return "Called by <class> to generate a <class> object from parsed components.";
+    }
+
     // Returns <null> if <name-keyword> DNE
     public static String parseOptionalClassOrInterfaceName(ArrayList<Datum> parameters) {
       Datum nameString = parameters.get(0);
@@ -53,9 +58,16 @@ public class OOPrimitives {
       return null;
     }
 
+    // Returns <""> if <docstring> DNE
+    public static String parseOptionalDocstring(ArrayList<Datum> parameters) {
+      Datum docstring = parameters.get(1);
+      if(docstring instanceof escm.type.String) return ((escm.type.String)docstring).value();
+      return "";
+    }
+
     // Returns <null> if <super> DNE
     private static EscmClass parseSuper(ArrayList<Datum> parameters) throws Exception {
-      Datum supr = parameters.get(1);
+      Datum supr = parameters.get(2);
       if(supr.eq(Boolean.FALSE)) return null;
       if(!(supr instanceof EscmClass))
         throw new Exceptionf("'class <super> parameter isn't a class (given %s): %s", supr.profile(), Exceptionf.profileArgs(parameters));
@@ -63,7 +75,7 @@ public class OOPrimitives {
     }
 
     private static ArrayList<EscmInterface> parseInterfaces(ArrayList<Datum> parameters) throws Exception {
-      Datum interfaceList = parameters.get(2);
+      Datum interfaceList = parameters.get(3);
       ArrayList<EscmInterface> interfaces = new ArrayList<EscmInterface>();
       while(interfaceList instanceof escm.type.Pair) {
         escm.type.Pair par = (escm.type.Pair)interfaceList;
@@ -78,7 +90,7 @@ public class OOPrimitives {
 
     // Returns <null> if constructor DNE
     private static CompoundProcedure parseConstructor(ArrayList<Datum> parameters) throws Exception {
-      Datum ctor = parameters.get(3);
+      Datum ctor = parameters.get(4);
       if(ctor.eq(Boolean.FALSE)) return null;
       if(!(ctor instanceof CompoundProcedure))
         throw new Exceptionf("'class <new> constructor must be a custom procedure (given %s): %s", ctor.profile(), Exceptionf.profileArgs(parameters));
@@ -105,18 +117,19 @@ public class OOPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 8) 
-        throw new Exceptionf("'(escm-oo-class <name-keyword> <super> <interface-list> <ctor> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list> <instance-prop-value-list>) expects exactly 8 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() != 9) 
+        throw new Exceptionf("'(escm-oo-class <name-keyword> <docstring> <super> <interface-list> <ctor> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list> <instance-prop-value-list>) expects exactly 9 args: %s", Exceptionf.profileArgs(parameters));
       // Parse components
       String className = parseOptionalClassOrInterfaceName(parameters);
+      String docstring = parseOptionalDocstring(parameters);
       EscmClass supr = parseSuper(parameters);
       ArrayList<EscmInterface> interfaces = parseInterfaces(parameters);
       CompoundProcedure ctor = parseConstructor(parameters);
-      ConcurrentHashMap<String,Datum> staticProps = parsePropertyNamesAndValues(parameters,"static",4,5);
-      ConcurrentHashMap<String,Datum> instanceProps = parsePropertyNamesAndValues(parameters,"instance",6,7);
+      ConcurrentHashMap<String,Datum> staticProps = parsePropertyNamesAndValues(parameters,"static",5,6);
+      ConcurrentHashMap<String,Datum> instanceProps = parsePropertyNamesAndValues(parameters,"instance",7,8);
       if(ctor != null) instanceProps.put("new",ctor);
       // Create the class!
-      return new EscmClass(className,supr,interfaces,staticProps,instanceProps);
+      return new EscmClass(className,docstring,supr,interfaces,staticProps,instanceProps);
     }
   }
 
@@ -131,15 +144,20 @@ public class OOPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("escm-oo-interface"),
                        new Symbol("<name-keyword>"),
+                       new Symbol("<docstring>"),
                        new Symbol("<interface-list>"),
                        new Symbol("<static-property-name-list>"),
                        new Symbol("<static-property-value-list>"),
                        new Symbol("<instance-property-name-list>"));
     }
 
+    public String docstring() {
+      return "Called by <interface> to generate a <interface> object from parsed components.";
+    }
+
     // Returns <null> if <super> DNE
     private static ArrayList<EscmInterface> parseInterfaces(ArrayList<Datum> parameters) throws Exception {
-      Datum interfaceList = parameters.get(1);
+      Datum interfaceList = parameters.get(2);
       ArrayList<EscmInterface> interfaces = new ArrayList<EscmInterface>();
       while(interfaceList instanceof escm.type.Pair) {
         escm.type.Pair par = (escm.type.Pair)interfaceList;
@@ -153,8 +171,8 @@ public class OOPrimitives {
     }
 
     private static ConcurrentHashMap<String,Datum> parsePropertyNamesAndValues(ArrayList<Datum> parameters) throws Exception {
-      Datum nameList = parameters.get(2);
-      Datum valueList = parameters.get(3);
+      Datum nameList = parameters.get(3);
+      Datum valueList = parameters.get(4);
       ConcurrentHashMap<String,Datum> namesAndValues = new ConcurrentHashMap<String,Datum>();
       while(nameList instanceof escm.type.Pair && valueList instanceof escm.type.Pair) {
         escm.type.Pair np = (escm.type.Pair)nameList;
@@ -172,7 +190,7 @@ public class OOPrimitives {
     }
 
     private static ArrayList<String> parseInstancePropertyNames(ArrayList<Datum> parameters) throws Exception {
-      Datum nameList = parameters.get(4);
+      Datum nameList = parameters.get(5);
       ArrayList<String> names = new ArrayList<String>();
       while(nameList instanceof escm.type.Pair) {
         escm.type.Pair par = (escm.type.Pair)nameList;
@@ -186,15 +204,16 @@ public class OOPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 5) 
-        throw new Exceptionf("'(escm-oo-interface <name-keyword> <interface-list> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list>) expects exactly 5 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() != 6) 
+        throw new Exceptionf("'(escm-oo-interface <name-keyword> <docstring> <interface-list> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list>) expects exactly 6 args: %s", Exceptionf.profileArgs(parameters));
       // Parse components
       String interfaceName = EscmOoClass.parseOptionalClassOrInterfaceName(parameters);
+      String docstring = EscmOoClass.parseOptionalDocstring(parameters);
       ArrayList<EscmInterface> interfaces = parseInterfaces(parameters);
       ConcurrentHashMap<String,Datum> staticProps = parsePropertyNamesAndValues(parameters);
       ArrayList<String> instanceNames = parseInstancePropertyNames(parameters);
       // Create the interface!
-      return new EscmInterface(interfaceName,interfaces,staticProps,instanceNames);
+      return new EscmInterface(interfaceName,docstring,interfaces,staticProps,instanceNames);
     }
   }
 
@@ -208,6 +227,10 @@ public class OOPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("meta-object?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is a meta-object. Equivalent to:\n  (or (class? <obj>) (interface? <obj>) (object? <obj>))";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -230,6 +253,10 @@ public class OOPrimitives {
       return Pair.List(new Symbol("interface?"),new Symbol("<obj>"));
     }
 
+    public String docstring() {
+      return "Returns whether <obj> is an <interface> (as created by <interface> or <define-interface>).";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(interface? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -248,6 +275,10 @@ public class OOPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("class?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is a <class> (as created by <class> or <define-class>).\nClasses can be applied to invoke their constructor.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -270,6 +301,10 @@ public class OOPrimitives {
       return Pair.List(new Symbol("object?"),new Symbol("<obj>"));
     }
 
+    public String docstring() {
+      return "Returns whether <obj> is an <object> (as created by a class constructor).\nObjects can become functors by defining a <->procedure> method.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(object? <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -288,6 +323,10 @@ public class OOPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("functor?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is an applicable object. Equivalent to:\n  (and (object? <obj>) (oo-has? <obj> '->procedure))";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -311,6 +350,10 @@ public class OOPrimitives {
       return Pair.List(
         Pair.List(new Symbol("oo-is?"),new Symbol("<object>"),new Symbol("<class>")),
         Pair.List(new Symbol("oo-is?"),new Symbol("<object>"),new Symbol("<interface>")));
+    }
+
+    public String docstring() {
+      return "Returns whether <object> is an instance of the <class> or <interface>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -458,6 +501,10 @@ public class OOPrimitives {
       return Pair.List(new Symbol("oo-has?"),new Symbol("<meta-object>"),new Symbol("<property-symbol-name>"),Signature.VARIADIC);
     }
 
+    public String docstring() {
+      return "Returns whether <meta-object> contains \"<property-symbol-name> ...\" as a property chain.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 2) 
         throw new Exceptionf("'(oo-has? <meta-object> <property-symbol-name> ...) expects at least 2 args: %s", Exceptionf.profileArgs(parameters));
@@ -481,6 +528,10 @@ public class OOPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("oo-get"),new Symbol("<meta-object>"),new Symbol("<property-symbol-name>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Returns the \"<property-symbol-name> ...\" property of <meta-object>.\nTriggers an error upon failure.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -511,6 +562,10 @@ public class OOPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("oo-set!"),new Symbol("<meta-object>"),new Symbol("<property-symbol-name>"),Signature.VARIADIC,new Symbol("<value>"));
+    }
+
+    public String docstring() {
+      return "Sets the \"<property-symbol-name> ...\" property of <meta-object> to <value>.\nTriggers an error upon failure.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -548,6 +603,10 @@ public class OOPrimitives {
       return Pair.List(new Symbol("oo-define"),new Symbol("<meta-object>"),new Symbol("<property-symbol-name>"),Signature.VARIADIC,new Symbol("<value>"));
     }
 
+    public String docstring() {
+      return "Defines the \"<property-symbol-name> ...\" property of <meta-object> to be <value>.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() < 3) 
         throw new Exceptionf("'(oo-define <meta-object> <property-symbol-name> ... <value>) expects at least 3 args: %s", Exceptionf.profileArgs(parameters));
@@ -580,6 +639,10 @@ public class OOPrimitives {
       return Pair.List(
         Pair.List(new Symbol("oo-super"),new Symbol("<object>")),
         Pair.List(new Symbol("oo-super"),new Symbol("<class>")));
+    }
+
+    public String docstring() {
+      return "Returns the super meta-object of <object> or <class>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -615,6 +678,10 @@ public class OOPrimitives {
       return Pair.List(new Symbol("oo-interfaces"),new Symbol("<meta-object>"));
     }
 
+    public String docstring() {
+      return "Returns the list of interfaces implemented by <meta-object>.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(oo-interfaces <meta-object>) expects exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
@@ -640,6 +707,10 @@ public class OOPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("oo-properties"),new Symbol("<meta-object>"));
+    }
+
+    public String docstring() {
+      return "Returns a list of <meta-object>'s property name symbols.\nFor classes and interfaces, it also denotes whether the property is static or not.";
     }
 
     private static Keyword STATIC_KEYWORD = new Keyword("static");
@@ -742,6 +813,10 @@ public class OOPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("escm-oo-super!"),new Symbol("<object>"),new Symbol("<parameter>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Called by <super!> in the process of updating an object's super object\nduring construction.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

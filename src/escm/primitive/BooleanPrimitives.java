@@ -22,6 +22,10 @@ public class BooleanPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("boolean?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is a boolean value (#t or #f).";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
@@ -40,6 +44,10 @@ public class BooleanPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("not"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns #t if <obj> is #f, otherwise #t.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

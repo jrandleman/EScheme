@@ -167,9 +167,9 @@
   "description": "Get the variable value \"specifically associated\" with <mutex>.",
   "example": null
 }, {
-  "name": "mutex-specific-set!",
+  "name": "mutex-set-specific!",
   "aliases": null,
-  "signatures": ["(mutex-specific-set! <mutex> <obj>)"],
+  "signatures": ["(mutex-set-specific! <mutex> <obj>)"],
   "description": "Set the variable value \"specifically associated\" with <mutex> to <obj>.",
   "example": null
 }, {

@@ -124,6 +124,13 @@ public class ObjectAccessChain extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public String docstring() {
+    return "Object-Access-Chain "+serializeValue();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Serialization
   private String serializeValue() {
     StringBuilder sb = new StringBuilder("[");

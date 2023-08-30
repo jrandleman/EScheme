@@ -35,6 +35,9 @@ public class PrimitiveProcedure extends Procedure {
   public PrimitiveProcedure(java.lang.String name, Primitive prm) {
     this.name = name;
     this.prm = new Callable() {
+      public String docstring() {
+        return prm.docstring();
+      }
       public Datum signature() {
         return prm.signature();
       }
@@ -90,6 +93,10 @@ public class PrimitiveProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // Application Abstraction
+  public String docstring() {
+    return prm.docstring();
+  }
+
   private boolean signatureShouldBindName(Datum name) {
     return name instanceof Symbol && ((Symbol)name).value().equals(Procedure.DEFAULT_NAME);
   }

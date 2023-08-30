@@ -62,11 +62,12 @@ compiles to `(load #void) (define n)`.
 A note on writing closures: you may nest the `load-closure` syntax as needed in order
 to denote closures. The `load-closure` syntax is as follows:
 
-`(load-closure ((<argument> ...) <instruction> ...) ...)`
+`(load-closure <optional-docstring> ((<argument> ...) <instruction> ...) ...)`
 
-This syntax will load the equivalent of `(fn ((<argument> ...) <instruction> ...) ...)`
+This syntax will load the equivalent of: `(fn ((<argument> ...) <instruction> ...) ...)`
 into CVR. Further note that closure expressions by default return the value left in 
-CVR upon terminating execution.
+CVR upon terminating execution. `<docstring>` may be optionally provided to yield
+further information on the closure's intended purpose in the `help` menu.
 
 For example, you may write:
 ```scheme
@@ -141,7 +142,7 @@ syntax. These include: `define`, `set!`, `load`, `call`, `push`, & `return`.
 ### Psuedo-instruction(s) converted into "real" instruction(s) by the assembler
 
 ```
-(load-closure ((<argument> ...) <instruction> ...) ...) ; syntax to load a closure
+(load-closure <optional-docstring> ((<argument> ...) <instruction> ...) ...) ; syntax to load a closure
 ```
 
 

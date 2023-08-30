@@ -11,6 +11,12 @@
   "description": "Get the <callable>'s name as EScheme data, or #f if unavailable.",
   "example": null
 }, {
+  "name": "docstring",
+  "aliases": null,
+  "signatures": ["(docstring <obj>)"],
+  "description": "Get the <obj>'s docstring if available, else #f.\n\nDocstrings are used to give details on objects passed to the <help> function,\nand **MUST** be writted as string literals to register as valid syntax (e.g.\nfor procedures, classes, interfaces, etc.).\n\nNote that docstring newlines and tabs should be added by users exactly as\nthey'd like their docstring to render in the <help> menu: no additional\nformatting will be done!",
+  "example": null
+}, {
   "name": "apply",
   "aliases": null,
   "signatures": ["(apply <callable> <obj-argument-list>)"],

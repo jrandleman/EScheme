@@ -45,6 +45,7 @@ public abstract class Procedure extends Datum implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Application Abstraction
+  public abstract String docstring();
   public abstract Datum signature(); // <#f> on failure
   public abstract Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception;
 

@@ -47,10 +47,12 @@ public class CompoundProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
   // Internal compound procedure fields
   protected static class CompileTime implements Serializable {
+    public String docstring;
     public ArrayList<ArrayList<Symbol>> parametersList;
     public ArrayList<Symbol> variadicParameterList; // <null> indicates non-variadic
     public ArrayList<ArrayList<Instruction>> bodyList;
-    public CompileTime(ArrayList<ArrayList<Symbol>> parametersList, ArrayList<Symbol> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
+    public CompileTime(String docstring, ArrayList<ArrayList<Symbol>> parametersList, ArrayList<Symbol> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
+      this.docstring = docstring;
       this.parametersList = parametersList;
       this.variadicParameterList = variadicParameterList;
       this.bodyList = bodyList;
@@ -63,8 +65,8 @@ public class CompoundProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  public CompoundProcedure(ArrayList<ArrayList<Symbol>> parametersList, ArrayList<Symbol> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
-    this.compileTime = new CompileTime(parametersList,variadicParameterList,bodyList);
+  public CompoundProcedure(String docstring, ArrayList<ArrayList<Symbol>> parametersList, ArrayList<Symbol> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
+    this.compileTime = new CompileTime(docstring.trim(),parametersList,variadicParameterList,bodyList);
   }
 
 
@@ -113,6 +115,13 @@ public class CompoundProcedure extends Procedure {
   // Hash code
   public int hashCode() {
     return Objects.hash("compound-"+type(),System.identityHashCode(definitionEnvironment),System.identityHashCode(compileTime));
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public String docstring() {
+    return compileTime.docstring;
   }
 
 

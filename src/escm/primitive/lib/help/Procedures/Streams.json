@@ -191,16 +191,16 @@
   "description": "Equivalent to: (scdr (scdr (scdr (scdr <stream-pair>))))",
   "example": null
 }, {
-  "name": "stream-val",
-  "aliases": null,
-  "signatures": ["(stream-val <stream> <index>)"],
-  "description": "Return the <index>th item in <stream>.",
-  "example": null
-}, {
   "name": "stream->list",
   "aliases": null,
   "signatures": ["(stream->list <stream> <list-length>)"],
   "description": "Return the first <list-length> items in <stream> as a list.",
+  "example": null
+}, {
+  "name": "stream-val",
+  "aliases": null,
+  "signatures": ["(stream-val <stream> <index>)"],
+  "description": "Return the <index>th item in <stream>.",
   "example": null
 }, {
   "name": "stream-map",

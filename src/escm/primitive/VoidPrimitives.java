@@ -23,6 +23,10 @@ public class VoidPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("void?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> has type #<void>.\nReturned by mutative actions like <set!>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 

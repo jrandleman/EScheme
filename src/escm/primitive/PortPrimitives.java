@@ -30,6 +30,10 @@ public class PortPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("open-input-file"),new Symbol("<filename-string>"));
     }
+
+    public String docstring() {
+      return "Returns an input-port file handle to read from <filename-string>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String))
@@ -50,6 +54,10 @@ public class PortPrimitives {
       return Pair.List(
         Pair.List(new Symbol("open-output-file")),
         Pair.List(new Symbol("open-output-file"),new Symbol("<filename-string>")));
+    }
+
+    public String docstring() {
+      return "Returns an output-port file handle to write to <filename-string>.\nIf <filename-string> exists, it is cleared.\n\nIf <filename-string> isn't given, generates a temporary file.\nAccess a temporary file's path via <port-path>.\nTemporary files are automatically deleted upon exit by the VM.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -72,6 +80,10 @@ public class PortPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("open-output-file+"),new Symbol("<filename-string>"));
     }
+
+    public String docstring() {
+      return "Returns an output-port file handle to write to <filename-string>.\nIf <filename-string> exists, it is appended to.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.String))
@@ -90,6 +102,10 @@ public class PortPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("close-port!"),new Symbol("<port>"));
+    }
+
+    public String docstring() {
+      return "Closes <port> if it hasn't been closed yet.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -111,6 +127,10 @@ public class PortPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("port-path"),new Symbol("<port>"));
     }
+
+    public String docstring() {
+      return "Returns the <port>'s path as a string.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Port))
@@ -129,6 +149,10 @@ public class PortPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("port-position"),new Symbol("<input-port>"));
+    }
+
+    public String docstring() {
+      return "Returns a pair: <input-port>'s (<line-number> . <column-number>)";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -150,6 +174,10 @@ public class PortPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("port?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is a port.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1)
@@ -168,6 +196,10 @@ public class PortPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("input-port?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is an input-port.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -188,6 +220,10 @@ public class PortPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("output-port?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is an output-port.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1)
@@ -206,6 +242,10 @@ public class PortPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("temp-port?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <obj> is a port pointing to a temporary file.\nAccess a temporary file's path via <port-path>.\nTemporary files are automatically deleted upon exit by the VM.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -226,6 +266,10 @@ public class PortPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("open-port?"),new Symbol("<port>"));
     }
+
+    public String docstring() {
+      return "Returns whether <port> is still open.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Port))
@@ -244,6 +288,10 @@ public class PortPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("closed-port?"),new Symbol("<port>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <port> is closed.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -264,6 +312,10 @@ public class PortPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("current-input-port"));
     }
+
+    public String docstring() {
+      return "Returns the current input-port, used as the default value for <read> etc.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0)
@@ -283,6 +335,10 @@ public class PortPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("current-output-port"));
     }
+
+    public String docstring() {
+      return "Returns the current output-port, used as the default value for <write> etc.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 0)
@@ -301,6 +357,10 @@ public class PortPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("call-with-input-file"),new Symbol("<filename-string>"),new Symbol("<unary-callable>"));
+    }
+
+    public String docstring() {
+      return "Invoke <unary-callable> with (open-input-file <filename-string>) as its argument.\nAutomatically close that given port upon <unary-callable>'s return, and yield\n<unary-callable>'s return value.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -332,6 +392,10 @@ public class PortPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("call-with-output-file"),new Symbol("<filename-string>"),new Symbol("<unary-callable>"));
+    }
+
+    public String docstring() {
+      return "Invoke <unary-callable> with (open-output-file <filename-string>) as its argument.\nAutomatically close that given port upon <unary-callable>'s return, and yield\n<unary-callable>'s return value.\nNote that <filename-string> is cleared if it exists.";
     }
 
     public static Trampoline.Bounce logic(String primitiveName, boolean append, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -369,6 +433,10 @@ public class PortPrimitives {
       return Pair.List(new Symbol("call-with-output-file+"),new Symbol("<filename-string>"),new Symbol("<unary-callable>"));
     }
 
+    public String docstring() {
+      return "Invoke <unary-callable> with (open-output-file <filename-string>) as its argument.\nAutomatically close that given port upon <unary-callable>'s return, and yield\n<unary-callable>'s return value.\nNote that <filename-string> is appended to if it exists.";
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       return CallWithOutputFile.logic(escmName(),true,parameters,continuation);
     }
@@ -384,6 +452,10 @@ public class PortPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("with-input-from-file"),new Symbol("<filename-string>"),new Symbol("<thunk-callable>"));
+    }
+
+    public String docstring() {
+      return "Invoke <thunk-callable> with (open-input-file <filename-string>) as the\ncurrent-input-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -417,6 +489,10 @@ public class PortPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("with-output-to-file"),new Symbol("<filename-string>"),new Symbol("<thunk-callable>"));
+    }
+
+    public String docstring() {
+      return "Invoke <thunk-callable> with (open-output-file <filename-string>) as the\ncurrent-output-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.\nNote that <filename-string> is cleared if it exists.";
     }
 
     public static Trampoline.Bounce logic(String primitiveName, boolean append, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -456,6 +532,10 @@ public class PortPrimitives {
       return Pair.List(new Symbol("with-output-to-file+"),new Symbol("<filename-string>"),new Symbol("<thunk-callable>"));
     }
 
+    public String docstring() {
+      return "Invoke <thunk-callable> with (open-output-file <filename-string>) as the\ncurrent-output-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.\nNote that <filename-string> is appended to if it exists.";
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       return WithOutputToFile.logic(escmName(),true,parameters,continuation);
     }
@@ -471,6 +551,10 @@ public class PortPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("peek-port"),new Symbol("<input-port>"));
+    }
+
+    public String docstring() {
+      return "Peek the first character in <input-port>. Returns #eof if empty.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -494,6 +578,10 @@ public class PortPrimitives {
       return Pair.List(new Symbol("stdin?"),new Symbol("<input-port>"));
     }
 
+    public String docstring() {
+      return "Returns whether <input-port> handles the program's standard input.";
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof InputPort))
         throw new Exceptionf("'(stdin? <input-port>) didn't receive 1 input-port: %s", Exceptionf.profileArgs(parameters));
@@ -511,6 +599,10 @@ public class PortPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("stdout?"),new Symbol("<output-port>"));
+    }
+
+    public String docstring() {
+      return "Returns whether <output-port> handles the program's standard output.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

@@ -1,7 +1,7 @@
 // Author: Jordan Randleman - escm.vm.type.callable.Signature
 // Purpose:
-//    Primitive interface that all Java callables who can show their parameter
-//    signature implement.
+//    Primitive interface for callables to enable introspection 
+//    on their signatures.
 
 package escm.vm.type.callable;
 import java.io.Serializable;

@@ -160,6 +160,17 @@ public class String extends Datum implements OrderedCollection, Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Callable (unary index getter)
+  public java.lang.String docstring() {
+    int n = codePointLength();
+    if(n == 0) {
+      return "String of length 0.";
+    } else if(n == 1) {
+      return "String of length 1.\nApply to index 0 to get the char.";
+    } else {
+      return "String of length "+n+".\nApply to any index from 0 to "+(n-1)+" to get a char.";
+    }
+  }
+
   public Datum signature() {
     return Pair.List(this,new Symbol("<index>"));
   }
@@ -1191,6 +1202,9 @@ public class String extends Datum implements OrderedCollection, Callable {
     int increment = java.lang.Character.charCount(codepoint);
     escm.type.Character hd = new escm.type.Character(codepoint);
     Callable trueCondPrimitive = new Callable() {
+      public java.lang.String docstring() {
+        return "Quicksort: move values to the left of the pivot.";
+      }
       public Datum signature() { 
         return Pair.List(new Symbol("escm-sort-in-lhs?"),new Symbol("<obj>"),new Symbol("<obj>")); 
       }
@@ -1200,6 +1214,9 @@ public class String extends Datum implements OrderedCollection, Callable {
       }
     };
     Callable falseCondPrimitive = new Callable() {
+      public java.lang.String docstring() {
+        return "Quicksort: move values to the right of the pivot.";
+      }
       public Datum signature() { 
         return Pair.List(new Symbol("escm-sort-in-rhs?"),new Symbol("<obj>"),new Symbol("<obj>")); 
       }

@@ -52,6 +52,10 @@ public class GeneratorPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("escm-generator?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is a result of <define-generator>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
@@ -99,6 +103,10 @@ public class GeneratorPrimitives {
         Pair.List(new Symbol("yield")),
         Pair.List(new Symbol("yield"),new Symbol("<obj>")));
     }
+
+    public String docstring() {
+      return "Pause the current execution of the generator and return <obj> (#void by\ndefault). Only valid within the \"<body> ...\" of <define-generator>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
@@ -121,7 +129,10 @@ public class GeneratorPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // (define-generator (<generator-name> <param> ...) <body> ...)
+  // (define-generator (<generator-name> <param> ...) <optional-docstring> <body> ...)
+  //
+  // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>.
+  // =====
   //
   // (define-syntax define-generator 
   //   (lambda (bindings . body)
@@ -146,31 +157,51 @@ public class GeneratorPrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("define-generator"),
-        Pair.List(new Symbol("<generator-name>"), new Symbol("<parameter>"),Signature.VARIADIC),
-        new Symbol("<body>"),Signature.VARIADIC);
+      return Pair.List(
+        Pair.List(new Symbol("define-generator"),
+          Pair.List(new Symbol("<generator-name>"), new Symbol("<parameter>"),Signature.VARIADIC),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("define-generator"),
+          Pair.List(new Symbol("<generator-name>"), new Symbol("<parameter>"),Signature.VARIADIC),
+          new Symbol("<docstring>"),new Symbol("<body>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "Define a generator constructor! Calling <generator-name>\nreturns a generator thunk, which can suspend its operation\n(until it gets invoked again) via the <yield> macro.\n\nNote that due to being a \"generator-constructor\", <generator-name>\nshould not be called recursively to emulate looping.\nInstead, define an inner procedure or use the \"named let\" construct.\n\nOptionally include <docstring> to yield further details on the generator\nconstructor's intended purpose in the <help> menu.\n\nAliased by <defgen>.\nFor example:\n  ;; Printing Numbers and Strings:\n  (define-generator (print-numbers start total)\n    (let loop ((i start))\n      (if (< i total)\n            (begin \n              (write i)\n              (display \" \")\n              (yield) ; pause execution until re-invoked\n              (loop (+ i 1))))))\n  \n  (define-generator (print-strings start total)\n    (let loop ((i start))\n      (if (< i total)\n            (begin \n              (write (number->string i))\n              (display \" \")\n              (yield) ; pause execution until re-invoked\n              (loop (+ i 1))))))\n  \n  (complete-all-generators! (print-numbers 0 10) (print-strings 0 10))\n  (newline)\n  \n  \n  ;; Creating a stream of integers from a starting number (0 by default):\n  (define-generator (ints-from (start 0))\n    (let loop ((n start))\n      (yield n)\n      (loop (+ n 1))))\n  \n  (define ints (ints-from 42))\n  (display (ints)) \n  (newline)\n  (display (ints)) \n  (newline)\n  (display (ints)) \n  (newline)";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       Symbol generatorObject = UniqueSymbol.generate("define-generator-object");
-      if(parameters.size() < 1)
+      int n = parameters.size();
+      if(n < 1)
         throw new Exceptionf("'(define-generator (<generator-name> <param> ...) <body> ...) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       Datum bindings = parameters.get(0);
-      Datum body = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,0);
-      return Pair.List(CorePrimitives.DEFINE,bindings,
-        Pair.List(CorePrimitives.DEFINE,generatorObject,
+      escm.type.String docstring = CorePrimitives.Fn.parseOptionalDocstring(parameters,n,1);
+      int priorBodyIdx = docstring == null ? 0 : 1;
+      Datum body = CorePrimitives.Lambda.getAllExpressionsAfter(parameters,priorBodyIdx);
+      Datum generatorObjectDefinition = Pair.List(
+        CorePrimitives.DEFINE,generatorObject,
           Pair.List(CorePrimitives.CONS,
             Pair.List(CorePrimitives.CONS,Pair.List(CorePrimitives.QUOTE,ESCM_GENERATOR),Boolean.FALSE),
             Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,
-              Pair.List(CorePrimitives.CALL_CC,new Pair(CorePrimitives.LAMBDA,new Pair(Pair.List(ESCM_GENERATOR_ESCAPE),body)))))),
-        Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,
-          Pair.List(CorePrimitives.IF,Pair.List(ESCM_IS_GENERATORP,generatorObject),
-            Pair.List(CorePrimitives.BEGIN,
-              Pair.List(CorePrimitives.SET_BANG,generatorObject,Pair.List(Pair.List(CDR,generatorObject))),
-              Pair.List(CorePrimitives.IF,Pair.List(ESCM_IS_GENERATORP,generatorObject),
-                Pair.List(CDAR,generatorObject),
-                generatorObject)),
-            GlobalState.GLOBAL_GENERATOR_COMPLETE)));
+              Pair.List(CorePrimitives.CALL_CC,new Pair(CorePrimitives.LAMBDA,new Pair(Pair.List(ESCM_GENERATOR_ESCAPE),body))))));
+      Datum generatorThunkBody = Pair.List(
+        CorePrimitives.IF,Pair.List(ESCM_IS_GENERATORP,generatorObject),
+          Pair.List(CorePrimitives.BEGIN,
+            Pair.List(CorePrimitives.SET_BANG,generatorObject,Pair.List(Pair.List(CDR,generatorObject))),
+            Pair.List(CorePrimitives.IF,Pair.List(ESCM_IS_GENERATORP,generatorObject),
+              Pair.List(CDAR,generatorObject),
+              generatorObject)),
+          GlobalState.GLOBAL_GENERATOR_COMPLETE);
+      if(docstring != null) {
+        return Pair.List(CorePrimitives.DEFINE,bindings,docstring,
+          generatorObjectDefinition,
+          Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,docstring,generatorThunkBody));
+      } else {
+        return Pair.List(CorePrimitives.DEFINE,bindings,
+          generatorObjectDefinition,
+          Pair.List(CorePrimitives.LAMBDA,Nil.VALUE,generatorThunkBody));
+      }
     }
   }
 
@@ -191,6 +222,10 @@ public class GeneratorPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("complete-all-generators!"),new Symbol("<generator-object>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Continues cycling through the generators until they all complete.";
     }
 
     private Trampoline.Bounce iterate(ArrayList<Datum> parameters, int finishedCount, int n, Pair generatorObjects, Datum remainingObjects, Trampoline.Continuation continuation) throws Exception {
@@ -237,6 +272,10 @@ public class GeneratorPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("complete-n-generators!"),new Symbol("<count>"),new Symbol("<generator-object>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Continues cycling through the generators until at least <n> of them have completed.";
     }
 
     private Trampoline.Bounce iterate(ArrayList<Datum> parameters, int finishedCount, int n, Pair generatorObjects, Datum remainingObjects, Trampoline.Continuation continuation) throws Exception {

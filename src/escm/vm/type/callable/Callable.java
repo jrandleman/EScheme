@@ -9,7 +9,8 @@ import java.io.Serializable;
 import escm.type.Datum;
 import escm.util.Trampoline;
 
-public interface Callable extends Signature, Serializable {
+public interface Callable extends DocString, Signature, Serializable {
+  public String docstring();
   public Datum signature();
   public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception;
 }

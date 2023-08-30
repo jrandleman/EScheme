@@ -405,14 +405,16 @@ public class HelpPrimitive {
       return "help";
     }
 
-
     public Datum signature() {
       return escm.type.Pair.List(
         escm.type.Pair.List(new Symbol("help")),
-        escm.type.Pair.List(new Symbol("help"),new Symbol("<query-symbol>")),
-        escm.type.Pair.List(new Symbol("help"),new Symbol("<query-obj>")));
+        escm.type.Pair.List(new Symbol("help"),new Symbol("<symbol>")),
+        escm.type.Pair.List(new Symbol("help"),new Symbol("<obj>")));
     }
 
+    public String docstring() {
+      return "No Arguments:\n  Launch the interactive help menu.\nSymbol Argument:\n  Query for <symbol>'s help entry.\nObj Argument:\n  Get information about <obj>.";
+    }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       cacheHelpDB(); // only caches upon first invocation!

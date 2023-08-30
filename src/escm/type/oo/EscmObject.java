@@ -63,6 +63,13 @@ public class EscmObject extends MetaObject implements Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Documentation String
+  public String docstring() {
+    return escmClass.docstring();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Functor Logic (Application Overload)
   public Datum signature() {
     try {
@@ -70,7 +77,7 @@ public class EscmObject extends MetaObject implements Callable {
       Datum procedure = get("->procedure");
       if(!(procedure instanceof MethodProcedure)) return Boolean.FALSE;
       return ((MethodProcedure)procedure).signature();
-    } catch(Exception t) {
+    } catch(Exception e) {
       return Boolean.FALSE;
     }
   }

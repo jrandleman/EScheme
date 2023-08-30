@@ -29,6 +29,10 @@ public class OrderedCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("ordered-collection?"),new Symbol("<obj>"));
     }
+
+    public String docstring() {
+      return "Returns whether <obj> is an ordered collection: String | List | Vector";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
@@ -48,6 +52,10 @@ public class OrderedCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("init"),new Symbol("<ordered-collection>"));
     }
+
+    public String docstring() {
+      return "Returns everything except the last item in <oc>.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof OrderedCollection)) 
@@ -66,6 +74,10 @@ public class OrderedCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("last"),new Symbol("<ordered-collection>"));
+    }
+
+    public String docstring() {
+      return "Returns the last item in <oc>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -88,6 +100,10 @@ public class OrderedCollectionPrimitives {
         Pair.List(new Symbol("slice"),new Symbol("<ordered-collection>"),new Symbol("<index>")),
         Pair.List(new Symbol("slice"),new Symbol("<ordered-collection>"),new Symbol("<index>"),new Symbol("<length>")),
         Pair.List(new Symbol("slice"),new Symbol("<ordered-collection>"),new Symbol("<index>"),new Symbol("<continue?-callable>")));
+    }
+
+    public String docstring() {
+      return "Slices a subset of the items in <oc> starting from <index>.\nIf no other args are given, returns the rest of the items from <index>.\nIf <length> is given, returns at most <length> items.\nGiven <continue?-callable>, slices while values satisfy <continue?-callable>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -121,6 +137,10 @@ public class OrderedCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("reverse"),new Symbol("<ordered-collection>"));
     }
+
+    public String docstring() {
+      return "Returns <oc> in reverse.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof OrderedCollection)) 
@@ -139,6 +159,10 @@ public class OrderedCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("remove-first"),new Symbol("<elt=?-callable>"),new Symbol("<ordered-collection>"));
+    }
+
+    public String docstring() {
+      return "Returns <oc> without the first value satisfying <elt=?-callable>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -159,6 +183,10 @@ public class OrderedCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("remove-last"),new Symbol("<elt=?-callable>"),new Symbol("<ordered-collection>"));
     }
+
+    public String docstring() {
+      return "Returns <oc> without the last value satisfying <elt=?-callable>.";
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
@@ -177,6 +205,10 @@ public class OrderedCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("skip"),new Symbol("<elt=?-callable>"),new Symbol("<ordered-collection>"));
+    }
+
+    public String docstring() {
+      return "Returns the first item that doesn't satisfy <elt=?-callable>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -197,6 +229,10 @@ public class OrderedCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("skip-right"),new Symbol("<elt=?-callable>"),new Symbol("<ordered-collection>"));
     }
+
+    public String docstring() {
+      return "Returns the last item that doesn't satisfy <elt=?-callable>.";
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
@@ -215,6 +251,10 @@ public class OrderedCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("fold-right"),new Symbol("<callable>"),new Symbol("<seed>"),new Symbol("<ordered-collection>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "Accumulate the values in \"<oc> ...\" from right to left by applying\n<callable> to \"<previous-result>\" and <item> with <seed-obj> acting\nas the initial \"<previous-result>\".\n\n  => Note that the \"<oc> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -245,6 +285,10 @@ public class OrderedCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("key-right"),new Symbol("<elt=?-callable>"),new Symbol("<ordered-collection>"));
     }
+
+    public String docstring() {
+      return "Get the last index in <ac> who's associated value satisfies <elt=?-callable?>.";
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
@@ -263,6 +307,10 @@ public class OrderedCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("drop-right"),new Symbol("<ordered-collection>"),new Symbol("<length>"));
+    }
+
+    public String docstring() {
+      return "Returns <oc> without <length> items from its right side.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -283,6 +331,10 @@ public class OrderedCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("drop-while"),new Symbol("<continue?-callable>"),new Symbol("<ordered-collection>"));
     }
+
+    public String docstring() {
+      return "Returns <oc> with items dropped from its left side while <continue?-callable>\nwas satisfied.";
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
@@ -301,6 +353,10 @@ public class OrderedCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("drop-right-while"),new Symbol("<continue?-callable>"),new Symbol("<ordered-collection>"));
+    }
+
+    public String docstring() {
+      return "Returns <oc> with items dropped from its right side while <continue?-callable>\nwas satisfied.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -321,6 +377,10 @@ public class OrderedCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("take-right"),new Symbol("<ordered-collection>"),new Symbol("<length>"));
     }
+
+    public String docstring() {
+      return "Returns <oc> with <length> items from its right side.";
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof OrderedCollection) || !ListPrimitives.isValidSize(parameters.get(1)))
@@ -339,6 +399,10 @@ public class OrderedCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("take-while"),new Symbol("<continue?-callable>"),new Symbol("<ordered-collection>"));
+    }
+
+    public String docstring() {
+      return "Returns items taken from <oc>'s left side while <continue?-callable> was\nsatisfied.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -359,6 +423,10 @@ public class OrderedCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("take-right-while"),new Symbol("<continue?-callable>"),new Symbol("<ordered-collection>"));
     }
+
+    public String docstring() {
+      return "Returns items taken from <oc>'s right side while <continue?-callable> was\nsatisfied.";
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
@@ -377,6 +445,10 @@ public class OrderedCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("sort"),new Symbol("<binary-predicate?-callable>"),new Symbol("<ordered-collection>"));
+    }
+
+    public String docstring() {
+      return "Returns <oc> sorted according to <binary-predicate?>'s comparison.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -397,6 +469,10 @@ public class OrderedCollectionPrimitives {
     public Datum signature() {
       return Pair.List(new Symbol("sorted?"),new Symbol("<binary-predicate?-callable>"),new Symbol("<ordered-collection>"));
     }
+
+    public String docstring() {
+      return "Returns whether <oc> was sorted according to <binary-predicate?>'s comparison.";
+    }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2 || !(parameters.get(0) instanceof Callable) || !(parameters.get(1) instanceof OrderedCollection))
@@ -415,6 +491,10 @@ public class OrderedCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("merge"),new Symbol("<binary-predicate?-callable>"),new Symbol("<ordered-collection>"),new Symbol("<ordered-collection>"));
+    }
+
+    public String docstring() {
+      return "Returns the <oc>'s merged with one another according to <binary-predicate?>'s\ncomparison.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -436,6 +516,10 @@ public class OrderedCollectionPrimitives {
 
     public Datum signature() {
       return Pair.List(new Symbol("delete-neighbor-duplicates"),new Symbol("<elt=?-callable>"),new Symbol("<ordered-collection>"));
+    }
+
+    public String docstring() {
+      return "Returns <oc> with any adjacent items matching with <elt=?> reduced to a single\nitem.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
