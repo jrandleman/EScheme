@@ -52,13 +52,13 @@
         (self.root.insert! v)
         (set! self.root (Node v))))
   ((inorder f)
-    "Traverse this node inorder while applying function <f>."
+    "Traverse the BST inorder while applying function <f>."
     (if self.root (self.root.inorder f)))
   ((preorder f)
-    "Traverse this node preorder while applying function <f>."
+    "Traverse the BST preorder while applying function <f>."
     (if self.root (self.root.preorder f)))
   ((postorder f)
-    "Traverse this node postorder while applying function <f>."
+    "Traverse the BST postorder while applying function <f>."
     (if self.root (self.root.postorder f))))
 
 
