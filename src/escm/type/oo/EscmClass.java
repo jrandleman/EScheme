@@ -104,7 +104,8 @@ public class EscmClass extends MetaObject implements Callable {
   }
 
   // Replaces names of <signature> with <newName>.
-  private Datum tagMethodWithName(Datum newName, Datum signature) {
+  // Also used by <EscmObject>.
+  static Datum tagMethodWithName(Datum newName, Datum signature) {
     if(!(signature instanceof Pair)) return Pair.List(newName);
     Pair ctorSignaturePair = (Pair)signature;
     Datum fst = ctorSignaturePair.car();
@@ -150,7 +151,7 @@ public class EscmClass extends MetaObject implements Callable {
       CompoundProcedure val = (CompoundProcedure)ctor;
       Datum signatures = tagMethodWithName(new Symbol("new"),val.signature());
       if(!(signatures instanceof Pair)) return printed;
-      if(printed) sb.append("  ----------------------------------------------------------------------\n\n");
+      if(printed) sb.append("  ----------------------------------------------------------------------\n");
       sb.append("  Constructor:");
       accumulateMethodSignatureAndDocstring(sb,signatures,val.docstring());
       sb.append("\n");
@@ -182,7 +183,7 @@ public class EscmClass extends MetaObject implements Callable {
       }
     }
     if(fields.size() > 0) {
-      if(printed) sb.append("  ----------------------------------------------------------------------\n\n");
+      if(printed) sb.append("  ----------------------------------------------------------------------\n");
       sb.append("  "+propType+" Fields:");
       for(ConcurrentHashMap.Entry<String,Datum> field : fields.entrySet()) {
         Datum val = field.getValue();
@@ -192,7 +193,7 @@ public class EscmClass extends MetaObject implements Callable {
       printed = true;
     }
     if(methods.size() > 0) {
-      if(printed) sb.append("  ----------------------------------------------------------------------\n\n");
+      if(printed) sb.append("  ----------------------------------------------------------------------\n");
       sb.append("  "+propType+" Methods:");
       for(ConcurrentHashMap.Entry<String,CompoundProcedure> method : methods.entrySet()) {
         accumulateMethod(sb,isStaticProps,method.getKey(),method.getValue());

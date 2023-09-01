@@ -76,7 +76,7 @@ public class EscmObject extends MetaObject implements Callable {
       if(!has("->procedure")) return Boolean.FALSE;
       Datum procedure = get("->procedure");
       if(!(procedure instanceof MethodProcedure)) return Boolean.FALSE;
-      return ((MethodProcedure)procedure).signature();
+      return EscmClass.tagMethodWithName(this,((MethodProcedure)procedure).signature());
     } catch(Exception e) {
       return Boolean.FALSE;
     }

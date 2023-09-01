@@ -97,7 +97,7 @@ public class EscmInterface extends MetaObject {
   // Print required props
   private boolean accumulateRequiredProperties(boolean printed, StringBuilder sb) {
     if(requiredProps.size() == 0) return printed;
-    if(printed) sb.append("  ----------------------------------------------------------------------\n\n");
+    if(printed) sb.append("  ----------------------------------------------------------------------\n");
     sb.append("  Required Instance Properties:");
     for(String required : requiredProps) {
       sb.append("\n    "+required);
@@ -164,7 +164,7 @@ public class EscmInterface extends MetaObject {
       }
     }
     if(fields.size() > 0) {
-      if(printed) sb.append("  ----------------------------------------------------------------------\n\n");
+      if(printed) sb.append("  ----------------------------------------------------------------------\n");
       sb.append("  Static Fields:");
       for(ConcurrentHashMap.Entry<String,Datum> field : fields.entrySet()) {
         Datum val = field.getValue();
@@ -174,7 +174,7 @@ public class EscmInterface extends MetaObject {
       printed = true;
     }
     if(methods.size() > 0) {
-      if(printed) sb.append("  ----------------------------------------------------------------------\n\n");
+      if(printed) sb.append("  ----------------------------------------------------------------------\n");
       sb.append("  Static Methods:");
       for(ConcurrentHashMap.Entry<String,CompoundProcedure> method : methods.entrySet()) {
         accumulateMethod(sb,method.getKey(),method.getValue());

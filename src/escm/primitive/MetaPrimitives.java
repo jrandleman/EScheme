@@ -41,12 +41,15 @@ public class MetaPrimitives {
       return "Get the <callable> call signature as EScheme data, or #f if unavailable.\n\nFor unary parameter lists: returns the parameter clause as a list of symbols.\nFor binary+ parameter lists: returns a list of parameter clauses.\n\nNote that the symbols '... & '. denote variadic parameters.\n\nAn argument list may be used to denote a default argument value.";
     }
 
+    public static Datum logic(Datum obj) {
+      if(!FunctionalPrimitives.IsCallable.logic(obj)) return Boolean.FALSE;
+      return ((Callable)obj).signature();
+    }
+
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(callable-signature <callable>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      Datum obj = parameters.get(0);
-      if(!FunctionalPrimitives.IsCallable.logic(obj)) return Boolean.FALSE;
-      return ((Callable)obj).signature();
+      return logic(parameters.get(0));
     }
   }
 
@@ -66,19 +69,22 @@ public class MetaPrimitives {
       return "Get the <callable>'s name as EScheme data, or #f if unavailable.";
     }
 
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1) 
-        throw new Exceptionf("'(callable-name <callable>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      Datum obj = parameters.get(0);
+    public static Datum logic(Datum obj) {
       if(!FunctionalPrimitives.IsCallable.logic(obj)) return Boolean.FALSE;
       if(obj instanceof Procedure) return new Symbol(((Procedure)obj).readableName());
       Datum sig = ((Callable)obj).signature();
       if(sig instanceof Pair) {
         Datum head = ((Pair)sig).car();
-        if(head instanceof Pair) return ((Pair)head).car();
-        return head;
+        if(head instanceof Pair) head = ((Pair)head).car();
+        if(head instanceof Symbol) return head;
       }
-      return sig;
+      return Boolean.FALSE;
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1) 
+        throw new Exceptionf("'(callable-name <callable>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return logic(parameters.get(0));
     }
   }
 
