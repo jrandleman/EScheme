@@ -19,9 +19,9 @@ too.
 ------------------------
 ## Using Concurrent Primitives
 
-Spawn threads via the `thread` procedure.
-Get a reentrant lock via the `mutex` procedure.
-Check out the `help` function's `Procedures > Concurrency` section for more!
+* Spawn threads via the `thread` procedure.
+* Get a reentrant lock via the `mutex` procedure.
+* Check out the `help` function's `Procedures > Concurrency` section for more!
 
 
 
