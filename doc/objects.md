@@ -90,7 +90,7 @@
 
 The `(super! <param> ...)` macro may be used within object constructors to
 initialize an object's super class with a set of parameters.
-  * Super objects with a "nullary" ctor are ctor'd automatically.
-  * `super!` ___must___ be used ___immediately___ in ctors to avoid undefined behavior!
+  * Super objects with a "nullary" constructor are constructor'd automatically.
+  * `super!` ___must___ be used ___immediately___ in constructors to avoid undefined behavior!
   * Use `(apply-super! <param-list>)` instead to initialize the super object with a list of values.
 
