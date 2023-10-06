@@ -8,9 +8,9 @@
 
 EScheme supports parallelism via true Java threads!
 
-Having immutable core literal data structures (including lists,
-in a departure from standard Scheme), however, objects generated
-from classes can be mutated (meaning one could create mutable
+Its core literal syntax uses immutable data structures (including lists
+and strings, in a departure from standard Scheme), however, objects 
+generated from classes can be mutated (meaning one could create mutable
 lists via the object system!).
 
 
