@@ -103,7 +103,7 @@ Module variables are named `<module-path-symbol>` by default, though there are
     For `Main.scm` to import `Module.scm`, it would contain:
 
       ```scheme
-      (import Root.Folder1.Module) ; within 'Main.scm'
+      (import Folder1.Module) ; within 'Main.scm'. '(import Root.Folder1.Module)' also works
       ```
 
     In this example, the module variable would be named `Module`. Note that
