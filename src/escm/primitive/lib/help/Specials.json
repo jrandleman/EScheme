@@ -181,25 +181,25 @@
 }, {
   "name": "guard",
   "aliases": null,
-  "signatures": ["(guard (<exception-symbol> (<condition> <guard-body> ...) ...) <body> ...)", "(guard (<variable> (<condition> <guard-body> ...) ... (else <guard-body>)) <body> ...)"],
+  "signatures": ["(guard (<raised-variable> (<condition> <guard-body> ...) ...) <body> ...)", "(guard (<raised-variable> (<condition> <guard-body> ...) ... (else <guard-body>)) <body> ...)"],
   "description": "Executes \"<body> ...\" while guarding against a <raise>d exception.\nThe <raise>d exception value is bound to <exception-symbol>, and\n<exception-symbol> is then passed to the <cond>-style\n\"(<condition> <guard-body> ...)\" clauses. If a condition is satisfied, then\n\"<guard-body> ...\" is executed. <else> matches against all exception types.",
   "example": "(guard (condition\n         (else\n          (display \"condition: \")\n          (write condition)\n          (newline)\n          'exception))\n  (+ 1 (raise 'an-error)))"
 }, {
   "name": "thread-define",
   "aliases": null,
-  "signatures": ["(thread-define <variable-name> <value>) (thread-define <thread> <variable-name> <value>)"],
+  "signatures": ["(thread-define <variable-name> <value>)", "(thread-define <thread> <variable-name> <value>)"],
   "description": "Bind <variable-name> to <value> in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.",
   "example": null
 }, {
   "name": "thread-set!",
   "aliases": null,
-  "signatures": ["(thread-set! <variable-name> <value>) (thread-set! <thread> <variable-name> <value>)"],
+  "signatures": ["(thread-set! <variable-name> <value>)", "(thread-set! <thread> <variable-name> <value>)"],
   "description": "Set <variable-name> to <value> in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.",
   "example": null
 }, {
   "name": "thread-get",
   "aliases": null,
-  "signatures": ["(thread-get <variable-name>) (thread-get <thread> <variable-name>)"],
+  "signatures": ["(thread-get <variable-name>)", "(thread-get <thread> <variable-name>)"],
   "description": "Get <variable-name>'s value in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.",
   "example": null
 }, {
