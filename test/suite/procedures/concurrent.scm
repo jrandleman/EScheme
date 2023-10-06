@@ -138,7 +138,7 @@
 ;   rather than just claiming to be locked/unlocked.
 ; Note that this can be inherently difficult, since the JVM's thread-scheduler 
 ;   is non-deterministic. Hence we design an algorithm that has a very low 
-;   change for #f positives, and no chance for #f negatives. Then, we use
+;   chance for #f positives, and no chance for #f negatives. Then, we use
 ;   "amplification" (a quick thank you to my graduate algorithms course!)
 ;   in order to even further reduce the liklihood of error.
 (define *amplification-count* 10)
