@@ -131,7 +131,7 @@ your current environment's namespace.
 ```
 
 Forcefully re-evaluate `<module-alias-symbol>` (note that `import` caches
-module by default).
+modules by default).
 
 
 ------------------------
