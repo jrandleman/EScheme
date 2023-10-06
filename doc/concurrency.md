@@ -30,8 +30,8 @@ too.
 
 * Threads each have their own stack, and hence their own set of continuations.
 * Continuations are delimited by the execution of the thread that created them.
-* Hence a child thread's continuation will never 'continue' back into the parent
-  thread, rather, it will terminate where the child thread terminated.
+  - Hence a child thread's continuation will never 'continue' back into the parent
+    thread, rather, it will terminate where the child thread terminated.
 
 
 
