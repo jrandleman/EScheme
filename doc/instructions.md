@@ -64,7 +64,7 @@ to denote closures. The `load-closure` syntax is as follows:
 
 `(load-closure <optional-docstring> ((<argument> ...) <instruction> ...) ...)`
 
-This syntax will load the equivalent of: `(fn ((<argument> ...) <instruction> ...) ...)`
+This syntax will load the equivalent of: `(fn <optional-docstring> ((<argument> ...) <instruction> ...) ...)`
 into CVR. Further note that closure expressions by default return the value left in 
 CVR upon terminating execution. `<docstring>` may be optionally provided to yield
 further information on the closure's intended purpose in the `help` menu.
