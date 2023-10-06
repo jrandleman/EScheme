@@ -25,6 +25,7 @@ import escm.type.procedure.CompoundProcedure;
 import escm.type.procedure.MethodProcedure;
 import escm.vm.type.collection.OrderedCollection;
 import escm.vm.type.callable.Callable;
+import escm.vm.type.callable.DocString;
 
 public class EscmClass extends MetaObject implements Callable {
   ////////////////////////////////////////////////////////////////////////////
@@ -223,7 +224,7 @@ public class EscmClass extends MetaObject implements Callable {
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
   public EscmClass(String name, String docstring, EscmClass superClass, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ConcurrentHashMap<String,Datum> objectProps) throws Exception {
-    this.docstring = docstring.trim();
+    this.docstring = DocString.format(docstring);
     this.superClass = superClass;
     this.interfaces = interfaces;
     this.props = props;

@@ -101,13 +101,14 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "Get the <obj>'s docstring if available, else #f.\n\nDocstrings are used to give details on objects passed to the <help> function,\nand **MUST** be writted as string literals to register as valid syntax (e.g.\nfor procedures, classes, interfaces, etc.).\n\nNote that docstring newlines and tabs should be added by users exactly as\nthey'd like their docstring to render in the <help> menu: no additional\nformatting will be done!";
+      // return "Get the <obj>'s docstring if available, else #f.\n\nDocstrings are used to give details on objects passed to the <help> function,\nand **MUST** be writted as string literals to register as valid syntax (e.g.\nfor procedures, classes, interfaces, etc.).\n\nNote that docstring newlines and tabs should be added by users exactly as\nthey'd like their docstring to render in the <help> menu: no additional\nformatting will be done!";
+      return "\nGet the <obj>'s docstring if available, else #f.\n\nDocstrings are used to give details on objects passed to the <help> function,\nand **MUST** be writted as string literals to register as valid syntax (think\nprocedures, classes, interfaces, etc.).\n\nNote that EScheme supports spanning string literals over several lines to \nautomatically insert newline characters, so\n\"\nhello\nthere!\n\"\nis a valid string that compiles to \"\\nhello\\nthere!\\n\"!\n\nDocstrings undergo minor fomatting to improve printing consistency:\n  1. All tab characters are converted to 2 spaces\n  2. Strings are right-trimmed (whitespace removed from the back)\n  3. Leading newline characters are trimmed from the left-hand side\n  4. The left-hand side padding of the string's lines are cropped:\n     \n     The minimum spacing prior the 1st character on a line is eliminated\n     from each line. This trims our docstring for more compact printing,\n     while still maintaining the original levels of relative indentation.\n\n     This allows us to write functions with docstrings like:\n\n     (define (factorial n)\n       \"\n       The factorial function:\n         => accepts a single integer argument\n       \"\n       (if (< n 2)\n           1\n           (* n (factorial (- n 1)))))\n\n    where despite \"The factorial function:\" being indented with two spaces \n    (if we start counting spaces from \"(define (factorial n)\" in the code),\n    the docstring will still print in <help> as if written:\n\n      \"The factorial function:\\n  => accepts a single integer argument\"\n\n    thereby cropping the string while maintaining \"=>\"'s relative indentation.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(docstring <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      String docs = ((DocString)parameters.get(0)).docstring().trim();
+      String docs = DocString.format(((DocString)parameters.get(0)).docstring());
       if(docs.length() > 0) return new escm.type.String(docs);
       return Boolean.FALSE;
     }

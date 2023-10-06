@@ -42,6 +42,7 @@ import escm.vm.util.ExecutionState;
 import escm.vm.util.Environment;
 import escm.vm.util.SourceInformation;
 import escm.vm.runtime.EscmCallStack;
+import escm.vm.type.callable.DocString;
 
 public class CompoundProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
@@ -66,7 +67,7 @@ public class CompoundProcedure extends Procedure {
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
   public CompoundProcedure(String docstring, ArrayList<ArrayList<Symbol>> parametersList, ArrayList<Symbol> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
-    this.compileTime = new CompileTime(docstring.trim(),parametersList,variadicParameterList,bodyList);
+    this.compileTime = new CompileTime(DocString.format(docstring),parametersList,variadicParameterList,bodyList);
   }
 
 

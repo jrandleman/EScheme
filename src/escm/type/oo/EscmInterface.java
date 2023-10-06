@@ -21,6 +21,7 @@ import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.bool.Boolean;
 import escm.type.procedure.CompoundProcedure;
+import escm.vm.type.callable.DocString;
 
 public class EscmInterface extends MetaObject {
   ////////////////////////////////////////////////////////////////////////////
@@ -202,7 +203,7 @@ public class EscmInterface extends MetaObject {
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
   public EscmInterface(String name, String docstring, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) throws Exception {
-    this.docstring = docstring.trim();
+    this.docstring = DocString.format(docstring);
     this.interfaces = interfaces;
     this.props = props;
     this.requiredProps = requiredProps;
