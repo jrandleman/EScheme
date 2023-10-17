@@ -10,7 +10,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TESTS
 
-; NO TESTS FOR HELP:
+; NO TESTS FOR HELP MENU:
 ;   => TOO DYNAMIC: CONTENTS MUST BE MANUALLY CHECKED WHEN ALTERED!
 ;   => ALWAYS PRINTS TO & READS FROM SYSTEM'S <stdout>/<stdin>, REGARDLESS
 ;      OF `(current-output-port)` OR `(current-input-port)` VALUES
+
+(help +) ; test can help is callable with an object

@@ -26,7 +26,7 @@ public class DateTimePrimitives {
     }
 
     public String docstring() {
-      return "Returns a list of the current time components:\n  (<hour> <minute> <second> <millisecond>)";
+      return "@help:Procedures:Date-Time\nReturns a list of the current time components:\n  (<hour> <minute> <second> <millisecond>)";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -53,7 +53,7 @@ public class DateTimePrimitives {
     }
 
     public String docstring() {
-      return "Returns a list of the current date components:\n  (<year> <month> <day>)";
+      return "@help:Procedures:Date-Time\nReturns a list of the current date components:\n  (<year> <month> <day>)";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -79,7 +79,7 @@ public class DateTimePrimitives {
     }
 
     public String docstring() {
-      return "Returns the number of milliseconds since the epoch (1 January 1970).";
+      return "@help:Procedures:Date-Time\nReturns the number of milliseconds since the epoch (1 January 1970).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -102,7 +102,7 @@ public class DateTimePrimitives {
     }
 
     public String docstring() {
-      return "Returns the name of the current time-zone as a string (#f if unknown).";
+      return "@help:Procedures:Date-Time\nReturns the name of the current time-zone as a string (#f if unknown).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -125,7 +125,7 @@ public class DateTimePrimitives {
     }
 
     public String docstring() {
-      return "Returns the name of the current week-day as a string (#f if unknown).";
+      return "@help:Procedures:Date-Time\nReturns the name of the current week-day as a string (#f if unknown).";
     }
 
     public static final escm.type.String SUNDAY = new escm.type.String("Sunday");
@@ -165,7 +165,7 @@ public class DateTimePrimitives {
     }
 
     public String docstring() {
-      return "Returns the name of the current month as a string (#f if unknown).";
+      return "@help:Procedures:Date-Time\nReturns the name of the current month as a string (#f if unknown).";
     }
 
     public static final escm.type.String JANUARY = new escm.type.String("January");
@@ -217,7 +217,7 @@ public class DateTimePrimitives {
     }
 
     public String docstring() {
-      return "Returns the name of the current year as a string (#f if unknown).";
+      return "@help:Procedures:Date-Time\nReturns the name of the current year as a string (#f if unknown).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

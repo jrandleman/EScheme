@@ -31,7 +31,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is an ordered collection: String | List | Vector";
+      return "@help:Procedures:Ordered-Collections\nReturns whether <obj> is an ordered collection: String | List | Vector";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -54,7 +54,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns everything except the last item in <oc>.";
+      return "@help:Procedures:Ordered-Collections\nReturns everything except the last item in <oc>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -77,7 +77,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns the last item in <oc>.";
+      return "@help:Procedures:Ordered-Collections\nReturns the last item in <oc>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -103,7 +103,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Slices a subset of the items in <oc> starting from <index>.\nIf no other args are given, returns the rest of the items from <index>.\nIf <length> is given, returns at most <length> items.\nGiven <continue?-callable>, slices while values satisfy <continue?-callable>.";
+      return "@help:Procedures:Ordered-Collections\nSlices a subset of the items in <oc> starting from <index>.\nIf no other args are given, returns the rest of the items from <index>.\nIf <length> is given, returns at most <length> items.\nGiven <continue?-callable>, slices while values satisfy <continue?-callable>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -139,7 +139,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <oc> in reverse.";
+      return "@help:Procedures:Ordered-Collections\nReturns <oc> in reverse.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -162,7 +162,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <oc> without the first value satisfying <elt=?-callable>.";
+      return "@help:Procedures:Ordered-Collections\nReturns <oc> without the first value satisfying <elt=?-callable>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -185,7 +185,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <oc> without the last value satisfying <elt=?-callable>.";
+      return "@help:Procedures:Ordered-Collections\nReturns <oc> without the last value satisfying <elt=?-callable>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -208,7 +208,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns the first item that doesn't satisfy <elt=?-callable>.";
+      return "@help:Procedures:Ordered-Collections\nReturns the first item that doesn't satisfy <elt=?-callable>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -231,7 +231,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns the last item that doesn't satisfy <elt=?-callable>.";
+      return "@help:Procedures:Ordered-Collections\nReturns the last item that doesn't satisfy <elt=?-callable>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -254,7 +254,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Accumulate the values in \"<oc> ...\" from right to left by applying\n<callable> to \"<previous-result>\" and <item> with <seed-obj> acting\nas the initial \"<previous-result>\".\n\n  => Note that the \"<oc> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector";
+      return "@help:Procedures:Ordered-Collections\nAccumulate the values in \"<oc> ...\" from right to left by applying\n<callable> to \"<previous-result>\" and <item> with <seed-obj> acting\nas the initial \"<previous-result>\".\n\n  => Note that the \"<oc> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -287,7 +287,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Get the last index in <ac> who's associated value satisfies <elt=?-callable?>.";
+      return "@help:Procedures:Ordered-Collections\nGet the last index in <ac> who's associated value satisfies <elt=?-callable?>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -310,7 +310,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <oc> without <length> items from its right side.";
+      return "@help:Procedures:Ordered-Collections\nReturns <oc> without <length> items from its right side.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -333,7 +333,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <oc> with items dropped from its left side while <continue?-callable>\nwas satisfied.";
+      return "@help:Procedures:Ordered-Collections\nReturns <oc> with items dropped from its left side while <continue?-callable>\nwas satisfied.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -356,7 +356,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <oc> with items dropped from its right side while <continue?-callable>\nwas satisfied.";
+      return "@help:Procedures:Ordered-Collections\nReturns <oc> with items dropped from its right side while <continue?-callable>\nwas satisfied.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -379,7 +379,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <oc> with <length> items from its right side.";
+      return "@help:Procedures:Ordered-Collections\nReturns <oc> with <length> items from its right side.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -402,7 +402,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns items taken from <oc>'s left side while <continue?-callable> was\nsatisfied.";
+      return "@help:Procedures:Ordered-Collections\nReturns items taken from <oc>'s left side while <continue?-callable> was\nsatisfied.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -425,7 +425,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns items taken from <oc>'s right side while <continue?-callable> was\nsatisfied.";
+      return "@help:Procedures:Ordered-Collections\nReturns items taken from <oc>'s right side while <continue?-callable> was\nsatisfied.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -448,7 +448,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <oc> sorted according to <binary-predicate?>'s comparison.";
+      return "@help:Procedures:Ordered-Collections\nReturns <oc> sorted according to <binary-predicate?>'s comparison.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -471,7 +471,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <oc> was sorted according to <binary-predicate?>'s comparison.";
+      return "@help:Procedures:Ordered-Collections\nReturns whether <oc> was sorted according to <binary-predicate?>'s comparison.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -494,7 +494,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns the <oc>'s merged with one another according to <binary-predicate?>'s\ncomparison.";
+      return "@help:Procedures:Ordered-Collections\nReturns the <oc>'s merged with one another according to <binary-predicate?>'s\ncomparison.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -519,7 +519,7 @@ public class OrderedCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <oc> with any adjacent items matching with <elt=?> reduced to a single\nitem.";
+      return "@help:Procedures:Ordered-Collections\nReturns <oc> with any adjacent items matching with <elt=?> reduced to a single\nitem.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

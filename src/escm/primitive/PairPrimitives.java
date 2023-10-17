@@ -25,7 +25,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Create a pair containing <car-obj> & <cdr-obj>. Lists are created by nesting\npairs with <nil> terminating the chain. The following are equivalent:\n  (cons 1 (cons 2 (cons 3 (quote ()))))\n  (list 1 2 3)";
+      return "@help:Procedures:Pairs\nCreate a pair containing <car-obj> & <cdr-obj>. Lists are created by nesting\npairs with <nil> terminating the chain. The following are equivalent:\n  (cons 1 (cons 2 (cons 3 (quote ()))))\n  (list 1 2 3)";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -47,7 +47,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Access the first item in a pair.";
+      return "@help:Procedures:Pairs\nAccess the first item in a pair.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -70,7 +70,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Access the second item in a pair.";
+      return "@help:Procedures:Pairs\nAccess the second item in a pair.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -93,7 +93,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (car <pair>))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (car <pair>))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -119,7 +119,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (cdr <pair>))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (cdr <pair>))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -145,7 +145,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (car <pair>))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (car <pair>))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -171,7 +171,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (cdr <pair>))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (cdr <pair>))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -197,7 +197,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (car (car <pair>)))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (car (car <pair>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -226,7 +226,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (car (cdr <pair>)))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (car (cdr <pair>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -255,7 +255,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (cdr (car <pair>)))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (cdr (car <pair>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -284,7 +284,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (cdr (cdr <pair>)))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (cdr (cdr <pair>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -313,7 +313,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (car (car <pair>)))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (car (car <pair>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -342,7 +342,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (car (cdr <pair>)))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (car (cdr <pair>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -371,7 +371,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (cdr (car <pair>)))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (cdr (car <pair>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -400,7 +400,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (cdr (cdr <pair>)))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (cdr (cdr <pair>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -429,7 +429,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (car (car (car <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (car (car (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -461,7 +461,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (car (car (cdr <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (car (car (cdr <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -493,7 +493,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (car (cdr (car <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (car (cdr (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -525,7 +525,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (car (cdr (cdr <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (car (cdr (cdr <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -559,7 +559,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (cdr (car (cr <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (cdr (car (cr <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -583,7 +583,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (cdr (car (car <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (cdr (car (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -615,7 +615,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (cdr (car (cdr <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (cdr (car (cdr <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -647,7 +647,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (cdr (cdr (car <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (cdr (cdr (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -679,7 +679,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (car (cdr (cdr (cdr <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (car (cdr (cdr (cdr <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -711,7 +711,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (car (car (car <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (car (car (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -743,7 +743,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (car (car (cdr <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (car (car (cdr <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -775,7 +775,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (car (cdr (car <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (car (cdr (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -807,7 +807,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (car (cdr (cdr <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (car (cdr (cdr <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -839,7 +839,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (cdr (car (car <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (cdr (car (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -871,7 +871,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (cdr (car (cdr <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (cdr (car (cdr <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -903,7 +903,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (cdr (cdr (car <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (cdr (cdr (car <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -935,7 +935,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (cdr (cdr (cdr (cdr <pair>))))";
+      return "@help:Procedures:Pairs\nEquivalent to: (cdr (cdr (cdr (cdr <pair>))))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -967,7 +967,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a pair.";
+      return "@help:Procedures:Pairs\nReturns whether <obj> is a pair.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -989,7 +989,7 @@ public class PairPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is not a pair.";
+      return "@help:Procedures:Pairs\nReturns whether <obj> is not a pair.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

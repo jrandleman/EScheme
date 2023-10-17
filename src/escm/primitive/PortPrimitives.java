@@ -32,7 +32,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns an input-port file handle to read from <filename-string>.";
+      return "@help:Procedures:Ports\nReturns an input-port file handle to read from <filename-string>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -57,7 +57,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns an output-port file handle to write to <filename-string>.\nIf <filename-string> exists, it is cleared.\n\nIf <filename-string> isn't given, generates a temporary file.\nAccess a temporary file's path via <port-path>.\nTemporary files are automatically deleted upon exit by the VM.";
+      return "@help:Procedures:Ports\nReturns an output-port file handle to write to <filename-string>.\nIf <filename-string> exists, it is cleared.\n\nIf <filename-string> isn't given, generates a temporary file.\nAccess a temporary file's path via <port-path>.\nTemporary files are automatically deleted upon exit by the VM.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -82,7 +82,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns an output-port file handle to write to <filename-string>.\nIf <filename-string> exists, it is appended to.";
+      return "@help:Procedures:Ports\nReturns an output-port file handle to write to <filename-string>.\nIf <filename-string> exists, it is appended to.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -105,7 +105,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Closes <port> if it hasn't been closed yet.";
+      return "@help:Procedures:Ports\nCloses <port> if it hasn't been closed yet.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -129,7 +129,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns the <port>'s path as a string.";
+      return "@help:Procedures:Ports\nReturns the <port>'s path as a string.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -152,7 +152,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns a pair: <input-port>'s (<line-number> . <column-number>)";
+      return "@help:Procedures:Ports\nReturns a pair: <input-port>'s (<line-number> . <column-number>)";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -176,7 +176,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a port.";
+      return "@help:Procedures:Ports\nReturns whether <obj> is a port.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -199,7 +199,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is an input-port.";
+      return "@help:Procedures:Ports\nReturns whether <obj> is an input-port.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -222,7 +222,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is an output-port.";
+      return "@help:Procedures:Ports\nReturns whether <obj> is an output-port.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -245,7 +245,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a port pointing to a temporary file.\nAccess a temporary file's path via <port-path>.\nTemporary files are automatically deleted upon exit by the VM.";
+      return "@help:Procedures:Ports\nReturns whether <obj> is a port pointing to a temporary file.\nAccess a temporary file's path via <port-path>.\nTemporary files are automatically deleted upon exit by the VM.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -268,7 +268,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <port> is still open.";
+      return "@help:Procedures:Ports\nReturns whether <port> is still open.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -291,7 +291,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <port> is closed.";
+      return "@help:Procedures:Ports\nReturns whether <port> is closed.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -314,7 +314,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns the current input-port, used as the default value for <read> etc.";
+      return "@help:Procedures:Ports\nReturns the current input-port, used as the default value for <read> etc.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -337,7 +337,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns the current output-port, used as the default value for <write> etc.";
+      return "@help:Procedures:Ports\nReturns the current output-port, used as the default value for <write> etc.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -360,7 +360,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Invoke <unary-callable> with (open-input-file <filename-string>) as its argument.\nAutomatically close that given port upon <unary-callable>'s return, and yield\n<unary-callable>'s return value.";
+      return "@help:Procedures:Ports\nInvoke <unary-callable> with (open-input-file <filename-string>) as its argument.\nAutomatically close that given port upon <unary-callable>'s return, and yield\n<unary-callable>'s return value.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -395,7 +395,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Invoke <unary-callable> with (open-output-file <filename-string>) as its argument.\nAutomatically close that given port upon <unary-callable>'s return, and yield\n<unary-callable>'s return value.\nNote that <filename-string> is cleared if it exists.";
+      return "@help:Procedures:Ports\nInvoke <unary-callable> with (open-output-file <filename-string>) as its argument.\nAutomatically close that given port upon <unary-callable>'s return, and yield\n<unary-callable>'s return value.\nNote that <filename-string> is cleared if it exists.";
     }
 
     public static Trampoline.Bounce logic(String primitiveName, boolean append, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -434,7 +434,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Invoke <unary-callable> with (open-output-file <filename-string>) as its argument.\nAutomatically close that given port upon <unary-callable>'s return, and yield\n<unary-callable>'s return value.\nNote that <filename-string> is appended to if it exists.";
+      return "@help:Procedures:Ports\nInvoke <unary-callable> with (open-output-file <filename-string>) as its argument.\nAutomatically close that given port upon <unary-callable>'s return, and yield\n<unary-callable>'s return value.\nNote that <filename-string> is appended to if it exists.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -455,7 +455,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Invoke <thunk-callable> with (open-input-file <filename-string>) as the\ncurrent-input-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.";
+      return "@help:Procedures:Ports\nInvoke <thunk-callable> with (open-input-file <filename-string>) as the\ncurrent-input-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -492,7 +492,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Invoke <thunk-callable> with (open-output-file <filename-string>) as the\ncurrent-output-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.\nNote that <filename-string> is cleared if it exists.";
+      return "@help:Procedures:Ports\nInvoke <thunk-callable> with (open-output-file <filename-string>) as the\ncurrent-output-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.\nNote that <filename-string> is cleared if it exists.";
     }
 
     public static Trampoline.Bounce logic(String primitiveName, boolean append, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -533,7 +533,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Invoke <thunk-callable> with (open-output-file <filename-string>) as the\ncurrent-output-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.\nNote that <filename-string> is appended to if it exists.";
+      return "@help:Procedures:Ports\nInvoke <thunk-callable> with (open-output-file <filename-string>) as the\ncurrent-output-port. Automatically close that given port upon <thunk-callable>'s\nreturn, and yield <thunk-callable>'s return value.\nNote that <filename-string> is appended to if it exists.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -554,7 +554,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Peek the first character in <input-port>. Returns #eof if empty.";
+      return "@help:Procedures:Ports\nPeek the first character in <input-port>. Returns #eof if empty.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -579,7 +579,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <input-port> handles the program's standard input.";
+      return "@help:Procedures:Ports\nReturns whether <input-port> handles the program's standard input.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -602,7 +602,7 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <output-port> handles the program's standard output.";
+      return "@help:Procedures:Ports\nReturns whether <output-port> handles the program's standard output.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

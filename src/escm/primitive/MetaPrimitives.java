@@ -4,6 +4,8 @@
 
 package escm.primitive;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
@@ -38,7 +40,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "Get the <callable> call signature as EScheme data, or #f if unavailable.\n\nFor unary parameter lists: returns the parameter clause as a list of symbols.\nFor binary+ parameter lists: returns a list of parameter clauses.\n\nNote that the symbols '... & '. denote variadic parameters.\n\nAn argument list may be used to denote a default argument value.";
+      return "@help:Procedures:Meta\nGet the <callable> call signature as EScheme data, or #f if unavailable.\n\nFor unary parameter lists: returns the parameter clause as a list of symbols.\nFor binary+ parameter lists: returns a list of parameter clauses.\n\nNote that the symbols '... & '. denote variadic parameters.\n\nAn argument list may be used to denote a default argument value.";
     }
 
     public static Datum logic(Datum obj) {
@@ -66,7 +68,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "Get the <callable>'s name as EScheme data, or #f if unavailable.";
+      return "@help:Procedures:Meta\nGet the <callable>'s name as EScheme data, or #f if unavailable.";
     }
 
     public static Datum logic(Datum obj) {
@@ -92,6 +94,8 @@ public class MetaPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // docstring
   public static class DocStringExtractor extends Primitive {
+    private static final String HELP_LOCATION_REGEX = "@help(:[^:\\s]+)+";
+
     public java.lang.String escmName() {
       return "docstring";
     }
@@ -101,16 +105,36 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      // return "Get the <obj>'s docstring if available, else #f.\n\nDocstrings are used to give details on objects passed to the <help> function,\nand **MUST** be writted as string literals to register as valid syntax (e.g.\nfor procedures, classes, interfaces, etc.).\n\nNote that docstring newlines and tabs should be added by users exactly as\nthey'd like their docstring to render in the <help> menu: no additional\nformatting will be done!";
-      return "\nGet the <obj>'s docstring if available, else #f.\n\nDocstrings are used to give details on objects passed to the <help> function,\nand **MUST** be writted as string literals to register as valid syntax (think\nprocedures, classes, interfaces, etc.).\n\nNote that EScheme supports spanning string literals over several lines to \nautomatically insert newline characters, so\n\"\nhello\nthere!\n\"\nis a valid string that compiles to \"\\nhello\\nthere!\\n\"!\n\nDocstrings undergo minor fomatting to improve printing consistency:\n  1. All tab characters are converted to 2 spaces\n  2. Strings are right-trimmed (whitespace removed from the back)\n  3. Leading newline characters are trimmed from the left-hand side\n  4. The left-hand side padding of the string's lines are cropped:\n     \n     The minimum spacing prior the 1st character on a line is eliminated\n     from each line. This trims our docstring for more compact printing,\n     while still maintaining the original levels of relative indentation.\n\n     This allows us to write functions with docstrings like:\n\n     (define (factorial n)\n       \"\n       The factorial function:\n         => accepts a single integer argument\n       \"\n       (if (< n 2)\n           1\n           (* n (factorial (- n 1)))))\n\n    where despite \"The factorial function:\" being indented with two spaces \n    (if we start counting spaces from \"(define (factorial n)\" in the code),\n    the docstring will still print in <help> as if written:\n\n      \"The factorial function:\\n  => accepts a single integer argument\"\n\n    thereby cropping the string while maintaining \"=>\"'s relative indentation.";
+      return "@help:Procedures:Meta\n\nGet the <obj>'s docstring if available, else #f.\n\nDocstrings are used to give details on objects passed to the <help> function,\nand **MUST** be writted as string literals to register as valid syntax (think\nprocedures, classes, interfaces, etc.).\n\nSee <help>'s help entry for details on the \"@help\" docstring syntax: used to \nput the doc's details in a specific folder during the interactive help menu.\n\nNote that EScheme supports spanning string literals over several lines to \nautomatically insert newline characters, so\n\"\nhello\nthere!\n\"\nis a valid string that compiles to \"\\nhello\\nthere!\\n\"!\n\nDocstrings undergo minor fomatting to improve printing consistency:\n  1. All tab characters are converted to 2 spaces\n  2. Strings are right-trimmed (whitespace removed from the back)\n  3. Leading newline characters are trimmed from the left-hand side\n  4. The left-hand side padding of the string's lines are cropped:\n     \n     The minimum spacing prior the 1st character on a line is eliminated\n     from each line. This trims our docstring for more compact printing,\n     while still maintaining the original levels of relative indentation.\n\n     This allows us to write functions with docstrings like:\n\n     (define (factorial n)\n       \"\n       The factorial function:\n         => accepts a single integer argument\n       \"\n       (if (< n 2)\n           1\n           (* n (factorial (- n 1)))))\n\n    where despite \"The factorial function:\" being indented with two spaces \n    (if we start counting spaces from \"(define (factorial n)\" in the code),\n    the docstring will still print in <help> as if written:\n\n      \"The factorial function:\\n  => accepts a single integer argument\"\n\n    thereby cropping the string while maintaining \"=>\"'s relative indentation.";
+    }
+
+    public static Datum logic(Datum obj) {
+      String docs = DocString.format(obj.docstring());
+      if(docs.length() > 0) return new escm.type.String(docs);
+      return Boolean.FALSE;
+    }
+
+    // Used by <HelpPrimitive>. Equivalent to <logic>, but also removes reference to <@help> first.
+    public static Datum helpLogic(Datum obj) {
+      String docs = DocString.format(obj.docstring().replaceFirst(HELP_LOCATION_REGEX,""));
+      if(docs.length() > 0) return new escm.type.String(docs);
+      return Boolean.FALSE;
+    }
+
+    // Used by <HelpPrimitive>. Extracts help-location components from the docstring.
+    public static String[] helpLocation(Datum obj) {
+      Matcher matcher = Pattern.compile(HELP_LOCATION_REGEX).matcher(obj.docstring());
+      if(matcher.find()) {
+        return matcher.group(0).substring(6).split(":");
+      } else {
+        return null;
+      }
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(docstring <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      String docs = DocString.format(((DocString)parameters.get(0)).docstring());
-      if(docs.length() > 0) return new escm.type.String(docs);
-      return Boolean.FALSE;
+      return logic(parameters.get(0));
     }
   }
 
@@ -128,7 +152,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "Apply <callable> to the arguments stored in the <arg-list> list.";
+      return "@help:Procedures:Meta\nApply <callable> to the arguments stored in the <arg-list> list.";
     }
 
     public static ArrayList<Datum> convertListToArrayList(Datum lis) {
@@ -168,7 +192,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "Convert <escm-code-as-data> into a list of its equivalent bytecode instructions.";
+      return "@help:Procedures:Meta\nConvert <escm-code-as-data> into a list of its equivalent bytecode instructions.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -191,7 +215,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "Evaluate <escm-bytecode-as-data> to produce a result.";
+      return "@help:Procedures:Meta\nEvaluate <escm-bytecode-as-data> to produce a result.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -214,7 +238,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "Evaluate <escm-code-as-data> to produce a result. Equivalent to:\n  (eval-bytecode (compile <escm-code-as-data>))";
+      return "@help:Procedures:Meta\nEvaluate <escm-code-as-data> to produce a result. Equivalent to:\n  (eval-bytecode (compile <escm-code-as-data>))";
     }
 
     public static Trampoline.Bounce logic(Datum data, Environment env, Trampoline.Continuation continuation) throws Exception {
@@ -243,7 +267,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "Returns a fresh, unique symbol. Guarentees that the symbol is unique across\nthreads as well. Used extensively by macros. Pass a <name-symbol> to improve\nreadability when printing generated symbols.";
+      return "@help:Procedures:Meta\nReturns a fresh, unique symbol. Guarentees that the symbol is unique across\nthreads as well. Used extensively by macros. Pass a <name-symbol> to improve\nreadability when printing generated symbols.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -270,7 +294,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a syntax object. Syntax objects are created when\nmacros are evaluated as a procedure argument.";
+      return "@help:Procedures:Meta\nReturns whether <obj> is a syntax object. Syntax objects are created when\nmacros are evaluated as a procedure argument.";
     }
 
     private static SyntaxProcedure isModuleMacro(Environment definitionEnvironment, Symbol moduleMacro) {
@@ -319,7 +343,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "Expanded to by <define-syntax> with its quoted <name-symbol> as <symbol>.";
+      return "@help:Procedures:Meta\nExpanded to by <define-syntax> with its quoted <name-symbol> as <symbol>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -350,7 +374,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "Returns the expansion of <quoted-macro-expression> by executing its macro.";
+      return "@help:Procedures:Meta\nReturns the expansion of <quoted-macro-expression> by executing its macro.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

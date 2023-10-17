@@ -24,7 +24,7 @@ public class SymbolPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a symbol.";
+      return "@help:Procedures:Symbols\nReturns whether <obj> is a symbol.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

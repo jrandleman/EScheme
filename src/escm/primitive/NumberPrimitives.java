@@ -43,7 +43,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the sum of \"<number> <number> ...\".\n\nAliases <append> if given a <symbol>, <keyword>, <associative-collection>,\nor 0-1 args. Aliases <bind> if give a non-<associative-collection> callable.";
+      return "@help:Procedures:Numbers\nReturns the sum of \"<number> <number> ...\".\n\nAliases <append> if given a <symbol>, <keyword>, <associative-collection>,\nor 0-1 args. Aliases <bind> if give a non-<associative-collection> callable.";
     }
 
     private static Datum logic(ArrayList<Datum> parameters) throws Exception {
@@ -89,7 +89,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the difference of \"<number> <number> ...\".\nIf given one <number>, returns its negative value.";
+      return "@help:Procedures:Numbers\nReturns the difference of \"<number> <number> ...\".\nIf given one <number>, returns its negative value.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -127,7 +127,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the product of \"<number> <number> ...\".\nNote that EScheme defines (* <n> 0) to be 0 for all numeric <n>.\nAliases <compose> if only given callables.";
+      return "@help:Procedures:Numbers\nReturns the product of \"<number> <number> ...\".\nNote that EScheme defines (* <n> 0) to be 0 for all numeric <n>.\nAliases <compose> if only given callables.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -158,7 +158,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the division of \"<number> <number> ...\".\nIf given one <number>, returns its inverse value.";
+      return "@help:Procedures:Numbers\nReturns the division of \"<number> <number> ...\".\nIf given one <number>, returns its inverse value.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -194,7 +194,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<number> <number> ...\" are equal to one another\nAliases <eq?> if given non-numerics.";
+      return "@help:Procedures:Numbers\nReturns whether \"<number> <number> ...\" are equal to one another\nAliases <eq?> if given non-numerics.";
     }
 
     public static Datum logic(Number firstValue, ArrayList<Datum> parameters) throws Exception {
@@ -231,7 +231,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<real> <real> ...\" are < one another.\nAliases <string<?> and <char<?> too!";
+      return "@help:Procedures:Numbers\nReturns whether \"<real> <real> ...\" are < one another.\nAliases <string<?> and <char<?> too!";
     }
 
     public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
@@ -277,7 +277,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<real> <real> ...\" are > one another.\nAliases <string>?> and <char>?> too!";
+      return "@help:Procedures:Numbers\nReturns whether \"<real> <real> ...\" are > one another.\nAliases <string>?> and <char>?> too!";
     }
 
     public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
@@ -323,7 +323,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<real> <real> ...\" are <= one another.\nAliases <string<=?> and <char<=?> too!";
+      return "@help:Procedures:Numbers\nReturns whether \"<real> <real> ...\" are <= one another.\nAliases <string<=?> and <char<=?> too!";
     }
 
     public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
@@ -369,7 +369,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<real> <real> ...\" are >= one another.\nAliases <string>=?> and <char>=?> too!";
+      return "@help:Procedures:Numbers\nReturns whether \"<real> <real> ...\" are >= one another.\nAliases <string>=?> and <char>=?> too!";
     }
 
     public static Datum logic(Real lastValue, ArrayList<Datum> parameters) throws Exception {
@@ -412,7 +412,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the exponentiation of \"<number> <number> ...\".\nRemember that exponentiation is right-associative!\nAliased by <**>.\n\nNote that EScheme defines the following to be true for all numeric <n>:\n  (expt <n> 0) ; 1\n  (expt 0 <positive-n>) ; 0\n  (expt 0 <negative-n>) ; Infinity\n  (expt 1 <infinite-n>) ; (expt -1 <infinite-n>) ; 1";
+      return "@help:Procedures:Numbers\nReturns the exponentiation of \"<number> <number> ...\".\nRemember that exponentiation is right-associative!\nAliased by <**>.\n\nNote that EScheme defines the following to be true for all numeric <n>:\n  (expt <n> 0) ; 1\n  (expt 0 <positive-n>) ; 0\n  (expt 0 <negative-n>) ; Infinity\n  (expt 1 <infinite-n>) ; (expt -1 <infinite-n>) ; 1";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -444,7 +444,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns Euler's number raised to the power of <number>.";
+      return "@help:Procedures:Numbers\nReturns Euler's number raised to the power of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -471,7 +471,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the log base-<base> of <number>. <base> defaults to (exp 1).";
+      return "@help:Procedures:Numbers\nReturns the log base-<base> of <number>. <base> defaults to (exp 1).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -502,7 +502,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the square-root of <number>.";
+      return "@help:Procedures:Numbers\nReturns the square-root of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -527,7 +527,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the absolute value of <real>.";
+      return "@help:Procedures:Numbers\nReturns the absolute value of <real>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -552,7 +552,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Efficiently performs (modulo (expt <base-real> <power-real>) <mod-real>).";
+      return "@help:Procedures:Numbers\nEfficiently performs (modulo (expt <base-real> <power-real>) <mod-real>).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -584,7 +584,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the min value of \"<real> ...\".";
+      return "@help:Procedures:Numbers\nReturns the min value of \"<real> ...\".";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -613,7 +613,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the max value of \"<real> ...\".";
+      return "@help:Procedures:Numbers\nReturns the max value of \"<real> ...\".";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -642,7 +642,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Coerces <number> to be inexact.";
+      return "@help:Procedures:Numbers\nCoerces <number> to be inexact.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -665,7 +665,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Coerces <number> to be exact.";
+      return "@help:Procedures:Numbers\nCoerces <number> to be exact.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -688,7 +688,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the numerator of <real> as an exact number.\nSee <denominator>.";
+      return "@help:Procedures:Numbers\nReturns the numerator of <real> as an exact number.\nSee <denominator>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -711,7 +711,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the denominator of <real> as an exact number.\nSee <numerator>.";
+      return "@help:Procedures:Numbers\nReturns the denominator of <real> as an exact number.\nSee <numerator>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -734,7 +734,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the quotient of (/ <dividend-real> <divisor-real>).\nSee <remainder>.";
+      return "@help:Procedures:Numbers\nReturns the quotient of (/ <dividend-real> <divisor-real>).\nSee <remainder>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -762,7 +762,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the remainder of (/ <dividend-real> <divisor-real>).\nSee <quotient>.";
+      return "@help:Procedures:Numbers\nReturns the remainder of (/ <dividend-real> <divisor-real>).\nSee <quotient>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -790,7 +790,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns <dividend-real> modulo <divisor-real>.";
+      return "@help:Procedures:Numbers\nReturns <dividend-real> modulo <divisor-real>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -818,7 +818,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns a pair: the quotient & remainder of (/ <dividend-real> <divisor-real>).";
+      return "@help:Procedures:Numbers\nReturns a pair: the quotient & remainder of (/ <dividend-real> <divisor-real>).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -847,7 +847,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns a pair: the integral & factional components of <real> as an inexact.";
+      return "@help:Procedures:Numbers\nReturns a pair: the integral & factional components of <real> as an inexact.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -873,7 +873,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Get the integral exact value of <real> as an inexact.\nFor Example:\n  (integral 0.5) ; 0\n  (integral 5.2) ; 5\n  (integral NaN) ; ERROR\n  (integral Infinity) ; ERROR";
+      return "@help:Procedures:Numbers\nGet the integral exact value of <real> as an inexact.\nFor Example:\n  (integral 0.5) ; 0\n  (integral 5.2) ; 5\n  (integral NaN) ; ERROR\n  (integral Infinity) ; ERROR";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -896,7 +896,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Get the fractional exact value of <real> as an inexact.\nFor example:\n  (fractional 5.0) ; 0\n  (fractional 5.2) ; 2\n  (fractional NaN) ; ERROR\n  (fractional Infinity) ; ERROR";
+      return "@help:Procedures:Numbers\nGet the fractional exact value of <real> as an inexact.\nFor example:\n  (fractional 5.0) ; 0\n  (fractional 5.2) ; 2\n  (fractional NaN) ; ERROR\n  (fractional Infinity) ; ERROR";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -919,7 +919,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the greatest common denominator of <integer> & <integer>.";
+      return "@help:Procedures:Numbers\nReturns the greatest common denominator of <integer> & <integer>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -947,7 +947,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the least common multiple of <integer> & <integer>.";
+      return "@help:Procedures:Numbers\nReturns the least common multiple of <integer> & <integer>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -975,7 +975,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the rounded value of <real>.";
+      return "@help:Procedures:Numbers\nReturns the rounded value of <real>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1000,7 +1000,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the floored value of <real>.";
+      return "@help:Procedures:Numbers\nReturns the floored value of <real>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1025,7 +1025,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the ceiling value of <real>.";
+      return "@help:Procedures:Numbers\nReturns the ceiling value of <real>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1050,7 +1050,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the truncated value of <real>.";
+      return "@help:Procedures:Numbers\nReturns the truncated value of <real>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1075,7 +1075,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a number.";
+      return "@help:Procedures:Numbers\nReturns whether <obj> is a number.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1097,7 +1097,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a complex number. Equivalent to <number?>.";
+      return "@help:Procedures:Numbers\nReturns whether <obj> is a complex number. Equivalent to <number?>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1119,7 +1119,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a real (non-complex) number.";
+      return "@help:Procedures:Numbers\nReturns whether <obj> is a real (non-complex) number.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1141,7 +1141,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is an inexact number.";
+      return "@help:Procedures:Numbers\nReturns whether <obj> is an inexact number.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1163,7 +1163,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is an exact number.";
+      return "@help:Procedures:Numbers\nReturns whether <obj> is an exact number.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1185,7 +1185,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is an integer.";
+      return "@help:Procedures:Numbers\nReturns whether <obj> is an integer.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1208,7 +1208,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a finite value.";
+      return "@help:Procedures:Numbers\nReturns whether <obj> is a finite value.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1231,7 +1231,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is <Infinite>.";
+      return "@help:Procedures:Numbers\nReturns whether <obj> is <Infinite>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1254,7 +1254,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is <NaN>.";
+      return "@help:Procedures:Numbers\nReturns whether <obj> is <NaN>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1277,7 +1277,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <real> is odd.";
+      return "@help:Procedures:Numbers\nReturns whether <real> is odd.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1298,7 +1298,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <real> is even.";
+      return "@help:Procedures:Numbers\nReturns whether <real> is even.";
     }
 
     public Datum signature() {
@@ -1327,7 +1327,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <real> is positive.";
+      return "@help:Procedures:Numbers\nReturns whether <real> is positive.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1352,7 +1352,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <real> is negative.";
+      return "@help:Procedures:Numbers\nReturns whether <real> is negative.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1377,7 +1377,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <real> is zero.";
+      return "@help:Procedures:Numbers\nReturns whether <real> is zero.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1402,7 +1402,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the sin of <number>.";
+      return "@help:Procedures:Numbers\nReturns the sin of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1427,7 +1427,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the cos of <number>.";
+      return "@help:Procedures:Numbers\nReturns the cos of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1452,7 +1452,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the tan of <number>.";
+      return "@help:Procedures:Numbers\nReturns the tan of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1477,7 +1477,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the asin of <number>.\nNote that asin yields a complex number if <number> exceeds its domain.";
+      return "@help:Procedures:Numbers\nReturns the asin of <number>.\nNote that asin yields a complex number if <number> exceeds its domain.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1502,7 +1502,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the acos of <number>.\nNote that acos yields a complex number if <number> exceeds its domain.";
+      return "@help:Procedures:Numbers\nReturns the acos of <number>.\nNote that acos yields a complex number if <number> exceeds its domain.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1529,7 +1529,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the atan of <number>. If given 2 arguments, returns the atan in\nradians of (/ <real> <real>) based on the signs of both values\nto determine the correct quadrant.";
+      return "@help:Procedures:Numbers\nReturns the atan of <number>. If given 2 arguments, returns the atan in\nradians of (/ <real> <real>) based on the signs of both values\nto determine the correct quadrant.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1561,7 +1561,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the sinh of <number>.";
+      return "@help:Procedures:Numbers\nReturns the sinh of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1586,7 +1586,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the cosh of <number>.";
+      return "@help:Procedures:Numbers\nReturns the cosh of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1611,7 +1611,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the tanh of <number>.";
+      return "@help:Procedures:Numbers\nReturns the tanh of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1636,7 +1636,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the asinh of <number>.";
+      return "@help:Procedures:Numbers\nReturns the asinh of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1661,7 +1661,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the acosh of <number>.\nNote that acosh yields a complex number if <number> exceeds its domain.";
+      return "@help:Procedures:Numbers\nReturns the acosh of <number>.\nNote that acosh yields a complex number if <number> exceeds its domain.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1686,7 +1686,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the atanh of <number>.\nNote that atanh yields a complex number if <number> exceeds its domain.";
+      return "@help:Procedures:Numbers\nReturns the atanh of <number>.\nNote that atanh yields a complex number if <number> exceeds its domain.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1711,7 +1711,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the number of ways in which <r> different things\ncan be selected and arranged out of <n> different things.\nBoth integers must be non-negative.";
+      return "@help:Procedures:Numbers\nReturns the number of ways in which <r> different things\ncan be selected and arranged out of <n> different things.\nBoth integers must be non-negative.";
     }
 
     private static final Exact ONE = new Exact(1);
@@ -1757,7 +1757,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the number of ways in which <r> different things\ncan be selected out of <n> different things.\nBoth integers must be non-negative.";
+      return "@help:Procedures:Numbers\nReturns the number of ways in which <r> different things\ncan be selected out of <n> different things.\nBoth integers must be non-negative.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1786,7 +1786,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns a random number between 0.0 and 1.0.\nGuarenteed to be unique across threads.";
+      return "@help:Procedures:Numbers\nReturns a random number between 0.0 and 1.0.\nGuarenteed to be unique across threads.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1808,7 +1808,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns a complex number with <real> & <imag> as real & imaginary components.";
+      return "@help:Procedures:Numbers\nReturns a complex number with <real> & <imag> as real & imaginary components.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1836,7 +1836,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns a complex number with <magnitude> & <angle> as its magnitude & angle.";
+      return "@help:Procedures:Numbers\nReturns a complex number with <magnitude> & <angle> as its magnitude & angle.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1864,7 +1864,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the real component of <number>.";
+      return "@help:Procedures:Numbers\nReturns the real component of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1889,7 +1889,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the imaginary component of <number>.";
+      return "@help:Procedures:Numbers\nReturns the imaginary component of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1915,7 +1915,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the magnitude of <number>.";
+      return "@help:Procedures:Numbers\nReturns the magnitude of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1940,7 +1940,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the angle of <number>.";
+      return "@help:Procedures:Numbers\nReturns the angle of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1966,7 +1966,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "Returns the conjugate of <number>.";
+      return "@help:Procedures:Numbers\nReturns the conjugate of <number>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

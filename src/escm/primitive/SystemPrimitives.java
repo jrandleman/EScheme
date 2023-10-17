@@ -75,7 +75,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Terminate the current EScheme session with <integer-code> (defaults to 0).";
+      return "@help:Procedures:System\nTerminate the current EScheme session with <integer-code> (defaults to 0).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -112,7 +112,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Reads and evaluates <filename-str>'s EScheme contents in the global environment.\nWorks for both regular & <serialize>d EScheme files.\nIf given <directory-str>, loads <filename-str> from <directory-str>. Use:\n\n  (load #path <filename-str>)\n\nas a portable alternative to (load <filename-str>) if <filename-str> is a\nrelative path, since <load> only operates relative to (current-directory).\n\nNote that <load-once> should be preferred to prevent cyclic loading.\n";
+      return "@help:Procedures:System\nReads and evaluates <filename-str>'s EScheme contents in the global environment.\nWorks for both regular & <serialize>d EScheme files.\nIf given <directory-str>, loads <filename-str> from <directory-str>. Use:\n\n  (load #path <filename-str>)\n\nas a portable alternative to (load <filename-str>) if <filename-str> is a\nrelative path, since <load> only operates relative to (current-directory).\n\nNote that <load-once> should be preferred to prevent cyclic loading.\n";
     }
 
     public static String addStringPaths(String path1, String path2) {
@@ -198,7 +198,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Works exactly like <load>, but only loads unloaded files. Use:\n\n  (load-once #path <filename-str>)\n\nas a portable alternative to (load-once <filename-str>) if <filename-str> is a\nrelative path, since <load-once> only operates relative to (current-directory).";
+      return "@help:Procedures:System\nWorks exactly like <load>, but only loads unloaded files. Use:\n\n  (load-once #path <filename-str>)\n\nas a portable alternative to (load-once <filename-str>) if <filename-str> is a\nrelative path, since <load-once> only operates relative to (current-directory).";
     }
 
     private static Symbol loadOnceFiles = new Symbol("*load-once-files*");
@@ -260,7 +260,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Executes a command, using the environment variable bindings in\n<env-var-str-list> (defaults to those of the current environment), \nin the <directory-str> directory (defaults to the current working \ndirectory).\n\nNote that each environment variable string in <env-var-str-list>\nshould follow the \"name=value\" format.\n\nIf <millisecond-timeout> (a real number) is given and exceeded, the\nspawned process will terminate. Note that this is NOT a hard cap \nthough: hence passing 0 as <millisecond-timeout> may still have \nsystem-wide side effects.\n\nUltimately passed to Java's <Runtime.getRuntime().exec()>.\nReferenced by <escm>.\n\nReturns a list:\n  (<command-stdout-str> <command-stderr-str> <command-exit-code>)";
+      return "@help:Procedures:System\nExecutes a command, using the environment variable bindings in\n<env-var-str-list> (defaults to those of the current environment), \nin the <directory-str> directory (defaults to the current working \ndirectory).\n\nNote that each environment variable string in <env-var-str-list>\nshould follow the \"name=value\" format.\n\nIf <millisecond-timeout> (a real number) is given and exceeded, the\nspawned process will terminate. Note that this is NOT a hard cap \nthough: hence passing 0 as <millisecond-timeout> may still have \nsystem-wide side effects.\n\nUltimately passed to Java's <Runtime.getRuntime().exec()>.\nReferenced by <escm>.\n\nReturns a list:\n  (<command-stdout-str> <command-stderr-str> <command-exit-code>)";
     }
     
     private static String[] convertStringListToStringArray(Datum list, String listContentType, ArrayList<Datum> parameters) throws Exception {
@@ -347,7 +347,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Execute an EScheme program in a seperate process. Effectively a wrapper \naround <system> that references <*escm-execution-command*>. Displays each \n<argv> to generate a single command string with <escm-file>.\n\nIf <millisecond-timeout> (a real number) is given and exceeded, the\nspawned process will terminate. Note that this is NOT a hard cap \nthough: hence passing 0 as <millisecond-timeout> may still have \nsystem-wide side effects.\n\nReturns a list:\n  (<program-stdout-str> <program-stderr-str> <program-exit-code>)";
+      return "@help:Procedures:System\nExecute an EScheme program in a seperate process. Effectively a wrapper \naround <system> that references <*escm-execution-command*>. Displays each \n<argv> to generate a single command string with <escm-file>.\n\nIf <millisecond-timeout> (a real number) is given and exceeded, the\nspawned process will terminate. Note that this is NOT a hard cap \nthough: hence passing 0 as <millisecond-timeout> may still have \nsystem-wide side effects.\n\nReturns a list:\n  (<program-stdout-str> <program-stderr-str> <program-exit-code>)";
     }
 
     private static String parseEscmProgramCommand(Long timeout, ArrayList<Datum> parameters) throws Exception {
@@ -393,7 +393,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Extracts the ultimate module name from <module-path-symbol>.\nFor example:\n  * (escm-get-module-name 'Module) ; 'Module\n  * (escm-get-module-name 'Folder1.Folder2.Module) ; 'Module";
+      return "@help:Procedures:System\nExtracts the ultimate module name from <module-path-symbol>.\nFor example:\n  * (escm-get-module-name 'Module) ; 'Module\n  * (escm-get-module-name 'Folder1.Folder2.Module) ; 'Module";
     }
 
     public static Symbol logic(Symbol modulePath) throws Exception {
@@ -426,7 +426,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "<import> quotes its <module-path> argument & passes it to this function,\nwhich then returns the generated <module> object to be bound to a name.";
+      return "@help:Procedures:System\n<import> quotes its <module-path> argument & passes it to this function,\nwhich then returns the generated <module> object to be bound to a name.";
     }
 
     public static class InvalidModuleException extends Exceptionf {
@@ -552,7 +552,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "<reload> quotes its <module-alias-symbol> argument & passes it to this\nfunction, which then returns the generated <module> object to be bound\nto <reload>'s <module-alias-symbol>.";
+      return "@help:Procedures:System\n<reload> quotes its <module-alias-symbol> argument & passes it to this\nfunction, which then returns the generated <module> object to be bound\nto <reload>'s <module-alias-symbol>.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -576,7 +576,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a module object.";
+      return "@help:Procedures:System\nReturns whether <obj> is a module object.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -599,7 +599,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Returns the absolute file path of <module>'s original location.";
+      return "@help:Procedures:System\nReturns the absolute file path of <module>'s original location.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -622,7 +622,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Returns a list of the symbols defined in <module>.\nBe warned: every module has its own copy of the standard library defined too!";
+      return "@help:Procedures:System\nReturns a list of the symbols defined in <module>.\nBe warned: every module has its own copy of the standard library defined too!";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -645,7 +645,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Internal primitive used by <define-parameter>, which passes its quoted\ntarget variable to this function.";
+      return "@help:Procedures:System\nInternal primitive used by <define-parameter>, which passes its quoted\ntarget variable to this function.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -669,7 +669,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Internal primitive used by <set-parameter!>, which passes its quoted\ntarget variable to this function.";
+      return "@help:Procedures:System\nInternal primitive used by <set-parameter!>, which passes its quoted\ntarget variable to this function.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -693,7 +693,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Internal primitive used by <get-parameter>, which passes its quoted\ntarget variable to this function.";
+      return "@help:Procedures:System\nInternal primitive used by <get-parameter>, which passes its quoted\ntarget variable to this function.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -716,7 +716,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Internal primitive used by <parameter?>, which passes its quoted\ntarget variable to this function.";
+      return "@help:Procedures:System\nInternal primitive used by <parameter?>, which passes its quoted\ntarget variable to this function.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -741,7 +741,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "If given no arguments, return a hashmap of name:value string environment \nvariable associations.\n\nIf given an environment variable name string, returns its string value. \nIf the given string is not an accessable environment variable, returns #f";
+      return "@help:Procedures:System\nIf given no arguments, return a hashmap of name:value string environment \nvariable associations.\n\nIf given an environment variable name string, returns its string value. \nIf the given string is not an accessable environment variable, returns #f";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -783,7 +783,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Hints the JVM to launch its garbage collector (GC). Does not guarentee\nimmediate GC execution.";
+      return "@help:Procedures:System\nHints the JVM to launch its garbage collector (GC). Does not guarentee\nimmediate GC execution.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -807,7 +807,7 @@ public class SystemPrimitives {
     }
 
     public String docstring() {
-      return "Returns the current call-stack (prior to calling the primitive) as an\nassociative list: ((<function-name-string> <source-information>) ...)\n  * <source-information> := #f ; if doesn't exist, else:\n                          | (<filename-string> <line-number> <column-number>)";
+      return "@help:Procedures:System\nReturns the current call-stack (prior to calling the primitive) as an\nassociative list: ((<function-name-string> <source-information>) ...)\n  * <source-information> := #f ; if doesn't exist, else:\n                          | (<filename-string> <line-number> <column-number>)";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

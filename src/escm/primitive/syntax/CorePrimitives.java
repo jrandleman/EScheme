@@ -88,7 +88,46 @@ public class CorePrimitives {
   public static Symbol ESCM_GET_PARAMETER = new Symbol("escm-get-parameter");
   public static Symbol ESCM_IS_PARAMETER_P = new Symbol("escm-parameter?");
 
+  
+  ////////////////////////////////////////////////////////////////////////////
+  // (bytecode <obj>)
+  //
+  // (define-syntax bytecode
+  //   (lambda instructions instructions))
+  //
+  // NOTE: The EScheme compiler itself actually explicitly parses for bytecode 
+  //       clauses, rather than using this Java primitive as a regular macro
+  //       object. This allows us to get fast compile-time bytecode expansions,
+  //       since we then don't want to perform a function call for each <bytecode> 
+  //       instance. 
+  //
+  //       We still keep this Bytecode macro here though for for <help> purposes:
+  //       that way users can use `(help bytecode)` to learn how to inline 
+  //       instructions in EScheme source code, without checking EScheme's `doc` 
+  //       directory.
+  public static class Bytecode extends PrimitiveSyntax {
+    public java.lang.String escmName() {
+      return "bytecode";
+    }
 
+    public Datum signature() {
+      return Pair.List(BYTECODE,new Symbol("<instruction>"),Signature.VARIADIC);
+    }
+
+    public String docstring() {
+      return "@help:Syntax:Core\n# An Introduction to EScheme's Bytecode\n\n## Brief Insight\nEScheme's bytecode structure can be thought of as a chain of instruction sets \nserving as function bodies.\n\nThe instructions (as outlined below) are designed __exclusively__ to serve as a \nmeans by which to perform control flow and bind items to the current environment. \n\n___All logical operations are abstracted away via user-defined & primitive functions!___ \n\nSuch is the crux of our incredibly reduced instruction set, and the fact that \nwe can get away with having all of our instructions be either unary or nullary.\nFor example, unlike most flavors of assembly, there is no `add` instruction. \nRather, to us, `+` is called like any other function.\n\n\n## Data Manipulation\nAll data is handled via 2 mediums in our bytecode: the \"current value register\" \n(CVR), and the function stack.\n\nThe CVR psuedo-register is never explicitely referenced in EScheme bytecode, \nrather it is implicitly used by certain instructions. For example, compiling \n`(define life 42)` yields the bytecode `(load 42) (define life)`. The `load` \ninstruction implicitly sets CVR to its argument, and `define` implicitly binds \nits argument to CVR in the environment.\n\nThe function stack is referred to via the `push`, `pop`, and `call` instructions.\n`call` affects the stack because, due to our lack of multiple registers, we push \nour arguments (and the function we're calling) onto the stack rather than putting \nthem in registers. More details on the `call` instruction may be found below.\n\n\n## Why Write Bytecode?\nThe vast majority of the bytecode that the interpreter works with is the result of\ncompiling EScheme expressions. However, it may be desirable to write out bytecode \nby hand under very specific circumstances. \n\nFor example, while EScheme certainly supports iteration via recursion, there is no \n\"true\" iteration by default a la `for`/`while` loop in Java or C++. However, by \nleveraging inlined bytecode, we can write a `while` macro that __does__ have true\niteration (such is outlined as an example below)!\n\n\n## Writing Bytecode\nIn order to write out bytecode, simply follow the instruction syntax outlined below.\nNote that any arguments specified as `<symbol>` or `<integer>` MUST be symbolic or \ninteger literals respectively. For example, `jump` and `call` both accept integers, \nbut whereas `jump` requires that it's argument is an integer literal, `call` also \naccepts variables that evaluate to integers.\n\n### NIL\nA note on writing NIL literals: use `()`. For example, `(define n (quote ()))`\ncompiles to `(load ()) (define n)`. You may alternatively use the `#nil` reader\nliteral.\n\n### VOID\nA note on writing VOID literals: use `#void`. For example, `(define n #void)`\ncompiles to `(load #void) (define n)`.\n\n### Closures\nA note on writing closures: you may nest the `load-closure` syntax as needed in order\nto denote closures. The `load-closure` syntax is as follows:\n\n`(load-closure <optional-docstring> ((<argument> ...) <instruction> ...) ...)`\n\nThis syntax will load the equivalent of: `(fn <optional-docstring> ((<argument> ...) <instruction> ...) ...)`\ninto CVR. Further note that closure expressions by default return the value left in \nCVR upon terminating execution. `<docstring>` may be optionally provided to yield\nfurther information on the closure's intended purpose in the `help` menu.\n\nFor example, you may write:\n(define (my-function y) \n  (map (lambda (x) (* x y)) (list 1 2 3)))\n\nAs:\n(load-closure \n  ((y)\n    (push map)\n    (load-closure \n      ((x)\n        (push *)\n        (push x)\n        (push y)\n        (call 3)))\n    (push)\n    (push list)\n    (push 1)\n    (push 2)\n    (push 3)\n    (call 4)\n    (push)\n    (call 3)))\n(define my-function)\n\n### Object Access Chains\nThe escm VM has built-in support for interpretting object access chains, hence\n`(define obj.prop1.prop2)` is perfectly valid bytecode syntax.\n\nAs such, all instructions that set or evaluate a symbolic datum support this \nsyntax. These include: `define`, `set!`, `load`, `call`, `push`, & `return`.\n\n\n\n\n------------------------------------------------------------------------------\n# The EScheme Bytecode Instruction Set\n\n(define <symbol>) ; bind <symbol> to CVR [sets CVR to <void>]\n\n(set! <symbol>) ; set! <symbol> to CVR [sets CVR to <void>]\n\n(defined? <symbol>) ; determine if <symbol> is defined as a variable [sets CVR to the boolean result]\n\n(ifn <integer>) ; if CVR is NOT truthy, jump <integer> instructions [sets CVR to <void>]\n\n(jump <integer>) ; jump <integer> instructions\n\n(load <datum>)         ; evaluate <datum> and load it into CVR\n(load-symbol <symbol>) ; load <symbol> as a symbolic value into CVR rather than evaluating it\n\n(call <datum>) ; <datum> must evaluate to an integer. get the fcn & arguments being applied from the stack. \n               ; positive <integer> denotes pushes from left to right & negative denotes pushes from right to left (when compiling the application expressions). \n               ; pops (abs <datum>) items off of the stack after the call, and places the returned value of the fcn application in CVR.\n\n(push)         ; push CVR to the stack\n(push <datum>) ; push <datum> to the stack\n\n(pop) ; pop a value off of the stack into CVR\n\n(return)         ; returns the value in CVR (effectively jumps to the end of the function)\n(return <datum>) ; returns the value in <datum> (effectively jumps to the end of the function)\n\n------------------------------------------------------------------------------\n## Helper `bytecode` Syntax\n### Psuedo-instruction(s) converted into \"real\" instruction(s) by the assembler\n\n(load-closure <optional-docstring> ((<argument> ...) <instruction> ...) ...) ; syntax to load a closure\n\n\n\n\n------------------------------------------------------------------------------\n# Examples\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n;; Demoing the compilation of closures\n\n;; Source Code\n(define (my-function y) \n  (map (lambda (x) (* x y)) (list 1 2 3)))\n\n;; Compiled Bytecode\n(load-closure \n  ((y)\n    (push map)\n    (load-closure \n      ((x)\n        (push *)\n        (push x)\n        (push y)\n        (call 3)))\n    (push)\n    (push list)\n    (push 1)\n    (push 2)\n    (push 3)\n    (call 4)\n    (push)\n    (call 3)))\n(define my-function)\n\n\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n;; Defining a \"(while (<condition> <return-expr> ...) <body> ...)\" macro using\n;; inlined bytecode & compilation\n\n(define-syntax while\n  (lambda (condition-returns . body)\n    (define compiled-condition (compile (car condition-returns)))\n    (define compiled-body (apply append (map compile body)))\n    (define compiled-returns (apply append (map compile (cdr condition-returns))))\n    `(bytecode \n      ,@compiled-condition\n      (ifn ,(+ (length compiled-body) 2))\n      ,@compiled-body\n      (jump ,(- 0 (length compiled-condition) (length compiled-body) 1))\n      (load #void)\n      ,@compiled-returns)))\n\n\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n;; Implementing \"apply\" in bytecode (impossible in native Scheme!)\n\n(load-closure \n  ((f args-list)\n    (load 1)\n    (define count)\n    (push f)\n    (push null?)\n    (push args-list)\n    (call 2)\n    (ifn 2)\n    (jump 15)\n    (push car)\n    (push args-list)\n    (call 2)\n    (push) ; save an extracted value\n    (push cdr)\n    (push args-list)\n    (call 2)\n    (set! args-list)\n    (push +)\n    (push 1)\n    (push count)\n    (call 3)\n    (set! count)\n    (jump -18)\n    (call count)))\n(define apply)\n\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n;; Implementing factorial (because of course we do so)\n\n;; Source Code\n(define (factorial n)\n  (if (< n 2)\n      1\n      (* n (factorial (- n 1)))))\n\n;; Compiled Bytecode\n(load-closure \n  ((n)\n    (push <)\n    (push n)\n    (push 2)\n    (call 3)\n    (ifn 2)\n    (return 1)\n    (push *)\n    (push n)\n    (push factorial)\n    (push -)\n    (push n)\n    (push 1)\n    (call 3)\n    (push)\n    (call 2)\n    (push)\n    (call 3)))\n(define factorial)";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      Datum instructions = Nil.VALUE;
+      for(int i = parameters.size()-1; i >= 0; --i) {
+        instructions = new Pair(parameters.get(i),instructions);
+      }
+      return instructions;
+    }
+  }
+
+  
   ////////////////////////////////////////////////////////////////////////////
   // (quote <obj>)
   //
@@ -111,7 +150,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Returns <obj> as a data structure.\nNote that the reader will expand \"'<obj>\" to \"(quote <obj>)\".\n\nFor example:\n  (quote a)  ; a\n  (quote 1)  ; 1\n  (quote \"\") ; \"\"\n  (quote #t) ; #t\n  (quote ()) ; #nil\n  (quote (1 2 . 3)) ; (cons 1 (cons 2 3))\n  (quote (1 2 3))   ; (list 1 2 3)";
+      return "@help:Syntax:Core\nReturns <obj> as a data structure.\nNote that the reader will expand \"'<obj>\" to \"(quote <obj>)\".\n\nFor example:\n  (quote a)  ; a\n  (quote 1)  ; 1\n  (quote \"\") ; \"\"\n  (quote #t) ; #t\n  (quote ()) ; #nil\n  (quote (1 2 . 3)) ; (cons 1 (cons 2 3))\n  (quote (1 2 3))   ; (list 1 2 3)";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -142,7 +181,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Defines <macro-name> to be a macro that uses to <callable>\nto perform its code expansion.\n\nFor example:\n  (define-syntax and\n    (lambda (. conditions)\n      (fold (lambda (acc item) (list (quote if) acc item #f))\n            #t\n            conditions)))";
+      return "@help:Syntax:Core\nDefines <macro-name> to be a macro that uses to <callable>\nto perform its code expansion.\n\nFor example:\n  (define-syntax and\n    (lambda (. conditions)\n      (fold (lambda (acc item) (list (quote if) acc item #f))\n            #t\n            conditions)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -229,7 +268,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Create a multi-arity procedure, with support for optional parameters via the\n\"(<param-name> <default-value>)\" syntax. Denote variadic parameters via the\n\"(<param> ... . <variadic-param>)\" or \"<variadic-param>\" syntax.\n\nOptionally include <docstring> to yield further details on the procedure's\nintended purpose in the <help> menu.\n\nFor example:\n  ; Using Mult-arity\n  (define factorial \n    (fn ((n) (factorial n 1))\n        ((n p)\n          (if (< n 2)\n              p\n              (factorial (- n 1) (* n p))))))\n\n\n  ; Using optional parameters: p is <1> by default\n  (define factorial\n    (fn ((n (p 1))\n          (if (< n 2)\n              p\n              (factorial (- n 1) (* n p))))))\n\n\n  ; Combine <fn> and <define> via <defn>:\n  (defn factorial \n    ((n) (factorial n 1))\n    ((n p)\n      (if (< n 2)\n          p\n          (factorial (- n 1) (* n p)))))";
+      return "@help:Syntax:Core\nCreate a multi-arity procedure, with support for optional parameters via the\n\"(<param-name> <default-value>)\" syntax. Denote variadic parameters via the\n\"(<param> ... . <variadic-param>)\" or \"<variadic-param>\" syntax.\n\nOptionally include <docstring> to yield further details on the procedure's\nintended purpose in the <help> menu.\n\nFor example:\n  ; Using Mult-arity\n  (define factorial \n    (fn ((n) (factorial n 1))\n        ((n p)\n          (if (< n 2)\n              p\n              (factorial (- n 1) (* n p))))))\n\n\n  ; Using optional parameters: p is <1> by default\n  (define factorial\n    (fn ((n (p 1))\n          (if (< n 2)\n              p\n              (factorial (- n 1) (* n p))))))\n\n\n  ; Combine <fn> and <define> via <defn>:\n  (defn factorial \n    ((n) (factorial n 1))\n    ((n p)\n      (if (< n 2)\n          p\n          (factorial (- n 1) (* n p)))))";
     }
 
     // Extract <docstring> if exists, else <null>
@@ -483,7 +522,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Shorthand for single-arity procedures. Expands to <fn> under the hood.\nSupports optional parameters via the \"(<param-name> <default-value>)\"\nsyntax. Denote variadic parameters via \"(<param> ... . <variadic-param>)\"\nor \"<variadic-param>\" syntax. Reader-shorthand support via the <#(> syntax.\n\nOptionally include <docstring> to yield further details on the procedure's\nintended purpose in the <help> menu.\n\nFor example:\n  ; Using optional parameters: p is <1> by default\n  (define factorial\n    (lambda (n (p 1))\n      (if (< n 2)\n          p\n          (factorial (- n 1) (* n p)))))\n\n\n  ; Combine <lambda> and <define> via:\n  (define (factorial n (p 1))\n    (if (< n 2)\n        p\n        (factorial (- n 1) (* n p))))\n\n\n  ;; Reader-shorthand via <#(>: #<expr> => (lambda () <expr>)\n  ;; Denote the Nth parameter via %N, with N starting at 1. \n  ;; Use %% to denote the variadic parameter.\n\n  ; Add 2:\n  (define add2 #(+ %1 2))\n\n  ; Get the 2nd parameter:\n  (define get-2nd #(begin %2))\n\n  ; The 'id' procedure:\n  (define id #(begin %1))\n\n  ; The 'list' procedure:\n  (define list #(begin %%))";
+      return "@help:Syntax:Core\nShorthand for single-arity procedures. Expands to <fn> under the hood.\nSupports optional parameters via the \"(<param-name> <default-value>)\"\nsyntax. Denote variadic parameters via \"(<param> ... . <variadic-param>)\"\nor \"<variadic-param>\" syntax. Reader-shorthand support via the <#(> syntax.\n\nOptionally include <docstring> to yield further details on the procedure's\nintended purpose in the <help> menu.\n\nFor example:\n  ; Using optional parameters: p is <1> by default\n  (define factorial\n    (lambda (n (p 1))\n      (if (< n 2)\n          p\n          (factorial (- n 1) (* n p)))))\n\n\n  ; Combine <lambda> and <define> via:\n  (define (factorial n (p 1))\n    (if (< n 2)\n        p\n        (factorial (- n 1) (* n p))))\n\n\n  ;; Reader-shorthand via <#(>: #<expr> => (lambda () <expr>)\n  ;; Denote the Nth parameter via %N, with N starting at 1. \n  ;; Use %% to denote the variadic parameter.\n\n  ; Add 2:\n  (define add2 #(+ %1 2))\n\n  ; Get the 2nd parameter:\n  (define get-2nd #(begin %2))\n\n  ; The 'id' procedure:\n  (define id #(begin %1))\n\n  ; The 'list' procedure:\n  (define list #(begin %%))";
     }
 
     public static Datum getAllExpressionsAfter(ArrayList<Datum> parameters, int startingIdx) {
@@ -572,7 +611,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Conditional branching:\n  if (not (eq? #f <condition>)): execute <consequence>\n  else: execute <alternative> (defaults to #void).";
+      return "@help:Syntax:Core\nConditional branching:\n  if (not (eq? #f <condition>)): execute <consequence>\n  else: execute <alternative> (defaults to #void).";
     }
 
     private Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum condition, Datum consequence, Datum alternative, Trampoline.Continuation continuation) throws Exception {
@@ -621,7 +660,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Combines a series of EScheme expressions into a single expression.\nSimilar to how {} is used in C++/Java, BUT <begin> does NOT have\nits own scope (use <let> for such instead).";
+      return "@help:Syntax:Core\nCombines a series of EScheme expressions into a single expression.\nSimilar to how {} is used in C++/Java, BUT <begin> does NOT have\nits own scope (use <let> for such instead).";
     }
 
     private Trampoline.Bounce iterate(ArrayList<Datum> parameters, int i, Datum compiledExpressions, Trampoline.Continuation continuation) throws Exception {
@@ -656,7 +695,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Assigns <symbol> to <obj>. <symbol> must have been previously\ndefined. Note that <symbol> may be an object property chain too,\nhence (set! obj.prop 42) is valid syntax!";
+      return "@help:Syntax:Core\nAssigns <symbol> to <obj>. <symbol> must have been previously\ndefined. Note that <symbol> may be an object property chain too,\nhence (set! obj.prop 42) is valid syntax!";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -708,7 +747,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Binds <symbol> to <obj> in the current environment.\nAliased by <def>. The 2nd signature is equivalent to:\n  (define <function-name> (lambda (<parameter> ...) <obj>))\n\nOptionally include <docstring> to yield further details on\nthe procedure's intended purpose in the <help> menu.\n\nNote that <symbol> may be an object property chain too,\nhence (define obj.prop 42) is valid syntax!";
+      return "@help:Syntax:Core\nBinds <symbol> to <obj> in the current environment.\nAliased by <def>. The 2nd signature is equivalent to:\n  (define <function-name> (lambda (<parameter> ...) <obj>))\n\nOptionally include <docstring> to yield further details on\nthe procedure's intended purpose in the <help> menu.\n\nNote that <symbol> may be an object property chain too,\nhence (define obj.prop 42) is valid syntax!";
     }
 
     private Trampoline.Bounce compileSimpleDefine(Datum bindings, Datum value, Trampoline.Continuation continuation) throws Exception {
@@ -757,7 +796,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Checks if <symbol> is defined in the current environment.\nAliased by <def?>. Note that <symbol> may be an object\nproperty chain too, hence (defined? obj.prop) is valid syntax!";
+      return "@help:Syntax:Core\nChecks if <symbol> is defined in the current environment.\nAliased by <def?>. Note that <symbol> may be an object\nproperty chain too, hence (defined? obj.prop) is valid syntax!";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -804,7 +843,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Combines <define> and <fn> by binding <function-name> to\n(fn (<parameters> <body> ...) ...)\n\nOptionally include <docstring> to yield further details\non the procedure's intended purpose in the <help> menu.";
+      return "@help:Syntax:Core\nCombines <define> and <fn> by binding <function-name> to\n(fn (<parameters> <body> ...) ...)\n\nOptionally include <docstring> to yield further details\non the procedure's intended purpose in the <help> menu.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -841,7 +880,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Returns whether none of \"<obj> ...\" are #f.";
+      return "@help:Syntax:Core\nReturns whether none of \"<obj> ...\" are #f.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -877,7 +916,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Returns whether any of \"<obj> ...\" are #t.";
+      return "@help:Syntax:Core\nReturns whether any of \"<obj> ...\" are #t.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -917,7 +956,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Delay <expression>'s evaluation until it is forced via <force>.\nFor example: (force (delay (+ 1 2))) ; => 3";
+      return "@help:Syntax:Core\nDelay <expression>'s evaluation until it is forced via <force>.\nFor example: (force (delay (+ 1 2))) ; => 3";
     }
 
     private static class DatumBox {
@@ -1010,7 +1049,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Conditional if-else chains. If <condition> is true, execute <body>.\nWith '=>' syntax, <condition> is passed to <callable> iff <condition> is #t.\n<else> is equivalent to #t.";
+      return "@help:Syntax:Core\nConditional if-else chains. If <condition> is true, execute <body>.\nWith '=>' syntax, <condition> is passed to <callable> iff <condition> is #t.\n<else> is equivalent to #t.";
     }
 
     private static Datum makeCondition(Datum condition) {
@@ -1098,7 +1137,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Signature 1 (nameless let):\n  Bind \"(<symbol> <obj>) ...\" in a local scope and execute <body>.\nSignature 2 (named let):\n  Bind <function-name> to (lambda (<parameter> ...) <body> ...) in a temporary\n  scope, and call it with \"<initial-value> ...\". Optionally include <docstring>\n  to yield further details on the procedure's intended purpose via <help>.";
+      return "@help:Syntax:Core\nSignature 1 (nameless let):\n  Bind \"(<symbol> <obj>) ...\" in a local scope and execute <body>.\nSignature 2 (named let):\n  Bind <function-name> to (lambda (<parameter> ...) <body> ...) in a temporary\n  scope, and call it with \"<initial-value> ...\". Optionally include <docstring>\n  to yield further details on the procedure's intended purpose via <help>.";
     }
 
     private static escm.util.Pair<Datum,Datum> getParamsAndArgs(Datum bindings, ArrayList<Datum> parameters) throws Exception {
@@ -1225,7 +1264,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Returns <obj> as a data structure. Any <unquote>d <obj>s will be\nevaluated first, and <unquote-splicing>ed <obj>s will be\nevaluated and spliced into the list.\nNote that the reader will expand:\n  \"`<obj>\" => \"(quasiquote <obj>)\"\n  \",<obj>\" => \"(unquote <obj>)\"\n  \",@<obj>\" => \"(unquote-splicing <obj>)\"";
+      return "@help:Syntax:Core\nReturns <obj> as a data structure. Any <unquote>d <obj>s will be\nevaluated first, and <unquote-splicing>ed <obj>s will be\nevaluated and spliced into the list.\nNote that the reader will expand:\n  \"`<obj>\" => \"(quasiquote <obj>)\"\n  \",<obj>\" => \"(unquote <obj>)\"\n  \",@<obj>\" => \"(unquote-splicing <obj>)\"";
     }
 
     private static boolean isTaggedList(Pair lst, Symbol tag) {
@@ -1360,7 +1399,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Conditional \"switch\" dispatch. If <value> matches any key in \"<key> ...\",\nexecute <body>. With '=>' syntax, (member <value> (list <key> ...)) is passed\nto <callable> iff <value> matches any key in \"<key> ...\".\n<else> matches against all <value>s.";
+      return "@help:Syntax:Core\nConditional \"switch\" dispatch. If <value> matches any key in \"<key> ...\",\nexecute <body>. With '=>' syntax, (member <value> (list <key> ...)) is passed\nto <callable> iff <value> matches any key in \"<key> ...\".\n<else> matches against all <value>s.";
     }
 
     private static Datum restOfClause(Pair clause) throws Exception {
@@ -1417,7 +1456,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to <let>, but later <symbol>s may refer\nto earlier ones.";
+      return "@help:Syntax:Core\nEquivalent to <let>, but later <symbol>s may refer\nto earlier ones.";
     }
 
     private static Datum generateNestedLambdaCalls(Symbol baseLetSymbol, Datum bindings, Datum internalLet, ArrayList<Datum> parameters) throws Exception {
@@ -1465,7 +1504,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Like <let>, but <value> may be a recursive function that\ncalls <symbol>.";
+      return "@help:Syntax:Core\nLike <let>, but <value> may be a recursive function that\ncalls <symbol>.";
     }
 
     private static escm.util.Pair<Datum,Datum> getParamsDefaultAndActualSettings(Datum bindings, ArrayList<Datum> parameters) throws Exception {
@@ -1520,7 +1559,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to <letrec>, but later <symbol>s may refer\nto earlier ones.";
+      return "@help:Syntax:Core\nEquivalent to <letrec>, but later <symbol>s may refer\nto earlier ones.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1547,7 +1586,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Execute \"<body> ...\" if <condition> is not true. Can be combined with the\n'*import*' global variable to mimic Python's \"if __name__=='__main__':\"\npattern:\n\n  (unless *import*\n    <execute-main-escheme-code-here> ...)\n\nOpposite of <when>.";
+      return "@help:Syntax:Core\nExecute \"<body> ...\" if <condition> is not true. Can be combined with the\n'*import*' global variable to mimic Python's \"if __name__=='__main__':\"\npattern:\n\n  (unless *import*\n    <execute-main-escheme-code-here> ...)\n\nOpposite of <when>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1576,7 +1615,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Execute \"<body> ...\" if <condition> is true. Opposite of <unless>.";
+      return "@help:Syntax:Core\nExecute \"<body> ...\" if <condition> is true. Opposite of <unless>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1621,7 +1660,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Execute \"<body> ...\" while <condition> is true.\nReturn \"<return-expr> ...\" (defaults to #void) upon completion.\nNote that <while> uses true iteration (not recursion!)";
+      return "@help:Syntax:Core\nExecute \"<body> ...\" while <condition> is true.\nReturn \"<return-expr> ...\" (defaults to #void) upon completion.\nNote that <while> uses true iteration (not recursion!)";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -1705,7 +1744,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "(do ((<var> <initial-val> <update-expr>) ...) \n    (<break-condition> <return-expr> ...) \n    <body> ...)\n\nExecute \"<body> ...\" while <break-condition> is #f. Once <break-condition> is\n#t, return \"<return-expr> ...\". \"<var>\" is set to \"<initial-val>\" at first, then\nto \"<update-expr>\" repeatedly after each iteration.\n\nNote: \n  1. \"<update-expr>\" is optional\n  2. If \"<update-expr>\" is ommited, \"<var> <initial-val>\" is optional\n  3. \"<return-expr> ...\" is optional\n  4. If \"<return-expr> ...\" is ommited, \"<break-condition>\" is optional\n  5. \"<body> ...\" is optional\n\nHence the most minimal form of \"do\" is \"(do () ())\" (an infinite loop).";
+      return "@help:Syntax:Core\n(do ((<var> <initial-val> <update-expr>) ...) \n    (<break-condition> <return-expr> ...) \n    <body> ...)\n\nExecute \"<body> ...\" while <break-condition> is #f. Once <break-condition> is\n#t, return \"<return-expr> ...\". \"<var>\" is set to \"<initial-val>\" at first, then\nto \"<update-expr>\" repeatedly after each iteration.\n\nNote: \n  1. \"<update-expr>\" is optional\n  2. If \"<update-expr>\" is ommited, \"<var> <initial-val>\" is optional\n  3. \"<return-expr> ...\" is optional\n  4. If \"<return-expr> ...\" is ommited, \"<break-condition>\" is optional\n  5. \"<body> ...\" is optional\n\nHence the most minimal form of \"do\" is \"(do () ())\" (an infinite loop).";
     }
 
     private static escm.util.Pair<Datum,Datum> getVarsAndVals(Datum varBindings, ArrayList<Datum> parameters) throws Exception {
@@ -1799,7 +1838,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Execute each expression, with \"<>\" bound as the result of the last expression.\nFor example:\n  ; The below results in 64:\n  (-<> (* 2 2)\n       (+ <> <>)\n       (* <> <>))";
+      return "@help:Syntax:Core\nExecute each expression, with \"<>\" bound as the result of the last expression.\nFor example:\n  ; The below results in 64:\n  (-<> (* 2 2)\n       (+ <> <>)\n       (* <> <>))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1863,7 +1902,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "<lambda> alternative to create a curried procedure! Suppose\n(define fcn (curry (a b) a)). <fcn> may be invoked as either\n(fcn 1 2) or ((fcn 1) 2).\n\n  => NOTE: It is UNDEFINED BEHAVIOR to have a VARIADIC CURRIED procedure!\n\nOptionally include <docstring> to yield further details on the\nprocedure's intended purpose in the <help> menu.";
+      return "@help:Syntax:Core\n<lambda> alternative to create a curried procedure! Suppose\n(define fcn (curry (a b) a)). <fcn> may be invoked as either\n(fcn 1 2) or ((fcn 1) 2).\n\n  => NOTE: It is UNDEFINED BEHAVIOR to have a VARIADIC CURRIED procedure!\n\nOptionally include <docstring> to yield further details on the\nprocedure's intended purpose in the <help> menu.";
     }
 
     private static Datum FA = Pair.List(new Symbol("f"),new Symbol("a"));
@@ -1936,7 +1975,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Wrapper to locally bind results of expressions that yield a <values> object.\nExpands to nested <call-with-values> expressions.\n\nSee the <values> and <call-with-values> <help> entries for more information\nand examples on using <values> expressions.";
+      return "@help:Syntax:Core\nWrapper to locally bind results of expressions that yield a <values> object.\nExpands to nested <call-with-values> expressions.\n\nSee the <values> and <call-with-values> <help> entries for more information\nand examples on using <values> expressions.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -2023,7 +2062,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Used by <guard> to generate a guared clause using <reraise> and \"<expression> ...\".";
+      return "@help:Syntax:Core\nUsed by <guard> to generate a guared clause using <reraise> and \"<expression> ...\".";
     }
 
     public Datum parseElse(Pair bodyCar) throws Exception {
@@ -2079,7 +2118,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Executes \"<body> ...\" while guarding against a <raise>d exception.\nThe <raise>d exception value is bound to <raised-var>, and\n<raised-var> is then passed to the <cond>-style\n\"(<condition> <expression> ...)\" clauses. If a condition is satisfied, then\n\"<expression> ...\" is executed. <else> matches against all exception types.\n\nFor example:\n  (guard (condition\n           (else\n            (display \"condition: \")\n            (write condition)\n            (newline)\n            'exception))\n    (+ 1 (raise 'an-error)))";
+      return "@help:Syntax:Core\nExecutes \"<body> ...\" while guarding against a <raise>d exception.\nThe <raise>d exception value is bound to <raised-var>, and\n<raised-var> is then passed to the <cond>-style\n\"(<condition> <expression> ...)\" clauses. If a condition is satisfied, then\n\"<expression> ...\" is executed. <else> matches against all exception types.\n\nFor example:\n  (guard (condition\n           (else\n            (display \"condition: \")\n            (write condition)\n            (newline)\n            'exception))\n    (+ 1 (raise 'an-error)))";
     }
 
     private static Symbol parseRaisedVar(Datum raisedVarAndClauses, ArrayList<Datum> parameters) throws Exception {
@@ -2140,7 +2179,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Defines a parameter variable. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nSee <set-parameter!> to set pre-existing parameters.\nSee <get-parameter> to explicitely evaluate a parameter variable.\nSee the <parameter?> <help> entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!";
+      return "@help:Syntax:Core\nDefines a parameter variable. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nSee <set-parameter!> to set pre-existing parameters.\nSee <get-parameter> to explicitely evaluate a parameter variable.\nSee the <parameter?> <help> entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -2167,7 +2206,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Sets an existing parameter variable. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nSee <define-parameter> to create new parameters.\nSee <get-parameter> to explicitely evaluate a parameter variable.\nSee the <parameter?> <help> entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!";
+      return "@help:Syntax:Core\nSets an existing parameter variable. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nSee <define-parameter> to create new parameters.\nSee <get-parameter> to explicitely evaluate a parameter variable.\nSee the <parameter?> <help> entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -2194,7 +2233,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Get a parameter variable's value. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nNote that parameter variables can also just be referenced by name, though\nbeware of shadowing them with a regular <define>!\n\nSee <define-parameter> to create new parameters.\nSee <set-parameter!> to set pre-existing parameters.\nSee the <parameter?> <help> entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!";
+      return "@help:Syntax:Core\nGet a parameter variable's value. Parameter variables are stored in the\n'meta-environment', which all module global environments inherit from.\nThus parameter variable states are shared across modules, and are global in\nscope.\n\nNote that parameter variables can also just be referenced by name, though\nbeware of shadowing them with a regular <define>!\n\nSee <define-parameter> to create new parameters.\nSee <set-parameter!> to set pre-existing parameters.\nSee the <parameter?> <help> entry to determine if a variable is a parameter.\n\nNote that *dosync-lock* is a parameter variable!";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -2221,7 +2260,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "Determine if <name> is a parameter variable. See the <define-parameter>\n<help> entry to learn more about what parameter variables are.";
+      return "@help:Syntax:Core\nDetermine if <name> is a parameter variable. See the <define-parameter>\n<help> entry to learn more about what parameter variables are.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

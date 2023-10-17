@@ -35,7 +35,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Pretty-print <obj> to <output-port> in indented, machine-readable form.\n<output-port> defaults to (current-output-port).\nAliased by \"pprint\".\nNote that this will infinitely loop for cyclical structures!";
+      return "@help:Procedures:IO\nPretty-print <obj> to <output-port> in indented, machine-readable form.\n<output-port> defaults to (current-output-port).\nAliased by \"pprint\".\nNote that this will infinitely loop for cyclical structures!";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -74,7 +74,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Print <obj> to <output-port> in machine-readable form.\n<output-port> defaults to (current-output-port).\nNote that this will infinitely loop for cyclical structures!";
+      return "@help:Procedures:IO\nPrint <obj> to <output-port> in machine-readable form.\n<output-port> defaults to (current-output-port).\nNote that this will infinitely loop for cyclical structures!";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -113,7 +113,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Print <obj> to <output-port> in human-readable form.\n<output-port> defaults to (current-output-port).\nNote that this will infinitely loop for cyclical structures!\nAliased by <print>.";
+      return "@help:Procedures:IO\nPrint <obj> to <output-port> in human-readable form.\n<output-port> defaults to (current-output-port).\nNote that this will infinitely loop for cyclical structures!\nAliased by <print>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -163,7 +163,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Print a newline to <output-port>. Equivalent to: (display \"\\n\").\n<output-port> defaults to (current-output-port).";
+      return "@help:Procedures:IO\nPrint a newline to <output-port>. Equivalent to: (display \"\\n\").\n<output-port> defaults to (current-output-port).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -199,7 +199,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Print <obj> to <output-port> in human-readable form, followed by a newline.\n<output-port> defaults to (current-output-port).\nNote that this will infinitely loop for cyclical structures!";
+      return "@help:Procedures:IO\nPrint <obj> to <output-port> in human-readable form, followed by a newline.\n<output-port> defaults to (current-output-port).\nNote that this will infinitely loop for cyclical structures!";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -238,7 +238,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Pretty-print formatted <format-string> with \"<arg> ...\" to <output-port>\nin indented, machine-readable form. <output-port> defaults to\n(current-output-port).\nAliased by \"pprintf\".\nNote that this will infinitely loop for cyclical structures!\n>> <format-string> is like Java's printf with unique formatting patterns:\n   ----------------------------------------------------------------------\n   %a = display anything\n   %wa = write anything\n   %pa = pretty-print anything\n   ----------------------------------------------------------------------\n   %... = display unpacked list/vector/hashmap\n   %w... = write unpacked list/vector/hashmap\n   %p... = pretty-print unpacked list/vector/hashmap\n   ----------------------------------------------------------------------\n   %n = number\n   %+n = number (show sign if positive too)\n   %,n = number with commas\n   %En = %en = number (coerced to exact)\n   %In = %in = number (coerced to inexact)\n   %#rn = %#Rn = number (in radix <#> from 2 to 36)\n   %#n = number (left-padded with 0s to a width of <#> characters)\n   %.#n = number (with <#> digits of precision)\n   -> IE \"%+e2rn\": make exact in binary with sign\n   -> NOTE: 1) 0-padding & precision MUST be of 2 digits or less!\n            2) Can't have radix with I-coercion or precision!\n   ----------------------------------------------------------------------\n   %$ = display real finite as a dollar value\n   %,$ = display real finite as a dollar value seperated by commas\n   ----------------------------------------------------------------------\n   %s = display string\n   %#s = display string & pad left with # spaces\n   %-#s = display string & pad right with # spaces\n   %ws = write string\n   -> NOTE: padding MUST be of 3 digits or less (ie from -999 to 999)\n   ----------------------------------------------------------------------\n   %b  = bool\n   %wb = write \"true\" or \"false\" instead of \"#t\" or \"#f\"\n   ----------------------------------------------------------------------\n   %%  = \"%\" (escapes a \"%\")\n   ----------------------------------------------------------------------";
+      return "@help:Procedures:IO\nPretty-print formatted <format-string> with \"<arg> ...\" to <output-port>\nin indented, machine-readable form. <output-port> defaults to\n(current-output-port).\nAliased by \"pprintf\".\nNote that this will infinitely loop for cyclical structures!\n>> <format-string> is like Java's printf with unique formatting patterns:\n   ----------------------------------------------------------------------\n   %a = display anything\n   %wa = write anything\n   %pa = pretty-print anything\n   ----------------------------------------------------------------------\n   %... = display unpacked list/vector/hashmap\n   %w... = write unpacked list/vector/hashmap\n   %p... = pretty-print unpacked list/vector/hashmap\n   ----------------------------------------------------------------------\n   %n = number\n   %+n = number (show sign if positive too)\n   %,n = number with commas\n   %En = %en = number (coerced to exact)\n   %In = %in = number (coerced to inexact)\n   %#rn = %#Rn = number (in radix <#> from 2 to 36)\n   %#n = number (left-padded with 0s to a width of <#> characters)\n   %.#n = number (with <#> digits of precision)\n   -> IE \"%+e2rn\": make exact in binary with sign\n   -> NOTE: 1) 0-padding & precision MUST be of 2 digits or less!\n            2) Can't have radix with I-coercion or precision!\n   ----------------------------------------------------------------------\n   %$ = display real finite as a dollar value\n   %,$ = display real finite as a dollar value seperated by commas\n   ----------------------------------------------------------------------\n   %s = display string\n   %#s = display string & pad left with # spaces\n   %-#s = display string & pad right with # spaces\n   %ws = write string\n   -> NOTE: padding MUST be of 3 digits or less (ie from -999 to 999)\n   ----------------------------------------------------------------------\n   %b  = bool\n   %wb = write \"true\" or \"false\" instead of \"#t\" or \"#f\"\n   ----------------------------------------------------------------------\n   %%  = \"%\" (escapes a \"%\")\n   ----------------------------------------------------------------------";
     }
 
     public static ArrayList<Datum> getStringfArgs(ArrayList<Datum> parameters, int argStartIndex) {
@@ -291,7 +291,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Print formatted <format-string> with \"<arg> ...\" to <output-port> in\nmachine-readable form. <output-port> defaults to (current-output-port).\nNote that this will infinitely loop for cyclical structures!\n>> <format-string> is like Java's printf with unique formatting patterns:\n   ----------------------------------------------------------------------\n   %a = display anything\n   %wa = write anything\n   %pa = pretty-print anything\n   ----------------------------------------------------------------------\n   %... = display unpacked list/vector/hashmap\n   %w... = write unpacked list/vector/hashmap\n   %p... = pretty-print unpacked list/vector/hashmap\n   ----------------------------------------------------------------------\n   %n = number\n   %+n = number (show sign if positive too)\n   %,n = number with commas\n   %En = %en = number (coerced to exact)\n   %In = %in = number (coerced to inexact)\n   %#rn = %#Rn = number (in radix <#> from 2 to 36)\n   %#n = number (left-padded with 0s to a width of <#> characters)\n   %.#n = number (with <#> digits of precision)\n   -> IE \"%+e2rn\": make exact in binary with sign\n   -> NOTE: 1) 0-padding & precision MUST be of 2 digits or less!\n            2) Can't have radix with I-coercion or precision!\n   ----------------------------------------------------------------------\n   %$ = display real finite as a dollar value\n   %,$ = display real finite as a dollar value seperated by commas\n   ----------------------------------------------------------------------\n   %s = display string\n   %#s = display string & pad left with # spaces\n   %-#s = display string & pad right with # spaces\n   %ws = write string\n   -> NOTE: padding MUST be of 3 digits or less (ie from -999 to 999)\n   ----------------------------------------------------------------------\n   %b  = bool\n   %wb = write \"true\" or \"false\" instead of \"#t\" or \"#f\"\n   ----------------------------------------------------------------------\n   %%  = \"%\" (escapes a \"%\")\n   ----------------------------------------------------------------------";
+      return "@help:Procedures:IO\nPrint formatted <format-string> with \"<arg> ...\" to <output-port> in\nmachine-readable form. <output-port> defaults to (current-output-port).\nNote that this will infinitely loop for cyclical structures!\n>> <format-string> is like Java's printf with unique formatting patterns:\n   ----------------------------------------------------------------------\n   %a = display anything\n   %wa = write anything\n   %pa = pretty-print anything\n   ----------------------------------------------------------------------\n   %... = display unpacked list/vector/hashmap\n   %w... = write unpacked list/vector/hashmap\n   %p... = pretty-print unpacked list/vector/hashmap\n   ----------------------------------------------------------------------\n   %n = number\n   %+n = number (show sign if positive too)\n   %,n = number with commas\n   %En = %en = number (coerced to exact)\n   %In = %in = number (coerced to inexact)\n   %#rn = %#Rn = number (in radix <#> from 2 to 36)\n   %#n = number (left-padded with 0s to a width of <#> characters)\n   %.#n = number (with <#> digits of precision)\n   -> IE \"%+e2rn\": make exact in binary with sign\n   -> NOTE: 1) 0-padding & precision MUST be of 2 digits or less!\n            2) Can't have radix with I-coercion or precision!\n   ----------------------------------------------------------------------\n   %$ = display real finite as a dollar value\n   %,$ = display real finite as a dollar value seperated by commas\n   ----------------------------------------------------------------------\n   %s = display string\n   %#s = display string & pad left with # spaces\n   %-#s = display string & pad right with # spaces\n   %ws = write string\n   -> NOTE: padding MUST be of 3 digits or less (ie from -999 to 999)\n   ----------------------------------------------------------------------\n   %b  = bool\n   %wb = write \"true\" or \"false\" instead of \"#t\" or \"#f\"\n   ----------------------------------------------------------------------\n   %%  = \"%\" (escapes a \"%\")\n   ----------------------------------------------------------------------";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -337,7 +337,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Print formatted <format-string> with \"<arg> ...\" to <output-port> in\nhuman-readable form. <output-port> defaults to (current-output-port).\nNote that this will infinitely loop for cyclical structures!\nAliased by <printf>.\n>> <format-string> is like Java's printf with unique formatting patterns:\n   ----------------------------------------------------------------------\n   %a = display anything\n   %wa = write anything\n   %pa = pretty-print anything\n   ----------------------------------------------------------------------\n   %... = display unpacked list/vector/hashmap\n   %w... = write unpacked list/vector/hashmap\n   %p... = pretty-print unpacked list/vector/hashmap\n   ----------------------------------------------------------------------\n   %n = number\n   %+n = number (show sign if positive too)\n   %,n = number with commas\n   %En = %en = number (coerced to exact)\n   %In = %in = number (coerced to inexact)\n   %#rn = %#Rn = number (in radix <#> from 2 to 36)\n   %#n = number (left-padded with 0s to a width of <#> characters)\n   %.#n = number (with <#> digits of precision)\n   -> IE \"%+e2rn\": make exact in binary with sign\n   -> NOTE: 1) 0-padding & precision MUST be of 2 digits or less!\n            2) Can't have radix with I-coercion or precision!\n   ----------------------------------------------------------------------\n   %$ = display real finite as a dollar value\n   %,$ = display real finite as a dollar value seperated by commas\n   ----------------------------------------------------------------------\n   %s = display string\n   %#s = display string & pad left with # spaces\n   %-#s = display string & pad right with # spaces\n   %ws = write string\n   -> NOTE: padding MUST be of 3 digits or less (ie from -999 to 999)\n   ----------------------------------------------------------------------\n   %b  = bool\n   %wb = write \"true\" or \"false\" instead of \"#t\" or \"#f\"\n   ----------------------------------------------------------------------\n   %%  = \"%\" (escapes a \"%\")\n   ----------------------------------------------------------------------";
+      return "@help:Procedures:IO\nPrint formatted <format-string> with \"<arg> ...\" to <output-port> in\nhuman-readable form. <output-port> defaults to (current-output-port).\nNote that this will infinitely loop for cyclical structures!\nAliased by <printf>.\n>> <format-string> is like Java's printf with unique formatting patterns:\n   ----------------------------------------------------------------------\n   %a = display anything\n   %wa = write anything\n   %pa = pretty-print anything\n   ----------------------------------------------------------------------\n   %... = display unpacked list/vector/hashmap\n   %w... = write unpacked list/vector/hashmap\n   %p... = pretty-print unpacked list/vector/hashmap\n   ----------------------------------------------------------------------\n   %n = number\n   %+n = number (show sign if positive too)\n   %,n = number with commas\n   %En = %en = number (coerced to exact)\n   %In = %in = number (coerced to inexact)\n   %#rn = %#Rn = number (in radix <#> from 2 to 36)\n   %#n = number (left-padded with 0s to a width of <#> characters)\n   %.#n = number (with <#> digits of precision)\n   -> IE \"%+e2rn\": make exact in binary with sign\n   -> NOTE: 1) 0-padding & precision MUST be of 2 digits or less!\n            2) Can't have radix with I-coercion or precision!\n   ----------------------------------------------------------------------\n   %$ = display real finite as a dollar value\n   %,$ = display real finite as a dollar value seperated by commas\n   ----------------------------------------------------------------------\n   %s = display string\n   %#s = display string & pad left with # spaces\n   %-#s = display string & pad right with # spaces\n   %ws = write string\n   -> NOTE: padding MUST be of 3 digits or less (ie from -999 to 999)\n   ----------------------------------------------------------------------\n   %b  = bool\n   %wb = write \"true\" or \"false\" instead of \"#t\" or \"#f\"\n   ----------------------------------------------------------------------\n   %%  = \"%\" (escapes a \"%\")\n   ----------------------------------------------------------------------";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -389,7 +389,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Read an EScheme datum from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.";
+      return "@help:Procedures:IO\nRead an EScheme datum from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -423,7 +423,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Read an EScheme datum from the string. Returns a pair:\n  (cons <read-datum> <string-w/o-read-datum>)";
+      return "@help:Procedures:IO\nRead an EScheme datum from the string. Returns a pair:\n  (cons <read-datum> <string-w/o-read-datum>)";
     }
 
     private static SourceInformation createPseudoSourceInformation(escm.type.String string) {
@@ -460,7 +460,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Read a line of text as a string from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.";
+      return "@help:Procedures:IO\nRead a line of text as a string from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -496,7 +496,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Read a char from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.";
+      return "@help:Procedures:IO\nRead a char from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -532,7 +532,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Read <integer> chars as a string from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.";
+      return "@help:Procedures:IO\nRead <integer> chars as a string from <input-port>.\n<input-port> defaults to (current-input-port).\nReturns #eof once reached <input-port>'s end.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -571,7 +571,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is the #eof object.";
+      return "@help:Procedures:IO\nReturns whether <obj> is the #eof object.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

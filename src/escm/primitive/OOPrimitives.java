@@ -48,7 +48,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Called by <class> to generate a <class> object from parsed components.";
+      return "@help:Procedures:OOP\nCalled by <class> to generate a <class> object from parsed components.";
     }
 
     // Returns <null> if <name-keyword> DNE
@@ -152,7 +152,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Called by <interface> to generate a <interface> object from parsed components.";
+      return "@help:Procedures:OOP\nCalled by <interface> to generate a <interface> object from parsed components.";
     }
 
     // Returns <null> if <super> DNE
@@ -230,7 +230,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a meta-object. Equivalent to:\n  (or (class? <obj>) (interface? <obj>) (object? <obj>))";
+      return "@help:Procedures:OOP\nReturns whether <obj> is a meta-object. Equivalent to:\n  (or (class? <obj>) (interface? <obj>) (object? <obj>))";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -254,7 +254,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is an <interface> (as created by <interface> or <define-interface>).";
+      return "@help:Procedures:OOP\nReturns whether <obj> is an <interface> (as created by <interface> or <define-interface>).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -278,7 +278,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a <class> (as created by <class> or <define-class>).\nClasses can be applied to invoke their constructor.";
+      return "@help:Procedures:OOP\nReturns whether <obj> is a <class> (as created by <class> or <define-class>).\nClasses can be applied to invoke their constructor.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -302,7 +302,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is an <object> (as created by a class constructor).\nObjects can become functors by defining a <->procedure> method.";
+      return "@help:Procedures:OOP\nReturns whether <obj> is an <object> (as created by a class constructor).\nObjects can become functors by defining a <->procedure> method.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -326,7 +326,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is an applicable object. Equivalent to:\n  (and (object? <obj>) (oo-has? <obj> '->procedure))";
+      return "@help:Procedures:OOP\nReturns whether <obj> is an applicable object. Equivalent to:\n  (and (object? <obj>) (oo-has? <obj> '->procedure))";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -353,7 +353,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <object> is an instance of the <class> or <interface>.";
+      return "@help:Procedures:OOP\nReturns whether <object> is an instance of the <class> or <interface>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -502,7 +502,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <meta-object> contains \"<property-symbol-name> ...\" as a property chain.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.";
+      return "@help:Procedures:OOP\nReturns whether <meta-object> contains \"<property-symbol-name> ...\" as a property chain.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -531,7 +531,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Returns the \"<property-symbol-name> ...\" property of <meta-object>.\nTriggers an error upon failure.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.";
+      return "@help:Procedures:OOP\nReturns the \"<property-symbol-name> ...\" property of <meta-object>.\nTriggers an error upon failure.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -565,7 +565,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Sets the \"<property-symbol-name> ...\" property of <meta-object> to <value>.\nTriggers an error upon failure.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.";
+      return "@help:Procedures:OOP\nSets the \"<property-symbol-name> ...\" property of <meta-object> to <value>.\nTriggers an error upon failure.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -604,7 +604,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Defines the \"<property-symbol-name> ...\" property of <meta-object> to be <value>.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.";
+      return "@help:Procedures:OOP\nDefines the \"<property-symbol-name> ...\" property of <meta-object> to be <value>.\n  => NOTE: Only operates on static values if <meta-object> is a class or interface.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -642,7 +642,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Returns the super meta-object of <object> or <class>.";
+      return "@help:Procedures:OOP\nReturns the super meta-object of <object> or <class>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -679,7 +679,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Returns the list of interfaces implemented by <meta-object>.";
+      return "@help:Procedures:OOP\nReturns the list of interfaces implemented by <meta-object>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -710,7 +710,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Returns a list of <meta-object>'s property name symbols.\nFor classes and interfaces, it also denotes whether the property is static or not.";
+      return "@help:Procedures:OOP\nReturns a list of <meta-object>'s property name symbols.\nFor classes and interfaces, it also denotes whether the property is static or not.";
     }
 
     private static Keyword STATIC_KEYWORD = new Keyword("static");
@@ -816,7 +816,7 @@ public class OOPrimitives {
     }
 
     public String docstring() {
-      return "Called by <super!> in the process of updating an object's super object\nduring construction.";
+      return "@help:Procedures:OOP\nCalled by <super!> in the process of updating an object's super object\nduring construction.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

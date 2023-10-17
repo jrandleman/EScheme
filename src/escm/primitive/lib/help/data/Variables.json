@@ -1,0 +1,64 @@
+[{
+  "name": "#path",
+  "description": "Reader literal that expands to the current file's parent path as a string."
+}, {
+  "name": "*argv*",
+  "description": "A list of the command-line arguments as strings."
+}, {
+  "name": "*file-separator*",
+  "description": "The file seperator string used by the host operating system."
+}, {
+  "name": "*path-separator*",
+  "description": "The path seperator (think environment variables) string used\nby the host operating system."
+}, {
+  "name": "*os-name*",
+  "description": "String of the host operating system's name.\n#f if lacking security permission to access such."
+}, {
+  "name": "*os-version*",
+  "description": "String of the host operating system's version.\n#f if lacking security permission to access such."
+}, {
+  "name": "*os-architecture*",
+  "description": "String of the host operating system's architecture.\n#f if lacking security permission to access such."
+}, {
+  "name": "*user-name*",
+  "description": "String of the system's active user name.\n#f if lacking security permission to access such."
+}, {
+  "name": "*user-home*",
+  "description": "String of the system's user home directory.\n#f if lacking security permission to access such."
+}, {
+  "name": "*escm-path*",
+  "description": "Path string to the hosting EScheme implementation's directory."
+}, {
+  "name": "*escm-version*",
+  "description": "String representing the current EScheme version number."
+}, {
+  "name": "*escm-execution-command*",
+  "description": "Execution command to run EScheme on the host machine. For example,\nthe below would run \"script.scm\" in a seperate process:\n  (system (append *escm-execution-command* \"script.scm\"))"
+}, {
+  "name": "*dosync-lock*",
+  "description": "Mutex lock used by <dosync>. Defined as a parameter, hence maintains the same\nstate across modules."
+}, {
+  "name": "*dosync-module-lock*",
+  "description": "Mutex lock used by <dosync-module>. Defined as a global variable, hence has\nunique state per module."
+}, {
+  "name": "*generator-complete*",
+  "description": "Variable that resolves to the value returned by generators\n(see <define-generator>) upon completion."
+}, {
+  "name": "*min-radix*",
+  "description": "Variable denoting the smallest radix supported by\n<string->number> and <number->string>. Generally 2.\nAlso check out <*max-radix*>!"
+}, {
+  "name": "*max-radix*",
+  "description": "Variable denoting the largest radix supported by\n<string->number> and <number->string>. Generally 36.\nAlso check out <*min-radix*>!"
+}, {
+  "name": "*min-priority*",
+  "description": "Variable denoting the smallest thread-priority supported by\n<thread-set-priority!>. Also check out <*max-priority*>!"
+}, {
+  "name": "*max-priority*",
+  "description": "Variable denoting the largest thread-priority supported by\n<thread-set-priority!>. Also check out <*min-priority*>!"
+}, {
+  "name": "*import*",
+  "description": "Variable denoting whether the current file was loaded via <import> or not.\nCan combine with <unless> to mimic Python's \"if __name__=='__main__':\" pattern:\n\n  (unless *import*\n    <execute-main-escheme-code-here> ...)"
+}, {
+  "name": "*load-once-files*",
+  "description": "Hashmap that stores the set of files already loaded by the current module.\nUsed by <load-once>."
+}]

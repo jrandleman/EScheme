@@ -44,6 +44,11 @@ public class Environment implements Serializable {
     return superEnv;
   }
 
+  // Used by <HelpPrimitive>.
+  public ConcurrentHashMap<String,Datum> bindings() {
+    return bindings;
+  }
+
   public Datum bindingsAsAssocList() {
     Datum alist = Nil.VALUE;
     for(ConcurrentHashMap.Entry<String,Datum> binding : bindings.entrySet())

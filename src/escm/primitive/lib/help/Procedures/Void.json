@@ -1,7 +1,0 @@
-[{
-  "name": "void?",
-  "aliases": null,
-  "signatures": ["(void? <obj>)"],
-  "description": "Returns whether <obj> has type #<void>.\nReturned by mutative actions like <set!>.",
-  "example": null
-}]

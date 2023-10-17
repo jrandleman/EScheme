@@ -34,7 +34,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Create a new string by appending each displayed argument together.\n\nRepresents a Java <string> under the hood (hence immutable).\nLiterals are denoted via double-quotes.\n\nStrings support the following control characters:\n  1) \"\\t\": tab,             represented as a char by #\\tab\n  2) \"\\n\": newline,         represented as a char by #\\newline\n  3) \"\\f\": form feed,       represented as a char by #\\page\n  4) \"\\r\": carriage return, represented as a char by #\\return\n  5) \"\\b\": backspace,       represented as a char by #\\backspace\n\nOctal literals may be used by prefixing up to 6 octal digits with \"\\\", ranging from\n\\0-\\177777 (0-65535 in decimal). This range ensures that each value fits neatly\nwithin a single 16bit Java char internally.\n  => Note this extends Java's octals, which only support \\0-\\377 (0-255 in decimal).\n\nJava 16bit unicode literals may be used by prefixing up to 4 hex digits with \"\\u\".\n  => Adjacent unicode literals may be used to create \"surrogate pairs\" that render\n     as a single unicode image for unicode values that require 32bit encoding.\n\nEScheme also extends Java unicode literals with syntax for 32bit unicode values.\nPrefixing up to 8 hex digits with \"\\U\" compiles to 2 seperate \"\\u\" instances.\n  => For example, both \"\\U1f608\" and \"\\ud83d\\ude08\" create the same string, but the\n     former is easier to write out after referencing the \"U+\" code from the internet.";
+      return "@help:Procedures:Strings\nCreate a new string by appending each displayed argument together.\n\nRepresents a Java <string> under the hood (hence immutable).\nLiterals are denoted via double-quotes.\n\nStrings support the following control characters:\n  1) \"\\t\": tab,             represented as a char by #\\tab\n  2) \"\\n\": newline,         represented as a char by #\\newline\n  3) \"\\f\": form feed,       represented as a char by #\\page\n  4) \"\\r\": carriage return, represented as a char by #\\return\n  5) \"\\b\": backspace,       represented as a char by #\\backspace\n\nOctal literals may be used by prefixing up to 6 octal digits with \"\\\", ranging from\n\\0-\\177777 (0-65535 in decimal). This range ensures that each value fits neatly\nwithin a single 16bit Java char internally.\n  => Note this extends Java's octals, which only support \\0-\\377 (0-255 in decimal).\n\nJava 16bit unicode literals may be used by prefixing up to 4 hex digits with \"\\u\".\n  => Adjacent unicode literals may be used to create \"surrogate pairs\" that render\n     as a single unicode image for unicode values that require 32bit encoding.\n\nEScheme also extends Java unicode literals with syntax for 32bit unicode values.\nPrefixing up to 8 hex digits with \"\\U\" compiles to 2 seperate \"\\u\" instances.\n  => For example, both \"\\U1f608\" and \"\\ud83d\\ude08\" create the same string, but the\n     former is easier to write out after referencing the \"U+\" code from the internet.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -57,7 +57,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns the length of <string>, with surrogate pairs counting as 2 chars.";
+      return "@help:Procedures:Strings\nReturns the length of <string>, with surrogate pairs counting as 2 chars.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -80,7 +80,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns <string> entirely upper-cased.";
+      return "@help:Procedures:Strings\nReturns <string> entirely upper-cased.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -103,7 +103,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns <string> entirely lower-cased.";
+      return "@help:Procedures:Strings\nReturns <string> entirely lower-cased.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -126,7 +126,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns <string> with special characters escaped (like when printing via <write>).\nNote that this escapes surrogate pairs using EScheme's custom \"\\U\" syntax.\n<string-java-escape> should be used to escape such with 2 \"\\u\" instances.";
+      return "@help:Procedures:Strings\nReturns <string> with special characters escaped (like when printing via <write>).\nNote that this escapes surrogate pairs using EScheme's custom \"\\U\" syntax.\n<string-java-escape> should be used to escape such with 2 \"\\u\" instances.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -149,7 +149,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns <string> with special characters escaped (like when printing via <write>).\nNote that this escapes surrogate pairs using 2 \"\\u\" instances.\n<string-escape> should be used to escape such with EScheme's custom \"\\U\" syntax.";
+      return "@help:Procedures:Strings\nReturns <string> with special characters escaped (like when printing via <write>).\nNote that this escapes surrogate pairs using 2 \"\\u\" instances.\n<string-escape> should be used to escape such with EScheme's custom \"\\U\" syntax.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -172,7 +172,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns <string> with special characters unescaped (like when printing via\n<display>). Note that this also unescapes EScheme's custom \"\\U\" syntax.";
+      return "@help:Procedures:Strings\nReturns <string> with special characters unescaped (like when printing via\n<display>). Note that this also unescapes EScheme's custom \"\\U\" syntax.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -195,7 +195,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Replaces all instances of <regex-string> in <string> with <replacement-string>.";
+      return "@help:Procedures:Strings\nReplaces all instances of <regex-string> in <string> with <replacement-string>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -222,7 +222,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns a string with the whitespace removed from both ends of <string>.";
+      return "@help:Procedures:Strings\nReturns a string with the whitespace removed from both ends of <string>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -245,7 +245,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns the first index of <substring> in <string> if present, or #f if it isn't.";
+      return "@help:Procedures:Strings\nReturns the first index of <substring> in <string> if present, or #f if it isn't.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -270,7 +270,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns the last index of <substring> in <string> if present, or #f if it isn't.";
+      return "@help:Procedures:Strings\nReturns the last index of <substring> in <string> if present, or #f if it isn't.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -295,7 +295,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether <string> starts with <prefix-string>. Also see <string-suffix?>.";
+      return "@help:Procedures:Strings\nReturns whether <string> starts with <prefix-string>. Also see <string-suffix?>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -318,7 +318,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether <string> ends with <suffix-string>. Also see <string-prefix?>.";
+      return "@help:Procedures:Strings\nReturns whether <string> ends with <suffix-string>. Also see <string-prefix?>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -343,7 +343,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns a string made from joining the strings in <string-list> by splicing\n<joiner-string> (defaults to \"\") between each item.";
+      return "@help:Procedures:Strings\nReturns a string made from joining the strings in <string-list> by splicing\n<joiner-string> (defaults to \"\") between each item.";
     }
     
     private static java.lang.String getJoinerString(ArrayList<Datum> parameters) throws Exception {
@@ -390,7 +390,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns a list of strings made from splitting <string> at each\n<splitter-regex> instance. Defaults to splitting into characters.";
+      return "@help:Procedures:Strings\nReturns a list of strings made from splitting <string> at each\n<splitter-regex> instance. Defaults to splitting into characters.";
     }
     
     private static java.lang.String getSplitterString(ArrayList<Datum> parameters) throws Exception {
@@ -444,7 +444,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Unfolds a string from left to right, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded string, and <update-callable> increments <seed> for the\nnext round of unfolding.\n\nNote that the result of <mapper-callable> must always be a character.";
+      return "@help:Procedures:Strings\nUnfolds a string from left to right, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded string, and <update-callable> increments <seed> for the\nnext round of unfolding.\n\nNote that the result of <mapper-callable> must always be a character.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -475,7 +475,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Unfolds a string from right to left, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded string, and <update-callable> increments <seed> for the\nnext round of unfolding.\n\nNote that the result of <mapper-callable> must always be a character.";
+      return "@help:Procedures:Strings\nUnfolds a string from right to left, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded string, and <update-callable> increments <seed> for the\nnext round of unfolding.\n\nNote that the result of <mapper-callable> must always be a character.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -506,7 +506,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether \"<string> <string> ...\" are equal to one another (case-sensitive).";
+      return "@help:Procedures:Strings\nReturns whether \"<string> <string> ...\" are equal to one another (case-sensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -541,7 +541,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether \"<string> <string> ...\" are < one another (case-sensitive).";
+      return "@help:Procedures:Strings\nReturns whether \"<string> <string> ...\" are < one another (case-sensitive).";
     }
 
     // @PRECONDITION: <parameters.size() >= 1>
@@ -581,7 +581,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether \"<string> <string> ...\" are > one another (case-sensitive).";
+      return "@help:Procedures:Strings\nReturns whether \"<string> <string> ...\" are > one another (case-sensitive).";
     }
 
     // @PRECONDITION: <parameters.size() >= 1>
@@ -621,7 +621,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether \"<string> <string> ...\" are <= one another (case-sensitive).";
+      return "@help:Procedures:Strings\nReturns whether \"<string> <string> ...\" are <= one another (case-sensitive).";
     }
 
     // @PRECONDITION: <parameters.size() >= 1>
@@ -661,7 +661,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether \"<string> <string> ...\" are >= one another (case-sensitive).";
+      return "@help:Procedures:Strings\nReturns whether \"<string> <string> ...\" are >= one another (case-sensitive).";
     }
 
     // @PRECONDITION: <parameters.size() >= 1>
@@ -701,7 +701,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether \"<string> <string> ...\" are equal to one another (case-insensitive).";
+      return "@help:Procedures:Strings\nReturns whether \"<string> <string> ...\" are equal to one another (case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -736,7 +736,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether \"<string> <string> ...\" are < one another (case-insensitive).";
+      return "@help:Procedures:Strings\nReturns whether \"<string> <string> ...\" are < one another (case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -771,7 +771,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether \"<string> <string> ...\" are > one another (case-insensitive).";
+      return "@help:Procedures:Strings\nReturns whether \"<string> <string> ...\" are > one another (case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -806,7 +806,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether \"<string> <string> ...\" are <= one another (case-insensitive).";
+      return "@help:Procedures:Strings\nReturns whether \"<string> <string> ...\" are <= one another (case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -841,7 +841,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether \"<string> <string> ...\" are >= one another (case-insensitive).";
+      return "@help:Procedures:Strings\nReturns whether \"<string> <string> ...\" are >= one another (case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -876,7 +876,7 @@ public class StringPrimitives {
     }
 
     public java.lang.String docstring() {
-      return "Returns whether <obj> is a string.";
+      return "@help:Procedures:Strings\nReturns whether <obj> is a string.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

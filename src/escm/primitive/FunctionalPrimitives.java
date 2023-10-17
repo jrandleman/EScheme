@@ -32,7 +32,7 @@ public class FunctionalPrimitives {
     }
 
     public String docstring() {
-      return "Returns <obj>. Useful for certain higher-level procedures.";
+      return "@help:Procedures:Functional\nReturns <obj>. Useful for certain higher-level procedures.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -55,7 +55,7 @@ public class FunctionalPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a procedure.\nPrefer <callable?> for more generic code.";
+      return "@help:Procedures:Functional\nReturns whether <obj> is a procedure.\nPrefer <callable?> for more generic code.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -78,7 +78,7 @@ public class FunctionalPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is applicable. Equivalent to:\n  (or (procedure? <obj>)\n      (functor? <obj>)\n      (class? <obj>)\n      (string? <obj>)\n      (vector? <obj>)\n      (hashmap? <obj>))";
+      return "@help:Procedures:Functional\nReturns whether <obj> is applicable. Equivalent to:\n  (or (procedure? <obj>)\n      (functor? <obj>)\n      (class? <obj>)\n      (string? <obj>)\n      (vector? <obj>)\n      (hashmap? <obj>))";
     }
 
     public static boolean logic(Datum d) {
@@ -106,7 +106,7 @@ public class FunctionalPrimitives {
     }
 
     public String docstring() {
-      return "Create a new, variadic procedure that is the composition of \"<callable> ...\".\nAliased by <*> if only given callables.";
+      return "@help:Procedures:Functional\nCreate a new, variadic procedure that is the composition of \"<callable> ...\".\nAliased by <*> if only given callables.";
     }
 
     private static Trampoline.Bounce applyComposedCallables(Datum result, int i, ArrayList<Datum> parameters, Trampoline.Continuation cont) throws Exception {
@@ -161,7 +161,7 @@ public class FunctionalPrimitives {
     }
 
     public String docstring() {
-      return "Create a new procedure by binding \"<arg> ...\" as arguments to <callable>.\nAliased by <+> if only given non-<associative-collection> callables.";
+      return "@help:Procedures:Functional\nCreate a new procedure by binding \"<arg> ...\" as arguments to <callable>.\nAliased by <+> if only given non-<associative-collection> callables.";
     }
 
     public static Datum logic(ArrayList<Datum> parameters) throws Exception {

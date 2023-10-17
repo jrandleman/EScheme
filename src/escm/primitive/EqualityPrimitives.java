@@ -25,7 +25,7 @@ public class EqualityPrimitives {
     }
 
     public String docstring() {
-      return "Determines shallow equality for objects that maintain state.";
+      return "@help:Procedures:Equality\nDetermines shallow equality for objects that maintain state.";
     }
 
     public static Datum logic(ArrayList<Datum> parameters) {
@@ -54,7 +54,7 @@ public class EqualityPrimitives {
     }
 
     public String docstring() {
-      return "Determines deep equality for objects.\nNote that this will infinitely loop for cyclical structures!";
+      return "@help:Procedures:Equality\nDetermines deep equality for objects.\nNote that this will infinitely loop for cyclical structures!";
     }
 
     public static Datum logic(ArrayList<Datum> parameters) {

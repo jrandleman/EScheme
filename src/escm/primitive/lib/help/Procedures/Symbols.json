@@ -1,7 +1,0 @@
-[{
-  "name": "symbol?",
-  "aliases": null,
-  "signatures": ["(symbol? <obj>)"],
-  "description": "Returns whether <obj> is a symbol.",
-  "example": null
-}]

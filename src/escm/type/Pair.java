@@ -86,6 +86,10 @@ public class Pair extends Datum implements OrderedCollection {
     return d instanceof Nil || (d instanceof Pair && ((Pair)d).length != DOTTED_LIST_LENGTH);
   }
 
+  public static boolean isListPair(Datum d) {
+    return d instanceof Pair && ((Pair)d).length != DOTTED_LIST_LENGTH;
+  }
+
   public static boolean isDottedList(Datum d) {
     return d instanceof Pair && ((Pair)d).length == DOTTED_LIST_LENGTH;
   }

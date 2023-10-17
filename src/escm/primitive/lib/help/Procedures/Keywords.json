@@ -1,7 +1,0 @@
-[{
-  "name": "keyword?",
-  "aliases": null,
-  "signatures": ["(keyword? <obj>)"],
-  "description": "Returns whether <obj> is a keyword.",
-  "example": null
-}]

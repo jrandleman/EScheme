@@ -33,7 +33,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Get the contents of <filename-string> as an EScheme data structure.";
+      return "@help:Procedures:Files\nGet the contents of <filename-string> as an EScheme data structure.";
     }
     
     private static Datum convertReadExpressionsToReadExpression(ArrayList<Datum> contents) {
@@ -97,7 +97,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Get the contents of <filename-string> as a string.";
+      return "@help:Procedures:Files\nGet the contents of <filename-string> as a string.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -120,7 +120,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Write <obj> to <filename-string> using machine-readable syntax.\nNote that this will infinitely loop for cyclical structures!";
+      return "@help:Procedures:Files\nWrite <obj> to <filename-string> using machine-readable syntax.\nNote that this will infinitely loop for cyclical structures!";
     }
     
     public static void writeStringToFile(String filename, String str, String callerName) throws Exception {
@@ -160,7 +160,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Append <obj> to <filename-string> using machine-readable syntax.\nNote that this will infinitely loop for cyclical structures!";
+      return "@help:Procedures:Files\nAppend <obj> to <filename-string> using machine-readable syntax.\nNote that this will infinitely loop for cyclical structures!";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -184,7 +184,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Write <obj> to <filename-string> using human-readable syntax.\nNote that this will infinitely loop for cyclical structures!";
+      return "@help:Procedures:Files\nWrite <obj> to <filename-string> using human-readable syntax.\nNote that this will infinitely loop for cyclical structures!";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -208,7 +208,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Append <obj> to <filename-string> using human-readable syntax.\nNote that this will infinitely loop for cyclical structures!";
+      return "@help:Procedures:Files\nAppend <obj> to <filename-string> using human-readable syntax.\nNote that this will infinitely loop for cyclical structures!";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -232,7 +232,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Write <obj> to <filename-string> using indented machine-readable syntax.\nNote that this will infinitely loop for cyclical structures!";
+      return "@help:Procedures:Files\nWrite <obj> to <filename-string> using indented machine-readable syntax.\nNote that this will infinitely loop for cyclical structures!";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -256,7 +256,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Append <obj> to <filename-string> using indented machine-readable syntax.\nNote that this will infinitely loop for cyclical structures!";
+      return "@help:Procedures:Files\nAppend <obj> to <filename-string> using indented machine-readable syntax.\nNote that this will infinitely loop for cyclical structures!";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -280,7 +280,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <path-string> is a path (directory or file) that exists on the\nsystem.";
+      return "@help:Procedures:Files\nReturns whether <path-string> is a path (directory or file) that exists on the\nsystem.";
     }
 
     public static boolean logic(Path p) {
@@ -311,7 +311,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <directory-path-string> is a directory path.";
+      return "@help:Procedures:Files\nReturns whether <directory-path-string> is a directory path.";
     }
 
     public static boolean logic(Path p) {
@@ -342,7 +342,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <file-path-string> is a file path.";
+      return "@help:Procedures:Files\nReturns whether <file-path-string> is a file path.";
     }
 
     public static boolean logic(Path p) {
@@ -373,7 +373,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Deletes <file-path-string>. Returns the deletion's success status.";
+      return "@help:Procedures:Files\nDeletes <file-path-string>. Returns the deletion's success status.";
     }
 
     public static boolean logic(Path p) {
@@ -404,7 +404,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Deletes <directory-path-string> if its empty. Returns the deletion's success status.";
+      return "@help:Procedures:Files\nDeletes <directory-path-string> if its empty. Returns the deletion's success status.";
     }
 
     public static boolean logic(Path p) {
@@ -436,7 +436,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Deletes <directory-path-string> and its contents. Returns the deletion's success status.";
+      return "@help:Procedures:Files\nDeletes <directory-path-string> and its contents. Returns the deletion's success status.";
     }
 
     private static boolean deleteDirectoryContents(Path dirPath) throws Exception {
@@ -483,7 +483,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Deletes <path-string> by dispatching to <file-delete!> or <directory-delete!>.\nReturns the deletion's success status.";
+      return "@help:Procedures:Files\nDeletes <path-string> by dispatching to <file-delete!> or <directory-delete!>.\nReturns the deletion's success status.";
     }
 
     public static boolean logic(Path p) {
@@ -514,7 +514,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Deletes <path-string> by dispatching to <file-delete!> or <directory-recursive-delete!>.\nReturns the deletion's success status.";
+      return "@help:Procedures:Files\nDeletes <path-string> by dispatching to <file-delete!> or <directory-recursive-delete!>.\nReturns the deletion's success status.";
     }
 
     public static boolean logic(Path p) {
@@ -550,7 +550,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return  "Returns a list of the directory entry paths in <directory-path-string>.\nReturns \"#f\" if <directory-path-string> doesn't denote a directory.";
+      return "@help:Procedures:Files\nReturns a list of the directory entry paths in <directory-path-string>.\nReturns \"#f\" if <directory-path-string> doesn't denote a directory.";
     }
 
     public static Datum logic(Path p) throws Exception {
@@ -582,7 +582,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Returns a list of the directory entry paths in <directory-path-string>, WITHOUT dot-files.\nNote that \"dot-file\" here refers to file names starting with \".\".\nReturns \"#f\" if <directory-path-string> doesn't denote a directory.";
+      return "@help:Procedures:Files\nReturns a list of the directory entry paths in <directory-path-string>, WITHOUT dot-files.\nNote that \"dot-file\" here refers to file names starting with \".\".\nReturns \"#f\" if <directory-path-string> doesn't denote a directory.";
     }
 
     public static Datum logic(Path p) throws Exception {
@@ -617,7 +617,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Get the current working directory's absolute path as a string.\n\nNote that <current-directory> refers to the directory that launched\nthe current process. Use #path if you instead want to refer to the\ndirectory of the current file.";
+      return "@help:Procedures:Files\nGet the current working directory's absolute path as a string.\n\nNote that <current-directory> refers to the directory that launched\nthe current process. Use #path if you instead want to refer to the\ndirectory of the current file.";
     }
 
     public static String logic() throws Exception {
@@ -644,7 +644,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Create a path by combining \"<string> ...\" with <*file-separator*> between each\ncomponent. Yields an absolute path. Passing no arguments is equivalent to\n(current-directory).";
+      return "@help:Procedures:Files\nCreate a path by combining \"<string> ...\" with <*file-separator*> between each\ncomponent. Yields an absolute path. Passing no arguments is equivalent to\n(current-directory).";
     }
 
     private static boolean hasTerminalSeparator(String s) {
@@ -704,7 +704,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Get <path-string>'s parent path. Returns #f if <path-string> doesn't have a\nparent. <positive-integer> denotes how many parents in the chain to go up\n(1 by default).";
+      return "@help:Procedures:Files\nGet <path-string>'s parent path. Returns #f if <path-string> doesn't have a\nparent. <positive-integer> denotes how many parents in the chain to go up\n(1 by default).";
     }
 
     // Returns <null> on failure
@@ -757,7 +757,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Get <path-string>'s file name. Returns #f if <path-string> is empty.";
+      return "@help:Procedures:Files\nGet <path-string>'s file name. Returns #f if <path-string> is empty.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -782,7 +782,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Create <path-string> as a directory.\nFails if any directory midway in <path-string> doesn't exist.\nReturns whether succeeded.";
+      return "@help:Procedures:Files\nCreate <path-string> as a directory.\nFails if any directory midway in <path-string> doesn't exist.\nReturns whether succeeded.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -805,7 +805,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Create <path-string> as a directory.\nCreates intermediate directories as needed while creating <path-string>.\nReturns whether succeeded.";
+      return "@help:Procedures:Files\nCreate <path-string> as a directory.\nCreates intermediate directories as needed while creating <path-string>.\nReturns whether succeeded.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -828,7 +828,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Returns the absolute path of <path-string>.";
+      return "@help:Procedures:Files\nReturns the absolute path of <path-string>.";
     }
 
     public static String logic(String pathStr) {
@@ -863,7 +863,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <path-string> is an absolute path. Note that this is different\nfrom <path?>: checks path structure, not whether it exists on the current\nsystem. Effectively: (equal? <path-string> (absolute-path <path-string>))";
+      return "@help:Procedures:Files\nReturns whether <path-string> is an absolute path. Note that this is different\nfrom <path?>: checks path structure, not whether it exists on the current\nsystem. Effectively: (equal? <path-string> (absolute-path <path-string>))";
     }
 
     public static boolean logic(String path) {
@@ -903,7 +903,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Get the file extension of <path-string>. Returns #f if non-existant.";
+      return "@help:Procedures:Files\nGet the file extension of <path-string>. Returns #f if non-existant.";
     }
 
     public static String logic(String pathStr) {
@@ -937,7 +937,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <path-string> has <extension-string> as its file extension.";
+      return "@help:Procedures:Files\nReturns whether <path-string> has <extension-string> as its file extension.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -968,7 +968,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Returns <path-string> with <new-extension-string> as its file extension.";
+      return "@help:Procedures:Files\nReturns <path-string> with <new-extension-string> as its file extension.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1004,7 +1004,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Returns <path-string> without its extension, including the \".\".\nReturns <path-string> if it doesn't have an extension or is an invalid path.";
+      return "@help:Procedures:Files\nReturns <path-string> without its extension, including the \".\".\nReturns <path-string> if it doesn't have an extension or is an invalid path.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1036,7 +1036,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Return the size of <file-path-string> in bytes.\nPlatform-dependant result if <file-path-string> is a directory.";
+      return "@help:Procedures:Files\nReturn the size of <file-path-string> in bytes.\nPlatform-dependant result if <file-path-string> is a directory.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1063,7 +1063,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Move <old-path-string> to be at <new-path-string> instead.\nTriggers an error if <new-path-string> already exists, or if\nany of the intermediate directories in <new-path-string> don't exist.";
+      return "@help:Procedures:Files\nMove <old-path-string> to be at <new-path-string> instead.\nTriggers an error if <new-path-string> already exists, or if\nany of the intermediate directories in <new-path-string> don't exist.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1097,7 +1097,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Move <old-path-string> to be at <new-path-string> instead.\nReplaces <new-path-string> if it already exists, and creates\nany intermediate directories in <new-path-string> as needed.\nReturns whether succeeded.";
+      return "@help:Procedures:Files\nMove <old-path-string> to be at <new-path-string> instead.\nReplaces <new-path-string> if it already exists, and creates\nany intermediate directories in <new-path-string> as needed.\nReturns whether succeeded.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1138,7 +1138,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Copy <old-path-string> to <new-path-string>.\nTriggers an error if <new-path-string> already exists, or if\nany of the intermediate directories in <new-path-string> don't exist.";
+      return "@help:Procedures:Files\nCopy <old-path-string> to <new-path-string>.\nTriggers an error if <new-path-string> already exists, or if\nany of the intermediate directories in <new-path-string> don't exist.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1172,7 +1172,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "Copy <old-path-string> to <new-path-string>.\nReplaces <new-path-string> if it already exists, and creates\nany intermediate directories in <new-path-string> as needed.\nReturns whether succeeded.";
+      return "@help:Procedures:Files\nCopy <old-path-string> to <new-path-string>.\nReplaces <new-path-string> if it already exists, and creates\nany intermediate directories in <new-path-string> as needed.\nReturns whether succeeded.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

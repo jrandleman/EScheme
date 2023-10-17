@@ -54,7 +54,7 @@ public class GeneratorPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a result of <define-generator>.";
+      return "@help:Syntax:Generators\nReturns whether <obj> is a result of <define-generator>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -105,7 +105,7 @@ public class GeneratorPrimitives {
     }
 
     public String docstring() {
-      return "Pause the current execution of the generator and return <obj> (#void by\ndefault). Only valid within the \"<body> ...\" of <define-generator>.";
+      return "@help:Syntax:Generators\nPause the current execution of the generator and return <obj> (#void by\ndefault). Only valid within the \"<body> ...\" of <define-generator>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -167,7 +167,7 @@ public class GeneratorPrimitives {
     }
 
     public String docstring() {
-      return "Define a generator constructor! Calling <generator-name>\nreturns a generator thunk, which can suspend its operation\n(until it gets invoked again) via the <yield> macro.\n\nNote that due to being a \"generator-constructor\", <generator-name>\nshould not be called recursively to emulate looping.\nInstead, define an inner procedure or use the \"named let\" construct.\n\nOptionally include <docstring> to yield further details on the generator\nconstructor's intended purpose in the <help> menu.\n\nAliased by <defgen>.\nFor example:\n  ;; Printing Numbers and Strings:\n  (define-generator (print-numbers start total)\n    (let loop ((i start))\n      (if (< i total)\n            (begin \n              (write i)\n              (display \" \")\n              (yield) ; pause execution until re-invoked\n              (loop (+ i 1))))))\n  \n  (define-generator (print-strings start total)\n    (let loop ((i start))\n      (if (< i total)\n            (begin \n              (write (number->string i))\n              (display \" \")\n              (yield) ; pause execution until re-invoked\n              (loop (+ i 1))))))\n  \n  (complete-all-generators! (print-numbers 0 10) (print-strings 0 10))\n  (newline)\n  \n  \n  ;; Creating a stream of integers from a starting number (0 by default):\n  (define-generator (ints-from (start 0))\n    (let loop ((n start))\n      (yield n)\n      (loop (+ n 1))))\n  \n  (define ints (ints-from 42))\n  (display (ints)) \n  (newline)\n  (display (ints)) \n  (newline)\n  (display (ints)) \n  (newline)";
+      return "@help:Syntax:Generators\nDefine a generator constructor! Calling <generator-name>\nreturns a generator thunk, which can suspend its operation\n(until it gets invoked again) via the <yield> macro.\n\nNote that due to being a \"generator-constructor\", <generator-name>\nshould not be called recursively to emulate looping.\nInstead, define an inner procedure or use the \"named let\" construct.\n\nOptionally include <docstring> to yield further details on the generator\nconstructor's intended purpose in the <help> menu.\n\nAliased by <defgen>.\nFor example:\n  ;; Printing Numbers and Strings:\n  (define-generator (print-numbers start total)\n    (let loop ((i start))\n      (if (< i total)\n            (begin \n              (write i)\n              (display \" \")\n              (yield) ; pause execution until re-invoked\n              (loop (+ i 1))))))\n  \n  (define-generator (print-strings start total)\n    (let loop ((i start))\n      (if (< i total)\n            (begin \n              (write (number->string i))\n              (display \" \")\n              (yield) ; pause execution until re-invoked\n              (loop (+ i 1))))))\n  \n  (complete-all-generators! (print-numbers 0 10) (print-strings 0 10))\n  (newline)\n  \n  \n  ;; Creating a stream of integers from a starting number (0 by default):\n  (define-generator (ints-from (start 0))\n    (let loop ((n start))\n      (yield n)\n      (loop (+ n 1))))\n  \n  (define ints (ints-from 42))\n  (display (ints)) \n  (newline)\n  (display (ints)) \n  (newline)\n  (display (ints)) \n  (newline)";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -225,7 +225,7 @@ public class GeneratorPrimitives {
     }
 
     public String docstring() {
-      return "Continues cycling through the generators until they all complete.";
+      return "@help:Syntax:Generators\nContinues cycling through the generators until they all complete.";
     }
 
     private Trampoline.Bounce iterate(ArrayList<Datum> parameters, int finishedCount, int n, Pair generatorObjects, Datum remainingObjects, Trampoline.Continuation continuation) throws Exception {
@@ -275,7 +275,7 @@ public class GeneratorPrimitives {
     }
 
     public String docstring() {
-      return "Continues cycling through the generators until at least <n> of them have completed.";
+      return "@help:Syntax:Generators\nContinues cycling through the generators until at least <n> of them have completed.";
     }
 
     private Trampoline.Bounce iterate(ArrayList<Datum> parameters, int finishedCount, int n, Pair generatorObjects, Datum remainingObjects, Trampoline.Continuation continuation) throws Exception {

@@ -27,7 +27,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a character value.";
+      return "@help:Procedures:Characters\nReturns whether <obj> is a character value.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -50,7 +50,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is alphabetic.";
+      return "@help:Procedures:Characters\nReturns whether <char> is alphabetic.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -73,7 +73,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is numeric.";
+      return "@help:Procedures:Characters\nReturns whether <char> is numeric.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -96,7 +96,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is whitespace.";
+      return "@help:Procedures:Characters\nReturns whether <char> is whitespace.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -119,7 +119,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is uppercase.";
+      return "@help:Procedures:Characters\nReturns whether <char> is uppercase.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -142,7 +142,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is lowercase.";
+      return "@help:Procedures:Characters\nReturns whether <char> is lowercase.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -165,7 +165,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is alphabetic or numeric.";
+      return "@help:Procedures:Characters\nReturns whether <char> is alphabetic or numeric.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -189,7 +189,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is a control character.";
+      return "@help:Procedures:Characters\nReturns whether <char> is a control character.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -212,7 +212,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is a punctuation character.";
+      return "@help:Procedures:Characters\nReturns whether <char> is a punctuation character.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -235,7 +235,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is a graph character, equivalent to:\n  (or (char-alphanumeric? <char>) (char-punctuation? <char>))";
+      return "@help:Procedures:Characters\nReturns whether <char> is a graph character, equivalent to:\n  (or (char-alphanumeric? <char>) (char-punctuation? <char>))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -259,7 +259,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is printable, equivalent to:\n  (or (char-graph? <char>) (eq? #\\space <char>))";
+      return "@help:Procedures:Characters\nReturns whether <char> is printable, equivalent to:\n  (or (char-graph? <char>) (eq? #\\space <char>))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -283,7 +283,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is a hexadecimal digit.";
+      return "@help:Procedures:Characters\nReturns whether <char> is a hexadecimal digit.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -307,7 +307,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns the upper-case version of <char>.";
+      return "@help:Procedures:Characters\nReturns the upper-case version of <char>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -330,7 +330,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns the upper-case version of <char>.";
+      return "@help:Procedures:Characters\nReturns the upper-case version of <char>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -353,7 +353,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<char> ...\" are equal to one another.";
+      return "@help:Procedures:Characters\nReturns whether \"<char> ...\" are equal to one another.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -383,7 +383,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<char> ...\" are less than one another.";
+      return "@help:Procedures:Characters\nReturns whether \"<char> ...\" are less than one another.";
     }
 
     // @PRECONDITION: <parameters.size() >= 1>
@@ -423,7 +423,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<char> ...\" are greater than one another.";
+      return "@help:Procedures:Characters\nReturns whether \"<char> ...\" are greater than one another.";
     }
 
     // @PRECONDITION: <parameters.size() >= 1>
@@ -463,7 +463,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<char> ...\" are less than or equal to one another.";
+      return "@help:Procedures:Characters\nReturns whether \"<char> ...\" are less than or equal to one another.";
     }
 
     // @PRECONDITION: <parameters.size() >= 1>
@@ -503,7 +503,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<char> ...\" are greater than or equal to one another.";
+      return "@help:Procedures:Characters\nReturns whether \"<char> ...\" are greater than or equal to one another.";
     }
 
     // @PRECONDITION: <parameters.size() >= 1>
@@ -543,7 +543,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<char> ...\" are equal to one another (case-insensitive).";
+      return "@help:Procedures:Characters\nReturns whether \"<char> ...\" are equal to one another (case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -573,7 +573,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<char> ...\" are less than one another (case-insensitive).";
+      return "@help:Procedures:Characters\nReturns whether \"<char> ...\" are less than one another (case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -605,7 +605,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<char> ...\" are greater than one another (case-insensitive).";
+      return "@help:Procedures:Characters\nReturns whether \"<char> ...\" are greater than one another (case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -637,7 +637,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<char> ...\" are less than or equal to one another\n(case-insensitive).";
+      return "@help:Procedures:Characters\nReturns whether \"<char> ...\" are less than or equal to one another\n(case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -669,7 +669,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether \"<char> ...\" are greater than or equal to one another\n(case-insensitive).";
+      return "@help:Procedures:Characters\nReturns whether \"<char> ...\" are greater than or equal to one another\n(case-insensitive).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -701,7 +701,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is a 32bit surrogate java char pair. Used to represent\n32bit unicode values, such codepoints become 2 java chars once stringified.\nNote that all EScheme string operations are codepoint-relative though! Hence a\nstring with a single surrogate java char pair in it will have a <length> of 1.\n\nSee <java-char?> to determine if a <char> is a 16bit unicode value, and\nsee <ascii-char?> to determine if a <char> is an ASCII value.";
+      return "@help:Procedures:Characters\nReturns whether <char> is a 32bit surrogate java char pair. Used to represent\n32bit unicode values, such codepoints become 2 java chars once stringified.\nNote that all EScheme string operations are codepoint-relative though! Hence a\nstring with a single surrogate java char pair in it will have a <length> of 1.\n\nSee <java-char?> to determine if a <char> is a 16bit unicode value, and\nsee <ascii-char?> to determine if a <char> is an ASCII value.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -724,7 +724,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is a 16bit java char, correlating to exactly 1 char\nwithin strings under the hood. Note that all EScheme string operations are\ncodepoint-relative though! Hence a string with a single surrogate java\nchar pair in it will have a <length> of 1.\n\nSee <char-pair?> to determine if a <char> is a 32bit unicode value, and\nsee <ascii-char?> to determine if a <char> is an ASCII value.";
+      return "@help:Procedures:Characters\nReturns whether <char> is a 16bit java char, correlating to exactly 1 char\nwithin strings under the hood. Note that all EScheme string operations are\ncodepoint-relative though! Hence a string with a single surrogate java\nchar pair in it will have a <length> of 1.\n\nSee <char-pair?> to determine if a <char> is a 32bit unicode value, and\nsee <ascii-char?> to determine if a <char> is an ASCII value.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -747,7 +747,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is an 8bit ascii char, correlating to exactly 1 char\nwithin strings under the hood. Note that all EScheme string operations are\ncodepoint-relative though! Hence a string with a single surrogate java\nchar pair in it will have a <length> of 1.\n\nSee <char-pair?> to determine if a <char> is a 32bit unicode value, and\nsee <java-char?> to determine if a <char> is a 16bit unicode value.";
+      return "@help:Procedures:Characters\nReturns whether <char> is an 8bit ascii char, correlating to exactly 1 char\nwithin strings under the hood. Note that all EScheme string operations are\ncodepoint-relative though! Hence a string with a single surrogate java\nchar pair in it will have a <length> of 1.\n\nSee <char-pair?> to determine if a <char> is a 32bit unicode value, and\nsee <java-char?> to determine if a <char> is a 16bit unicode value.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -770,7 +770,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns the number of java chars <char> stringifies to.\nReturns 2 if (char-pair? <char>), else returns 1.";
+      return "@help:Procedures:Characters\nReturns the number of java chars <char> stringifies to.\nReturns 2 if (char-pair? <char>), else returns 1.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -795,7 +795,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns the digit represented by <char> in <radix> (defaults to 36).\nReturns #f if <radix> is an invalid non-negative int or <char> isn't a digit.";
+      return "@help:Procedures:Characters\nReturns the digit represented by <char> in <radix> (defaults to 36).\nReturns #f if <radix> is an invalid non-negative int or <char> isn't a digit.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -830,7 +830,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns the char representing digit <integer> in <radix> (defaults to 36).\nReturns #f if <radix> is an invalid non-negative int or <integer> isn't a digit.";
+      return "@help:Procedures:Characters\nReturns the char representing digit <integer> in <radix> (defaults to 36).\nReturns #f if <radix> is an invalid non-negative int or <integer> isn't a digit.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -863,7 +863,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns <char>'s name as a string, or #f if its an unassigned unicode value.";
+      return "@help:Procedures:Characters\nReturns <char>'s name as a string, or #f if its an unassigned unicode value.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -888,7 +888,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is an unassigned unicode value.";
+      return "@help:Procedures:Characters\nReturns whether <char> is an unassigned unicode value.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -911,7 +911,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is the high portion of a 32bit surrogate char pair.";
+      return "@help:Procedures:Characters\nReturns whether <char> is the high portion of a 32bit surrogate char pair.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -935,7 +935,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <char> is the low portion of a 32bit surrogate char pair.";
+      return "@help:Procedures:Characters\nReturns whether <char> is the low portion of a 32bit surrogate char pair.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -959,7 +959,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns the high portion of <char> if it's a 32 surrogate pair.\nIf (java-char? <char>), returns #f.";
+      return "@help:Procedures:Characters\nReturns the high portion of <char> if it's a 32 surrogate pair.\nIf (java-char? <char>), returns #f.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -984,7 +984,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns the low portion of <char> if it's a 32 surrogate pair.\nIf (java-char? <char>), returns #f.";
+      return "@help:Procedures:Characters\nReturns the low portion of <char> if it's a 32 surrogate pair.\nIf (java-char? <char>), returns #f.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1009,7 +1009,7 @@ public class CharacterPrimitives {
     }
 
     public String docstring() {
-      return "Returns a new character formed by combining <high-char> & <low-char> into\na single 32bit surrogate char pair.\nReturns #f if (not (and (char-high? <high-char>) (char-low? <low-char>)))";
+      return "@help:Procedures:Characters\nReturns a new character formed by combining <high-char> & <low-char> into\na single 32bit surrogate char pair.\nReturns #f if (not (and (char-high? <high-char>) (char-low? <low-char>)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

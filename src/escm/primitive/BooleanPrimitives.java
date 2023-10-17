@@ -24,7 +24,7 @@ public class BooleanPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a boolean value (#t or #f).";
+      return "@help:Procedures:Booleans\nReturns whether <obj> is a boolean value (#t or #f).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -47,7 +47,7 @@ public class BooleanPrimitives {
     }
 
     public String docstring() {
-      return "Returns #t if <obj> is #f, otherwise #t.";
+      return "@help:Procedures:Booleans\nReturns #t if <obj> is #f, otherwise #t.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

@@ -42,7 +42,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "Return a list containing \"<obj> ...\". Given no args, returns '().\nLists are right-nested pairs ending in nil: '()\nCreate list literals via the (<literal> ...) syntax.";
+      return "@help:Procedures:Lists\nReturn a list containing \"<obj> ...\". Given no args, returns '().\nLists are right-nested pairs ending in nil: '()\nCreate list literals via the (<literal> ...) syntax.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -66,7 +66,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "Return a dotted.list containing \"<obj> <obj> ...\".";
+      return "@help:Procedures:Lists\nReturn a dotted.list containing \"<obj> <obj> ...\".";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -92,7 +92,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "Unfolds a list from left to right, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded list, and <update-callable> increments <seed> for the\nnext round of unfolding.";
+      return "@help:Procedures:Lists\nUnfolds a list from left to right, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded list, and <update-callable> increments <seed> for the\nnext round of unfolding.";
     }
 
     public static Trampoline.Bounce logic(Datum acc, Callable breakCond, Callable mapper, Callable successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
@@ -140,7 +140,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "Unfolds a list from right to left, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded list, and <update-callable> increments <seed> for the\nnext round of unfolding.";
+      return "@help:Procedures:Lists\nUnfolds a list from right to left, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded list, and <update-callable> increments <seed> for the\nnext round of unfolding.";
     }
 
     public static Trampoline.Bounce logic(Datum acc, Callable breakCond, Callable mapper, Callable successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
@@ -186,7 +186,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "Returns the sublist in <list> starting with <obj> based on <eq?> item\nequality. Returns #f if <obj> isn't in <list>.";
+      return "@help:Procedures:Lists\nReturns the sublist in <list> starting with <obj> based on <eq?> item\nequality. Returns #f if <obj> isn't in <list>.";
     }
 
     private static Symbol EQP_SYMBOL = new Symbol("eq?");
@@ -231,7 +231,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "Returns the sublist in <list> starting with <obj> based on <equal?> item\nequality. Returns #f if <obj> isn't in <list>.";
+      return "@help:Procedures:Lists\nReturns the sublist in <list> starting with <obj> based on <equal?> item\nequality. Returns #f if <obj> isn't in <list>.";
     }
 
     private static Symbol EQUALP_SYMBOL = new Symbol("equal?");
@@ -264,7 +264,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "Returns the pair in associative-lsit <alist> starting with <key> based\non <eq?> item equality. Returns #f if <obj> isn't a key in in <alist>.";
+      return "@help:Procedures:Lists\nReturns the pair in associative-lsit <alist> starting with <key> based\non <eq?> item equality. Returns #f if <obj> isn't a key in in <alist>.";
     }
 
     public static Trampoline.Bounce logic(Callable eqp, String fcnName, Datum originalList, Datum key, Datum iterator, Trampoline.Continuation continuation) throws Exception {
@@ -304,7 +304,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "Returns the pair in associative-lsit <alist> starting with <key> based\non <equal?> item equality. Returns #f if <obj> isn't a key in in <alist>.";
+      return "@help:Procedures:Lists\nReturns the pair in associative-lsit <alist> starting with <key> based\non <equal?> item equality. Returns #f if <obj> isn't a key in in <alist>.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -329,7 +329,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a proper list.";
+      return "@help:Procedures:Lists\nReturns whether <obj> is a proper list.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -352,7 +352,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a dotted-list.";
+      return "@help:Procedures:Lists\nReturns whether <obj> is a dotted-list.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -375,7 +375,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is an associative list (list of pairs).";
+      return "@help:Procedures:Lists\nReturns whether <obj> is an associative list (list of pairs).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -405,7 +405,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is nill (a.k.a. '() and #nil).";
+      return "@help:Procedures:Lists\nReturns whether <obj> is nill (a.k.a. '() and #nil).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

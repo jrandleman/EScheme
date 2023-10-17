@@ -34,7 +34,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is an associative collection:\n    String | List | Vector | Hashmap";
+      return "@help:Procedures:Associative-Collections\nReturns whether <obj> is an associative collection:\n    String | List | Vector | Hashmap";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -57,7 +57,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Get the first item in <ac>.";
+      return "@help:Procedures:Associative-Collections\nGet the first item in <ac>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -80,7 +80,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Get everything after the first item in <ac>.";
+      return "@help:Procedures:Associative-Collections\nGet everything after the first item in <ac>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -103,7 +103,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <ac> is empty.";
+      return "@help:Procedures:Associative-Collections\nReturns whether <ac> is empty.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -126,7 +126,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <ac>'s length. Aliased by <len>.";
+      return "@help:Procedures:Associative-Collections\nReturns <ac>'s length. Aliased by <len>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -152,7 +152,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <ac>'s length. If <ac> is a dotted-list, returns #f.\nThis is instead of triggering an error, as <length> would.";
+      return "@help:Procedures:Associative-Collections\nReturns <ac>'s length. If <ac> is a dotted-list, returns #f.\nThis is instead of triggering an error, as <length> would.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -177,7 +177,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Accumulate the values in \"<ac> ...\" from left to right by applying\n<callable> to \"<previous-result>\" and <item> with <seed-obj> acting\nas the initial \"<previous-result>\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
+      return "@help:Procedures:Associative-Collections\nAccumulate the values in \"<ac> ...\" from left to right by applying\n<callable> to \"<previous-result>\" and <item> with <seed-obj> acting\nas the initial \"<previous-result>\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -210,7 +210,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Creates a new associative collection by applying <callable> to each item in\n\"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
+      return "@help:Procedures:Associative-Collections\nCreates a new associative collection by applying <callable> to each item in\n\"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -243,7 +243,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Applies <callable> to each item in \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
+      return "@help:Procedures:Associative-Collections\nApplies <callable> to each item in \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -276,7 +276,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Creates a new associative collection by filtering items in <ac> that don't\nsatisfy the <keep?-callable> callable.";
+      return "@help:Procedures:Associative-Collections\nCreates a new associative collection by filtering items in <ac> that don't\nsatisfy the <keep?-callable> callable.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -303,7 +303,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Count the number of times <predicate?-callable> is satisfied in <ac>.";
+      return "@help:Procedures:Associative-Collections\nCount the number of times <predicate?-callable> is satisfied in <ac>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -330,7 +330,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Creates a new associative collection by removing items in <ac> that\nsatisfy the <predicate?-callable> callable.";
+      return "@help:Procedures:Associative-Collections\nCreates a new associative collection by removing items in <ac> that\nsatisfy the <predicate?-callable> callable.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -357,7 +357,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Get the value in <ac> associated to <key>.";
+      return "@help:Procedures:Associative-Collections\nGet the value in <ac> associated to <key>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -382,7 +382,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Get the first key in <ac> who's associated value satisfies <predicate?-callable>.";
+      return "@help:Procedures:Associative-Collections\nGet the first key in <ac> who's associated value satisfies <predicate?-callable>.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -415,7 +415,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Aliased by <+>. Given nothing, returns NIL. Given '<obj>', returns <obj>.\n\nGiven '<symbol> ...':\n  Returns a new symbol of '<symbol> ...' concatenated with one another.\n\nGiven '<keyword> ...':\n  Returns a new keyword of '<keyword> ...' concatenated with one another.\n\nGiven '<ac> ...':\n  Creates a new associative collection by appending '<ac> ...' together.\n\n    => Note that the '<ac> ...' values will have their types unified according\n       to the following hierarchy: String < List < Vector < Hashmap";
+      return "@help:Procedures:Associative-Collections\nAliased by <+>. Given nothing, returns NIL. Given '<obj>', returns <obj>.\n\nGiven '<symbol> ...':\n  Returns a new symbol of '<symbol> ...' concatenated with one another.\n\nGiven '<keyword> ...':\n  Returns a new keyword of '<keyword> ...' concatenated with one another.\n\nGiven '<ac> ...':\n  Creates a new associative collection by appending '<ac> ...' together.\n\n    => Note that the '<ac> ...' values will have their types unified according\n       to the following hierarchy: String < List < Vector < Hashmap";
     }
 
     private static Symbol appendSymbols(ArrayList<Datum> parameters) throws Exception {
@@ -509,7 +509,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Return a copy of <ac> without <key>'s association.";
+      return "@help:Procedures:Associative-Collections\nReturn a copy of <ac> without <key>'s association.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -536,7 +536,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Given 3 args:\n  Returns a copy of <ac> with <val> associated to <key>.\nGiven 2 args:\n  Returns a copy of <oc> with <val> added as efficiently as possible.\n  <val>'s position will depend on <ac>'s specific collection type.\nNote:\n  <ac> denotes an associative-collection\n  <oc> denotes an ordered-collection";
+      return "@help:Procedures:Associative-Collections\nGiven 3 args:\n  Returns a copy of <ac> with <val> associated to <key>.\nGiven 2 args:\n  Returns a copy of <oc> with <val> added as efficiently as possible.\n  <val>'s position will depend on <ac>'s specific collection type.\nNote:\n  <ac> denotes an associative-collection\n  <oc> denotes an ordered-collection";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -566,7 +566,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <length> items taken from the left of <ac>.";
+      return "@help:Procedures:Associative-Collections\nReturns <length> items taken from the left of <ac>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -593,7 +593,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns <ac> with <length> items dropped from its left side.";
+      return "@help:Procedures:Associative-Collections\nReturns <ac> with <length> items dropped from its left side.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -620,7 +620,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether any of the <ac>s satisfy <predicate?-callable>.";
+      return "@help:Procedures:Associative-Collections\nReturns whether any of the <ac>s satisfy <predicate?-callable>.";
     }
 
     private Trampoline.Bounce iter(Callable predicate, ArrayList<Datum> parameters, int i, int n, Trampoline.Continuation continuation) throws Exception {
@@ -656,7 +656,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether every one of the <ac>s satisfy <predicate?-callable>.";
+      return "@help:Procedures:Associative-Collections\nReturns whether every one of the <ac>s satisfy <predicate?-callable>.";
     }
 
     private Trampoline.Bounce iter(Callable predicate, ArrayList<Datum> parameters, int i, int n, Trampoline.Continuation continuation) throws Exception {
@@ -692,7 +692,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Convert <ac> to a string (note that its keys must be increasing integers\nstarting from 0, and its values must be characters).";
+      return "@help:Procedures:Associative-Collections\nConvert <ac> to a string (note that its keys must be increasing integers\nstarting from 0, and its values must be characters).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -715,7 +715,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Convert <ac> to a list (note that its keys must be increasing integers starting\nfrom 0).";
+      return "@help:Procedures:Associative-Collections\nConvert <ac> to a list (note that its keys must be increasing integers starting\nfrom 0).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -738,7 +738,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Convert <ac> to a vector (note that its keys must be increasing integers\nstarting from 0).";
+      return "@help:Procedures:Associative-Collections\nConvert <ac> to a vector (note that its keys must be increasing integers\nstarting from 0).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -761,7 +761,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Convert <ac> to a hashmap.";
+      return "@help:Procedures:Associative-Collections\nConvert <ac> to a hashmap.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -784,7 +784,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns the set union of values (compared by <elt=?>) in \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
+      return "@help:Procedures:Associative-Collections\nReturns the set union of values (compared by <elt=?>) in \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -812,7 +812,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns the intersection of values (compared by <elt=?>) between \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
+      return "@help:Procedures:Associative-Collections\nReturns the intersection of values (compared by <elt=?>) between \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -840,7 +840,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns the set difference of values (compared by <elt=?>) in \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
+      return "@help:Procedures:Associative-Collections\nReturns the set difference of values (compared by <elt=?>) in \"<ac> ...\".\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -868,7 +868,7 @@ public class AssociativeCollectionPrimitives {
     }
 
     public String docstring() {
-      return "Returns the set symmetric-difference of values (compared by <elt=?>) in\n\"<ac> ...\". SymDiff(a,b) = Union(Diff(a,b),Diff(b,a))\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
+      return "@help:Procedures:Associative-Collections\nReturns the set symmetric-difference of values (compared by <elt=?>) in\n\"<ac> ...\". SymDiff(a,b) = Union(Diff(a,b),Diff(b,a))\n\n  => Note that the \"<ac> ...\" values will have their types unified according\n     to the following hierarchy: String < List < Vector < Hashmap";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {

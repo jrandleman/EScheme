@@ -25,7 +25,7 @@ public class VoidPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> has type #<void>.\nReturned by mutative actions like <set!>.";
+      return "@help:Procedures:Void\nReturns whether <obj> has type #<void>.\nReturned by mutative actions like <set!>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

@@ -34,7 +34,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Construct a vector containing \"<obj> ...\".\nCreate vector literals via the [<item> ...] syntax.\nVectors are applicable to an index to get an entry: (<vector> <index>)";
+      return "@help:Procedures:Vectors\nConstruct a vector containing \"<obj> ...\".\nCreate vector literals via the [<item> ...] syntax.\nVectors are applicable to an index to get an entry: (<vector> <index>)";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -55,7 +55,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Construct a vector of <length> instances of <fill-value>.";
+      return "@help:Procedures:Vectors\nConstruct a vector of <length> instances of <fill-value>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -82,7 +82,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Sets the entry at <index> in <vector> to be <obj>.";
+      return "@help:Procedures:Vectors\nSets the entry at <index> in <vector> to be <obj>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -113,7 +113,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Fill all of <vector> with <fill-value>.";
+      return "@help:Procedures:Vectors\nFill all of <vector> with <fill-value>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -137,7 +137,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Grow <vector> by <length> items set to <fill-value>.";
+      return "@help:Procedures:Vectors\nGrow <vector> by <length> items set to <fill-value>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -168,7 +168,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Insert <obj> at <index> in <vector>, shifting back following items as needed.";
+      return "@help:Procedures:Vectors\nInsert <obj> at <index> in <vector>, shifting back following items as needed.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -199,7 +199,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Deletes the entry at <index> in <vector>. Returns the deleted item.";
+      return "@help:Procedures:Vectors\nDeletes the entry at <index> in <vector>. Returns the deleted item.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -228,7 +228,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Pushes <obj> to the back of <vector>.";
+      return "@help:Procedures:Vectors\nPushes <obj> to the back of <vector>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -256,7 +256,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Pushes <obj> to the front of <vector>.";
+      return "@help:Procedures:Vectors\nPushes <obj> to the front of <vector>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -284,7 +284,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Pops <obj> from the back of <vector>. Returns the popped item.";
+      return "@help:Procedures:Vectors\nPops <obj> from the back of <vector>. Returns the popped item.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -307,7 +307,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Pops <obj> from the front of <vector>. Returns the popped item.";
+      return "@help:Procedures:Vectors\nPops <obj> from the front of <vector>. Returns the popped item.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -330,7 +330,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Append \"<appended-vector> ...\" to <vector> (thereby mutating it).";
+      return "@help:Procedures:Vectors\nAppend \"<appended-vector> ...\" to <vector> (thereby mutating it).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -364,7 +364,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Unfolds a vector from left to right, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded vector, and <update-callable> increments <seed> for the\nnext round of unfolding.";
+      return "@help:Procedures:Vectors\nUnfolds a vector from left to right, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded vector, and <update-callable> increments <seed> for the\nnext round of unfolding.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -395,7 +395,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Unfolds a vector from right to left, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded vector, and <update-callable> increments <seed> for the\nnext round of unfolding.";
+      return "@help:Procedures:Vectors\nUnfolds a vector from right to left, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded vector, and <update-callable> increments <seed> for the\nnext round of unfolding.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -426,7 +426,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Returns the index of <obj> in <vector>, or #f if its missing.\nUses <eq?> for comparisons.";
+      return "@help:Procedures:Vectors\nReturns the index of <obj> in <vector>, or #f if its missing.\nUses <eq?> for comparisons.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -453,7 +453,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Returns the index of <obj> in <vector>, or #f if its missing.\nUses <equal?> for comparisons.";
+      return "@help:Procedures:Vectors\nReturns the index of <obj> in <vector>, or #f if its missing.\nUses <equal?> for comparisons.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -480,7 +480,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a vector.";
+      return "@help:Procedures:Vectors\nReturns whether <obj> is a vector.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

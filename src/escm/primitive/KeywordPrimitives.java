@@ -25,7 +25,7 @@ public class KeywordPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a keyword.";
+      return "@help:Procedures:Keywords\nReturns whether <obj> is a keyword.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

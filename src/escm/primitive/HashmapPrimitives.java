@@ -28,7 +28,7 @@ public class HashmapPrimitives {
     }
 
     public String docstring() {
-      return "Construct a hashmap containing key-value associations of \"<key> <value> ...\".\nCreate hashmap literals via the {<key> <value> ...} syntax.\nHashmaps are applicable to a key to get their entry: (<hashmap> <key>)";
+      return "@help:Procedures:Hashmaps\nConstruct a hashmap containing key-value associations of \"<key> <value> ...\".\nCreate hashmap literals via the {<key> <value> ...} syntax.\nHashmaps are applicable to a key to get their entry: (<hashmap> <key>)";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -55,7 +55,7 @@ public class HashmapPrimitives {
     }
 
     public String docstring() {
-      return "Get the keys of <hashmap> as a list.";
+      return "@help:Procedures:Hashmaps\nGet the keys of <hashmap> as a list.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -78,7 +78,7 @@ public class HashmapPrimitives {
     }
 
     public String docstring() {
-      return "Get the values of <hashmap> as a list.";
+      return "@help:Procedures:Hashmaps\nGet the values of <hashmap> as a list.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -101,7 +101,7 @@ public class HashmapPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a key in <hashmap>.";
+      return "@help:Procedures:Hashmaps\nReturns whether <obj> is a key in <hashmap>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -127,7 +127,7 @@ public class HashmapPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a value in <hashmap>.";
+      return "@help:Procedures:Hashmaps\nReturns whether <obj> is a value in <hashmap>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -153,7 +153,7 @@ public class HashmapPrimitives {
     }
 
     public String docstring() {
-      return "Associate <value> to <key> in <hashmap>.\nReturns whether replaced an existing value.";
+      return "@help:Procedures:Hashmaps\nAssociate <value> to <key> in <hashmap>.\nReturns whether replaced an existing value.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -179,7 +179,7 @@ public class HashmapPrimitives {
     }
 
     public String docstring() {
-      return "Delete <key>'s association in <hashmap>. Returns whether succeeded.";
+      return "@help:Procedures:Hashmaps\nDelete <key>'s association in <hashmap>. Returns whether succeeded.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -205,7 +205,7 @@ public class HashmapPrimitives {
     }
 
     public String docstring() {
-      return "Returns a new <hashmap> combining all of the associations in \"<hashmap> ...\".";
+      return "@help:Procedures:Hashmaps\nReturns a new <hashmap> combining all of the associations in \"<hashmap> ...\".";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -234,7 +234,7 @@ public class HashmapPrimitives {
     }
 
     public String docstring() {
-      return "Combine all of the associations in \"<merged-hashmap> ...\" into <hashmap>.";
+      return "@help:Procedures:Hashmaps\nCombine all of the associations in \"<merged-hashmap> ...\" into <hashmap>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -268,7 +268,7 @@ public class HashmapPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a hashmap.";
+      return "@help:Procedures:Hashmaps\nReturns whether <obj> is a hashmap.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -291,7 +291,7 @@ public class HashmapPrimitives {
     }
 
     public String docstring() {
-      return "Returns the hashcode of \"<obj> ...\" combined with one another.\nUnused by any of the other hashmap primitives, but hey, it\ncould be useful to expose to users.";
+      return "@help:Procedures:Hashmaps\nReturns the hashcode of \"<obj> ...\" combined with one another.\nUnused by any of the other hashmap primitives, but hey, it\ncould be useful to expose to users.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

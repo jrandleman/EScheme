@@ -67,7 +67,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Create a stream-pair of \"<obj> <obj>\". Streams don't evaluate their\nitems until the items are accessed via <scar>, <scdr>, <scaar>, etc.\nCreate a stream by nesting stream pairs that end with (quote ()) [think lists].";
+      return "@help:Syntax:Streams\nCreate a stream-pair of \"<obj> <obj>\". Streams don't evaluate their\nitems until the items are accessed via <scar>, <scdr>, <scaar>, etc.\nCreate a stream by nesting stream pairs that end with (quote ()) [think lists].";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -93,7 +93,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a stream-pair created by <scons>.";
+      return "@help:Syntax:Streams\nReturns whether <obj> is a stream-pair created by <scons>.";
     }
 
     public static boolean logic(Datum d) {
@@ -125,7 +125,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Returns whether <obj> is a stream. Equivalent to:\n  (or (stream-pair? <obj>) (null? <obj>))";
+      return "@help:Syntax:Streams\nReturns whether <obj> is a stream. Equivalent to:\n  (or (stream-pair? <obj>) (null? <obj>))";
     }
 
     public static boolean logic(Datum d) {
@@ -154,7 +154,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Access the first item in a stream-pair.";
+      return "@help:Syntax:Streams\nAccess the first item in a stream-pair.";
     }
 
     public static Trampoline.Bounce logic(Datum streamPair, Trampoline.Continuation continuation) throws Exception {
@@ -186,7 +186,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Access the second item in a stream-pair.";
+      return "@help:Syntax:Streams\nAccess the second item in a stream-pair.";
     }
 
     public static Trampoline.Bounce logic(Datum streamPair, Trampoline.Continuation continuation) throws Exception {
@@ -218,7 +218,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scar <stream-pair>))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scar <stream-pair>))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -243,7 +243,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scdr <stream-pair>))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scdr <stream-pair>))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -268,7 +268,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scar <stream-pair>))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scar <stream-pair>))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -293,7 +293,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scdr <stream-pair>))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scdr <stream-pair>))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -318,7 +318,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scar (scar <stream-pair>)))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scar (scar <stream-pair>)))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -343,7 +343,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scar (scdr <stream-pair>)))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scar (scdr <stream-pair>)))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -368,7 +368,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scdr (scar <stream-pair>)))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scdr (scar <stream-pair>)))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -393,7 +393,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scdr (scdr <stream-pair>)))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scdr (scdr <stream-pair>)))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -418,7 +418,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scar (scar <stream-pair>)))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scar (scar <stream-pair>)))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -443,7 +443,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scar (scdr <stream-pair>)))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scar (scdr <stream-pair>)))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -468,7 +468,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scdr (scar <stream-pair>)))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scdr (scar <stream-pair>)))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -493,7 +493,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scdr (scdr <stream-pair>)))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scdr (scdr <stream-pair>)))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -518,7 +518,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scar (scar (scar <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scar (scar (scar <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -543,7 +543,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scar (scar (scdr <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scar (scar (scdr <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -568,7 +568,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scar (scdr (scar <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scar (scdr (scar <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -593,7 +593,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scar (scdr (scdr <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scar (scdr (scdr <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -618,7 +618,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scdr (scar (scar <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scdr (scar (scar <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -643,7 +643,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scdr (scar (scdr <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scdr (scar (scdr <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -668,7 +668,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scdr (scdr (scar <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scdr (scdr (scar <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -693,7 +693,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scar (scdr (scdr (scdr <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scar (scdr (scdr (scdr <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -718,7 +718,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scar (scar (scar <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scar (scar (scar <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -743,7 +743,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scar (scar (scdr <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scar (scar (scdr <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -768,7 +768,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scar (scdr (scar <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scar (scdr (scar <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -793,7 +793,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scar (scdr (scdr <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scar (scdr (scdr <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -818,7 +818,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scdr (scar (scar <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scdr (scar (scar <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -843,7 +843,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scdr (scar (scdr <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scdr (scar (scdr <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -868,7 +868,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scdr (scdr (scar <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scdr (scdr (scar <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -893,7 +893,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Equivalent to: (scdr (scdr (scdr (scdr <stream-pair>))))";
+      return "@help:Syntax:Streams\nEquivalent to: (scdr (scdr (scdr (scdr <stream-pair>))))";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -921,7 +921,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Return the first <list-length> items in <stream> as a list.";
+      return "@help:Syntax:Streams\nReturn the first <list-length> items in <stream> as a list.";
     }
 
     public static boolean isValidStreamIndex(Datum i) {
@@ -968,7 +968,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Return the <index>th item in <stream>.";
+      return "@help:Syntax:Streams\nReturn the <index>th item in <stream>.";
     }
 
     private static Trampoline.Bounce logic(Datum s, int idx, Trampoline.Continuation continuation) throws Exception {
@@ -1011,7 +1011,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Generate a new stream by applying <callable> to each of the items in\n\"<stream> ...\". Executes lazily.";
+      return "@help:Syntax:Streams\nGenerate a new stream by applying <callable> to each of the items in\n\"<stream> ...\". Executes lazily.";
     }
 
     public static Datum compiledAtom(Datum atom) {
@@ -1054,7 +1054,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Generate a new stream by filtering out items in <stream> that don't\nsatisfy <keep?-callable>. Executes lazily.";
+      return "@help:Syntax:Streams\nGenerate a new stream by filtering out items in <stream> that don't\nsatisfy <keep?-callable>. Executes lazily.";
     }
 
     private Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum c, Datum compiledCallable, Datum stream, Trampoline.Continuation continuation) throws Exception {
@@ -1108,7 +1108,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Generate an infinite stream by starting with <seed> and updating it\nwith <update-callable>. Executes lazily.";
+      return "@help:Syntax:Streams\nGenerate an infinite stream by starting with <seed> and updating it\nwith <update-callable>. Executes lazily.";
     }
 
     private Datum logic(ArrayList<Datum> parameters, Datum c, Datum seed) throws Exception {
@@ -1152,7 +1152,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Return an infinite stream of items in <obj-list> repeating in a cycle. Executes lazily.";
+      return "@help:Syntax:Streams\nReturn an infinite stream of items in <obj-list> repeating in a cycle. Executes lazily.";
     }
 
     public static Datum logic(Environment env, Datum originalObjs, Datum objs) throws Exception {
@@ -1181,7 +1181,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Return an infinite stream of \"<obj> ...\" repeating in a cycle. Executes lazily.";
+      return "@help:Syntax:Streams\nReturn an infinite stream of \"<obj> ...\" repeating in a cycle. Executes lazily.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1213,7 +1213,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Returns a new stream of \"<stream> ...\" appended to one another.";
+      return "@help:Syntax:Streams\nReturns a new stream of \"<stream> ...\" appended to one another.";
     }
 
     private Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum s, Datum streams, Trampoline.Continuation continuation) throws Exception {
@@ -1261,7 +1261,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Return a stream with the interleaved values of <stream1> and <stream2>.\nExecutes lazily.";
+      return "@help:Syntax:Streams\nReturn a stream with the interleaved values of <stream1> and <stream2>.\nExecutes lazily.";
     }
 
     private Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum stream1, Datum stream2, Trampoline.Continuation continuation) throws Exception {
@@ -1306,7 +1306,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Return a thunk (nullary procedure) that, upon invocation, returns the\nnext item in the stream.\nReturns <*generator-complete*> once at the end of the stream.";
+      return "@help:Syntax:Streams\nReturn a thunk (nullary procedure) that, upon invocation, returns the\nnext item in the stream.\nReturns <*generator-complete*> once at the end of the stream.";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -1348,7 +1348,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Returns the substream in <stream> starting with <obj> based on <equal?> item\nequality. Returns #f if <obj> isn't in <stream>. Note that this will run\nforever if <obj> isn't in <stream> and <stream> is infinite.";
+      return "@help:Syntax:Streams\nReturns the substream in <stream> starting with <obj> based on <equal?> item\nequality. Returns #f if <obj> isn't in <stream>. Note that this will run\nforever if <obj> isn't in <stream> and <stream> is infinite.";
     }
 
     private static Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum obj, Datum stream, Trampoline.Continuation continuation) throws Exception {
@@ -1388,7 +1388,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Returns the substream in <stream> starting with <obj> based on <eq?> item\nequality. Returns #f if <obj> isn't in <stream>. Note that this will run\nforever if <obj> isn't in <stream> and <stream> is infinite.";
+      return "@help:Syntax:Streams\nReturns the substream in <stream> starting with <obj> based on <eq?> item\nequality. Returns #f if <obj> isn't in <stream>. Note that this will run\nforever if <obj> isn't in <stream> and <stream> is infinite.";
     }
 
     private static Trampoline.Bounce logic(ArrayList<Datum> parameters, Datum obj, Datum stream, Trampoline.Continuation continuation) throws Exception {
@@ -1426,7 +1426,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Returns the first <length> items in <stream> as another stream.";
+      return "@help:Syntax:Streams\nReturns the first <length> items in <stream> as another stream.";
     }
 
     public static Trampoline.Bounce logic(String sig, ArrayList<Datum> parameters, Environment env, Datum stream, int length, Trampoline.Continuation continuation) throws Exception {
@@ -1472,7 +1472,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Returns a stream with the first items in <stream> while they satisfy\n<continue?-callable>.";
+      return "@help:Syntax:Streams\nReturns a stream with the first items in <stream> while they satisfy\n<continue?-callable>.";
     }
 
     public static Trampoline.Bounce logic(String sig, ArrayList<Datum> parameters, Environment env, Datum contPred, Datum stream, Trampoline.Continuation continuation) throws Exception {
@@ -1527,7 +1527,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Returns <stream> without its first <length> items as another stream.";
+      return "@help:Syntax:Streams\nReturns <stream> without its first <length> items as another stream.";
     }
 
     public static Trampoline.Bounce logic(String sig, ArrayList<Datum> parameters, Datum stream, int length, Trampoline.Continuation continuation) throws Exception {
@@ -1568,7 +1568,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Returns <stream> without all of the leading items that satisfy <continue?-callable>\nas another stream. Note that this will run forever if <stream> is infinite\nand every item in it satisfies <predicate?>.";
+      return "@help:Syntax:Streams\nReturns <stream> without all of the leading items that satisfy <continue?-callable>\nas another stream. Note that this will run forever if <stream> is infinite\nand every item in it satisfies <predicate?>.";
     }
 
     public static Trampoline.Bounce logic(String sig, ArrayList<Datum> parameters, Datum contPred, Datum stream, Trampoline.Continuation continuation) throws Exception {
@@ -1621,7 +1621,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Slices a subset of the items in <stream> starting from <start-index>.\nIf no other args are given, returns the rest of the items from <start-index>.\nIf <length> is given, returns at most <length> items.\nGiven <continue?-callable>, slices while values satisfy <continue?-callable>.\n\nNote that this may run infinitely if given an infinite stream where every\nvalue satisfies <continue?-callable>";
+      return "@help:Syntax:Streams\nSlices a subset of the items in <stream> starting from <start-index>.\nIf no other args are given, returns the rest of the items from <start-index>.\nIf <length> is given, returns at most <length> items.\nGiven <continue?-callable>, slices while values satisfy <continue?-callable>.\n\nNote that this may run infinitely if given an infinite stream where every\nvalue satisfies <continue?-callable>";
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -1670,7 +1670,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Unfolds a stream from left to right, starting with <seed>. <break?-callable>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded stream, and <update-callable> increments <seed> for the\nnext round of unfolding.\n\nSee <stream-unfolds> for an alternative without <break?-callable>.";
+      return "@help:Syntax:Streams\nUnfolds a stream from left to right, starting with <seed>. <break?-callable>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded stream, and <update-callable> increments <seed> for the\nnext round of unfolding.\n\nSee <stream-unfolds> for an alternative without <break?-callable>.";
     }
 
     private Trampoline.Bounce logic(Datum breakCond, Datum mapper, Datum successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
@@ -1726,7 +1726,7 @@ public class StreamPrimitives {
     }
 
     public String docstring() {
-      return "Unfolds a stream from left to right, starting with <seed>. <mapper-callable>\nmaps the <seed> to a value in the unfolded stream, and <update-callable>\nincrements <seed> for the next round of unfolding.\n\nSee <stream-unfold> for an alternative with a <break?-callable>.";
+      return "@help:Syntax:Streams\nUnfolds a stream from left to right, starting with <seed>. <mapper-callable>\nmaps the <seed> to a value in the unfolded stream, and <update-callable>\nincrements <seed> for the next round of unfolding.\n\nSee <stream-unfold> for an alternative with a <break?-callable>.";
     }
 
     private Trampoline.Bounce logic(Datum mapper, Datum successor, Datum seed, Trampoline.Continuation continuation) throws Exception {

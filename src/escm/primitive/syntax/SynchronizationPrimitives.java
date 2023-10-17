@@ -51,7 +51,7 @@ public class SynchronizationPrimitives {
     }
 
     public String docstring() {
-      return "Execute \"<expr> ...\" with a mutex lock around it as a critical section.\nLocks/Unlocks the lock via <dynamic-wind> to ensure that random\ncontinuations don't prevent us from unlocking the lock.\n\n  NOTE: Locks the *dosync-lock* parameter mutex variable (same state across\n        modules).";
+      return "@help:Syntax:Synchronization\nExecute \"<expr> ...\" with a mutex lock around it as a critical section.\nLocks/Unlocks the lock via <dynamic-wind> to ensure that random\ncontinuations don't prevent us from unlocking the lock.\n\n  NOTE: Locks the *dosync-lock* parameter mutex variable (same state across\n        modules).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -83,7 +83,7 @@ public class SynchronizationPrimitives {
     }
 
     public String docstring() {
-      return "Execute \"<expr> ...\" with a mutex lock around it as a critical section.\nLocks/Unlocks the lock via <dynamic-wind> to ensure that random continuations\ndon't prevent us from unlocking the lock.\n\n  NOTE: Locks the *dosync-module-lock* global mutex variable (unique state\n        per module).";
+      return "@help:Syntax:Synchronization\nExecute \"<expr> ...\" with a mutex lock around it as a critical section.\nLocks/Unlocks the lock via <dynamic-wind> to ensure that random continuations\ndon't prevent us from unlocking the lock.\n\n  NOTE: Locks the *dosync-module-lock* global mutex variable (unique state\n        per module).";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -118,7 +118,7 @@ public class SynchronizationPrimitives {
     }
 
     public String docstring() {
-      return "Like <dosync>, but with a lock of your choosing rather than *dosync-lock*.";
+      return "@help:Syntax:Synchronization\nLike <dosync>, but with a lock of your choosing rather than *dosync-lock*.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -155,7 +155,7 @@ public class SynchronizationPrimitives {
     }
 
     public String docstring() {
-      return "Bind <variable-name> to <value> in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Syntax:Synchronization\nBind <variable-name> to <value> in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -193,7 +193,7 @@ public class SynchronizationPrimitives {
     }
 
     public String docstring() {
-      return "Set <variable-name> to <value> in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Syntax:Synchronization\nSet <variable-name> to <value> in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -231,7 +231,7 @@ public class SynchronizationPrimitives {
     }
 
     public String docstring() {
-      return "Get <variable-name>'s value in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Syntax:Synchronization\nGet <variable-name>'s value in <thread>'s (defaults to the \"meta-thread\")\ndynamic environment (effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -269,7 +269,7 @@ public class SynchronizationPrimitives {
     }
 
     public String docstring() {
-      return "Return whether <variable-name> is defined in <thread>'s\n(defaults to the \"meta-thread\") dynamic environment\n(effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Syntax:Synchronization\nReturn whether <variable-name> is defined in <thread>'s\n(defaults to the \"meta-thread\") dynamic environment\n(effectively a thread-local global environment).\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

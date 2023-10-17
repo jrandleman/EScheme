@@ -29,7 +29,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a string to a number in base <radix> (defaults to 10).\n<radix> must be between <*min-radix*> and <*max-radix*>.\nReturns #f if failed coercion.";
+      return "@help:Procedures:Type-Coercions\nConvert a string to a number in base <radix> (defaults to 10).\n<radix> must be between <*min-radix*> and <*max-radix*>.\nReturns #f if failed coercion.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -74,7 +74,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a number to a string in base <radix> (defaults to 10).\n<radix> must be between <*min-radix*> and <*max-radix*>.\nReturns #f if failed coercion.";
+      return "@help:Procedures:Type-Coercions\nConvert a number to a string in base <radix> (defaults to 10).\n<radix> must be between <*min-radix*> and <*max-radix*>.\nReturns #f if failed coercion.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -117,7 +117,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a keyword to a symbol.";
+      return "@help:Procedures:Type-Coercions\nConvert a keyword to a symbol.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -140,7 +140,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a symbol to a keyword.";
+      return "@help:Procedures:Type-Coercions\nConvert a symbol to a keyword.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -163,7 +163,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a string to a symbol.";
+      return "@help:Procedures:Type-Coercions\nConvert a string to a symbol.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -186,7 +186,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a symbol to a string.";
+      return "@help:Procedures:Type-Coercions\nConvert a symbol to a string.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -209,7 +209,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a string to a keyword.";
+      return "@help:Procedures:Type-Coercions\nConvert a string to a keyword.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -232,7 +232,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a keyword to a string.";
+      return "@help:Procedures:Type-Coercions\nConvert a keyword to a string.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -255,7 +255,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Write <obj> to a string in machine-readable form.";
+      return "@help:Procedures:Type-Coercions\nWrite <obj> to a string in machine-readable form.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -278,7 +278,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Write <obj> to a string in human-readable form.";
+      return "@help:Procedures:Type-Coercions\nWrite <obj> to a string in human-readable form.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -301,7 +301,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Write <obj> to a string in indented, machine-readable form.\nAliased by <pprint-to-string>.";
+      return "@help:Procedures:Type-Coercions\nWrite <obj> to a string in indented, machine-readable form.\nAliased by <pprint-to-string>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -324,7 +324,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a vector to a list.";
+      return "@help:Procedures:Type-Coercions\nConvert a vector to a list.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -347,7 +347,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a list to a vector.";
+      return "@help:Procedures:Type-Coercions\nConvert a list to a vector.";
     }
 
     public static escm.type.Vector logic(Datum l) {
@@ -380,7 +380,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a hashmap to a list of keys & values.";
+      return "@help:Procedures:Type-Coercions\nConvert a hashmap to a list of keys & values.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -403,7 +403,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a hashmap to a vector of keys & values.";
+      return "@help:Procedures:Type-Coercions\nConvert a hashmap to a vector of keys & values.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -426,7 +426,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a list of keys & values to a hashmap.";
+      return "@help:Procedures:Type-Coercions\nConvert a list of keys & values to a hashmap.";
     }
 
     private static escm.type.Hashmap logic(Datum lst, ArrayList<Datum> parameters) throws Exception {
@@ -462,7 +462,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a vector of keys & values to a hashmap.";
+      return "@help:Procedures:Type-Coercions\nConvert a vector of keys & values to a hashmap.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -488,7 +488,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a character to an integer codepoint value.";
+      return "@help:Procedures:Type-Coercions\nConvert a character to an integer codepoint value.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -511,7 +511,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert an integer codepoint value to a character.";
+      return "@help:Procedures:Type-Coercions\nConvert an integer codepoint value to a character.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -537,7 +537,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a list of chars to a string.";
+      return "@help:Procedures:Type-Coercions\nConvert a list of chars to a string.";
     }
 
     private escm.type.String logic(Datum lis, ArrayList<Datum> parameters) throws Exception {
@@ -573,7 +573,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a string to a list of chars.";
+      return "@help:Procedures:Type-Coercions\nConvert a string to a list of chars.";
     }
 
     private Datum logic(escm.type.String str, ArrayList<Datum> parameters) throws Exception {
@@ -605,7 +605,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a vector of chars to a string.";
+      return "@help:Procedures:Type-Coercions\nConvert a vector of chars to a string.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -628,7 +628,7 @@ public class TypeCoercionPrimitives {
     }
 
     public String docstring() {
-      return "Convert a string to a vector of chars.";
+      return "@help:Procedures:Type-Coercions\nConvert a string to a vector of chars.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
