@@ -535,7 +535,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nBind <symbolic-variable-name> to <value> in <thread>'s\n(defaults to the \"meta-thread\") dynamic environment\n(effectively a thread-local global environment)\nUse the <thread-define> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Procedures:Concurrency\nBind <symbolic-variable-name> to <value> in <thread>'s (defaults to the\n\"meta-thread\") dynamic environment (effectively a thread-local global\nenvironment).\n\nUse the <thread-define> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -576,7 +576,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nSet <symbolic-variable-name> to <value> in <thread>'s\n(defaults to the \"meta-thread\") dynamic environment\n(effectively a thread-local global environment)\nUse the <thread-set!> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Procedures:Concurrency\nSet <symbolic-variable-name> to <value> in <thread>'s (defaults to the\n\"meta-thread\") dynamic environment (effectively a thread-local global\nenvironment).\n\nUse the <thread-set!> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -621,7 +621,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nGet <symbolic-variable-name>'s value in <thread>'s\n(defaults to the \"meta-thread\") dynamic environment\n(effectively a thread-local global environment)\nUse the <thread-get> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Procedures:Concurrency\nGet <symbolic-variable-name>'s value in <thread>'s (defaults to the\n\"meta-thread\") dynamic environment (effectively a thread-local global\nenvironment).\n\nUse the <thread-get> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -665,7 +665,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturn whether <symbolic-variable-name> is defined in <thread>'s\n(defaults to the \"meta-thread\") dynamic environment\n(effectively a thread-local global environment)\nUse the <thread-get> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Procedures:Concurrency\nReturn whether <symbolic-variable-name> is defined in <thread>'s (defaults to the\n\"meta-thread\") dynamic environment (effectively a thread-local global\nenvironment).\n\nUse the <thread-get> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
