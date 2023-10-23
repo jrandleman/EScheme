@@ -6,6 +6,7 @@ package escm.primitive.lib.help.fs;
 import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Keyword;
+import escm.type.Pair;
 
 public class TopicNode extends HelpNode {
   public final String name;
@@ -38,16 +39,22 @@ public class TopicNode extends HelpNode {
   }
 
   public Datum toDatum() {
-    return new Keyword(name);
+    return new Pair(new Keyword(name),new escm.type.String(toString()));
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("===============================================================================\n");
+    sb.append("Entry: "+name+"\n");
+    for(int i = 0, n = name.length()+7; i < n; ++i) {
+      sb.append('*');
+    }
+    sb.append("\n\nDescription:\n  "+String.join("\n  ",description.split("\n"))+"\n");
+    sb.append("===============================================================================\n");
+    return sb.toString();
   }
 
   public void print() {
-    System.out.println("===============================================================================");
-    System.out.println("Entry: "+name);
-    for(int i = 0, n = name.length()+7; i < n; ++i) {
-      System.out.print('*');
-    }
-    System.out.println("\n\nDescription:\n  "+String.join("\n  ",description.split("\n")));
-    System.out.println("===============================================================================");
+    System.out.print(toString());
   }
 }

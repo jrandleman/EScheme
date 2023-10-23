@@ -6,6 +6,7 @@ package escm.primitive.lib.help.fs;
 import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Keyword;
+import escm.type.Pair;
 import escm.primitive.HelpPrimitives;
 
 public class ObjectNode extends HelpNode {
@@ -39,10 +40,10 @@ public class ObjectNode extends HelpNode {
   }
 
   public Datum toDatum() {
-    return new Keyword(name);
+    return new Pair(new Keyword(name),new escm.type.String(HelpPrimitives.Help.describeObject(obj)));
   }
 
   public void print() {
-    HelpPrimitives.Help.describeObject(obj);
+    HelpPrimitives.Help.printObjectDescription(obj);
   }
 }

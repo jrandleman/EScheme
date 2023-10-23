@@ -201,16 +201,16 @@ public class HelpPrimitives {
 
     //////////////////////////////////////////////////////////////////////////
     // Describe a Given Object
-    private static void printObjectName(Datum obj) {
+    private static void printObjectName(StringBuilder sb, Datum obj) {
       Datum name = MetaPrimitives.CallableName.logic(obj);
       if(name instanceof Symbol) {
         String nameValue = ((Symbol)name).value();
-        System.out.print("Name: ");
-        System.out.println(nameValue);
+        sb.append("Name: ");
+        sb.append(nameValue+"\n");
         for(int i = 0, n = nameValue.length()+6; i < n; ++i) {
-          System.out.print('*');
+          sb.append('*');
         }
-        System.out.println("\n");
+        sb.append("\n\n");
       }
     }
 
@@ -225,41 +225,48 @@ public class HelpPrimitives {
     }
 
 
-    private static void printObjectSignatures(Datum obj) {
+    private static void printObjectSignatures(StringBuilder sb, Datum obj) {
       Datum sigs = MetaPrimitives.CallableSignature.logic(obj);
       if(!(sigs instanceof Boolean)) {
-        System.out.println("Signatures:");
+        sb.append("Signatures:\n");
         if(hasMultipleSignatures(sigs)) {
           while(sigs instanceof Pair) {
             Pair p = (Pair)sigs;
-            System.out.println(padNewlinesWithTabs(p.car().pprint()));
+            sb.append(padNewlinesWithTabs(p.car().pprint())+"\n");
             sigs = p.cdr();
           }
         } else {
-          System.out.println(padNewlinesWithTabs(sigs.pprint()));
+          sb.append(padNewlinesWithTabs(sigs.pprint())+"\n");
         }
-        System.out.println("");
+        sb.append("\n");
       }
     }
 
 
-    private static void printObjectDocstring(Datum obj) {
+    private static void printObjectDocstring(StringBuilder sb, Datum obj) {
       Datum docs = MetaPrimitives.DocStringExtractor.helpLogic(obj);
-      System.out.println("Description:");
+      sb.append("Description:\n");
       if(docs instanceof escm.type.String && ((escm.type.String)docs).value().length() > 0) {
-        System.out.println(padNewlinesWithTabs(((escm.type.String)docs).value()));
+        sb.append(padNewlinesWithTabs(((escm.type.String)docs).value())+"\n");
       } else {
-        System.out.println("  Given item: "+obj.profile());
+        sb.append("  Given item: "+obj.profile()+"\n");
       }
     }
 
 
-    public static synchronized void describeObject(Datum obj) {
-      System.out.println("===============================================================================");
-      printObjectName(obj);
-      printObjectSignatures(obj);
-      printObjectDocstring(obj);
-      System.out.println("===============================================================================");
+    public static synchronized String describeObject(Datum obj) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("===============================================================================\n");
+      printObjectName(sb,obj);
+      printObjectSignatures(sb,obj);
+      printObjectDocstring(sb,obj);
+      sb.append("===============================================================================\n");
+      return sb.toString();
+    }
+
+
+    public static void printObjectDescription(Datum obj) {
+      System.out.print(describeObject(obj));
     }
 
 
@@ -276,7 +283,7 @@ public class HelpPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Meta\nObj Argument:\n  Get information about <obj>.\n\nNo Arguments:\n  Launch the interactive help menu. The help menu consists of folders, which\n  in turn hold descriptions of various variables in EScheme's environment.\n\n  Type folder names in the input prompt to enter them, and use \":\" as a \n  separator to enter multiple folders (e.g. \"folder1:folder2:folder3\").\n  Type . for the current directory, .. for the parent, ... for the \n  grandparent, etc.\n\n  Type :quit to quit, :~ to return to the home directory, or :help for more \n  information.\n\n  Procedures, classes, and interfaces that want to explain how they work in \n  the <help> menu should use <docstring> syntax. Within the <docstring>, the\n  \"@help\" syntax can be used to place the variable within a certain \n  subdirectory of the help menu. For example:\n\n    (define (fact n)\n      \"\n      @help:Procedures:Numbers\n      The factorial function. Accepts an int arg.\n      \"\n      (if (< n 2)\n          1\n          (* n (fact (- n 1)))))\n\n  would put fact's <help> entry in the Numbers directory, which itself is in\n  the Procedures directory. Docstring entries without the \"@help\" syntax\n  are placed in the \"Misc\" directory.\n\nSee <define-help> to register topic documents in help's file tree.";
+      return "@help:Procedures:Meta\nObj Argument:\n  Get information about <obj>.\n\nNo Arguments:\n  Launch the interactive help menu. The help menu consists of folders, which\n  in turn hold descriptions of various variables in EScheme's environment.\n\n  Type folder names in the input prompt to enter them, and use \":\" as a \n  separator to enter multiple folders (e.g. \"folder1:folder2:folder3\").\n  Type . for the current directory, .. for the parent, ... for the \n  grandparent, etc.\n\n  Type :quit to quit, :~ to return to the home directory, or :help for more \n  information.\n\n  Procedures, classes, and interfaces that want to explain how they work in \n  the <help> menu should use <docstring> syntax. Within the <docstring>, the\n  \"@help\" syntax can be used to place the variable within a certain \n  subdirectory of the help menu. For example:\n\n    (define (fact n)\n      \"\n      @help:Procedures:Numbers\n      The factorial function. Accepts an int arg.\n      \"\n      (if (< n 2)\n          1\n          (* n (fact (- n 1)))))\n\n  would put fact's <help> entry in the Numbers directory, which itself is in\n  the Procedures directory. Docstring entries without the \"@help\" syntax\n  are placed in the \"Misc\" directory.\n\nSee <define-help> to register topic documents in help's file tree.\nSee <help-directory> to get help's files as an EScheme data structure.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -286,7 +293,7 @@ public class HelpPrimitives {
         if(parameters.size() == 0) {
           launchInteractiveMenu(this.definitionEnvironment);
         } else {
-          describeObject(parameters.get(0));
+          printObjectDescription(parameters.get(0));
         }
       } catch(TerminateHelpMenuException e) {
         // Ignore this exception, thrown when user enters :quit or ^D (EOF)
@@ -315,7 +322,7 @@ public class HelpPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Meta\nRegister the <docstring> topic document in help's file tree, at path <path> in\nfile <name>. Note that <path> denotes a set of folder names seperated by <:>.\n\nAliased by <defhelp>.";
+      return "@help:Procedures:Meta\nRegister the <docstring> topic document in help's file tree, at path <path> in\nfile <name>. Note that <path> denotes a set of folder names seperated by <:>.\n\nAliased by <defhelp>. Use <help> to see defined topic documents.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -333,6 +340,29 @@ public class HelpPrimitives {
         throw new Exceptionf("'(help <path:name-string> <docstring>) <path:name> %s has invalid folder names: %s", docs.profile(), Exceptionf.profileArgs(parameters));
       TOPICS.put(pathStr.trim(),docsStr);
       return Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // help-directory
+  public static class HelpDirectory extends Primitive {
+    public java.lang.String escmName() {
+      return "help-directory";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("help-directory"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Meta\nGet the entire <help> menu directory as an EScheme data structure. A folder\nis a list that starts with its name as a keyword, followed by its child files.\nA topic is a pair with a keyword name <car> and a docstring <cdr>.\n\nUse <help> to explore this data structure interactively via the command line.";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 0)
+        throw new Exceptionf("'(help-directory) doesn't accept arguments: %s", Exceptionf.profileArgs(parameters));
+      return HelpNode.createHomeDirectory(this.definitionEnvironment).toDatum();
     }
   }
 }

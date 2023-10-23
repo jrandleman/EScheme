@@ -10,6 +10,8 @@
 (help <optional-obj>)
 
 (define-help <help-path:name-str> <docstring>) ; aliases <defhelp>
+
+(help-directory)
 ```
 
 
