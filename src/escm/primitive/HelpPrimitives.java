@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.primitive.HelpPrimitive
+// Author: Jordan Randleman - escm.primitive.HelpPrimitives
 // Purpose:
 //    Java primitive to help explain language features.
 //
@@ -25,7 +25,7 @@ import escm.primitive.MetaPrimitives;
 import escm.primitive.lib.help.fs.HelpNode;
 import escm.primitive.lib.help.fs.FolderNode;
 
-public class HelpPrimitive {
+public class HelpPrimitives {
   public static class Help extends Primitive {
     //////////////////////////////////////////////////////////////////////////
     // Terminate Help Exception
@@ -140,15 +140,19 @@ public class HelpPrimitive {
     }
 
 
-    private static String[] preprocessCommand(String prompt) {
+    public static String[] preprocessCommand(String prompt) {
       prompt = prompt.trim();
       if(isCommand(prompt)) return new String[]{prompt};
       return prompt.split(":");
     }
 
 
-    private static boolean isValidCommand(String[] cmds) {
-      return cmds.length != 0 && (cmds.length != 1 || cmds[0].length() != 0);
+    static boolean isValidCommand(String[] cmds) {
+      if(cmds.length == 0) return false;
+      for(int i = 0; i < cmds.length; ++i) {
+        if(cmds[i].length() == 0) return false;
+      }
+      return true;
     }
 
 
@@ -272,7 +276,7 @@ public class HelpPrimitive {
     }
 
     public String docstring() {
-      return "@help:Procedures:Meta\nObj Argument:\n  Get information about <obj>.\n\nNo Arguments:\n  Launch the interactive help menu. The help menu consists of folders, which\n  in turn hold descriptions of various variables in EScheme's environment.\n\n  Type folder names in the input prompt to enter them, and use \":\" as a \n  separator to enter multiple folders (e.g. \"folder1:folder2:folder3\").\n  Type . for the current directory, .. for the parent, ... for the \n  grandparent, etc.\n\n  Type :quit to quit, :~ to return to the home directory, or :help for more \n  information.\n\n  Procedures, classes, and interfaces that want to explain how they work in \n  the <help> menu should use <docstring> syntax. Within the <docstring>, the\n  \"@help\" syntax can be used to place the variable within a certain \n  subdirectory of the help menu. For example:\n\n    (define (fact n)\n      \"\n      @help:Procedures:Numbers\n      The factorial function. Accepts an int arg.\n      \"\n      (if (< n 2)\n          1\n          (* n (fact (- n 1)))))\n\n  would put fact's <help> entry in the Numbers directory, which itself is in\n  the Procedures directory. Docstring entries without the \"@help\" syntax\n  are placed in the \"Misc\" directory.";
+      return "@help:Procedures:Meta\nObj Argument:\n  Get information about <obj>.\n\nNo Arguments:\n  Launch the interactive help menu. The help menu consists of folders, which\n  in turn hold descriptions of various variables in EScheme's environment.\n\n  Type folder names in the input prompt to enter them, and use \":\" as a \n  separator to enter multiple folders (e.g. \"folder1:folder2:folder3\").\n  Type . for the current directory, .. for the parent, ... for the \n  grandparent, etc.\n\n  Type :quit to quit, :~ to return to the home directory, or :help for more \n  information.\n\n  Procedures, classes, and interfaces that want to explain how they work in \n  the <help> menu should use <docstring> syntax. Within the <docstring>, the\n  \"@help\" syntax can be used to place the variable within a certain \n  subdirectory of the help menu. For example:\n\n    (define (fact n)\n      \"\n      @help:Procedures:Numbers\n      The factorial function. Accepts an int arg.\n      \"\n      (if (< n 2)\n          1\n          (* n (fact (- n 1)))))\n\n  would put fact's <help> entry in the Numbers directory, which itself is in\n  the Procedures directory. Docstring entries without the \"@help\" syntax\n  are placed in the \"Misc\" directory.\n\nSee <define-help> to register topic documents in help's file tree.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -287,6 +291,47 @@ public class HelpPrimitive {
       } catch(TerminateHelpMenuException e) {
         // Ignore this exception, thrown when user enters :quit or ^D (EOF)
       }
+      return Void.VALUE;
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // define-help
+  public static class DefineHelp extends Primitive {
+    //////////////////////////////////////////////////////////////////////////
+    // Global Topic Storage (accessed by <escm.primitive.lib.help.fs.HelpNode>)
+    public static final ConcurrentHashMap<String,String> TOPICS = new ConcurrentHashMap<String,String>();
+
+
+    //////////////////////////////////////////////////////////////////////////
+    // Main Execution
+    public java.lang.String escmName() {
+      return "define-help";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("define-help"),new Symbol("<path:name-string>"),new Symbol("<docstring>"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Meta\nRegister the <docstring> topic document in help's file tree, at path <path> in\nfile <name>. Note that <path> denotes a set of folder names seperated by <:>.\n\nAliased by <defhelp>.";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2)
+        throw new Exceptionf("'(help <path:name-string> <docstring>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum path = parameters.get(0);
+      Datum docs = parameters.get(1);
+      if(!(path instanceof escm.type.String))
+        throw new Exceptionf("'(help <path:name-string> <docstring>) <path:name> %s isn't a string: %s", path.profile(), Exceptionf.profileArgs(parameters));
+      if(!(docs instanceof escm.type.String))
+        throw new Exceptionf("'(help <path:name-string> <docstring>) <docstring> %s isn't a string: %s", docs.profile(), Exceptionf.profileArgs(parameters));
+      String pathStr = ((escm.type.String)path).value();
+      String docsStr = ((escm.type.String)docs).value();
+      if(!Help.isValidCommand(Help.preprocessCommand(pathStr)))
+        throw new Exceptionf("'(help <path:name-string> <docstring>) <path:name> %s has invalid folder names: %s", docs.profile(), Exceptionf.profileArgs(parameters));
+      TOPICS.put(pathStr.trim(),docsStr);
       return Void.VALUE;
     }
   }

@@ -7,7 +7,9 @@
 ------------------------
 ## Language Help:
 ```scheme
-(help <optional-query-symbol-or-obj>)
+(help <optional-obj>)
+
+(define-help <help-path:name-str> <docstring>) ; aliases <defhelp>
 ```
 
 
@@ -157,9 +159,9 @@
 (display <optional-output-port> <obj>) ; aliased by <print>
 (newline <optional-output-port>)
 
-(pretty-printf <optional-output-port> <format-string> <arg> ...) ; aliased by <pprintf>
-(writef <optional-output-port> <format-string> <arg> ...)
-(displayf <optional-output-port> <format-string> <arg> ...) ; aliased by <printf>
+(pretty-printf <optional-output-port> <format-str> <arg> ...) ; aliased by <pprintf>
+(writef <optional-output-port> <format-str> <arg> ...)
+(displayf <optional-output-port> <format-str> <arg> ...) ; aliased by <printf>
 
 (println <optional-output-port> <obj>)
 
@@ -254,9 +256,9 @@
 ------------------------
 ## Ports:
 ```scheme
-(open-input-file <filename-string>)
-(open-output-file <optional-filename-string>) ; nullary call creates a "temporary file"!
-(open-output-file+ <filename-string>)
+(open-input-file <filename-str>)
+(open-output-file <optional-filename-str>) ; nullary call creates a "temporary file"!
+(open-output-file+ <filename-str>)
 
 (close-port! <port>)
 
@@ -274,13 +276,13 @@
 (current-input-port)
 (current-output-port)
 
-(call-with-input-file <filename-string> <unary-callable>)
-(call-with-output-file <filename-string> <unary-callable>)
-(call-with-output-file+ <filename-string> <unary-callable>)
+(call-with-input-file <filename-str> <unary-callable>)
+(call-with-output-file <filename-str> <unary-callable>)
+(call-with-output-file+ <filename-str> <unary-callable>)
 
-(with-input-from-file <filename-string> <thunk-callable>)
-(with-output-to-file <filename-string> <thunk-callable>)
-(with-output-to-file+ <filename-string> <thunk-callable>)
+(with-input-from-file <filename-str> <thunk-callable>)
+(with-output-to-file <filename-str> <thunk-callable>)
+(with-output-to-file+ <filename-str> <thunk-callable>)
 
 (peek-port <input-port>)
 
@@ -418,7 +420,7 @@
 (string-ci<=? <str> <str> ...)
 (string-ci>=? <str> <str> ...)
 
-(stringf <format-string> <arg> ...)
+(stringf <format-str> <arg> ...)
 ```
 
 
@@ -637,10 +639,10 @@
 (integer->char <integer>)
 
 (list->string <list>)
-(string->list <string>)
+(string->list <str>)
 
 (vector->string <vector>)
-(string->vector <string>)
+(string->vector <str>)
 
 (write-to-string <obj>)
 (display-to-string <obj>)
@@ -654,7 +656,7 @@
 (typeof <obj>) ; returns a symbol of obj's typename
 
 (error <reason> <arg> ...)
-(errorf <format-string> <arg> ...)
+(errorf <format-str> <arg> ...)
 
 (copy <obj>)
 

@@ -14,6 +14,7 @@ import escm.util.json.JsonArray;
 import escm.util.json.JsonObject;
 import escm.util.json.JsonString;
 import escm.vm.util.Environment;
+import escm.primitive.HelpPrimitives;
 import escm.primitive.MetaPrimitives;
 import escm.vm.runtime.installerGenerated.EscmPath;
 
@@ -107,12 +108,28 @@ public abstract class HelpNode {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Help FS Defined Topic Parsing
+  private static void registerDefinedTopics(FolderNode home) {
+    // Note that <TOPICS> key entries are guarenteed to pass <HelpPrimitives.Help.isValidCommand()>!
+    for(HashMap.Entry<String,String> topic : HelpPrimitives.DefineHelp.TOPICS.entrySet()) {
+      String[] splitPath = HelpPrimitives.Help.preprocessCommand(topic.getKey());
+      String[] dirs = new String[splitPath.length-1];
+      for(int i = 0; i < dirs.length; ++i) {
+        dirs[i] = splitPath[i];
+      }
+      home.addTopic(dirs,splitPath[dirs.length],topic.getValue());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // FS Creation from a Given Environment
   // Called to get the root the help directory
   public static FolderNode createHomeDirectory(Environment env) {
     FolderNode home = new FolderNode();
     registerEnvironmentVariables(env,home);
     registerPresetJsonTopics(home);
+    registerDefinedTopics(home);
     return home;
   }
 
