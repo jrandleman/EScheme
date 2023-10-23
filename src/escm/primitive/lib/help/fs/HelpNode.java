@@ -109,7 +109,7 @@ public abstract class HelpNode {
 
   ////////////////////////////////////////////////////////////////////////////
   // Help FS Defined Topic Parsing
-  private static void registerDefinedTopics(FolderNode home) {
+  private static void registerUserDefinedTopics(FolderNode home) {
     // Note that <TOPICS> key entries are guarenteed to pass <HelpPrimitives.Help.isValidCommand()>!
     for(HashMap.Entry<String,String> topic : HelpPrimitives.DefineHelp.TOPICS.entrySet()) {
       String[] splitPath = HelpPrimitives.Help.preprocessCommand(topic.getKey());
@@ -129,7 +129,7 @@ public abstract class HelpNode {
     FolderNode home = new FolderNode();
     registerEnvironmentVariables(env,home);
     registerPresetJsonTopics(home);
-    registerDefinedTopics(home);
+    registerUserDefinedTopics(home);
     return home;
   }
 
