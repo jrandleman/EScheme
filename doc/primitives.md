@@ -7,7 +7,7 @@
 ------------------------
 ## Language Help:
 ```scheme
-(help <optional-obj>)
+(help <optional-obj-or-str>)
 
 (define-help <help-path:name-str> <docstring>) ; aliases <defhelp>
 

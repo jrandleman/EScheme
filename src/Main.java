@@ -1,6 +1,13 @@
 // Author: Jordan Randleman - Main
 // Purpose:
-//    Main file to start the VM.
+//    Main file to start the EScheme VM.
+//
+// +-----------------------------------------------------------------------+
+// | It is no exaggeration to regard this as the most fundamental idea in  |
+// | programming:                                                          |
+// |    The evaluator, which determines the meaning of expressions in a    |
+// |    programming language, is just another program. - SICP vol2, p.360  |
+// +-----------------------------------------------------------------------+
 
 import java.util.ArrayList;
 import java.io.File;

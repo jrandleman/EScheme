@@ -40,10 +40,15 @@ public class ObjectNode extends HelpNode {
   }
 
   public Datum toDatum() {
-    return new Pair(new Keyword(name),new escm.type.String(HelpPrimitives.Help.describeObject(obj)));
+    return new Pair(new Keyword(name),new escm.type.String(toString()));
+  }
+
+  public String toString() {
+    return HelpPrimitives.Help.describeObject(obj);
   }
 
   public void print() {
-    HelpPrimitives.Help.printObjectDescription(obj);
+    System.out.print(toString());
+    System.out.flush();
   }
 }

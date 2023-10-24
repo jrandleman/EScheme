@@ -56,5 +56,6 @@ public class TopicNode extends HelpNode {
 
   public void print() {
     System.out.print(toString());
+    System.out.flush();
   }
 }

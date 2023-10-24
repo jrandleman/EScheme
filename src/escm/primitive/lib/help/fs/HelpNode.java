@@ -139,5 +139,6 @@ public abstract class HelpNode {
   public abstract FolderNode getParent();
   public abstract String getPath();
   public abstract Datum toDatum();
+  public abstract String toString();
   public abstract void print();
 }

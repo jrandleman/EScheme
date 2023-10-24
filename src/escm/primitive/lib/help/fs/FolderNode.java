@@ -49,14 +49,15 @@ public class FolderNode extends HelpNode {
   public HelpNode get(String[] names) { // returns <null> if DNE
     if(names.length == 0) return null;
     HelpNode item = this;
-    for(int i = names.length-1; i >= 0 && item != null; --i) {
+    for(int i = 0, n = names.length-1; i < n && item != null; ++i) {
       if(item instanceof FolderNode) {
         item = ((FolderNode)item).children.get(names[i]);
       } else {
         return null; // found non-<FolderNode> too early in the chain
       }
     }
-    return item;
+    if(item == null) return null;
+    return ((FolderNode)item).children.get(names[names.length-1]);
   }
 
   public FolderNode getParent() {
@@ -90,13 +91,18 @@ public class FolderNode extends HelpNode {
     return new Pair(new Keyword(name),treeDatum);
   }
 
-  public void print() {
+  public String toString() {
     ArrayList<String> options = new ArrayList<String>();
     for(ConcurrentHashMap.Entry<String,HelpNode> entry : children.entrySet()) {
       options.add(entry.getKey());
     }
     Collections.sort(options);
-    showOptionsMenu(options);
+    return getOptionsMenu(options);
+  }
+
+  public void print() {
+    System.out.print(toString());
+    System.out.flush();
   }
 
 
@@ -123,7 +129,8 @@ public class FolderNode extends HelpNode {
   // Internal File System Navigator Support Function
   private static final int HELP_MENU_COLUMNS = 5;
 
-  private static void showOptionsMenu(ArrayList<String> options) {
+  private static String getOptionsMenu(ArrayList<String> options) {
+    StringBuilder output = new StringBuilder();
     // Get the lengths of each menu column
     int[] col_lengths = new int[HELP_MENU_COLUMNS];
     int totalOptions = options.size();
@@ -136,7 +143,7 @@ public class FolderNode extends HelpNode {
       }
     }
     // Print the menu
-    if(totalOptions > 0) System.out.print("\n  ");
+    if(totalOptions > 0) output.append("\n  ");
     for(int i = 0; i < totalOptions; ++i) {
       String option = options.get(i);
       StringBuilder sb = new StringBuilder();
@@ -145,12 +152,13 @@ public class FolderNode extends HelpNode {
       for(int space = 0, n = col_lengths[i%HELP_MENU_COLUMNS]-option.length(); space < n; ++space) {
         sb.append(' ');
       }
-      System.out.print(sb.toString());
+      output.append(sb.toString());
       if((i+1)%HELP_MENU_COLUMNS == 0) {
-        System.out.print("\n  ");
+        output.append("\n  ");
       } else if(i+1 == totalOptions) {
-        System.out.print('\n');
+        output.append('\n');
       }
     }
+    return output.toString();
   }
 }

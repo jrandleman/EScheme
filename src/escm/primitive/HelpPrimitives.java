@@ -200,6 +200,22 @@ public class HelpPrimitives {
 
 
     //////////////////////////////////////////////////////////////////////////
+    // Static DB Traversal
+    //   => Returns <null> if <target> is an invalid help path, as would be
+    //      entered in the interactive menu's home directory!
+    private static String getInteractiveMenuEntry(Environment env, String target) throws Exception {
+      FolderNode home = HelpNode.createHomeDirectory(env);
+      String[] cmds = preprocessCommand(target);
+      if(isValidCommand(cmds)) {
+        HelpNode item = home.get(cmds);
+        if(item == null) return null;
+        return item.toString();
+      }
+      return null;
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////
     // Describe a Given Object
     private static void printObjectName(StringBuilder sb, Datum obj) {
       Datum name = MetaPrimitives.CallableName.logic(obj);
@@ -265,11 +281,6 @@ public class HelpPrimitives {
     }
 
 
-    public static void printObjectDescription(Datum obj) {
-      System.out.print(describeObject(obj));
-    }
-
-
     //////////////////////////////////////////////////////////////////////////
     // Main Dispatch
     public java.lang.String escmName() {
@@ -279,21 +290,35 @@ public class HelpPrimitives {
     public Datum signature() {
       return Pair.List(
         Pair.List(new Symbol("help")),
+        Pair.List(new Symbol("help"),new Symbol("<path-string>")),
         Pair.List(new Symbol("help"),new Symbol("<obj>")));
     }
 
     public String docstring() {
-      return "@help:Procedures:Meta\nObj Argument:\n  Get information about <obj>.\n\nNo Arguments:\n  Launch the interactive help menu. The help menu consists of folders, which\n  in turn hold descriptions of various variables in EScheme's environment.\n\n    * Note that the <help> menu always operates relative to the program's\n      original <stdin> and <stdout> streams, rather than the values of\n      <current-input-port> and <current-output-port>.\n\n  Type folder names in the input prompt to enter them, and use \":\" as a \n  separator to enter multiple folders (e.g. \"folder1:folder2:folder3\").\n  Type . for the current directory, .. for the parent, ... for the \n  grandparent, etc.\n\n  Type :quit to quit, :~ to return to the home directory, or :help for more \n  information.\n\n  Procedures, classes, and interfaces that want to explain how they work in \n  the <help> menu should use <docstring> syntax. Within the <docstring>, the\n  \"@help\" syntax can be used to place the variable within a certain \n  subdirectory of the help menu. For example:\n\n    (define (fact n)\n      \"\n      @help:Procedures:Numbers\n      The factorial function. Accepts an int arg.\n      \"\n      (if (< n 2)\n          1\n          (* n (fact (- n 1)))))\n\n  would put fact's <help> entry in the Numbers directory, which itself is in\n  the Procedures directory. Docstring entries without the \"@help\" syntax\n  are placed in the \"Misc\" directory.\n\nSee <define-help> to register topic documents in help's file tree.\nSee <help-directory> to get help's files as an EScheme data structure.";
+      return "@help:Procedures:Meta\nObj Argument:\n  Get information about <obj>.\n\nString Argument:\n  Get result of typing in <path-string> to the interactive help menu.\n\nNo Arguments:\n  Launch the interactive help menu. The help menu consists of folders, which\n  in turn hold descriptions of various variables in EScheme's environment.\n\n    * Note that the <help> menu always operates relative to the program's\n      original <stdin> and <stdout> streams, rather than the values of\n      <current-input-port> and <current-output-port>.\n\n  Type folder names in the input prompt to enter them, and use \":\" as a \n  separator to enter multiple folders (e.g. \"folder1:folder2:folder3\").\n  Type . for the current directory, .. for the parent, ... for the \n  grandparent, etc.\n\n  Type :quit to quit, :~ to return to the home directory, or :help for more \n  information.\n\n  Procedures, classes, and interfaces that want to explain how they work in \n  the <help> menu should use <docstring> syntax. Within the <docstring>, the\n  \"@help\" syntax can be used to place the variable within a certain \n  subdirectory of the help menu. For example:\n\n    (define (fact n)\n      \"\n      @help:Procedures:Numbers\n      The factorial function. Accepts an int arg.\n      \"\n      (if (< n 2)\n          1\n          (* n (fact (- n 1)))))\n\n  would put fact's <help> entry in the Numbers directory, which itself is in\n  the Procedures directory. Docstring entries without the \"@help\" syntax\n  are placed in the \"Misc\" directory.\n\nSee <define-help> to register topic documents in help's file tree.\nSee <help-directory> to get help's files as an EScheme data structure.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() > 1)
+      int n = parameters.size();
+      if(n > 1)
         throw new Exceptionf("'(help <optional-obj>) received more than 1 arg: %s", Exceptionf.profileArgs(parameters));
       try {
-        if(parameters.size() == 0) {
+        // Launch the interactive menu
+        if(n == 0) {
           launchInteractiveMenu(this.definitionEnvironment);
+        // Or inspect an item
         } else {
-          printObjectDescription(parameters.get(0));
+          // Given a string: get the <help> menu result of navigating the given path
+          Datum obj = parameters.get(0);
+          if(obj instanceof escm.type.String) {
+            String entry = getInteractiveMenuEntry(this.definitionEnvironment,((escm.type.String)obj).value());
+            if(entry == null) return Boolean.FALSE;
+            return new escm.type.String(entry);
+          // Given an obj: print out information about the given object
+          } else {
+            System.out.print(describeObject(obj));
+            System.out.flush();
+          }
         }
       } catch(TerminateHelpMenuException e) {
         // Ignore this exception, thrown when user enters :quit or ^D (EOF)
