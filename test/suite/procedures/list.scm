@@ -12,6 +12,7 @@
 (ut (list) '())
 (ut (list 1) '(1))
 (ut (list 1 2 3) '(1 2 3))
+(ut ls list) ; check alias
 
 (ut (list* 1 2) '(1 . 2))
 (ut (list* 1 2) (cons 1 2))

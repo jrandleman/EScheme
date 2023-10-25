@@ -171,6 +171,9 @@ public class GlobalState {
   private static final Symbol LEN = new Symbol("len");
   private static final Symbol LENGTH = new Symbol("length");
 
+  private static final Symbol LS = new Symbol("ls");
+  private static final Symbol LIST = new Symbol("list");
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Get the default environment (only has EScheme's core primitives defined)
@@ -213,6 +216,7 @@ public class GlobalState {
     definitionEnvironment.define(IS_ACP,definitionEnvironment.get(IS_ASSOCIATIVE_COLLECTIONP));
     definitionEnvironment.define(IS_OCP,definitionEnvironment.get(IS_ORDERED_COLLECTIONP));
     definitionEnvironment.define(LEN,definitionEnvironment.get(LENGTH));
+    definitionEnvironment.define(LS,definitionEnvironment.get(LIST));
     return definitionEnvironment;
   }
 };

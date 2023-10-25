@@ -42,7 +42,7 @@ public class ListPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Lists\nReturn a list containing \"<obj> ...\". Given no args, returns '().\nLists are right-nested pairs ending in nil: '()\nCreate list literals via the (<literal> ...) syntax.";
+      return "@help:Procedures:Lists\nReturn a list containing \"<obj> ...\". Given no args, returns '().\nLists are right-nested pairs ending in nil: '()\nCreate list literals via the (<literal> ...) syntax.\nCan quote list literals to create values: '(<literal> ...)\n\nAliased by <ls>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

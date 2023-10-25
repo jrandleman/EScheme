@@ -9,7 +9,7 @@
 ```scheme
 (help <optional-obj-or-str>)
 
-(define-help <help-path:name-str> <docstring>) ; aliases <defhelp>
+(define-help <help-path:name-str> <docstring>) ; aliased by <defhelp>
 
 (help-directory)
 ```
@@ -308,7 +308,7 @@
 ------------------------
 ## Lists:
 ```scheme
-(list <obj> ...) (list)
+(list <obj> ...) (list) ; aliased by <ls>
 (list* <obj> <obj> ...) ; create a dotted list
 
 (unfold <break-condition> <map-callable> <successor-callable> <seed>)

@@ -26,7 +26,7 @@
 ```scheme
 (define <variable-name> <value>)
 (define <variable1> <variable2> ... <variableN> <N-length-list-expression>)
-(define (<procedure-name> <parameter> ...) <body-expression> ...)
+(define (<procedure-name> <parameter> ...) <body> ...)
 
 (defined? <variable-name>)
 

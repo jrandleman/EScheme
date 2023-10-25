@@ -702,7 +702,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Core\nAssigns <symbol> to <obj>. <symbol> must have been previously\ndefined. Note that <symbol> may be an object property chain too,\nhence (set! obj.prop 42) is valid syntax!\n\nMay assign several variables to values in a list. For example:\n(set! a b (list 1 2)) sets variables <a> to 1 and <b> to 2.";
+      return "@help:Syntax:Core\nAssigns <symbol> to <obj>. <symbol> must have been previously\ndefined. Note that <symbol> may be an object property chain too,\nhence (set! obj.prop 42) is valid syntax!\n\nMay assign several variables to values in a list. For example:\n(set! a b (list 1 2)) sets variables <a> to 1 and <b> to 2.\n  * Alias <list> with <ls> to quickly create multiple values!";
     }
 
     public static Trampoline.Bounce expandCompoundBindings(String opName, Symbol opSymbol, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -796,7 +796,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Core\nBinds <symbol> to <obj> in the current environment. Note that <symbol> \nmay be an object property chain too, hence (define obj.prop 42) is valid \nsyntax!\n\nMay bind several variables to values in a list. For example:\n(define a b (list 1 2)) binds variables <a> to 1 and <b> to 2.\n\nThe 3rd signature is equivalent to:\n  (define <function-name> (lambda (<parameter> ...) <obj>))\n\nOptionally include <docstring> to yield further details on\nthe procedure's intended purpose in the <help> menu.\n\nAliased by <def>.";
+      return "@help:Syntax:Core\nBinds <symbol> to <obj> in the current environment. Note that <symbol> \nmay be an object property chain too, hence (define obj.prop 42) is valid \nsyntax!\n\nMay bind several variables to values in a list. For example:\n(define a b (list 1 2)) binds variables <a> to 1 and <b> to 2.\n  * Alias <list> with <ls> to quickly create multiple values!\n\nThe 3rd signature is equivalent to:\n  (define <function-name> (lambda (<parameter> ...) <obj>))\n\nOptionally include <docstring> to yield further details on\nthe procedure's intended purpose in the <help> menu.\n\nAliased by <def>.";
     }
 
     private Trampoline.Bounce compileSimpleDefine(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
