@@ -74,6 +74,8 @@ public class CorePrimitives {
   public static Symbol LIST = new Symbol("list");
   public static Symbol CONS = new Symbol("cons");
   public static Symbol FOLD = new Symbol("fold");
+  public static Symbol CAR = new Symbol("car");
+  public static Symbol CDR = new Symbol("cdr");
   public static Symbol APPEND = new Symbol("append");
   public static Symbol MEMBER = new Symbol("member");
   public static Symbol CALL_WITH_VALUES = new Symbol("call-with-values");
@@ -678,6 +680,9 @@ public class CorePrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // (set! <var> <value>)
+  // (set! <var1> <var2> ... <varN> <N-length-list-expression>) 
+  //
+  // NOTE: The EScheme code below doesn't account for multiple variable bindings.
   //
   // (define-syntax set!
   //   (lambda (var val)
@@ -691,31 +696,74 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(SET_BANG,new Symbol("<symbol>"),new Symbol("<obj>"));
+      return Pair.List(
+        Pair.List(SET_BANG,new Symbol("<symbol>"),new Symbol("<obj>")),
+        Pair.List(SET_BANG,new Symbol("<symbol1>"),new Symbol("<symbol2>"),Signature.VARIADIC,new Symbol("<symbolN>"),new Symbol("<N-length-list-expression>")));
     }
 
     public String docstring() {
-      return "@help:Syntax:Core\nAssigns <symbol> to <obj>. <symbol> must have been previously\ndefined. Note that <symbol> may be an object property chain too,\nhence (set! obj.prop 42) is valid syntax!";
+      return "@help:Syntax:Core\nAssigns <symbol> to <obj>. <symbol> must have been previously\ndefined. Note that <symbol> may be an object property chain too,\nhence (set! obj.prop 42) is valid syntax!\n\nMay assign several variables to values in a list. For example:\n(set! a b (list 1 2)) sets variables <a> to 1 and <b> to 2.";
+    }
+
+    public static Trampoline.Bounce expandCompoundBindings(String opName, Symbol opSymbol, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      int n = parameters.size();
+      Symbol hidden = UniqueSymbol.generate("compound-"+opName);
+      Datum listCreationExpression = parameters.get(n-1);
+      Datum beginExpression = Nil.VALUE;
+      for(int i = n-2; i >= 0; --i) {
+        Datum variable = parameters.get(i);
+        if(!(variable instanceof Symbol))
+          throw new Exceptionf("'("+opName+" <symbol1> <symbol2> ... <symbolN> <N-length-list-expression>) invalid syntax: %s", Exceptionf.profileArgs(parameters));
+        beginExpression = new Pair(Pair.List(opSymbol,variable,Pair.List(CAR,hidden)),beginExpression);
+        if(i == 0) {
+          beginExpression = new Pair(Pair.List(DEFINE,hidden,listCreationExpression),beginExpression);
+        } else {
+          beginExpression = new Pair(Pair.List(SET_BANG,hidden,Pair.List(CDR,hidden)),beginExpression);
+        }
+      }
+      return continuation.run(new Pair(BEGIN,beginExpression));
+    }
+
+    private Trampoline.Bounce compileSimpleSetBang(Datum variable, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      return Compiler.run(parameters.get(1),this.definitionEnvironment,(compiledValue) -> () -> {
+        return continuation.run(Pair.binaryAppend(new Pair(BYTECODE,compiledValue),Pair.List(Pair.List(SET_BANG,variable))));
+      });
     }
     
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      if(parameters.size() != 2)
+      int n = parameters.size();
+      if(n < 1)
         throw new Exceptionf("'(set! <symbol> <obj>) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       Datum variable = parameters.get(0);
       if(!(variable instanceof Symbol))
         throw new Exceptionf("'(set! <symbol> <obj>) <symbol> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
-      return Compiler.run(parameters.get(1),this.definitionEnvironment,(compiledValue) -> () -> {
-        return continuation.run(Pair.binaryAppend(new Pair(BYTECODE,compiledValue),Pair.List(Pair.List(SET_BANG,variable))));
-      });
+      if(n <= 2) return compileSimpleSetBang(variable,parameters,continuation);
+      return expandCompoundBindings("set!",SET_BANG,parameters,continuation);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // (define <var> <value>) 
+  // (define <var1> <var2> ... <varN> <N-length-list-expression>) 
   // (define (<function-name> <param> ...) <optional-docstring> <body> ...)
   //
-  // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>.
+  // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>,
+  //       nor multiple variable bindings.
+  //
+  //       For a multiple variable bindings example,
+  //
+  //         (def a b c <list-creation-expr>)
+  //        
+  //         becomes
+  //        
+  //         (begin
+  //           (def hidden <list-creation-expr>)
+  //           (def a (car hidden))
+  //           (set! hidden (cdr hidden))
+  //           (def b (car hidden))
+  //           (set! hidden (cdr hidden))
+  //           (def c (car hidden)))
   // =====
   //
   // (define-syntax define
@@ -742,15 +790,18 @@ public class CorePrimitives {
     public Datum signature() {
       return Pair.List(
         Pair.List(DEFINE,new Symbol("<symbol>"),new Symbol("<obj>")),
+        Pair.List(DEFINE,new Symbol("<symbol1>"),new Symbol("<symbol2>"),Signature.VARIADIC,new Symbol("<symbolN>"),new Symbol("<N-length-list-expression>")),
         Pair.List(DEFINE,Pair.List(new Symbol("<function-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
         Pair.List(DEFINE,Pair.List(new Symbol("<function-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<docstring>"),new Symbol("<body>"),Signature.VARIADIC));
     }
 
     public String docstring() {
-      return "@help:Syntax:Core\nBinds <symbol> to <obj> in the current environment.\nAliased by <def>. The 2nd signature is equivalent to:\n  (define <function-name> (lambda (<parameter> ...) <obj>))\n\nOptionally include <docstring> to yield further details on\nthe procedure's intended purpose in the <help> menu.\n\nNote that <symbol> may be an object property chain too,\nhence (define obj.prop 42) is valid syntax!";
+      return "@help:Syntax:Core\nBinds <symbol> to <obj> in the current environment. Note that <symbol> \nmay be an object property chain too, hence (define obj.prop 42) is valid \nsyntax!\n\nMay bind several variables to values in a list. For example:\n(define a b (list 1 2)) binds variables <a> to 1 and <b> to 2.\n\nThe 3rd signature is equivalent to:\n  (define <function-name> (lambda (<parameter> ...) <obj>))\n\nOptionally include <docstring> to yield further details on\nthe procedure's intended purpose in the <help> menu.\n\nAliased by <def>.";
     }
 
-    private Trampoline.Bounce compileSimpleDefine(Datum bindings, Datum value, Trampoline.Continuation continuation) throws Exception {
+    private Trampoline.Bounce compileSimpleDefine(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      Datum bindings = parameters.get(0);
+      Datum value = parameters.size() == 2 ? parameters.get(1) : Void.VALUE;
       return Compiler.run(value,this.definitionEnvironment,(compiledValue) -> () -> {
         return continuation.run(Pair.binaryAppend(new Pair(BYTECODE,compiledValue),Pair.List(Pair.List(DEFINE,bindings))));
       });
@@ -774,7 +825,10 @@ public class CorePrimitives {
       if(n < 1)
         throw new Exceptionf("'(define <symbol> <value>) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       Datum bindings = parameters.get(0);
-      if(n == 2 && bindings instanceof Symbol) return compileSimpleDefine(bindings,parameters.get(1),continuation);
+      if(bindings instanceof Symbol) {
+        if(n <= 2) return compileSimpleDefine(parameters,continuation);
+        return SetBang.expandCompoundBindings("define",DEFINE,parameters,continuation);
+      }
       return compileProcedureDefine(bindings,n,parameters,continuation);
     }
   }

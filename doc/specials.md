@@ -25,11 +25,13 @@
 ## Bind Variables:
 ```scheme
 (define <variable-name> <value>)
-(define (<procedure-name> <parameter> ...) <value>)
+(define <variable1> <variable2> ... <variableN> <N-length-list-expression>)
+(define (<procedure-name> <parameter> ...) <body-expression> ...)
 
 (defined? <variable-name>)
 
 (set! <variable-name> <value>)
+(set! <variable1> <variable2> ... <variableN> <N-length-list-expression>)
 ```
 
 

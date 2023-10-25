@@ -100,11 +100,26 @@
 (define val 42)
 (ut val 42)
 (ut (begin (set! val 314) val) 314)
+; setting several values
+(define slval1 42)
+(define slval2 42)
+(define slval3 42)
+(ut (begin (set! slval1 slval2 '(1 2)) slval1) 1)
+(ut (begin (set! slval1 slval2 '(1 2)) slval2) 2)
+(ut (begin (set! slval1 slval2 slval3 '(4 5 6)) slval1) 4)
+(ut (begin (set! slval1 slval2 slval3 '(4 5 6)) slval2) 5)
+(ut (begin (set! slval1 slval2 slval3 '(4 5 6)) slval3) 6)
 
 
 (define val 42)
 (ut val 42)
 (ut (begin (define val 314) val) 314)
+; binding several values
+(ut (begin (define dlval1 dlval2 '(1 2)) dlval1) 1)
+(ut (begin (define dlval1 dlval2 '(1 2)) dlval2) 2)
+(ut (begin (define dlval1 dlval2 dlval3 '(4 5 6)) dlval1) 4)
+(ut (begin (define dlval1 dlval2 dlval3 '(4 5 6)) dlval2) 5)
+(ut (begin (define dlval1 dlval2 dlval3 '(4 5 6)) dlval3) 6)
 ; 1-ary
 (ut (begin (define (val) 12) (val)) 12)
 (ut (begin (define (val a) a) (val 1)) 1)
