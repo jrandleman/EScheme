@@ -113,17 +113,17 @@
     - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
     - `#(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
 12. Immutable pairs & strings
-   - Mutable pairs may be implemented by users via the object system!
+    - Mutable pairs may be implemented by users via the object system!
 13. Keyword primitive types
-   - Like symbols, but prefixed with `:`, & they always evaluate to themselves
+    - Like symbols, but prefixed with `:`, & they always evaluate to themselves
 14. Reader extensions:
-   - `(. <obj>)` is equivalent to `<obj>` for the reader
-   - `#eof`, `#void`, `#nil` reader literals yield their respective values
-   - `#path` reader literal expands to the current file's parent path string
+    - `(. <obj>)` is equivalent to `<obj>` for the reader
+    - `#eof`, `#void`, `#nil` reader literals yield their respective values
+    - `#path` reader literal expands to the current file's parent path string
 15. Support for `bytecode`, `compile`, `eval-bytecode`
-   - `bytecode`: special form to have the compiler reflect the given bytecode
-   - `compile`: convert a quoted escm expression into a quoted bytecode list
-   - `eval-bytecode`: evaluate the given quoted bytecode list in the global environment
-     * Hence `eval` is equivalent to `(compose eval-bytecode compile)`!
+    - `bytecode`: special form to have the compiler reflect the given bytecode
+    - `compile`: convert a quoted escm expression into a quoted bytecode list
+    - `eval-bytecode`: evaluate the given quoted bytecode list in the global environment
+      * Hence `eval` is equivalent to `(compose eval-bytecode compile)`!
 16. No `eqv?`: only `eq?` and `equal?`
 17. And so much more! :)
