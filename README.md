@@ -88,7 +88,7 @@
 1. Object System (classes, interfaces, and objects!)
 2. Module System (file-specific variables & macros!)
 3. Multithreading Support (threads and reentrant locks!)
-4. Compile-time Procedural Macros
+4. Compile-time procedural macros
 5. Multi-arity and optional-parameter function support via `fn`!
 6. Stackless function calls (no stack overflow from recursion!)
 7. Trivially `define`/`set!` multiple values: `(define a b '(1 2))`
