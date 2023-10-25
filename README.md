@@ -85,45 +85,45 @@
 ------------------------------------------------------------------------------
 ## EScheme-Specific Concepts (Scheme Extensions/Deviations)
 
-1. Stackless function calls (no stack overflow from recursion)
-2. Support for `bytecode`, `compile`, `eval-bytecode`
-   - `bytecode`: special form to have the compiler reflect the given bytecode
-   - `compile`: convert a quoted escm expression into a quoted bytecode list
-   - `eval-bytecode`: evaluate the given quoted bytecode list in the global environment
-     * Hence `eval` is equivalent to `(compose eval-bytecode compile)`!
-3. `(. <obj>)` is equivalent to `<obj>` for the reader
-4. `#eof`, `#void`, `#nil` reader literals for their respective values
-5. `#path` reader literal that expands to the current file's parent path string
-6. Keyword primitive types
-   - Like symbols, but prefixed with `:`, & they always evaluate to themselves
-7. Vector literals have been reworked
+1. Object System (classes, interfaces, and objects!)
+2. Module System (file-specific variables & macros!)
+3. Multithreading Support (threads and reentrant locks!)
+4. Compile-time Procedural Macros
+5. Multi-arity and optional-parameter function support via `fn`!
+6. Stackless function calls (no stack overflow from recursion!)
+7. Trivially `define`/`set!` mulitple values: `(define a b '(1 2))`
+8. Generic algorithmic collection primitives (string, list, vector, hashmap) 
+9. Vector literals have been reworked
    - Uses `[<obj> ...]` instead of `#(<obj> ...)`
    - Quotes aren't always required: 
      * `[a b c]` compiles to vector of `a`, `b`, & `c` evaluated as variables
    - Quotes can be used though to get expected results: 
      * `(quote [a b c])` => `[(quote a) (quote b) (quote c)]`
-8. Hashmap literals have been added in
-   - Use `{<key> <value> ...}`
-   - A note on hashing:
-     * Immutable values hash based on contents (think numbers, symbols, pairs, etc.)
-     * Mutable values hash based on identity (e.g. ___not___ their contents)
-       - This includes vectors, hashmaps, objects, classes, interfaces, etc.
-   - Quotes aren't always required: 
-     * `{a 42}` compiles to a hashmap with key `a` evaluated as variable
-   - Quotes can be used though to get expected results: 
-     * `(quote {a 42})` => `{(quote a) (quote 42)}`
-9. Immutable pairs & strings
-   - Mutable pairs may be implemented by users via the object system!
-10. `#(` reader lambda literal support
+10. Hashmap literals have been added in
+    - Use `{<key> <value> ...}`
+    - A note on hashing:
+      * Immutable values hash based on contents (think numbers, symbols, pairs, etc.)
+      * Mutable values hash based on identity (e.g. ___not___ their contents)
+        - This includes vectors, hashmaps, objects, classes, interfaces, etc.
+    - Quotes aren't always required: 
+      * `{a 42}` compiles to a hashmap with key `a` evaluated as variable
+    - Quotes can be used though to get expected results: 
+      * `(quote {a 42})` => `{(quote a) (quote 42)}`
+11. `#(` reader lambda literal support
     - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
     - `#(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
-11. Compile-time procedural macro system
-    - No run-time expansion and all global in scope!
-12. Object System (classes, interfaces, and objects!)
-13. Multithreading Support (threads and reentrant locks!)
-14. Multi-arity and optional-parameter support via `fn`!
-15. Proper module system for file-specific variables & macros!
-16. Generic algorithmic primitives for associative & ordered collections!
-    * Associative collections: strings, lists, vectors, hashmaps
-    * Ordered collections: strings, lists, vectors
-17. No `eqv?`: only `eq?` and `equal?`
+12. Immutable pairs & strings
+   - Mutable pairs may be implemented by users via the object system!
+13. Keyword primitive types
+   - Like symbols, but prefixed with `:`, & they always evaluate to themselves
+14. Reader extensions:
+   - `(. <obj>)` is equivalent to `<obj>` for the reader
+   - `#eof`, `#void`, `#nil` reader literals yield their respective values
+   - `#path` reader literal expands to the current file's parent path string
+15. Support for `bytecode`, `compile`, `eval-bytecode`
+   - `bytecode`: special form to have the compiler reflect the given bytecode
+   - `compile`: convert a quoted escm expression into a quoted bytecode list
+   - `eval-bytecode`: evaluate the given quoted bytecode list in the global environment
+     * Hence `eval` is equivalent to `(compose eval-bytecode compile)`!
+16. No `eqv?`: only `eq?` and `equal?`
+17. And so much more! :)
