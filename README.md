@@ -91,8 +91,8 @@
 4. Compile-time Procedural Macros
 5. Multi-arity and optional-parameter function support via `fn`!
 6. Stackless function calls (no stack overflow from recursion!)
-7. Trivially `define`/`set!` mulitple values: `(define a b '(1 2))`
-8. Generic algorithmic collection primitives (string, list, vector, hashmap) 
+7. Trivially `define`/`set!` multiple values: `(define a b '(1 2))`
+8. Generic collection algorithm primitives (string, list, vector, hashmap) 
 9. Vector literals have been reworked
    - Uses `[<obj> ...]` instead of `#(<obj> ...)`
    - Quotes aren't always required: 
