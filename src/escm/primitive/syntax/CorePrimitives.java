@@ -725,7 +725,8 @@ public class CorePrimitives {
     }
 
     private Trampoline.Bounce compileSimpleSetBang(Datum variable, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      return Compiler.run(parameters.get(1),this.definitionEnvironment,(compiledValue) -> () -> {
+      Datum value = parameters.size() == 2 ? parameters.get(1) : Void.VALUE;
+      return Compiler.run(value,this.definitionEnvironment,(compiledValue) -> () -> {
         return continuation.run(Pair.binaryAppend(new Pair(BYTECODE,compiledValue),Pair.List(Pair.List(SET_BANG,variable))));
       });
     }
