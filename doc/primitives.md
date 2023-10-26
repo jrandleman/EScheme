@@ -673,7 +673,7 @@
 (with-exception-handler <unary-callable-handler> <callable-thunk>)
 (raise <obj>)
 
-(time <callable> <arg> ...) ; (<time-taken-in-milliseconds> . <result>)
+(time <callable> <arg> ...) ; (<time-taken-in-milliseconds> <result>)
 
 (serialize <escm-file-path> <serialized-file-path>)
 (serialize-module <escm-file-path> <serialized-file-path>)

@@ -137,4 +137,4 @@
 
 (define time-result (time + 1 2 3))
 (ut (number? (car time-result)) #t)
-(ut (cdr time-result) 6)
+(ut (cadr time-result) 6)

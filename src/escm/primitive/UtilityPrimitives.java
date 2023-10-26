@@ -608,7 +608,7 @@ public class UtilityPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Utilities\nReturns a pair after applying <callable> to \"<arg> ...\":\n  (<execution-time-in-milliseconds> . <result>)";
+      return "@help:Procedures:Utilities\nReturns a list after applying <callable> to \"<arg> ...\":\n  (<execution-time-in-milliseconds> <result>)";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
@@ -621,7 +621,7 @@ public class UtilityPrimitives {
       long start = Calendar.getInstance().getTimeInMillis();
       return ((Callable)callable).callWith(parameters,(result) -> () -> {
         long end = Calendar.getInstance().getTimeInMillis();
-        return continuation.run(new Pair(new Exact(end-start),result));
+        return continuation.run(Pair.List(new Exact(end-start),result));
       });
     }
   }
