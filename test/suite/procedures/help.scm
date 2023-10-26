@@ -19,8 +19,8 @@
 (ut (string? (help "Procedures:Numbers:+")) #t) ; test can get help topic contents as a string
 
 (ut (define-help "Procedures:Numbers:factorial" "Returns N*(N-1)*...*2*1 for integer N") #void)
-(ut (string? (help "Procedures:Numbers:factorial")) #t) ; verify actually defined the new section
+(ut (not (string-contains (help "Procedures:Numbers:factorial") "Returns N*(N-1)*...*2*1 for integer N")) #f) ; verify definition happened
 (ut define-help defhelp) ; check alias
 
 (ut (define help-root (help-directory)) #void) ; check can call <help-directory>
-(ut (and (list? help-root) (car help-root)) :~) ; check at least have the home directory
+(ut (and (pair? help-root) (car help-root)) :~) ; check at least have the home directory
