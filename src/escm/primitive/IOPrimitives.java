@@ -423,7 +423,7 @@ public class IOPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:IO\nRead an EScheme datum from the string. Returns a pair:\n  (cons <read-datum> <string-w/o-read-datum>)";
+      return "@help:Procedures:IO\nRead an EScheme datum from the string. Returns a list:\n  (<read-datum> <string-w/o-read-datum>)";
     }
 
     private static SourceInformation createPseudoSourceInformation(escm.type.String string) {
@@ -441,7 +441,7 @@ public class IOPrimitives {
       if(readString.length() == 0) return escm.type.Void.VALUE; // (read-string "") => <void>
       escm.util.Pair<Datum,Integer> result = Reader.read(readString,createPseudoSourceInformation(str),Reader.GIVE_DETAILED_INCOMPLETE_ERRORS);
       String restOfString = readString.substring(result.second).trim();
-      return new escm.type.Pair(result.first,new escm.type.String(restOfString));
+      return escm.type.Pair.List(result.first,new escm.type.String(restOfString));
     }
   }
 

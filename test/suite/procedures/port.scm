@@ -57,8 +57,8 @@
 
 (ut (port-path (open-input-file in-file)) in-file)
 
-(ut (port-position ip) '(1 . 1))
-(ut (begin (read ip) (port-position ip)) '(3 . 49))
+(ut (port-position ip) '(1 1))
+(ut (begin (read ip) (port-position ip)) '(3 49))
 
 (ut (input-port? (current-input-port)) #t)
 (ut (output-port? (current-output-port)) #t)

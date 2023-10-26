@@ -168,7 +168,7 @@
 (println <optional-output-port> <obj>)
 
 (read <optional-input-port>)
-(read-string <str>) ; returns a pair: (cons <read-datum> <str-without-read-datum>)
+(read-string <str>) ; returns a list: (<read-datum> <str-without-read-datum>)
 (read-line <optional-input-port>)
 (read-char <optional-input-port>)
 (read-chars <integer> <optional-input-port>)
@@ -265,7 +265,7 @@
 (close-port! <port>)
 
 (port-path <port>)
-(port-position <input-port>) ; returns a pair: (<line-number> . <column-number>)
+(port-position <input-port>) ; returns a list: (<line-number> <column-number>)
 
 (port? <obj>)
 (input-port? <obj>)

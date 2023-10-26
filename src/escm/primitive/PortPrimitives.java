@@ -152,14 +152,14 @@ public class PortPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Ports\nReturns a pair: <input-port>'s (<line-number> . <column-number>)";
+      return "@help:Procedures:Ports\nReturns a list: <input-port>'s (<line-number> <column-number>)";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof InputPort))
         throw new Exceptionf("'(port-position <input-port>) didn't receive 1 input-port: %s", Exceptionf.profileArgs(parameters));
       InputPort ip = (InputPort)parameters.get(0);
-      return new escm.type.Pair(new Exact(ip.lineNumber()),new Exact(ip.columnNumber()));
+      return escm.type.Pair.List(new Exact(ip.lineNumber()),new Exact(ip.columnNumber()));
     }
   }
 

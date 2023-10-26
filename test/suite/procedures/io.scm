@@ -74,13 +74,13 @@
 
 (ut 
   (read-string "(defn fact ((n) (fact n 1)) ((n p) (if (< n 2) p (fact (- n 1) (* n p))))) (display (fact 5)) (newline)")
-  (cons 
+  (list 
     '(defn fact ((n) (fact n 1)) ((n p) (if (< n 2) p (fact (- n 1) (* n p)))))
     "(display (fact 5)) (newline)"))
 (ut 
   (read-string "(display (fact 5)) (newline)")
-  (cons '(display (fact 5)) "(newline)"))
-(ut (read-string "(newline)") (cons '(newline) ""))
+  (list '(display (fact 5)) "(newline)"))
+(ut (read-string "(newline)") (list '(newline) ""))
 (ut (read-string "") #void)
 (ut (read-string "    ") #void)
 
