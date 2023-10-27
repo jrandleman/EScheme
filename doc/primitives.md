@@ -171,7 +171,7 @@
 (read-string <str>) ; returns a list: (<read-datum> <str-without-read-datum>)
 (read-line <optional-input-port>)
 (read-char <optional-input-port>)
-(read-chars <integer> <optional-input-port>)
+(read-chars <optional-input-port> <integer>)
 
 (eof? <obj>)
 ```

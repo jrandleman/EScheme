@@ -528,7 +528,7 @@ public class IOPrimitives {
     public Datum signature() {
       return Pair.List(
         Pair.List(new Symbol("read-chars"),new Symbol("<integer>")),
-        Pair.List(new Symbol("read-chars"),new Symbol("<integer>"),new Symbol("<input-port>")));
+        Pair.List(new Symbol("read-chars"),new Symbol("<input-port>"),new Symbol("<integer>")));
     }
 
     public String docstring() {
@@ -538,21 +538,21 @@ public class IOPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
       if(n < 1 || n > 2) 
-        throw new Exceptionf("'(read-chars <integer> <optional-input-port>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
-      Datum intArg = parameters.get(0);
-      if(!ListPrimitives.isValidSize(intArg))
-        throw new Exceptionf("'(read-chars <integer> <optional-input-port>) 1st arg isn't a non-negative integer: %s", Exceptionf.profileArgs(parameters));
-      int totalCharsToRead = ((Real)intArg).intValue();
-      InputPort port = null;
-      if(n == 2) {
-        Datum portDatum = parameters.get(1);
-        if(!(portDatum instanceof InputPort))
-          throw new Exceptionf("'(read-chars <integer> <optional-input-port>) 2nd arg isn't an input port: %s", Exceptionf.profileArgs(parameters));
-        port = (InputPort)portDatum;
-      } else {
-        port = InputPort.getCurrent();
+        throw new Exceptionf("'(read-chars <optional-input-port> <integer>) invalid arg signature: %s", Exceptionf.profileArgs(parameters));
+      Datum intArg = null;
+      Datum portArg = null;
+      if(n == 1) {
+        portArg = InputPort.getCurrent();
+        intArg = parameters.get(0);
+      } else { // n == 2
+        portArg = parameters.get(0);
+        intArg = parameters.get(1);
       }
-      String chars = port.readCharacters(totalCharsToRead);
+      if(!ListPrimitives.isValidSize(intArg))
+        throw new Exceptionf("'(read-chars <optional-input-port> <integer>) <integer> isn't a non-negative integer: %s", Exceptionf.profileArgs(parameters));
+      if(!(portArg instanceof InputPort))
+          throw new Exceptionf("'(read-chars <input-port> <integer>) 1st arg isn't an input port: %s", Exceptionf.profileArgs(parameters));
+      String chars = ((InputPort)portArg).readCharacters(((Real)intArg).intValue());
       if(chars == null) return escm.type.port.Eof.VALUE; // EOF in a <read> call yields an #eof
       return new escm.type.String(chars);
     }

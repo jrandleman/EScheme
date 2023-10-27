@@ -109,11 +109,11 @@
 (define read-chunk-size 5)
 (let ((i 0) (n (length *in-file-contents*)))
   (while ((< i n))
-    (ut (read-chars read-chunk-size in-port) (slice *in-file-contents* i read-chunk-size))
+    (ut (read-chars in-port read-chunk-size) (slice *in-file-contents* i read-chunk-size))
     (set! i (+ i read-chunk-size)))
-  (ut (eof? (read-chars read-chunk-size in-port)) #t)
-  (ut (eof? (read-chars read-chunk-size in-port)) #t)
-  (ut (eof? (read-chars read-chunk-size in-port)) #t))
+  (ut (eof? (read-chars in-port read-chunk-size)) #t)
+  (ut (eof? (read-chars in-port read-chunk-size)) #t)
+  (ut (eof? (read-chars in-port read-chunk-size)) #t))
 
 (reset-in-port!) ; show reading 0 chars doesn't move the port
-(ut (begin (read-chars 0 in-port) (file-read-string (port-path in-port))) *in-file-contents*)
+(ut (begin (read-chars in-port 0) (file-read-string (port-path in-port))) *in-file-contents*)
