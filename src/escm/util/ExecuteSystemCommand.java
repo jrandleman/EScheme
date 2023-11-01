@@ -51,8 +51,9 @@ public class ExecuteSystemCommand {
         BufferedReader reader = new BufferedReader(new InputStreamReader(pro.getInputStream()));
         StringBuilder buffer = new StringBuilder();
         String line = null;
-        while(pro.isAlive() && (line = reader.readLine()) != null) buffer.append('\n'+line);
+        while((line = reader.readLine()) != null) buffer.append('\n'+line);
         output.value = buffer.toString();
+        pro.waitFor();
       } catch(Throwable e) { /* do nothing */ }
     });
     Thread errorThread = new Thread(() -> {
@@ -60,13 +61,15 @@ public class ExecuteSystemCommand {
         BufferedReader reader = new BufferedReader(new InputStreamReader(pro.getErrorStream()));
         StringBuilder buffer = new StringBuilder();
         String line = null;
-        while(pro.isAlive() && (line = reader.readLine()) != null) buffer.append('\n'+line);
+        while((line = reader.readLine()) != null) buffer.append('\n'+line);
         error.value = buffer.toString();
+        pro.waitFor();
       } catch(Throwable e) { /* do nothing */ }
     });
     outputThread.start();
     errorThread.start();
-    pro.waitFor();
+    outputThread.join();
+    errorThread.join();
     res.out = output.value.length() == 0 ? "" : output.value.substring(1);
     res.err = error.value.length() == 0 ? "" : error.value.substring(1);
   }

@@ -141,6 +141,7 @@ public class Installer {
           readStream(buffer,reader);
         }
         output.value = buffer.toString();
+        pro.waitFor();
       } catch(Throwable e) { /* do nothing */ }
     });
     Thread errorThread = new Thread(() -> {
@@ -149,11 +150,13 @@ public class Installer {
         StringBuilder buffer = new StringBuilder();
         readStream(buffer,reader);
         error.value = buffer.toString();
+        pro.waitFor();
       } catch(Throwable e) { /* do nothing */ }
     });
     outputThread.start();
     errorThread.start();
-    pro.waitFor();
+    outputThread.join();
+    errorThread.join();
     res.out = output.value.length() == 0 ? "" : output.value.substring(1);
     res.err = error.value.length() == 0 ? "" : error.value.substring(1);
   }
