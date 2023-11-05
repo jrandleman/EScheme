@@ -455,7 +455,8 @@ public class HelpPrimitives {
         String name = root.getName();
         if(name.equals(HelpNode.UNCATEGORIZED_VARIABLES_FOLDER_NAME)) return "";
         StringBuilder sb = new StringBuilder();
-        sb.append(indents+"* ["+name+"](#"+name+")\n");
+        String link = name.equals("Syntax") ? "Syntax-1" : name;
+        sb.append(indents+"* ["+name+"](#"+link+")\n");
         for(Map.Entry<String,HelpNode> entry : ((FolderNode)root).getOrderedChildren().entrySet()) {
           sb.append(getTableOfContents(entry.getValue(),indents+"  "));
         }

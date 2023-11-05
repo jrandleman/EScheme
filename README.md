@@ -172,7 +172,7 @@ with EScheme's most unique features being referenced from traditional Scheme ent
   * [Utilities](#Utilities)
   * [Vectors](#Vectors)
   * [Void](#Void)
-* [Syntax](#Syntax)
+* [Syntax](#Syntax-1)
   * [Core](#Core)
   * [Generators](#Generators)
   * [Modules](#Modules)
