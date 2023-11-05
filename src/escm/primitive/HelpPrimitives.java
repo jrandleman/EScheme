@@ -452,18 +452,17 @@ public class HelpPrimitives {
 
     private static String getTableOfContents(HelpNode root, String indents) {
       if(root instanceof FolderNode) {
-        String name = root.getName();
-        if(name.equals(HelpNode.UNCATEGORIZED_VARIABLES_FOLDER_NAME)) return "";
+        FolderNode rootDir = (FolderNode)root;
+        if(rootDir.name.equals(HelpNode.UNCATEGORIZED_VARIABLES_FOLDER_NAME)) return "";
         StringBuilder sb = new StringBuilder();
-        String link = name.equals("Syntax") ? "Syntax-1" : name; // clashes with <syntax?> from <:~:Procedures>
-        sb.append(indents+"* ["+name+"](#"+link+")\n");
-        for(Map.Entry<String,HelpNode> entry : ((FolderNode)root).getOrderedChildren().entrySet()) {
+        String link = rootDir.name.equals("Syntax") ? "Syntax-1" : rootDir.name; // clashes with <syntax?> from <:~:Procedures>
+        sb.append(indents+"* ["+rootDir.name+"](#"+link+")\n");
+        for(Map.Entry<String,HelpNode> entry : rootDir.getOrderedChildren().entrySet()) {
           sb.append(getTableOfContents(entry.getValue(),indents+"  "));
         }
         return sb.toString();
       } else {
-        // return indents+"* `"+root.getName()+"`\n";
-        return ""; // no longer printing anything in ToC for non-folders
+        return ""; // not printing anything in ToC for non-folders
       }
     }
 

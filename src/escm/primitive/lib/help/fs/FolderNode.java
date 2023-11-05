@@ -6,6 +6,7 @@ package escm.primitive.lib.help.fs;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TreeMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.type.Datum;
@@ -89,7 +90,7 @@ public class FolderNode extends HelpNode {
     return parent;
   }
 
-  public String getName() {
+  public String getHelpName() {
     return name;
   }
 
@@ -122,8 +123,14 @@ public class FolderNode extends HelpNode {
     StringBuilder sb = new StringBuilder();
     sb.append("\n-------------------------------------------------------------------------------\n");
     sb.append(bolds+name+"\n\n");
+    HashSet<String> printedEntries = new HashSet<String>();
     for(Map.Entry<String,HelpNode> entry : getOrderedChildren().entrySet()) {
-      sb.append(entry.getValue().toMarkdown(depth+1));
+      HelpNode entryValue = entry.getValue();
+      String entryName = entryValue.getHelpName();
+      if(printedEntries.contains(entryName) == false) {
+        printedEntries.add(entryName);
+        sb.append(entryValue.toMarkdown(depth+1));
+      }
     }
     return sb.toString();
   }

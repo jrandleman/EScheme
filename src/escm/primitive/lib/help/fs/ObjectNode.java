@@ -24,7 +24,9 @@ public class ObjectNode extends HelpNode {
     return parent;
   }
 
-  public String getName() {
+  public String getHelpName() {
+    String name = HelpPrimitives.Help.getObjectName(obj);
+    if(name == null) return this.name;
     return name;
   }
 

@@ -146,7 +146,7 @@ public abstract class HelpNode {
   }
 
   public abstract FolderNode getParent();
-  public abstract String getName();
+  public abstract String getHelpName();
   public abstract String getPath();
   public abstract Datum toDatum();
   public abstract String toMarkdown(int depth);

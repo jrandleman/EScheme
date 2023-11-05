@@ -23,7 +23,7 @@ public class TopicNode extends HelpNode {
     return parent;
   }
 
-  public String getName() {
+  public String getHelpName() {
     return name;
   }
 

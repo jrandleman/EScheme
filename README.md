@@ -305,20 +305,6 @@ Given '<ac> ...':
 ```
 
 -------------------------------------------------------------------------------
-### `associative-collection?`
-
-#### Signatures:
-```scheme
-(associative-collection? <obj>)
-```
-
-#### Description:
-```
-Returns whether <obj> is an associative collection:
-    String | List | Vector | Hashmap
-```
-
--------------------------------------------------------------------------------
 ### `conj`
 
 #### Signatures:
@@ -508,19 +494,6 @@ Returns the intersection of values (compared by <elt=?>) between "<ac> ...".
 #### Description:
 ```
 Get the first key in <ac> who's associated value satisfies <predicate?-callable>.
-```
-
--------------------------------------------------------------------------------
-### `length`
-
-#### Signatures:
-```scheme
-(length <associative-collection>)
-```
-
-#### Description:
-```
-Returns <ac>'s length. Aliased by <len>.
 ```
 
 -------------------------------------------------------------------------------
@@ -2760,147 +2733,6 @@ Note that this will infinitely loop for cyclical structures!
 ```
 
 -------------------------------------------------------------------------------
-### `pretty-print`
-
-#### Signatures:
-```scheme
-(pretty-print <obj>)
-(pretty-print <output-port> <obj>)
-```
-
-#### Description:
-```
-Pretty-print <obj> to <output-port> in indented, machine-readable form.
-<output-port> defaults to (current-output-port).
-Aliased by "pprint".
-Note that this will infinitely loop for cyclical structures!
-```
-
--------------------------------------------------------------------------------
-### `pretty-printf`
-
-#### Signatures:
-```scheme
-(pretty-printf <format-string> <arg> ...)
-(pretty-printf <output-port> <format-string> <arg> ...)
-```
-
-#### Description:
-```
-Pretty-print formatted <format-string> with "<arg> ..." to <output-port>
-in indented, machine-readable form. <output-port> defaults to
-(current-output-port).
-Aliased by "pprintf".
-Note that this will infinitely loop for cyclical structures!
->> <format-string> is like Java's printf with unique formatting patterns:
-   ----------------------------------------------------------------------
-   %a = display anything
-   %wa = write anything
-   %pa = pretty-print anything
-   ----------------------------------------------------------------------
-   %... = display unpacked list/vector/hashmap
-   %w... = write unpacked list/vector/hashmap
-   %p... = pretty-print unpacked list/vector/hashmap
-   ----------------------------------------------------------------------
-   %n = number
-   %+n = number (show sign if positive too)
-   %,n = number with commas
-   %En = %en = number (coerced to exact)
-   %In = %in = number (coerced to inexact)
-   %#rn = %#Rn = number (in radix <#> from 2 to 36)
-   %#n = number (left-padded with 0s to a width of <#> characters)
-   %.#n = number (with <#> digits of precision)
-   -> IE "%+e2rn": make exact in binary with sign
-   -> NOTE: 1) 0-padding & precision MUST be of 2 digits or less!
-            2) Can't have radix with I-coercion or precision!
-   ----------------------------------------------------------------------
-   %$ = display real finite as a dollar value
-   %,$ = display real finite as a dollar value seperated by commas
-   ----------------------------------------------------------------------
-   %s = display string
-   %#s = display string & pad left with # spaces
-   %-#s = display string & pad right with # spaces
-   %ws = write string
-   -> NOTE: padding MUST be of 3 digits or less (ie from -999 to 999)
-   ----------------------------------------------------------------------
-   %b  = bool
-   %wb = write "true" or "false" instead of "#t" or "#f"
-   ----------------------------------------------------------------------
-   %%  = "%" (escapes a "%")
-   ----------------------------------------------------------------------
-```
-
--------------------------------------------------------------------------------
-### `display`
-
-#### Signatures:
-```scheme
-(display <obj>)
-(display <output-port> <obj>)
-```
-
-#### Description:
-```
-Print <obj> to <output-port> in human-readable form.
-<output-port> defaults to (current-output-port).
-Note that this will infinitely loop for cyclical structures!
-Aliased by <print>.
-```
-
--------------------------------------------------------------------------------
-### `displayf`
-
-#### Signatures:
-```scheme
-(displayf <format-string> <arg> ...)
-(displayf <output-port> <format-string> <arg> ...)
-```
-
-#### Description:
-```
-Print formatted <format-string> with "<arg> ..." to <output-port> in
-human-readable form. <output-port> defaults to (current-output-port).
-Note that this will infinitely loop for cyclical structures!
-Aliased by <printf>.
->> <format-string> is like Java's printf with unique formatting patterns:
-   ----------------------------------------------------------------------
-   %a = display anything
-   %wa = write anything
-   %pa = pretty-print anything
-   ----------------------------------------------------------------------
-   %... = display unpacked list/vector/hashmap
-   %w... = write unpacked list/vector/hashmap
-   %p... = pretty-print unpacked list/vector/hashmap
-   ----------------------------------------------------------------------
-   %n = number
-   %+n = number (show sign if positive too)
-   %,n = number with commas
-   %En = %en = number (coerced to exact)
-   %In = %in = number (coerced to inexact)
-   %#rn = %#Rn = number (in radix <#> from 2 to 36)
-   %#n = number (left-padded with 0s to a width of <#> characters)
-   %.#n = number (with <#> digits of precision)
-   -> IE "%+e2rn": make exact in binary with sign
-   -> NOTE: 1) 0-padding & precision MUST be of 2 digits or less!
-            2) Can't have radix with I-coercion or precision!
-   ----------------------------------------------------------------------
-   %$ = display real finite as a dollar value
-   %,$ = display real finite as a dollar value seperated by commas
-   ----------------------------------------------------------------------
-   %s = display string
-   %#s = display string & pad left with # spaces
-   %-#s = display string & pad right with # spaces
-   %ws = write string
-   -> NOTE: padding MUST be of 3 digits or less (ie from -999 to 999)
-   ----------------------------------------------------------------------
-   %b  = bool
-   %wb = write "true" or "false" instead of "#t" or "#f"
-   ----------------------------------------------------------------------
-   %%  = "%" (escapes a "%")
-   ----------------------------------------------------------------------
-```
-
--------------------------------------------------------------------------------
 ### `println`
 
 #### Signatures:
@@ -3182,24 +3014,6 @@ Returns whether <obj> is a proper list.
 ```
 
 -------------------------------------------------------------------------------
-### `list`
-
-#### Signatures:
-```scheme
-(list <obj> ...)
-```
-
-#### Description:
-```
-Return a list containing "<obj> ...". Given no args, returns '().
-Lists are right-nested pairs ending in nil: '()
-Create list literals via the (<literal> ...) syntax.
-Can quote list literals to create values: '(<literal> ...)
-
-Aliased by <ls>.
-```
-
--------------------------------------------------------------------------------
 ### `member`
 
 #### Signatures:
@@ -3333,22 +3147,6 @@ An argument list may be used to denote a default argument value.
 #### Description:
 ```
 Convert <escm-code-as-data> into a list of its equivalent bytecode instructions.
-```
-
--------------------------------------------------------------------------------
-### `define-help`
-
-#### Signatures:
-```scheme
-(define-help <path:name-string> <docstring>)
-```
-
-#### Description:
-```
-Register the <docstring> topic document in help's file tree, at path <path> in
-file <name>. Note that <path> denotes a set of folder names seperated by <:>.
-
-Aliased by <defhelp>. Use <help> to see defined topic documents.
 ```
 
 -------------------------------------------------------------------------------
@@ -4009,27 +3807,6 @@ Returns whether <obj> is an exact number.
 #### Description:
 ```
 Returns Euler's number raised to the power of <number>.
-```
-
--------------------------------------------------------------------------------
-### `expt`
-
-#### Signatures:
-```scheme
-(expt <number> <number> ...)
-```
-
-#### Description:
-```
-Returns the exponentiation of "<number> <number> ...".
-Remember that exponentiation is right-associative!
-Aliased by <**>.
-
-Note that EScheme defines the following to be true for all numeric <n>:
-  (expt <n> 0) ; 1
-  (expt 0 <positive-n>) ; 0
-  (expt 0 <negative-n>) ; Infinity
-  (expt 1 <infinite-n>) ; (expt -1 <infinite-n>) ; 1
 ```
 
 -------------------------------------------------------------------------------
@@ -4898,19 +4675,6 @@ Returns the last item in <oc>.
 ```
 Returns the <oc>'s merged with one another according to <binary-predicate?>'s
 comparison.
-```
-
--------------------------------------------------------------------------------
-### `ordered-collection?`
-
-#### Signatures:
-```scheme
-(ordered-collection? <obj>)
-```
-
-#### Description:
-```
-Returns whether <obj> is an ordered collection: String | List | Vector
 ```
 
 -------------------------------------------------------------------------------
@@ -6693,20 +6457,6 @@ Aliased by <pprint-to-string>.
 ```
 
 -------------------------------------------------------------------------------
-### `pretty-print-to-string`
-
-#### Signatures:
-```scheme
-(pretty-print-to-string <obj>)
-```
-
-#### Description:
-```
-Write <obj> to a string in indented, machine-readable form.
-Aliased by <pprint-to-string>.
-```
-
--------------------------------------------------------------------------------
 ### `string->keyword`
 
 #### Signatures:
@@ -6888,20 +6638,6 @@ For example:
   (call-with-values
     (lambda () (values 'bond 'james))
     (lambda (x y) (cons y x)))
-```
-
--------------------------------------------------------------------------------
-### `call-with-current-continuation`
-
-#### Signatures:
-```scheme
-(call-with-current-continuation <unary-callable>)
-```
-
-#### Description:
-```
-Calls <unary-callable> with the current unary continuation as its argument.
-Aliased by <call/cc>.
 ```
 
 -------------------------------------------------------------------------------
@@ -7856,36 +7592,6 @@ property chain too, hence (defined? obj.prop) is valid syntax!
 ```
 
 -------------------------------------------------------------------------------
-### `define`
-
-#### Signatures:
-```scheme
-(define <symbol> <obj>)
-(define <symbol1> <symbol2> ... <symbolN> <N-length-list-expression>)
-(define (<function-name> <parameter> ...) <body> ...)
-(define (<function-name> <parameter> ...) <docstring> <body> ...)
-```
-
-#### Description:
-```
-Binds <symbol> to <obj> in the current environment. Note that <symbol> 
-may be an object property chain too, hence (define obj.prop 42) is valid 
-syntax!
-
-May bind several variables to values in a list. For example:
-(define a b (list 1 2)) binds variables <a> to 1 and <b> to 2.
-  * Alias <list> with <ls> to quickly create multiple values!
-
-The 3rd signature is equivalent to:
-  (define <function-name> (lambda (<parameter> ...) <obj>))
-
-Optionally include <docstring> to yield further details on
-the procedure's intended purpose in the <help> menu.
-
-Aliased by <def>.
-```
-
--------------------------------------------------------------------------------
 ### `define-parameter`
 
 #### Signatures:
@@ -7926,21 +7632,6 @@ For example:
       (fold (lambda (acc item) (list (quote if) acc item #f))
             #t
             conditions)))
-```
-
--------------------------------------------------------------------------------
-### `defined?`
-
-#### Signatures:
-```scheme
-(defined? <symbol>)
-```
-
-#### Description:
-```
-Checks if <symbol> is defined in the current environment.
-Aliased by <def?>. Note that <symbol> may be an object
-property chain too, hence (defined? obj.prop) is valid syntax!
 ```
 
 -------------------------------------------------------------------------------
@@ -8568,68 +8259,6 @@ For example:
 ```
 
 -------------------------------------------------------------------------------
-### `define-generator`
-
-#### Signatures:
-```scheme
-(define-generator (<generator-name> <parameter> ...) <body> ...)
-(define-generator (<generator-name> <parameter> ...) <docstring> <body> ...)
-```
-
-#### Description:
-```
-Define a generator constructor! Calling <generator-name>
-returns a generator thunk, which can suspend its operation
-(until it gets invoked again) via the <yield> macro.
-
-Note that due to being a "generator-constructor", <generator-name>
-should not be called recursively to emulate looping.
-Instead, define an inner procedure or use the "named let" construct.
-
-Optionally include <docstring> to yield further details on the generator
-constructor's intended purpose in the <help> menu.
-
-Aliased by <defgen>.
-For example:
-  ;; Printing Numbers and Strings:
-  (define-generator (print-numbers start total)
-    (let loop ((i start))
-      (if (< i total)
-            (begin 
-              (write i)
-              (display " ")
-              (yield) ; pause execution until re-invoked
-              (loop (+ i 1))))))
-  
-  (define-generator (print-strings start total)
-    (let loop ((i start))
-      (if (< i total)
-            (begin 
-              (write (number->string i))
-              (display " ")
-              (yield) ; pause execution until re-invoked
-              (loop (+ i 1))))))
-  
-  (complete-all-generators! (print-numbers 0 10) (print-strings 0 10))
-  (newline)
-  
-  
-  ;; Creating a stream of integers from a starting number (0 by default):
-  (define-generator (ints-from (start 0))
-    (let loop ((n start))
-      (yield n)
-      (loop (+ n 1))))
-  
-  (define ints (ints-from 42))
-  (display (ints)) 
-  (newline)
-  (display (ints)) 
-  (newline)
-  (display (ints)) 
-  (newline)
-```
-
--------------------------------------------------------------------------------
 ### `yield`
 
 #### Signatures:
@@ -8946,76 +8575,6 @@ Also generates a (<class-name>? <obj>) predicate procedure!
 Optionally include <docstring> to detail information on the class in <help>.
 
 Aliased by <defclass>.
-
-See <object-oriented-programming> in <Topics> for more high-level object
-orientation details. See <class> for more detailed object orientation
-details. See <meta-object> in <Types> for more type details.
-```
-
--------------------------------------------------------------------------------
-### `define-class`
-
-#### Signatures:
-```scheme
-(define-class <class-name>
-  (:extends <super-class>)
-  (:implements <interface> ...)
-  (<field-name> <default-value>)
-  ((<method-name> <parameter> ...) <body> ...)
-  (:static <field-name> <default-value>)
-  (:static (<method-name> <parameter> ...) <body> ...)
-  ...)
-(define-class <class-name>
-  (:extends <super-class>)
-  (:implements <interface> ...)
-  <docstring>
-  (<field-name> <default-value>)
-  ((<method-name> <parameter> ...) <body> ...)
-  (:static <field-name> <default-value>)
-  (:static (<method-name> <parameter> ...) <body> ...)
-  ...)
-```
-
-#### Description:
-```
-Simple wrapper macro combining <define> and <class> to bind <class-name>.
-Also generates a (<class-name>? <obj>) predicate procedure!
-Optionally include <docstring> to detail information on the class in <help>.
-
-Aliased by <defclass>.
-
-See <object-oriented-programming> in <Topics> for more high-level object
-orientation details. See <class> for more detailed object orientation
-details. See <meta-object> in <Types> for more type details.
-```
-
--------------------------------------------------------------------------------
-### `define-interface`
-
-#### Signatures:
-```scheme
-(define-interface <interface-name>
-  (:extends <interface> ...)
-  <field-name>
-  (:static <field-name> <default-value>)
-  (:static (<method-name> <parameter> ...) <body> ...)
-  ...)
-(define-interface <interface-name>
-  (:extends <interface> ...)
-  <docstring>
-  <field-name>
-  (:static <field-name> <default-value>)
-  (:static (<method-name> <parameter> ...) <body> ...)
-  ...)
-```
-
-#### Description:
-```
-Simple wrapper macro combining <define> and <interface> to bind <interface-name>.
-Also generates a (<interface-name>? <obj>) predicate procedure!
-Optionally include <docstring> to detail information on the interface in <help>.
-
-Aliased by <definterface>.
 
 See <object-oriented-programming> in <Topics> for more high-level object
 orientation details. See <class> for more detailed object orientation
