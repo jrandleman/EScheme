@@ -8,6 +8,8 @@
 package escm.primitive;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.TreeMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -216,11 +218,71 @@ public class HelpPrimitives {
 
 
     //////////////////////////////////////////////////////////////////////////
+    // Analyze a Given Object
+    private static String getTab(int tabSpaceWidth) {
+      StringBuilder tab = new StringBuilder();
+      for(; tabSpaceWidth > 0; --tabSpaceWidth) {
+        tab.append(" ");
+      }
+      return tab.toString();
+    }
+
+
+    private static boolean hasMultipleSignatures(Datum sigs) {
+      return Pair.isListPair(sigs) && ((Pair)sigs).car() instanceof Pair;
+    }
+
+
+    private static String padNewlinesWithTabs(String docs, String tab) {
+      return tab+String.join("\n"+tab,docs.split("\n"));
+    }
+
+
+    // Might return <null> on fail
+    public static String getObjectName(Datum obj) {
+      Datum name = MetaPrimitives.CallableName.logic(obj);
+      if(name instanceof Symbol) return ((Symbol)name).value();
+      return null;
+    }
+
+
+    // Might return <null> on fail
+    public static String getObjectSignatures(Datum obj, int tabSpaceWidth) {
+      String tab = getTab(tabSpaceWidth);
+      Datum sigs = MetaPrimitives.CallableSignature.logic(obj);
+      if(sigs instanceof Boolean) return null;
+      if(hasMultipleSignatures(sigs)) {
+        StringBuilder sb = new StringBuilder();
+        while(sigs instanceof Pair) {
+          Pair p = (Pair)sigs;
+          sb.append(padNewlinesWithTabs(p.car().pprint(),tab));
+          sigs = p.cdr();
+          if(sigs instanceof Pair) sb.append("\n");
+        }
+        return sb.toString();
+      } else {
+        return padNewlinesWithTabs(sigs.pprint(),tab);
+      }
+    }
+
+
+    // Might return <null> on fail
+    public static String getObjectDocstring(Datum obj, int tabSpaceWidth) {
+      String tab = getTab(tabSpaceWidth);
+      Datum docs = MetaPrimitives.DocStringExtractor.helpLogic(obj);
+      if(docs instanceof escm.type.String && ((escm.type.String)docs).value().length() > 0) {
+        return padNewlinesWithTabs(((escm.type.String)docs).value(),tab);
+      } else {
+        return tab+"Given item: "+obj.profile();
+      }
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////
     // Describe a Given Object
     private static void printObjectName(StringBuilder sb, Datum obj) {
-      Datum name = MetaPrimitives.CallableName.logic(obj);
-      if(name instanceof Symbol) {
-        String nameValue = ((Symbol)name).value();
+      String nameValue = getObjectName(obj);
+      if(nameValue != null) {
         sb.append("Name: ");
         sb.append(nameValue+"\n");
         for(int i = 0, n = nameValue.length()+6; i < n; ++i) {
@@ -231,41 +293,22 @@ public class HelpPrimitives {
     }
 
 
-    private static boolean hasMultipleSignatures(Datum sigs) {
-      return Pair.isListPair(sigs) && ((Pair)sigs).car() instanceof Pair;
-    }
-
-
-    private static String padNewlinesWithTabs(String docs) {
-      return "  "+String.join("\n  ",docs.split("\n"));
-    }
-
-
     private static void printObjectSignatures(StringBuilder sb, Datum obj) {
-      Datum sigs = MetaPrimitives.CallableSignature.logic(obj);
-      if(!(sigs instanceof Boolean)) {
+      String sigs = getObjectSignatures(obj,2);
+      if(sigs != null) {
         sb.append("Signatures:\n");
-        if(hasMultipleSignatures(sigs)) {
-          while(sigs instanceof Pair) {
-            Pair p = (Pair)sigs;
-            sb.append(padNewlinesWithTabs(p.car().pprint())+"\n");
-            sigs = p.cdr();
-          }
-        } else {
-          sb.append(padNewlinesWithTabs(sigs.pprint())+"\n");
-        }
-        sb.append("\n");
+        sb.append(sigs);
+        sb.append("\n\n");
       }
     }
 
 
     private static void printObjectDocstring(StringBuilder sb, Datum obj) {
-      Datum docs = MetaPrimitives.DocStringExtractor.helpLogic(obj);
-      sb.append("Description:\n");
-      if(docs instanceof escm.type.String && ((escm.type.String)docs).value().length() > 0) {
-        sb.append(padNewlinesWithTabs(((escm.type.String)docs).value())+"\n");
-      } else {
-        sb.append("  Given item: "+obj.profile()+"\n");
+      String docs = getObjectDocstring(obj,2);
+      if(docs != null) {
+        sb.append("Description:\n");
+        sb.append(docs);
+        sb.append("\n");
       }
     }
 
@@ -388,6 +431,63 @@ public class HelpPrimitives {
       if(parameters.size() != 0)
         throw new Exceptionf("'(help-directory) doesn't accept arguments: %s", Exceptionf.profileArgs(parameters));
       return HelpNode.createHomeDirectory(this.definitionEnvironment).toDatum();
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // help-markdown
+  public static class HelpMarkdown extends Primitive {
+    public java.lang.String escmName() {
+      return "help-markdown";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("help-markdown"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Meta\nGet the entire <help> menu directory as a markdown string. Folder contents are\norganized by topics then subfolders, with each section being alphabetically\nlisted.\n\nUse <help> to explore this markdown interactively via the command line.";
+    }
+
+    private static String getTableOfContents(HelpNode root, String indents) {
+      if(root instanceof FolderNode) {
+        String name = root.getName();
+        if(name.equals(HelpNode.UNCATEGORIZED_VARIABLES_FOLDER_NAME)) return "";
+        StringBuilder sb = new StringBuilder();
+        sb.append(indents+"* ["+name+"](#"+name+")\n");
+        for(Map.Entry<String,HelpNode> entry : ((FolderNode)root).getOrderedChildren().entrySet()) {
+          sb.append(getTableOfContents(entry.getValue(),indents+"  "));
+        }
+        return sb.toString();
+      } else {
+        // return indents+"* `"+root.getName()+"`\n";
+        return ""; // no longer printing anything in ToC for non-folders
+      }
+    }
+
+    private static String getTableOfContents(TreeMap<String,HelpNode> contents) {
+      StringBuilder toc = new StringBuilder("-------------------------------------------------------------------------------\n");
+      toc.append("# Table of Contents\n\n");
+      for(ConcurrentHashMap.Entry<String,HelpNode> entry : contents.entrySet()) {
+        toc.append(getTableOfContents(entry.getValue(),""));
+      }
+      return toc.toString();
+    }
+
+    private static String getMarkdown(TreeMap<String,HelpNode> contents) {
+      StringBuilder md = new StringBuilder();
+      for(ConcurrentHashMap.Entry<String,HelpNode> entry : contents.entrySet()) {
+        md.append(entry.getValue().toMarkdown(1));
+      }
+      return md.toString();
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 0)
+        throw new Exceptionf("'(help-markdown) doesn't accept arguments: %s", Exceptionf.profileArgs(parameters));
+      TreeMap<String,HelpNode> contents = HelpNode.createHomeDirectory(this.definitionEnvironment).getOrderedChildren();
+      return new escm.type.String(getTableOfContents(contents)+"\n"+getMarkdown(contents));
     }
   }
 }

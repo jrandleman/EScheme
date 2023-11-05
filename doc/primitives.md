@@ -12,6 +12,7 @@
 (define-help <help-path:name-str> <docstring>) ; aliased by <defhelp>
 
 (help-directory)
+(help-markdown)
 ```
 
 

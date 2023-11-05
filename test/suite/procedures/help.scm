@@ -24,3 +24,5 @@
 
 (ut (define help-root (help-directory)) #void) ; check can call <help-directory>
 (ut (and (pair? help-root) (car help-root)) :~) ; check at least have the home directory
+
+(ut (string? (help-markdown)) #t) ; check can call <help-markdown>

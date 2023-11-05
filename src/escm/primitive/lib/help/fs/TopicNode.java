@@ -23,6 +23,10 @@ public class TopicNode extends HelpNode {
     return parent;
   }
 
+  public String getName() {
+    return name;
+  }
+
   public String getPath() {
     ArrayList<String> path = new ArrayList<String>();
     path.add(':'+name);
@@ -40,6 +44,16 @@ public class TopicNode extends HelpNode {
 
   public Datum toDatum() {
     return new Pair(new Keyword(name),new escm.type.String(toString()));
+  }
+
+  public String toMarkdown(int depth) {
+    String bolds = HelpNode.bolds(depth);
+    StringBuilder sb = new StringBuilder();
+    sb.append("\n-------------------------------------------------------------------------------\n");
+    sb.append(bolds+" `"+name+"`\n\n");
+    sb.append(bolds+"# Description:\n");
+    sb.append("```\n"+description+"\n```\n");
+    return sb.toString();
   }
 
   public String toString() {

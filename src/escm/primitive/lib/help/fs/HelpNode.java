@@ -21,8 +21,9 @@ import escm.vm.runtime.installerGenerated.EscmPath;
 public abstract class HelpNode {
   ////////////////////////////////////////////////////////////////////////////
   // Static Invariants for the Help FS
-  static final String UNCATEGORIZED_VARIABLES_FOLDER_NAME = "Misc";
-  static final String HOME_DIRECTORY_FOLDER_NAME = "~";
+  public static final String UNCATEGORIZED_VARIABLES_FOLDER_NAME = "Misc";
+  public static final String HOME_DIRECTORY_FOLDER_NAME = "~";
+  
   static final String RESERVED_PREFIX_1 = new String(new char[]{(char)101,(char)115,(char)99,(char)109,(char)45});
   static final String RESERVED_PREFIX_2 = new String(new char[]{(char)116,(char)97,(char)115,(char)110,(char)105,(char)109});
 
@@ -136,9 +137,19 @@ public abstract class HelpNode {
 
   ////////////////////////////////////////////////////////////////////////////
   // Required FS Methods
+  public static String bolds(int depth) {
+    StringBuilder sb = new StringBuilder();
+    for(int i = 0; i < depth; ++i) {
+      sb.append("#");
+    }
+    return sb.toString();
+  }
+
   public abstract FolderNode getParent();
+  public abstract String getName();
   public abstract String getPath();
   public abstract Datum toDatum();
+  public abstract String toMarkdown(int depth);
   public abstract String toString();
   public abstract void print();
 }

@@ -5,6 +5,8 @@
 package escm.primitive.lib.help.fs;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.TreeMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.type.Datum;
 import escm.type.Keyword;
@@ -60,6 +62,24 @@ public class FolderNode extends HelpNode {
     return ((FolderNode)item).children.get(names[names.length-1]);
   }
 
+  public TreeMap<String,HelpNode> getOrderedChildren() {
+    TreeMap<String,HelpNode> sorted = new TreeMap<String,HelpNode>((String s1, String s2) -> {
+      HelpNode v1 = children.get(s1);
+      HelpNode v2 = children.get(s2);
+      if(v1 == null) return -1;
+      if(v2 == null) return 1;
+      if(v1 instanceof FolderNode) {
+        if(v2 instanceof FolderNode) return s1.compareTo(s2);
+        return -1;
+      } else {
+        if(v2 instanceof FolderNode) return 1;
+        return s1.compareTo(s2);
+      }
+    });
+    sorted.putAll(children);
+    return sorted;
+  }
+
   public FolderNode getParent() {
     return parent;
   }
@@ -67,6 +87,10 @@ public class FolderNode extends HelpNode {
   public FolderNode getShellParent() {
     if(parent == null) return this;
     return parent;
+  }
+
+  public String getName() {
+    return name;
   }
 
   public String getPath() {
@@ -89,6 +113,19 @@ public class FolderNode extends HelpNode {
       treeDatum = new Pair(entry.getValue().toDatum(),treeDatum);
     }
     return new Pair(new Keyword(name),treeDatum);
+  }
+
+  public String toMarkdown(int depth) {
+    if(name.equals(UNCATEGORIZED_VARIABLES_FOLDER_NAME)) return "";
+    String bolds = HelpNode.bolds(depth);
+    if(bolds.length() != 0) bolds += " ";
+    StringBuilder sb = new StringBuilder();
+    sb.append("\n-------------------------------------------------------------------------------\n");
+    sb.append(bolds+name+"\n\n");
+    for(Map.Entry<String,HelpNode> entry : getOrderedChildren().entrySet()) {
+      sb.append(entry.getValue().toMarkdown(depth+1));
+    }
+    return sb.toString();
   }
 
   public String toString() {
