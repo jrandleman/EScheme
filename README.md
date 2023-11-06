@@ -134,7 +134,8 @@
 ## Automatically Generated Language Documentation
 
 The rest of this README.md contains the result of executing `(help-markdown)`, which 
-yields a string of the `(help)` directory's contents represented as a markdown file.
+yields a string of the `(help)` directory's contents in alphabetical order as a markdown 
+file.
 
 Note that the below is not intended to be a Scheme programming tutorial: the internet 
 is already rife with many wonderful alternatives. Hence, the documentation below is 
