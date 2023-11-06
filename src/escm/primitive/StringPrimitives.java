@@ -447,6 +447,25 @@ public class StringPrimitives {
       return "@help:Procedures:Strings\nUnfolds a string from left to right, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded string, and <update-callable> increments <seed> for the\nnext round of unfolding.\n\nNote that the result of <mapper-callable> must always be a character.";
     }
 
+    public static Trampoline.Bounce logic(Datum acc, Callable breakCond, Callable mapper, Callable successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
+      ArrayList<Datum> breakArgs = new ArrayList<Datum>(1);
+      breakArgs.add(seed);
+      return breakCond.callWith(breakArgs,(shouldBreak) -> () -> {
+        if(shouldBreak.isTruthy()) return continuation.run(acc);
+        ArrayList<Datum> mapArgs = new ArrayList<Datum>(1);
+        mapArgs.add(seed);
+        return mapper.callWith(mapArgs,(mapValue) -> () -> {
+          ArrayList<Datum> sucArgs = new ArrayList<Datum>(1);
+          sucArgs.add(seed);
+          return successor.callWith(sucArgs,(sucValue) -> () -> {
+            return logic(acc,breakCond,mapper,successor,sucValue,(unfolded) -> () -> {
+              return continuation.run(new escm.type.String(mapValue.display()+unfolded.display()));
+            });
+          });
+        });
+      });
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 4) 
         throw new Exceptionf("'(string-unfold <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
@@ -456,8 +475,8 @@ public class StringPrimitives {
         throw new Exceptionf("'(string-unfold <break-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(2) instanceof Callable))
         throw new Exceptionf("'(string-unfold <break-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
-      return ListPrimitives.Unfold.logic(Nil.VALUE,(Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),parameters.get(3),(resultList) -> () -> {
-        return continuation.run(((AssociativeCollection)resultList).toACString());
+      return logic(new escm.type.String(),(Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),parameters.get(3),(resultList) -> () -> {
+        return continuation.run(resultList);
       });
     }
   }
@@ -478,6 +497,23 @@ public class StringPrimitives {
       return "@help:Procedures:Strings\nUnfolds a string from right to left, starting with <seed>. <break?-condition>\ndetermines when unfolding stops, <mapper-callable> maps the <seed> to a value\nin the unfolded string, and <update-callable> increments <seed> for the\nnext round of unfolding.\n\nNote that the result of <mapper-callable> must always be a character.";
     }
 
+    public static Trampoline.Bounce logic(Datum acc, Callable breakCond, Callable mapper, Callable successor, Datum seed, Trampoline.Continuation continuation) throws Exception {
+      ArrayList<Datum> breakArgs = new ArrayList<Datum>(1);
+      breakArgs.add(seed);
+      return breakCond.callWith(breakArgs,(shouldBreak) -> () -> {
+        if(shouldBreak.isTruthy()) return continuation.run(acc);
+        ArrayList<Datum> mapArgs = new ArrayList<Datum>(1);
+        mapArgs.add(seed);
+        return mapper.callWith(mapArgs,(mapValue) -> () -> {
+          ArrayList<Datum> sucArgs = new ArrayList<Datum>(1);
+          sucArgs.add(seed);
+          return successor.callWith(sucArgs,(sucValue) -> () -> {
+            return logic(new escm.type.String(mapValue.display()+acc.display()),breakCond,mapper,successor,sucValue,continuation);
+          });
+        });
+      });
+    }
+
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 4) 
         throw new Exceptionf("'(string-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) invalid args: %s", Exceptionf.profileArgs(parameters));
@@ -487,8 +523,8 @@ public class StringPrimitives {
         throw new Exceptionf("'(string-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 2nd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
       if(!(parameters.get(2) instanceof Callable))
         throw new Exceptionf("'(string-unfold-right <break-condition> <map-callable> <successor-callable> <seed>) 3rd arg isn't a callable: %s", Exceptionf.profileArgs(parameters));
-      return ListPrimitives.UnfoldRight.logic(Nil.VALUE,(Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),parameters.get(3),(resultList) -> () -> {
-        return continuation.run(((AssociativeCollection)resultList).toACString());
+      return logic(new escm.type.String(),(Callable)parameters.get(0),(Callable)parameters.get(1),(Callable)parameters.get(2),parameters.get(3),(resultList) -> () -> {
+        return continuation.run(resultList);
       });
     }
   }

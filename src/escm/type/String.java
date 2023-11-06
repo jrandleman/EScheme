@@ -149,7 +149,10 @@ public class String extends Datum implements OrderedCollection, Callable {
   // Constructor
   public String(java.lang.String s) {
     value = s;
-    codePointLength = -1; // only computed 1st time <codePointLength()> is called
+    codePointLength = s.length();
+    if(codePointLength > 1) {
+      codePointLength = -1; // recompute 1st time <codePointLength()> is called
+    }
   }
 
   public String() {
