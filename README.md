@@ -35,7 +35,7 @@
 
 
 ------------------------------------------------------------------------------
-## Command-line flags may be used to modify EScheme's behavior:
+## EScheme Command Line Flags:
 1. `-v`, `--version`
    * Print EScheme version information
 2. `-h`, `--help`
