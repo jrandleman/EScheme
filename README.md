@@ -83,7 +83,7 @@
 
 
 ------------------------------------------------------------------------------
-## EScheme-Specific Concepts (Scheme Extensions/Deviations)
+## EScheme-Specific Concepts (Scheme Extensions/Deviations):
 
 1. Object System (classes, interfaces, and objects!)
 2. Module System (file-specific variables & macros!)
