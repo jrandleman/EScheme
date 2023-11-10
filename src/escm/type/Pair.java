@@ -564,7 +564,7 @@ public class Pair extends Datum implements OrderedCollection {
   //////////////////////////////////////
 
   private Trampoline.Bounce forEachIter(Callable c, Datum lis, Trampoline.Continuation continuation) throws Exception {
-    if(!(lis instanceof Pair)) return continuation.run(Nil.VALUE);
+    if(!(lis instanceof Pair)) return continuation.run(Void.VALUE);
     Pair plis = (Pair)lis;
     ArrayList<Datum> args = new ArrayList<Datum>(1);
     args.add(plis.car);
