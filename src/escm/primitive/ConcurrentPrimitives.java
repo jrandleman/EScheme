@@ -36,7 +36,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nCreate a new thread that invokes <callable-thunk> upon being passed to\n<thread-start!>. Returns <name-string> (defaults to a random string) if\npassed to <thread-name>.";
+      return "@help:Procedures:Concurrency:Threads\nCreate a new thread that invokes <callable-thunk> upon being passed to\n<thread-start!>. Returns <name-string> (defaults to a random string) if\npassed to <thread-name>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -75,7 +75,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns whether <obj> is a thread.";
+      return "@help:Procedures:Concurrency:Threads\nReturns whether <obj> is a thread.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -98,7 +98,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns <thread>'s name.";
+      return "@help:Procedures:Concurrency:Threads\nReturns <thread>'s name.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -121,7 +121,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns <thread>'s unique id.";
+      return "@help:Procedures:Concurrency:Threads\nReturns <thread>'s unique id.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -144,7 +144,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns <thread>'s callable thunk runnable.";
+      return "@help:Procedures:Concurrency:Threads\nReturns <thread>'s callable thunk runnable.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -167,7 +167,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns <thread>'s status as a symbolic name:\n  'ready | 'running | 'blocked | 'waiting | 'timed-waiting | 'finished";
+      return "@help:Procedures:Concurrency:Threads\nReturns <thread>'s status as a symbolic name:\n  'ready | 'running | 'blocked | 'waiting | 'timed-waiting | 'finished";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -190,7 +190,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nHints that the runtime may temporarily pause this thread if needed.";
+      return "@help:Procedures:Concurrency:Threads\nHints that the runtime may temporarily pause this thread if needed.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -214,7 +214,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nTries to set <thread> to be a JVM daemon thread or not, based on\n<boolean-status>. Returns whether succeeded.";
+      return "@help:Procedures:Concurrency:Threads\nTries to set <thread> to be a JVM daemon thread or not, based on\n<boolean-status>. Returns whether succeeded.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -237,7 +237,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns whether <thread> is a JVM daemon thread.";
+      return "@help:Procedures:Concurrency:Threads\nReturns whether <thread> is a JVM daemon thread.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -260,7 +260,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns <thread>'s priority, between <*min-priority*> and <*max-priority*>.";
+      return "@help:Procedures:Concurrency:Threads\nReturns <thread>'s priority, between <*min-priority*> and <*max-priority*>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -283,7 +283,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nTries to set <thread>'s priority to be <int-priority>, which must be between\n<*min-priority*> and <*max-priority*>. Returns whether succeeded.";
+      return "@help:Procedures:Concurrency:Threads\nTries to set <thread>'s priority to be <int-priority>, which must be between\n<*min-priority*> and <*max-priority*>. Returns whether succeeded.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -314,7 +314,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nStarts \"<thread> ...\" and invokes their callable thunk runnables.\nReturns a list of threads that failed to start (e.g. already started).";
+      return "@help:Procedures:Concurrency:Threads\nStarts \"<thread> ...\" and invokes their callable thunk runnables.\nReturns a list of threads that failed to start (e.g. already started).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -349,7 +349,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nWaits for <thread> to join. If given <max-ms-to-wait>, waits that\nmany milliseconds prior returning control to the calling thread.\nReturns whether <thread> was interrupted.";
+      return "@help:Procedures:Concurrency:Threads\nWaits for <thread> to join. If given <max-ms-to-wait>, waits that\nmany milliseconds prior returning control to the calling thread.\nReturns whether <thread> was interrupted.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -388,7 +388,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns whether <thread> was interrupted.";
+      return "@help:Procedures:Concurrency:Threads\nReturns whether <thread> was interrupted.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -411,7 +411,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nTries to interrupt <thread>, and returns whether succeeded.";
+      return "@help:Procedures:Concurrency:Threads\nTries to interrupt <thread>, and returns whether succeeded.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -434,7 +434,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns whether the current thread has been interrupted.\nAlso clears its \"interrupted?\" flag afterwards.";
+      return "@help:Procedures:Concurrency:Threads\nReturns whether the current thread has been interrupted.\nAlso clears its \"interrupted?\" flag afterwards.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -457,7 +457,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nHas the current thread sleep for <ms-to-sleep> milliseconds.\nReturns whether was interrupted.";
+      return "@help:Procedures:Concurrency:Threads\nHas the current thread sleep for <ms-to-sleep> milliseconds.\nReturns whether was interrupted.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -480,7 +480,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns the current thread.";
+      return "@help:Procedures:Concurrency:Threads\nReturns the current thread.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -503,7 +503,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nRun the given \"<callable-thunk> ...\" items in parallel.";
+      return "@help:Procedures:Concurrency:Threads\nRun the given \"<callable-thunk> ...\" items in parallel.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -535,7 +535,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nBind <symbolic-variable-name> to <value> in <thread>'s (defaults to the\n\"meta-thread\") dynamic environment (effectively a thread-local global\nenvironment).\n\nUse the <thread-define> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Procedures:Concurrency:Threads\nBind <symbolic-variable-name> to <value> in <thread>'s (defaults to the\n\"meta-thread\") dynamic environment (effectively a thread-local global\nenvironment).\n\nUse the <thread-define> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -576,7 +576,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nSet <symbolic-variable-name> to <value> in <thread>'s (defaults to the\n\"meta-thread\") dynamic environment (effectively a thread-local global\nenvironment).\n\nUse the <thread-set!> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Procedures:Concurrency:Threads\nSet <symbolic-variable-name> to <value> in <thread>'s (defaults to the\n\"meta-thread\") dynamic environment (effectively a thread-local global\nenvironment).\n\nUse the <thread-set!> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -621,7 +621,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nGet <symbolic-variable-name>'s value in <thread>'s (defaults to the\n\"meta-thread\") dynamic environment (effectively a thread-local global\nenvironment).\n\nUse the <thread-get> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Procedures:Concurrency:Threads\nGet <symbolic-variable-name>'s value in <thread>'s (defaults to the\n\"meta-thread\") dynamic environment (effectively a thread-local global\nenvironment).\n\nUse the <thread-get> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -665,7 +665,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturn whether <symbolic-variable-name> is defined in <thread>'s (defaults to the\n\"meta-thread\") dynamic environment (effectively a thread-local global\nenvironment).\n\nUse the <thread-get> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Procedures:Concurrency:Threads\nReturn whether <symbolic-variable-name> is defined in <thread>'s (defaults to the\n\"meta-thread\") dynamic environment (effectively a thread-local global\nenvironment).\n\nUse the <thread-get> macro to pass <symbolic-variable-name> as a literal.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -705,7 +705,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturn an associative list of the variables (and their values!) defined\nin <thread>'s (defaults to the \"meta-thread\") dynamic environment.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
+      return "@help:Procedures:Concurrency:Threads\nReturn an associative list of the variables (and their values!) defined\nin <thread>'s (defaults to the \"meta-thread\") dynamic environment.\n\nNote that the \"meta-thread\" is a pseudo-thread accessable by all threads:\n  Thread dynamic environments \"inherit\" value bindings from the\n  \"meta-thread\" by caching a copy of them upon reference.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -739,7 +739,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nCreate a new reentrant-lock mutex. Returns <name-str> (defaults to a random string)\nif passed to <mutex-name>.";
+      return "@help:Procedures:Concurrency:Mutexes\nCreate a new reentrant-lock mutex. Returns <name-str> (defaults to a random string)\nif passed to <mutex-name>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -770,7 +770,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns whether <obj> is a mutex.";
+      return "@help:Procedures:Concurrency:Mutexes\nReturns whether <obj> is a mutex.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -793,7 +793,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns <mutex>'s name.";
+      return "@help:Procedures:Concurrency:Mutexes\nReturns <mutex>'s name.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -818,7 +818,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nGet the variable value \"specifically associated\" with <mutex>.";
+      return "@help:Procedures:Concurrency:Mutexes\nGet the variable value \"specifically associated\" with <mutex>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -840,7 +840,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nSet the variable value \"specifically associated\" with <mutex> to <obj>.";
+      return "@help:Procedures:Concurrency:Mutexes\nSet the variable value \"specifically associated\" with <mutex> to <obj>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -865,7 +865,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns whether managed to acquired the lock prior to <millisecond-timeout>\n(defaults to Infinity).";
+      return "@help:Procedures:Concurrency:Mutexes\nReturns whether managed to acquired the lock prior to <millisecond-timeout>\n(defaults to Infinity).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -899,7 +899,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nUnlocks <mutex>. Returns #f if the current thread wasn't locking <mutex>.";
+      return "@help:Procedures:Concurrency:Mutexes\nUnlocks <mutex>. Returns #f if the current thread wasn't locking <mutex>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -922,7 +922,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns whether <mutex> is locked by any thread.";
+      return "@help:Procedures:Concurrency:Mutexes\nReturns whether <mutex> is locked by any thread.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -945,7 +945,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns the total number of threads waiting to acquire <mutex>.";
+      return "@help:Procedures:Concurrency:Mutexes\nReturns the total number of threads waiting to acquire <mutex>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -968,7 +968,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns whether any thread is waiting for <mutex>.";
+      return "@help:Procedures:Concurrency:Mutexes\nReturns whether any thread is waiting for <mutex>.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -991,7 +991,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nGet the total number of holds on <mutex> by the current thread.";
+      return "@help:Procedures:Concurrency:Mutexes\nGet the total number of holds on <mutex> by the current thread.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -1014,7 +1014,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns whether <mutex> is held by the current thread.";
+      return "@help:Procedures:Concurrency:Mutexes\nReturns whether <mutex> is held by the current thread.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
