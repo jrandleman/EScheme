@@ -167,7 +167,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency\nReturns <thread>'s status as a symbolic name:\n  'ready | 'running | 'blocked | 'waiting | 'timed-waiting | 'finished\n)";
+      return "@help:Procedures:Concurrency\nReturns <thread>'s status as a symbolic name:\n  'ready | 'running | 'blocked | 'waiting | 'timed-waiting | 'finished";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
