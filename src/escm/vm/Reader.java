@@ -197,6 +197,35 @@ public class Reader {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Scope Management Helpers
+  
+  // Static strings used as <scopeName> args to <decrementScope()>
+  private static final String LIST_SCOPE_NAME = "parenthesis";
+  private static final String VECT_SCOPE_NAME = "bracket";
+  private static final String HMAP_SCOPE_NAME = "curly-brace";
+
+  // <scopeOpener> ::= '(' | '[' | '{'
+  // => NOTE: Also updates position in <source>!
+  private static void incrementScope(char scopeOpener, ArrayDeque<Character> containerStack, SourceInformation source) {
+    containerStack.push(scopeOpener);
+    source.updatePosition(scopeOpener);
+  }
+
+  // <scopeOpener> ::= '(' | '[' | '{'
+  // <scopeCloser> ::= ')' | ']' | '}'
+  // <scopeName>   ::= LIST_SCOPE_NAME | VECT_SCOPE_NAME | HMAP_SCOPE_NAME
+  // => NOTE: Also updates position in <source>!
+  private static void decrementScope(char scopeOpener, char scopeCloser, String scopeName, ArrayDeque<Character> containerStack, CharSequence sourceCode, int i, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
+    if(containerStack.size() == 0)
+      throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid "+scopeName+": found a '"+scopeCloser+"' prior an associated '"+scopeOpener+"'!");
+    char opener = containerStack.pop();
+    if(opener != scopeOpener)
+      throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid "+scopeName+": found a closing '"+scopeCloser+"' prior to closing '%c'!", opener);
+    source.updatePosition(scopeCloser);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // List Literal Parsing Helpers
   private static boolean isPeriodSymbol(Datum d) throws ReaderException {
     return d instanceof Symbol && ((Symbol)d).value().equals(".");
@@ -241,26 +270,20 @@ public class Reader {
   private static Pair<Datum,Integer> parseListLiteral(CharSequence sourceCode, int i, int n, ArrayDeque<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
     int listIndex = i-1;
     SourceInformation listSource = source.clone();
-    source.updatePosition('(');
-    if(i == n)
-      throw new IncompleteException(ignoringIncomplete,listIndex,sourceCode,listSource,"READ ERROR: Incomplete list literal!");
-    // parse NIL
-    if(sourceCode.charAt(i) == ')') {
-      source.updatePosition(')');
-      return new Pair<Datum,Integer>(Nil.VALUE,i+1);
-    }
-    // parse PAIR
+    incrementScope('(',containerStack,source); // only do this after cloning above!
     ArrayList<Datum> listItems = new ArrayList<Datum>();
-    while(i < n && sourceCode.charAt(i) != ')') {
+    boolean completed = false;
+    while(i < n && completed == false) {
       Pair<Datum,Integer> parsedItem = readLoop(sourceCode,i,containerStack,source,ignoringIncomplete);
       if(parsedItem.first != null) // if actually parsed something more than just whitespace & comments
         listItems.add(parsedItem.first);
       i = parsedItem.second;
+      completed = parsedItem.first == null && sourceCode.charAt(i-1) == ')';
     }
-    if(i >= n)
+    if(completed == false)
       throw new IncompleteException(ignoringIncomplete,listIndex,sourceCode,listSource,"READ ERROR: Incomplete list literal!");
-    source.updatePosition(')');
-    return new Pair<Datum,Integer>(convertArrayListToSchemeList(listIndex,sourceCode,listSource,listItems),i+1);
+    decrementScope('(',')',LIST_SCOPE_NAME,containerStack,sourceCode,i-1,source,ignoringIncomplete);
+    return new Pair<Datum,Integer>(convertArrayListToSchemeList(listIndex,sourceCode,listSource,listItems),i);
   }
 
   
@@ -271,20 +294,22 @@ public class Reader {
   private static Pair<Datum,Integer> parseVectorLiteral(CharSequence sourceCode, int i, int n, ArrayDeque<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
     int vectorIndex = i-1;
     SourceInformation vectorSource = source.clone();
-    source.updatePosition('[');
+    incrementScope('[',containerStack,source); // only do this after cloning above!
     if(i == n)
       throw new IncompleteException(ignoringIncomplete,vectorIndex,sourceCode,vectorSource,"READ ERROR: Incomplete vector literal!");
     escm.type.Vector vect = new escm.type.Vector();
-    while(i < n && sourceCode.charAt(i) != ']') {
+    boolean completed = false;
+    while(i < n && completed == false) {
       Pair<Datum,Integer> parsedItem = readLoop(sourceCode,i,containerStack,source,ignoringIncomplete);
       if(parsedItem.first != null) // if actually parsed something more than just whitespace & comments
         vect.push(parsedItem.first);
       i = parsedItem.second;
+      completed = parsedItem.first == null && sourceCode.charAt(i-1) == ']';
     }
-    if(i >= n)
+    if(completed == false)
       throw new IncompleteException(ignoringIncomplete,vectorIndex,sourceCode,vectorSource,"READ ERROR: Incomplete vector literal!");
-    source.updatePosition(']');
-    return new Pair<Datum,Integer>(vect,i+1);
+    decrementScope('[',']',VECT_SCOPE_NAME,containerStack,sourceCode,i-1,source,ignoringIncomplete);
+    return new Pair<Datum,Integer>(vect,i);
   }
 
   
@@ -295,12 +320,13 @@ public class Reader {
   private static Pair<Datum,Integer> parseHashmapLiteral(CharSequence sourceCode, int i, int n, ArrayDeque<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
     int hashmapIndex = i-1;
     SourceInformation hashmapSource = source.clone();
-    source.updatePosition('{');
+    incrementScope('{',containerStack,source); // only do this after cloning above!
     if(i == n)
       throw new IncompleteException(ignoringIncomplete,hashmapIndex,sourceCode,hashmapSource,"READ ERROR: Incomplete hashmap literal!");
     escm.type.Hashmap hmap = new escm.type.Hashmap();
     Datum key = null;
-    while(i < n && sourceCode.charAt(i) != '}') {
+    boolean completed = false;
+    while(i < n && completed == false) {
       Pair<Datum,Integer> parsedItem = readLoop(sourceCode,i,containerStack,source,ignoringIncomplete);
       if(parsedItem.first != null) { // if actually parsed something more than just whitespace & comments
         if(key == null) {
@@ -311,13 +337,14 @@ public class Reader {
         }
       }
       i = parsedItem.second;
+      completed = parsedItem.first == null && sourceCode.charAt(i-1) == '}';
     }
-    if(i >= n)
+    if(completed == false)
       throw new IncompleteException(ignoringIncomplete,hashmapIndex,sourceCode,hashmapSource,"READ ERROR: Incomplete hashmap literal!");
     if(key != null)
       throw new ReaderException(hashmapIndex,sourceCode,hashmapSource,"READ ERROR: Hashmap literal %s key %s doesn't have a value!", hmap.write(), key.profile());
-    source.updatePosition('}');
-    return new Pair<Datum,Integer>(hmap,i+1);
+    decrementScope('{','}',HMAP_SCOPE_NAME,containerStack,sourceCode,i-1,source,ignoringIncomplete);
+    return new Pair<Datum,Integer>(hmap,i);
   }
 
 
@@ -556,44 +583,17 @@ public class Reader {
 
   ////////////////////////////////////////////////////////////////////////////
   // Main Reader Loop
-  // => <.first> is <null> if only read whitespace/comments
+  // => <.first> is <null> if only read whitespace/comments/"end of container"
+  // => <.second> is the next location to consider parsing
+  // => Will return immediately if detected the end of a scope (')',']','}')
   private static Pair<Datum,Integer> readLoop(CharSequence sourceCode, int startIndex, ArrayDeque<Character> containerStack, SourceInformation source, boolean ignoringIncomplete) throws ReaderException {
 
     for(int i = startIndex, n = sourceCode.length(); i < n; ++i) {
       char currentChar = sourceCode.charAt(i);
 
-      // Account for paren scoping
-      if(currentChar == '(') {
-        containerStack.push('(');
-      } else if(currentChar == ')') {
-        if(containerStack.size() == 0)
-          throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid parenthesis: found a ')' prior an associated '('!");
-        char opener = containerStack.pop();
-        if(opener != '(')
-          throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid parenthesis: found a closing ')' prior to closing '%c'!", opener);
-        return new Pair<Datum,Integer>(null,i);
-
-      // Account for bracket scoping
-      } else if(currentChar == '[') {
-        containerStack.push('[');
-      } else if(currentChar == ']') {
-        if(containerStack.size() == 0)
-          throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid bracket: found a ']' prior an associated '['!");
-        char opener = containerStack.pop();
-        if(opener != '[')
-          throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid bracket: found a closing ']' prior to closing '%c'!", opener);
-        return new Pair<Datum,Integer>(null,i);
-
-      // Account for curly-brace scoping
-      } else if(currentChar == '{') {
-        containerStack.push('{');
-      } else if(currentChar == '}') {
-        if(containerStack.size() == 0)
-          throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid curly-brace: found a '}' prior an associated '{'!");
-        char opener = containerStack.pop();
-        if(opener != '{')
-          throw new ReaderException(i,sourceCode,source,"READ ERROR: Invalid curly-brace: found a closing '}' prior to closing '%c'!", opener);
-        return new Pair<Datum,Integer>(null,i);
+      // Return if scope ended
+      if(currentChar == ')' || currentChar == ']' || currentChar == '}') {
+        return new Pair<Datum,Integer>(null,i+1);
       }
 
       // Ignore whitespace

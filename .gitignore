@@ -1,3 +1,5 @@
 
 .DS_Store
 doc/TODO.md
+installer/speed-test.scm
+test/parallel-main.scm

@@ -330,7 +330,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Vectors\nAppend \"<appended-vector> ...\" to <vector> (thereby mutating it).";
+      return "@help:Procedures:Vectors\nAppend vectors to <vector> (thereby mutating <vector>).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
