@@ -295,8 +295,6 @@ public class Reader {
     int vectorIndex = i-1;
     SourceInformation vectorSource = source.clone();
     incrementScope('[',containerStack,source); // only do this after cloning above!
-    if(i == n)
-      throw new IncompleteException(ignoringIncomplete,vectorIndex,sourceCode,vectorSource,"READ ERROR: Incomplete vector literal!");
     escm.type.Vector vect = new escm.type.Vector();
     boolean completed = false;
     while(i < n && completed == false) {
@@ -321,8 +319,6 @@ public class Reader {
     int hashmapIndex = i-1;
     SourceInformation hashmapSource = source.clone();
     incrementScope('{',containerStack,source); // only do this after cloning above!
-    if(i == n)
-      throw new IncompleteException(ignoringIncomplete,hashmapIndex,sourceCode,hashmapSource,"READ ERROR: Incomplete hashmap literal!");
     escm.type.Hashmap hmap = new escm.type.Hashmap();
     Datum key = null;
     boolean completed = false;
