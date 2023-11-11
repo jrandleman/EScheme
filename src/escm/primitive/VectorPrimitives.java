@@ -82,7 +82,7 @@ public class VectorPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Vectors\nSets the entry at <index> in <vector> to be <obj>.";
+      return "@help:Procedures:Vectors\nSets the entry at <index> in <vector> to be <obj>. Note this can also be done\nby directly applying the vector to the index and new value (like a function).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

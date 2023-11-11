@@ -38,7 +38,7 @@
 //
 //      - Datum toReverseList() // used internally
 //
-//      - callWith(...) // given an index, returns the entry at that position
+//      - callWith(...) // given an index, returns the entry at that position. alternatively give a value too to set!
 
 package escm.type;
 import java.util.ArrayList;
@@ -298,29 +298,37 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       if(n == 0) {
         return "Vector of length 0. Hashcode is "+hashCode();
       } else if(n == 1) {
-        return "Vector of length 1.\nApply to index 0 to get the item.\nHashcode is "+hashCode()+".";
+        return "Vector of length 1. Apply to index 0 to get the item. Set index 0 by applying\nto 0 and the new value. Hashcode is "+hashCode()+".";
       } else {
-        return "Vector of length "+n+".\nApply to any index from 0 to "+(n-1)+" to get an item.\nHashcode is "+hashCode()+".";
+        return "Vector of length "+n+". Apply to any index from 0 to "+(n-1)+" to get an item.\nSet those indices by applying to an index and the new value.\nHashcode is "+hashCode()+".";
       }
     }
   }
 
   public Datum signature() {
-    return Pair.List(this,new Symbol("<index>"));
+    return Pair.List(
+      Pair.List(this,new Symbol("<index>")),
+      Pair.List(this,new Symbol("<index>"),new Symbol("<obj>")));
   }
 
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
-    if(arguments.size() != 1)
+    int n = arguments.size();
+    if(n == 0)
       throw new Exceptionf("VECTOR [CALLABLE-GET]: Expects exactly 1 integer index arg for vector %s: %s", write(), Exceptionf.profileArgs(arguments));
     Datum idxDatum = arguments.get(0);
     if(!(idxDatum instanceof Real) || !((Real)idxDatum).isInteger())
-      throw new Exceptionf("VECTOR [CALLABLE-GET]: Expects exactly 1 integer index arg for vector %s: %s", write(), Exceptionf.profileArgs(arguments));
+      throw new Exceptionf("VECTOR [CALLABLE-GET]: Expects an integer index arg for vector %s: %s", write(), Exceptionf.profileArgs(arguments));
     int index = ((Real)idxDatum).intValue();
     synchronized(this) {
       if(index < 0 || index >= value.size())
         throw new Exceptionf("VECTOR [CALLABLE-GET]: Invalid index %d (size %d) for vector %s", index, value.size(), write());
-      return continuation.run(value.get(index));
+      if(n == 1) return continuation.run(value.get(index));
+      if(n == 2) {
+        value.set(index,arguments.get(1));
+        return continuation.run(Void.VALUE);
+      }
     }
+    throw new Exceptionf("VECTOR [CALLABLE-GET]: Expects 1 or 2 integer index arg(s) for vector %s: %s", write(), Exceptionf.profileArgs(arguments));
   }
 
 

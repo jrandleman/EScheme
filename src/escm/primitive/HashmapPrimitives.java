@@ -153,7 +153,7 @@ public class HashmapPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Hashmaps\nAssociate <value> to <key> in <hashmap>.\nReturns whether replaced an existing value.";
+      return "@help:Procedures:Hashmaps\nAssociate <value> to <key> in <hashmap>. Returns whether replaced an existing\nvalue. Note this can also be done by directly applying the hashmap to the key\nand new value (like a function).";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

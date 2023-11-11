@@ -152,6 +152,8 @@ with EScheme's most unique features being referenced from traditional Scheme ent
   * [Booleans](#Booleans)
   * [Characters](#Characters)
   * [Concurrency](#Concurrency)
+    * [Mutexes](#Mutexes)
+    * [Threads](#Threads)
   * [Date-Time](#Date-Time)
   * [Equality](#Equality)
   * [Files](#Files)
@@ -1178,229 +1180,237 @@ see <ascii-char?> to determine if a <char> is an ASCII value.
 
 
 -------------------------------------------------------------------------------
-### `current-thread`
+### Mutexes
 
-#### Signatures:
-```scheme
-(current-thread)
-```
-
-#### Description:
-```
-Returns the current thread.
-```
 
 -------------------------------------------------------------------------------
-### `interrupted?!`
+#### `mutex`
 
-#### Signatures:
-```scheme
-(interrupted?!)
-```
-
-#### Description:
-```
-Returns whether the current thread has been interrupted.
-Also clears its "interrupted?" flag afterwards.
-```
-
--------------------------------------------------------------------------------
-### `mutex`
-
-#### Signatures:
+##### Signatures:
 ```scheme
 (mutex)
 (mutex <name-string>)
 ```
 
-#### Description:
+##### Description:
 ```
 Create a new reentrant-lock mutex. Returns <name-str> (defaults to a random string)
 if passed to <mutex-name>.
 ```
 
 -------------------------------------------------------------------------------
-### `mutex-held?`
+#### `mutex-held?`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (mutex-held? <mutex>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns whether <mutex> is held by the current thread.
 ```
 
 -------------------------------------------------------------------------------
-### `mutex-hold-count`
+#### `mutex-hold-count`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (mutex-hold-count <mutex>)
 ```
 
-#### Description:
+##### Description:
 ```
 Get the total number of holds on <mutex> by the current thread.
 ```
 
 -------------------------------------------------------------------------------
-### `mutex-lock!`
+#### `mutex-lock!`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (mutex-lock! <mutex>)
 (mutex-lock! <mutex> <milliseconds-timeout>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns whether managed to acquired the lock prior to <millisecond-timeout>
 (defaults to Infinity).
 ```
 
 -------------------------------------------------------------------------------
-### `mutex-locked?`
+#### `mutex-locked?`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (mutex-locked? <mutex>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns whether <mutex> is locked by any thread.
 ```
 
 -------------------------------------------------------------------------------
-### `mutex-name`
+#### `mutex-name`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (mutex-name <mutex>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns <mutex>'s name.
 ```
 
 -------------------------------------------------------------------------------
-### `mutex-queue-length`
+#### `mutex-queue-length`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (mutex-queue-length <mutex>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns the total number of threads waiting to acquire <mutex>.
 ```
 
 -------------------------------------------------------------------------------
-### `mutex-queued?`
+#### `mutex-queued?`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (mutex-queued? <mutex>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns whether any thread is waiting for <mutex>.
 ```
 
 -------------------------------------------------------------------------------
-### `mutex-set-specific!`
+#### `mutex-set-specific!`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (mutex-set-specific! <mutex> <obj>)
 ```
 
-#### Description:
+##### Description:
 ```
 Set the variable value "specifically associated" with <mutex> to <obj>.
 ```
 
 -------------------------------------------------------------------------------
-### `mutex-specific`
+#### `mutex-specific`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (mutex-specific <mutex>)
 ```
 
-#### Description:
+##### Description:
 ```
 Get the variable value "specifically associated" with <mutex>.
 ```
 
 -------------------------------------------------------------------------------
-### `mutex-unlock!`
+#### `mutex-unlock!`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (mutex-unlock! <mutex>)
 ```
 
-#### Description:
+##### Description:
 ```
 Unlocks <mutex>. Returns #f if the current thread wasn't locking <mutex>.
 ```
 
 -------------------------------------------------------------------------------
-### `mutex?`
+#### `mutex?`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (mutex? <obj>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns whether <obj> is a mutex.
 ```
 
 -------------------------------------------------------------------------------
-### `parallel`
+### Threads
 
-#### Signatures:
+
+-------------------------------------------------------------------------------
+#### `current-thread`
+
+##### Signatures:
+```scheme
+(current-thread)
+```
+
+##### Description:
+```
+Returns the current thread.
+```
+
+-------------------------------------------------------------------------------
+#### `interrupted?!`
+
+##### Signatures:
+```scheme
+(interrupted?!)
+```
+
+##### Description:
+```
+Returns whether the current thread has been interrupted.
+Also clears its "interrupted?" flag afterwards.
+```
+
+-------------------------------------------------------------------------------
+#### `parallel`
+
+##### Signatures:
 ```scheme
 (parallel <callable-thunk> ...)
 ```
 
-#### Description:
+##### Description:
 ```
 Run the given "<callable-thunk> ..." items in parallel.
 ```
 
 -------------------------------------------------------------------------------
-### `sleep`
+#### `sleep`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (sleep <millisecond-integer>)
 ```
 
-#### Description:
+##### Description:
 ```
 Has the current thread sleep for <ms-to-sleep> milliseconds.
 Returns whether was interrupted.
 ```
 
 -------------------------------------------------------------------------------
-### `thread`
+#### `thread`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread <thunk-callable>)
 (thread <name-string> <thunk-callable>)
 ```
 
-#### Description:
+##### Description:
 ```
 Create a new thread that invokes <callable-thunk> upon being passed to
 <thread-start!>. Returns <name-string> (defaults to a random string) if
@@ -1408,28 +1418,28 @@ passed to <thread-name>.
 ```
 
 -------------------------------------------------------------------------------
-### `thread-daemon?`
+#### `thread-daemon?`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-daemon? <thread>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns whether <thread> is a JVM daemon thread.
 ```
 
 -------------------------------------------------------------------------------
-### `thread-define'`
+#### `thread-define'`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-define' <symbol> <value>)
 (thread-define' <thread> <symbol> <value>)
 ```
 
-#### Description:
+##### Description:
 ```
 Bind <symbolic-variable-name> to <value> in <thread>'s (defaults to the
 "meta-thread") dynamic environment (effectively a thread-local global
@@ -1443,15 +1453,15 @@ Note that the "meta-thread" is a pseudo-thread accessable by all threads:
 ```
 
 -------------------------------------------------------------------------------
-### `thread-defined?'`
+#### `thread-defined?'`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-defined?' <symbol>)
 (thread-defined?' <thread> <symbol>)
 ```
 
-#### Description:
+##### Description:
 ```
 Return whether <symbolic-variable-name> is defined in <thread>'s (defaults to the
 "meta-thread") dynamic environment (effectively a thread-local global
@@ -1465,15 +1475,15 @@ Note that the "meta-thread" is a pseudo-thread accessable by all threads:
 ```
 
 -------------------------------------------------------------------------------
-### `thread-dynamic-environment`
+#### `thread-dynamic-environment`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-dynamic-environment)
 (thread-dynamic-environment <thread>)
 ```
 
-#### Description:
+##### Description:
 ```
 Return an associative list of the variables (and their values!) defined
 in <thread>'s (defaults to the "meta-thread") dynamic environment.
@@ -1484,15 +1494,15 @@ Note that the "meta-thread" is a pseudo-thread accessable by all threads:
 ```
 
 -------------------------------------------------------------------------------
-### `thread-get'`
+#### `thread-get'`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-get' <symbol>)
 (thread-get' <thread> <symbol>)
 ```
 
-#### Description:
+##### Description:
 ```
 Get <symbolic-variable-name>'s value in <thread>'s (defaults to the
 "meta-thread") dynamic environment (effectively a thread-local global
@@ -1506,54 +1516,54 @@ Note that the "meta-thread" is a pseudo-thread accessable by all threads:
 ```
 
 -------------------------------------------------------------------------------
-### `thread-id`
+#### `thread-id`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-id <thread>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns <thread>'s unique id.
 ```
 
 -------------------------------------------------------------------------------
-### `thread-interrupt!`
+#### `thread-interrupt!`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-interrupt! <thread>)
 ```
 
-#### Description:
+##### Description:
 ```
 Tries to interrupt <thread>, and returns whether succeeded.
 ```
 
 -------------------------------------------------------------------------------
-### `thread-interrupted?`
+#### `thread-interrupted?`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-interrupted? <thread>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns whether <thread> was interrupted.
 ```
 
 -------------------------------------------------------------------------------
-### `thread-join!`
+#### `thread-join!`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-join! <thread>)
 (thread-join! <thread> <milliseconds-timeout>)
 ```
 
-#### Description:
+##### Description:
 ```
 Waits for <thread> to join. If given <max-ms-to-wait>, waits that
 many milliseconds prior returning control to the calling thread.
@@ -1561,54 +1571,54 @@ Returns whether <thread> was interrupted.
 ```
 
 -------------------------------------------------------------------------------
-### `thread-name`
+#### `thread-name`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-name <thread>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns <thread>'s name.
 ```
 
 -------------------------------------------------------------------------------
-### `thread-priority`
+#### `thread-priority`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-priority <thread>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns <thread>'s priority, between <*min-priority*> and <*max-priority*>.
 ```
 
 -------------------------------------------------------------------------------
-### `thread-runnable`
+#### `thread-runnable`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-runnable <thread>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns <thread>'s callable thunk runnable.
 ```
 
 -------------------------------------------------------------------------------
-### `thread-set!'`
+#### `thread-set!'`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-set!' <symbol> <value>)
 (thread-set!' <thread> <symbol> <value>)
 ```
 
-#### Description:
+##### Description:
 ```
 Set <symbolic-variable-name> to <value> in <thread>'s (defaults to the
 "meta-thread") dynamic environment (effectively a thread-local global
@@ -1622,84 +1632,83 @@ Note that the "meta-thread" is a pseudo-thread accessable by all threads:
 ```
 
 -------------------------------------------------------------------------------
-### `thread-set-daemon!`
+#### `thread-set-daemon!`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-set-daemon! <thread> <status-boolean>)
 ```
 
-#### Description:
+##### Description:
 ```
 Tries to set <thread> to be a JVM daemon thread or not, based on
 <boolean-status>. Returns whether succeeded.
 ```
 
 -------------------------------------------------------------------------------
-### `thread-set-priority!`
+#### `thread-set-priority!`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-set-priority! <thread> <priority-integer>)
 ```
 
-#### Description:
+##### Description:
 ```
 Tries to set <thread>'s priority to be <int-priority>, which must be between
 <*min-priority*> and <*max-priority*>. Returns whether succeeded.
 ```
 
 -------------------------------------------------------------------------------
-### `thread-start!`
+#### `thread-start!`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-start! <thread> ...)
 ```
 
-#### Description:
+##### Description:
 ```
 Starts "<thread> ..." and invokes their callable thunk runnables.
 Returns a list of threads that failed to start (e.g. already started).
 ```
 
 -------------------------------------------------------------------------------
-### `thread-status`
+#### `thread-status`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-status <thread>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns <thread>'s status as a symbolic name:
   'ready | 'running | 'blocked | 'waiting | 'timed-waiting | 'finished
-)
 ```
 
 -------------------------------------------------------------------------------
-### `thread-yield`
+#### `thread-yield`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread-yield)
 ```
 
-#### Description:
+##### Description:
 ```
 Hints that the runtime may temporarily pause this thread if needed.
 ```
 
 -------------------------------------------------------------------------------
-### `thread?`
+#### `thread?`
 
-#### Signatures:
+##### Signatures:
 ```scheme
 (thread? <obj>)
 ```
 
-#### Description:
+##### Description:
 ```
 Returns whether <obj> is a thread.
 ```
@@ -6954,7 +6963,7 @@ Vectors are applicable to an index to get an entry: (<vector> <index>)
 
 #### Description:
 ```
-Append "<appended-vector> ..." to <vector> (thereby mutating it).
+Append vectors to <vector> (thereby mutating <vector>).
 ```
 
 -------------------------------------------------------------------------------

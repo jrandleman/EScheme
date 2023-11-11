@@ -26,7 +26,7 @@
 //
 //      - Datum toReverseList() // used internally
 //
-//      - callWith(...) // given a key, returns the value at that position
+//      - callWith(...) // given a key, returns the value at that position. alternatively give a value too to set!
 
 package escm.type;
 import java.util.Arrays;
@@ -167,22 +167,32 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
     if(n == 0) {
       return "Hashmap of length 0. Hashcode is "+hashCode();
     } else {
-      return "Hashmap of length "+n+".\nApply to one of its keys to get an associated value.\nHashcode is "+hashCode()+".";
+      return "Hashmap of length "+n+".\nApply to one of its keys to get an associated value.\nSet those keys by applying to a key and the new value.\nHashcode is "+hashCode()+".";
     }
   }
 
   public Datum signature() {
-    return Pair.List(this,new Symbol("<key>"));
+    return Pair.List(
+      Pair.List(this,new Symbol("<key>")),
+      Pair.List(this,new Symbol("<key>"),new Symbol("<obj>")));
   }
 
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
-    if(arguments.size() != 1)
-      throw new Exceptionf("HASHMAP [CALLABLE-GET]: Expects exactly 1 key arg for hashmap %s: %s", write(), Exceptionf.profileArgs(arguments));
+    int n = arguments.size();
+    if(n == 0)
+      throw new Exceptionf("HASHMAP [CALLABLE-GET]: Expects 1 or 2 arg(s) for hashmap %s: %s", write(), Exceptionf.profileArgs(arguments));
     Datum key = arguments.get(0);
-    Datum val = value.get(key);
-    if(val == null)
-      throw new Exceptionf("HASHMAP [CALLABLE-GET]: Invalid key %s for hashmap %s", key.profile(), write());
-    return continuation.run(val);
+    if(n == 1) {
+      Datum val = value.get(key);
+      if(val == null)
+        throw new Exceptionf("HASHMAP [CALLABLE-GET]: Invalid key %d (size %d) for hashmap %s", key, value.size(), write());
+      return continuation.run(val);
+    }
+    if(n == 2) {
+      value.put(key,arguments.get(1));
+      return continuation.run(Void.VALUE);
+    }
+    throw new Exceptionf("HASHMAP [CALLABLE-GET]: Expects 1 or 2 arg(s) for hashmap %s: %s", write(), Exceptionf.profileArgs(arguments));
   }
 
 
