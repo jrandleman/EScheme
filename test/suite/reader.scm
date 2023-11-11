@@ -154,7 +154,7 @@
 (ut (symbol? 'a) #t)
 (ut (symbol? 'ab) #t)
 
-; check callability
+; check callability (get)
 (ut ("abc" 0) #\a)
 (ut ("abc" 1) #\b)
 (ut ("abc" 2) #\c)
@@ -164,6 +164,12 @@
 (ut ('{0 a 1 b 2 c} 0) 'a)
 (ut ('{0 a 1 b 2 c} 1) 'b)
 (ut ('{0 a 1 b 2 c} 2) 'c)
+
+; check callability (set)
+(def v [1 2 3])
+(def h {:a 1 :b 2 :c 3})
+(ut (begin (v 0 4) (v 1 5) (v 2 6) v) [4 5 6])
+(ut (begin (h :a 4) (h :b 5) (h :c 6) (h :d 7) h) {:a 4 :b 5 :c 6 :d 7})
 
 (define-interface I)
 (define-class C ((->procedure) 0))
