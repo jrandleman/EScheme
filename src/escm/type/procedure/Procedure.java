@@ -110,7 +110,7 @@ public abstract class Procedure extends Datum implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Procedure copy() {
+  public Procedure shallowCopy() {
     return this;
   }
 }

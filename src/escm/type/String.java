@@ -254,7 +254,7 @@ public class String extends Datum implements OrderedCollection, Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying semantics
-  public String copy() {
+  public String shallowCopy() {
     return this;
   }
 

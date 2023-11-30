@@ -87,7 +87,7 @@ public class Void extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Void copy() {
+  public Void shallowCopy() {
     return this;
   }
 }

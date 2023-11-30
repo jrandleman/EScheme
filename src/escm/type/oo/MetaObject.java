@@ -279,14 +279,14 @@ public abstract class MetaObject extends Dottable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public abstract MetaObject copy();
+  public abstract MetaObject shallowCopy();
 
 
   // Support function to generate a copy <props>
   public static ConcurrentHashMap<String,Datum> copyProps(ConcurrentHashMap<String,Datum> props) {
     ConcurrentHashMap<String,Datum> copied = new ConcurrentHashMap<String,Datum>();
     for(ConcurrentHashMap.Entry<String,Datum> e : props.entrySet())
-      copied.put(e.getKey(),e.getValue().copy());
+      copied.put(e.getKey(),e.getValue().shallowCopy());
     return copied;
   }
 }

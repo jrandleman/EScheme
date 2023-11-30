@@ -52,7 +52,7 @@ public class Environment implements Serializable {
   public Datum bindingsAsAssocList() {
     Datum alist = Nil.VALUE;
     for(ConcurrentHashMap.Entry<String,Datum> binding : bindings.entrySet())
-      alist = new Pair(Pair.List(new Symbol(binding.getKey()),binding.getValue().copy()),alist);
+      alist = new Pair(Pair.List(new Symbol(binding.getKey()),binding.getValue()),alist);
     return alist;
   }
 

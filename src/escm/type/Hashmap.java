@@ -285,7 +285,7 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
     this.value = value;
   }
 
-  public Hashmap copy() {
+  public Hashmap shallowCopy() {
     return new Hashmap(new ConcurrentHashMap<Datum,Datum>(value));
   }
 
@@ -576,7 +576,7 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   //////////////////////////////////////
 
   public AssociativeCollection delete(Datum key) throws Exception { // returns <this> if deletion fails
-    Hashmap cpy = copy();
+    Hashmap cpy = shallowCopy();
     if(cpy.del(key) == false)
       throw new Exceptionf("HASHMAP [DELETE]: invalid key %s for hashmap %s deletion", key.profile(), cpy.write());
     return (AssociativeCollection)cpy;
@@ -587,7 +587,7 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   //////////////////////////////////////
 
   public AssociativeCollection conj(Datum key, Datum newValue) throws Exception {
-    Hashmap cpy = copy();
+    Hashmap cpy = shallowCopy();
     cpy.set(key,newValue);
     return (AssociativeCollection)cpy;
   }
@@ -676,7 +676,7 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   }
 
   public Hashmap toACHashmap() throws Exception {
-    return copy();
+    return shallowCopy();
   }
 
   //////////////////////////////////////

@@ -99,7 +99,7 @@ public class Nil extends Datum implements OrderedCollection {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Nil copy() {
+  public Nil shallowCopy() {
     return this;
   }
 

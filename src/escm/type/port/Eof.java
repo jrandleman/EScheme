@@ -88,7 +88,7 @@ public class Eof extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Eof copy() {
+  public Eof shallowCopy() {
     return this;
   }
 }

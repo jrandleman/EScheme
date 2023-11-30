@@ -137,7 +137,7 @@ public class EscmModule extends Dottable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public EscmModule copy() {
+  public EscmModule shallowCopy() {
     return this;
   }
 }

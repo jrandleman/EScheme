@@ -466,7 +466,7 @@ public abstract class Number extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Number copy() {
+  public Number shallowCopy() {
     return this;
   }
 }

@@ -255,7 +255,7 @@ public class Thread extends Datum {
     if(!thread.dynamicEnvironment.has(name)) {
       if(!GlobalState.metaThreadDynamicEnvironment.has(name)) 
         throw new Exceptionf("Variable %s doesn't exist in escm.type.concurrent.Thread \"%s\"'s dynamic environment!", getName());
-      Datum cachedCopy = GlobalState.metaThreadDynamicEnvironment.get(name).copy();
+      Datum cachedCopy = GlobalState.metaThreadDynamicEnvironment.get(name).shallowCopy();
       thread.dynamicEnvironment.define(name,cachedCopy);
       return cachedCopy;
     } else {
@@ -358,7 +358,7 @@ public class Thread extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Thread copy() {
+  public Thread shallowCopy() {
     return this;
   }
 }

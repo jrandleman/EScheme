@@ -415,7 +415,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Vector copy() {
+  public Vector shallowCopy() {
     synchronized(this) {
       return new Vector(0,(ArrayList<Datum>)value.clone());
     }
@@ -706,7 +706,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
     synchronized(this) {
       if(deleteIdx < 0 || deleteIdx >= value.size())
         throw new Exceptionf("VECTOR [DELETE]: index %d out of vector range [0,%d)", deleteIdx, value.size());
-      Vector v = copy();
+      Vector v = shallowCopy();
       v.delete(deleteIdx);
       return v;
     }
@@ -724,7 +724,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       int idx = ((Real)key).intValue();
       if(idx < -1 || idx > n)
         throw new Exceptionf("VECTOR [CONJ]: index %d violates vector bounds [-1,%d]", idx, n);
-      Vector v = copy();
+      Vector v = shallowCopy();
       if(idx == -1) {
         v.pushFront(newValue);
       } else if(idx == n) {
@@ -784,7 +784,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   }
 
   public Vector toACVector() throws Exception {
-    return copy();
+    return shallowCopy();
   }
 
   public Hashmap toACHashmap() throws Exception {
@@ -1062,7 +1062,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
 
   private Trampoline.Bounce removeIter(Callable predicate, int i, boolean increasing, int mod, Trampoline.Continuation continuation) throws Exception {
     synchronized(this) {
-      if((increasing && i >= value.size()) || (!increasing && i < 0)) return continuation.run(copy());
+      if((increasing && i >= value.size()) || (!increasing && i < 0)) return continuation.run(shallowCopy());
       ArrayList<Datum> args = new ArrayList<Datum>(1);
       args.add(value.get(i));
       return predicate.callWith(args,(shouldRemove) -> () -> {
@@ -1251,14 +1251,14 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   public OrderedCollection takeRight(int length) throws Exception {
     synchronized(this) {
       int n = value.size();
-      if(length >= n) return copy();
+      if(length >= n) return shallowCopy();
       return subvector(n-length,n);
     }
   }
 
   private Trampoline.Bounce takeWhile(Callable predicate, int idx, Trampoline.Continuation continuation) throws Exception {
     synchronized(this) {
-      if(idx >= value.size()) return continuation.run(copy());
+      if(idx >= value.size()) return continuation.run(shallowCopy());
       ArrayList<Datum> args = new ArrayList<Datum>(1);
       args.add(value.get(idx));
       return predicate.callWith(args,(keepTaking) -> () -> {
@@ -1276,7 +1276,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
 
   private Trampoline.Bounce takeRightWhile(Callable predicate, int idx, Trampoline.Continuation continuation) throws Exception {
     synchronized(this) {
-      if(idx < 0) return continuation.run(copy());
+      if(idx < 0) return continuation.run(shallowCopy());
       ArrayList<Datum> args = new ArrayList<Datum>(1);
       args.add(value.get(idx));
       return predicate.callWith(args,(keepTaking) -> () -> {

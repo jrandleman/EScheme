@@ -403,7 +403,7 @@ public class EscmClass extends MetaObject implements Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public EscmClass copy() {
+  public EscmClass shallowCopy() {
     return this;
   }
 }

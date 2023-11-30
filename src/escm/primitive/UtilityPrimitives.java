@@ -131,7 +131,7 @@ public class UtilityPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1) 
         throw new Exceptionf("'(copy <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      return parameters.get(0).copy();
+      return parameters.get(0).shallowCopy();
     }
   }
 

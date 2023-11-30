@@ -99,7 +99,7 @@ public class InstructionSet extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public InstructionSet copy() {
+  public InstructionSet shallowCopy() {
     return this;
   }
 }

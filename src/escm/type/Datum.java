@@ -72,5 +72,5 @@ public abstract class Datum implements Serializable, DocString {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public abstract Datum copy();
+  public abstract Datum shallowCopy();
 }

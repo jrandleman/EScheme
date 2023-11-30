@@ -95,5 +95,5 @@ public abstract class Dottable extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public abstract Dottable copy();
+  public abstract Dottable shallowCopy();
 }

@@ -198,7 +198,7 @@ public class Mutex extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Mutex copy() {
+  public Mutex shallowCopy() {
     return this;
   }
 }

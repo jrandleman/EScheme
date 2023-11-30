@@ -96,7 +96,7 @@ public class Keyword extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Keyword copy() {
+  public Keyword shallowCopy() {
     return this;
   }
 }

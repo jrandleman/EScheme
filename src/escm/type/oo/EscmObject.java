@@ -251,13 +251,13 @@ public class EscmObject extends MetaObject implements Callable {
     if(superObject == null) {
       this.superObject = null;
     } else {
-      this.superObject = superObject.copy();
+      this.superObject = superObject.shallowCopy();
     }
     this.props = propsCopy;
     this.bindMethodsWithNewSelfAndSuper();
   }
 
-  public EscmObject copy() {
+  public EscmObject shallowCopy() {
     return new EscmObject(0,escmClass,superObject,new ConcurrentHashMap<String,Datum>(props));
   }
 }

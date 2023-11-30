@@ -99,7 +99,7 @@ public abstract class Port extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Port copy() {
+  public Port shallowCopy() {
     return this;
   }
 }

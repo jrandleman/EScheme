@@ -362,7 +362,7 @@ public class EscmInterface extends MetaObject {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public EscmInterface copy() {
+  public EscmInterface shallowCopy() {
     return this;
   }
 }

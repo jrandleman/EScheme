@@ -189,7 +189,7 @@ public class Character extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Character copy() {
+  public Character shallowCopy() {
     return this;
   }
 }

@@ -236,7 +236,7 @@ public class ObjectAccessChain extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public ObjectAccessChain copy() {
+  public ObjectAccessChain shallowCopy() {
     return this;
   }
 }

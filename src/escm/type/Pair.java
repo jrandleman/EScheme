@@ -455,7 +455,7 @@ public class Pair extends Datum implements OrderedCollection {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Pair copy() {
+  public Pair shallowCopy() {
     return this;
   }
 

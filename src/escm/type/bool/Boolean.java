@@ -99,7 +99,7 @@ public abstract class Boolean extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Boolean copy() {
+  public Boolean shallowCopy() {
     return this;
   }
 }

@@ -124,7 +124,7 @@ public class Symbol extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  public Symbol copy() {
+  public Symbol shallowCopy() {
     return this;
   }
 }
