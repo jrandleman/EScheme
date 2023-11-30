@@ -26,8 +26,18 @@ public class GlobalState {
   // static field to hold command-line args
   private static Datum argv = escm.type.Nil.VALUE;
 
-  public static synchronized void setArgv(Datum d) { argv = d; }
-  public static synchronized Datum getArgv() { return argv.copy(); }
+  public static synchronized void setArgv(int argvStart, String[] args) {
+    argv = escm.type.Nil.VALUE;
+    if(argvStart >= args.length) return;
+    for(int i = args.length-1; i > argvStart; --i)  {
+      argv = new escm.type.Pair(new escm.type.String(args[i]),argv);
+    }
+    argv = new escm.type.Pair(new escm.type.String(FilePrimitives.AbsolutePath.logic(args[argvStart])),argv);
+  }
+
+  public static synchronized Datum getArgv() { 
+    return argv; 
+  }
 
 
   ////////////////////////////////////////////////////////////////////////////
