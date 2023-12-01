@@ -7359,7 +7359,7 @@ syntax. These include: `define`, `set!`, `load`, `call`, `push`, & `return`.
 
 (jump <integer>) ; jump <integer> instructions
 
-(quote <datum>) ; quote <datum> and load it into CVR. may recurse infinitely for cyclic lists/vectors/hashmaps.
+(quote <datum>) ; quote <datum> and load it into CVR. may recurse infinitely for cyclic vectors/hashmaps.
 
 (load <datum>) ; evaluate <datum> and load it into CVR
 
