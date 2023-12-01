@@ -239,6 +239,13 @@ public class String extends Datum implements OrderedCollection, Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public String quote(ExecutionState state) {
+    return this;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public String loadWithState(ExecutionState state) {
     return this;

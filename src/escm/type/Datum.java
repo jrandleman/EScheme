@@ -61,6 +61,12 @@ public abstract class Datum implements Serializable, DocString {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  // => WARNING: THIS WILL INFINITELY RECURSE ON CYCLIC VECTORS/HASHMAPS!
+  public abstract Datum quote(ExecutionState state);
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public abstract Datum loadWithState(ExecutionState state) throws Exception;
 

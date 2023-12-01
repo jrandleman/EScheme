@@ -440,6 +440,14 @@ public class Pair extends Datum implements OrderedCollection {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  // => WARNING: THIS WILL INFINITELY RECURSE ON CYCLIC VECTORS/HASHMAPS!
+  public Pair quote(ExecutionState state) {
+    return new Pair(car.quote(state),cdr.quote(state));
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public Pair loadWithState(ExecutionState state) {
     return this;

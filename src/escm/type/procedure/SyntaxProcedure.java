@@ -56,6 +56,13 @@ public class SyntaxProcedure extends Procedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public SyntaxProcedure quote(ExecutionState state) {
+    return this;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public SyntaxProcedure loadWithState(ExecutionState state) {
     return this;

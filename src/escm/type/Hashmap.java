@@ -266,6 +266,22 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  // => WARNING: THIS WILL INFINITELY RECURSE ON CYCLIC VECTORS/HASHMAPS!
+  private Hashmap(ConcurrentHashMap<Datum,Datum> value) {
+    this.value = value;
+  }
+
+  public Hashmap quote(ExecutionState state) {
+    ConcurrentHashMap<Datum,Datum> quoted = new ConcurrentHashMap<Datum,Datum>();
+    for(ConcurrentHashMap.Entry<Datum,Datum> entry : value.entrySet()) {
+      quoted.put(entry.getKey().quote(state),entry.getValue().quote(state));
+    }
+    return new Hashmap(quoted);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public Hashmap loadWithState(ExecutionState state) {
     return this;
@@ -281,10 +297,6 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
-  private Hashmap(ConcurrentHashMap<Datum,Datum> value) {
-    this.value = value;
-  }
-
   public Hashmap shallowCopy() {
     return new Hashmap(new ConcurrentHashMap<Datum,Datum>(value));
   }

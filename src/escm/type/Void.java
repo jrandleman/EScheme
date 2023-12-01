@@ -72,6 +72,13 @@ public class Void extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public Void quote(ExecutionState state) {
+    return this;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public Void loadWithState(ExecutionState state) {
     return this;

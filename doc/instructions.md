@@ -50,7 +50,7 @@ but whereas `jump` requires that it's argument is an integer literal, `call` als
 accepts variables that evaluate to integers.
 
 ### NIL
-A note on writing NIL literals: use `()`. For example, `(define n (quote ()))`
+A note on writing NIL literals: use `()`. For example, `(define n ())`
 compiles to `(load ()) (define n)`. You may alternatively use the `#nil` reader
 literal.
 
@@ -121,8 +121,9 @@ syntax. These include: `define`, `set!`, `load`, `call`, `push`, & `return`.
 
 (jump <integer>) ; jump <integer> instructions
 
-(load <datum>)         ; evaluate <datum> and load it into CVR
-(load-symbol <symbol>) ; load <symbol> as a symbolic value into CVR rather than evaluating it
+(quote <datum>) ; quote <datum> and load it into CVR. may recurse infinitely for cyclic vectors/hashmaps.
+
+(load <datum>) ; evaluate <datum> and load it into CVR
 
 (call <datum>) ; <datum> must evaluate to an integer. get the fcn & arguments being applied from the stack. 
                ; positive <integer> denotes pushes from left to right & negative denotes pushes from right to left (when compiling the application expressions). 

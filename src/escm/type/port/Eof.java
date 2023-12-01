@@ -73,6 +73,13 @@ public class Eof extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public Eof quote(ExecutionState state) {
+    return this;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public Eof loadWithState(ExecutionState state) {
     return this;

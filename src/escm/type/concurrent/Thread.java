@@ -343,6 +343,13 @@ public class Thread extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public Thread quote(ExecutionState state) {
+    return this;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public Thread loadWithState(ExecutionState state) {
     return this;

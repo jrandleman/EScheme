@@ -84,8 +84,15 @@ public class InstructionSet extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public InstructionSet quote(ExecutionState state) {
+    return this;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter (effectively "get")
-  public Datum loadWithState(ExecutionState state) throws Exception {
+  public InstructionSet loadWithState(ExecutionState state) {
     return this;
   }
 

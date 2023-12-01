@@ -72,6 +72,13 @@ public class CompoundProcedure extends Procedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public CompoundProcedure quote(ExecutionState state) {
+    return loadWithState(state);
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   // => Cloning + super environment binding
   protected CompoundProcedure(String name, SourceInformation invocationSource, Environment definitionEnvironment, CompileTime compileTime) {

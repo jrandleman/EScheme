@@ -84,6 +84,13 @@ public abstract class Boolean extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public Boolean quote(ExecutionState state) {
+    return this;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public Boolean loadWithState(ExecutionState state) {
     return this;

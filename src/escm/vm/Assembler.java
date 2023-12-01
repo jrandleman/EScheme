@@ -34,8 +34,8 @@ public class Assembler {
       case "defined?":     return Instruction.DEFINEDP;
       case "ifn":          return Instruction.IFN;
       case "jump":         return Instruction.JUMP;
+      case "quote":        return Instruction.QUOTE;
       case "load":         return Instruction.LOAD;
-      case "load-symbol":  return Instruction.LOAD_SYMBOL;
       case "call":         return Instruction.CALL;
       case "push":         return Instruction.PUSH;
       case "pop":          return Instruction.POP;
@@ -224,6 +224,12 @@ public class Assembler {
       }
 
       ////////////////////////////////////////////////////////////////////////
+      // (quote <datum>)
+      case Instruction.QUOTE: {
+        return new Instruction(Instruction.QUOTE,getInstructionArgument(instructionPair));
+      }
+
+      ////////////////////////////////////////////////////////////////////////
       // (load <datum>)
       case Instruction.LOAD: {
         Datum arg = getInstructionArgument(instructionPair);
@@ -234,15 +240,6 @@ public class Assembler {
           }
         }
         return new Instruction(Instruction.LOAD,arg);
-      }
-
-      ////////////////////////////////////////////////////////////////////////
-      // (load-symbol <datum>)
-      case Instruction.LOAD_SYMBOL: {
-        Datum arg = getInstructionArgument(instructionPair);
-        if(!(arg instanceof Symbol))
-          throw new Exceptionf("ASM ERROR: \"load-symbol\" instruction %s must have a symbolic arg!", instruction.profile());
-        return new Instruction(Instruction.LOAD_SYMBOL,arg);
       }
 
       ////////////////////////////////////////////////////////////////////////

@@ -29,6 +29,13 @@ public class ContinuationProcedure extends Procedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public ContinuationProcedure quote(ExecutionState state) {
+    return this;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public ContinuationProcedure loadWithState(ExecutionState state) {
     return this;

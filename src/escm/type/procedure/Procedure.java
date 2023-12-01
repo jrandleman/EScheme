@@ -51,6 +51,11 @@ public abstract class Procedure extends Datum implements Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public abstract Procedure quote(ExecutionState state);
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter Abstraction
   public abstract Procedure loadWithState(ExecutionState state);
 

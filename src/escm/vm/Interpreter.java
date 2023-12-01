@@ -120,17 +120,17 @@ public class Interpreter {
         }
 
         //////////////////////////////////////////////////////////////////////
-        // (load <datum>)
-        case Instruction.LOAD: {
-          state.cvr = instruction.argument.loadWithState(state);
+        // (quote <symbol>)
+        case Instruction.QUOTE: {
+          state.cvr = instruction.argument.quote(state);
           ++state.cii;
           break;
         }
 
         //////////////////////////////////////////////////////////////////////
-        // (load-symbol <symbol>)
-        case Instruction.LOAD_SYMBOL: {
-          state.cvr = instruction.argument;
+        // (load <datum>)
+        case Instruction.LOAD: {
+          state.cvr = instruction.argument.loadWithState(state);
           ++state.cii;
           break;
         }

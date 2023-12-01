@@ -106,6 +106,13 @@ public class Symbol extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public Symbol quote(ExecutionState state) {
+    return this;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public Datum loadWithState(ExecutionState state) throws Exception {
     Datum value = state.env.get(this);

@@ -207,6 +207,13 @@ public class ObjectAccessChain extends Datum {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public ObjectAccessChain quote(ExecutionState state) {
+    return this;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter (effectively "get")
   public Datum loadWithState(Environment env) throws Exception {
     Datum result = env.get(value[0]);

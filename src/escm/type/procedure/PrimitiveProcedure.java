@@ -49,6 +49,13 @@ public class PrimitiveProcedure extends Procedure {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  public PrimitiveProcedure quote(ExecutionState state) {
+    return this;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public PrimitiveProcedure loadWithState(ExecutionState state) {
     return this;

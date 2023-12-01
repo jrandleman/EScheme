@@ -400,6 +400,21 @@ public class Vector extends Datum implements OrderedCollection, Callable {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Quoting semantics for the VM's interpreter
+  // => WARNING: THIS WILL INFINITELY RECURSE ON CYCLIC VECTORS/HASHMAPS!
+  public Vector quote(ExecutionState state) {
+    synchronized(this) {
+      int n = value.size();
+      ArrayList<Datum> quoted = new ArrayList<Datum>(n);
+      for(Datum d : value) {
+        quoted.add(d.quote(state));
+      }
+      return new Vector(0,quoted);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Loading-into-memory semantics for the VM's interpreter
   public Vector loadWithState(ExecutionState state) {
     return this;
