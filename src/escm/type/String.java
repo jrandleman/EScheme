@@ -1331,4 +1331,17 @@ public class String extends Datum implements OrderedCollection, Callable {
   public Trampoline.Bounce deleteNeighborDuplicates(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
     return deleteListNeighborDuplicates(binaryPredicate,0,codePointLength(),0,continuation);
   }
+
+  //////////////////////////////////////
+  // array-list conversion
+  //////////////////////////////////////
+
+  public ArrayList<Datum> toArrayList() {
+    ArrayList<Datum> vals = new ArrayList<Datum>();
+    forEachChar((idx, chr) -> {
+      vals.add(chr);
+      return true;
+    });
+    return vals;
+  }
 }

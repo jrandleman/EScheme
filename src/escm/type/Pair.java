@@ -1427,4 +1427,19 @@ public class Pair extends Datum implements OrderedCollection {
       return ((OrderedCollection)withoutLeadingDuplicates).deleteNeighborDuplicates(binaryPredicate,(deld) -> () -> continuation.run(new Pair(car,deld)));
     });
   }
+
+  //////////////////////////////////////
+  // array-list conversion
+  //////////////////////////////////////
+
+  public ArrayList<Datum> toArrayList() {
+    ArrayList<Datum> vals = new ArrayList<Datum>();
+    Datum iter = this;
+    while(iter instanceof Pair) {
+      Pair p = (Pair)iter;
+      vals.add(p.car);
+      iter = p.cdr;
+    }
+    return vals;
+  }
 }

@@ -140,4 +140,6 @@ public interface OrderedCollection extends AssociativeCollection {
   Trampoline.Bounce merge(Callable binaryPredicate, OrderedCollection oc, Trampoline.Continuation continuation) throws Exception; // -> OrderedCollection
 
   Trampoline.Bounce deleteNeighborDuplicates(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception; // -> OrderedCollection
+
+  ArrayList<Datum> toArrayList();
 }

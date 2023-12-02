@@ -26,6 +26,7 @@ import escm.vm.util.ObjectAccessChain;
 import escm.vm.type.callable.DocString;
 import escm.vm.type.primitive.Primitive;
 import escm.vm.type.primitive.PrimitiveCallable;
+import escm.vm.type.collection.OrderedCollection;
 
 public class MetaPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -148,34 +149,23 @@ public class MetaPrimitives {
 
 
     public Datum signature() {
-      return Pair.List(new Symbol("apply"),new Symbol("<callable>"),new Symbol("<arg-list>"));
+      return Pair.List(new Symbol("apply"),new Symbol("<callable>"),new Symbol("<argument-ordered-collection>"));
     }
 
     public String docstring() {
-      return "@help:Procedures:Meta\nApply <callable> to the arguments stored in the <arg-list> list.";
-    }
-
-    public static ArrayList<Datum> convertListToArrayList(Datum lis) {
-      ArrayList<Datum> aList = new ArrayList<Datum>();
-      while(lis instanceof Pair) {
-        Pair lisPair = (Pair)lis;
-        aList.add(lisPair.car());
-        lis = lisPair.cdr();
-      }
-      return aList;
+      return "@help:Procedures:Meta\nApply <callable> to the arguments stored in <argument-ordered-collection>.";
     }
 
     public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       if(parameters.size() != 2) 
-        throw new Exceptionf("'(apply <callable> <arg-list>) didn't receive exactly 2 args (procedure & arg-list): %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(apply <callable> <argument-ordered-collection>) didn't receive exactly 2 args (procedure & arg-oc): %s", Exceptionf.profileArgs(parameters));
       Datum procedure = parameters.get(0);
       Datum arguments = parameters.get(1);
       if(!(procedure instanceof Callable)) 
-        throw new Exceptionf("'(apply <callable> <arg-list>) 1st arg %s isn't a procedure!", procedure.profile());
-      if(!Pair.isList(arguments)) 
-        throw new Exceptionf("'(apply <callable> <arg-list>) 2nd arg %s isn't an arg list!", arguments.profile());
-      ArrayList<Datum> args = convertListToArrayList(arguments);
-      return ((Callable)procedure).callWith(args,continuation);
+        throw new Exceptionf("'(apply <callable> <argument-ordered-collection>) 1st arg %s isn't a procedure!", procedure.profile());
+      if(!(arguments instanceof OrderedCollection)) 
+        throw new Exceptionf("'(apply <callable> <argument-ordered-collection>) 2nd arg %s isn't an arg oc!", arguments.profile());
+      return ((Callable)procedure).callWith(((OrderedCollection)arguments).toArrayList(),continuation);
     }
   }
 
@@ -365,6 +355,13 @@ public class MetaPrimitives {
   ////////////////////////////////////////////////////////////////////////////
   // expand-syntax
   public static class ExpandSyntax extends PrimitiveCallable {
+    public static ArrayList<Datum> convertDatumOCToArrayList(Datum obj) {
+      if(obj instanceof OrderedCollection) {
+        return ((OrderedCollection)obj).toArrayList();
+      }
+      return new ArrayList<Datum>();
+    }
+
     public java.lang.String escmName() {
       return "expand-syntax";
     }
@@ -388,7 +385,7 @@ public class MetaPrimitives {
       SyntaxProcedure macro = IsSyntax.logic(this.definitionEnvironment,macroName);
       if(macro == null)
         throw new Exceptionf("'(expand-syntax <quoted-macro-expression>) given arg isn't a macro expression: %s", Exceptionf.profileArgs(parameters));
-      ArrayList<Datum> macroArgs = Apply.convertListToArrayList(macroExprList.cdr());
+      ArrayList<Datum> macroArgs = convertDatumOCToArrayList(macroExprList.cdr());
       return macro.callWith(macroArgs,continuation);
     }
   }

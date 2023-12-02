@@ -417,7 +417,7 @@ public class UtilityPrimitives {
     public static Trampoline.Bounce logic(Callable producer, Callable consumer, Trampoline.Continuation continuation) throws Exception {
       return producer.callWith(new ArrayList<Datum>(),(x) -> () -> {
         if(Values.isMagic(x))
-          return consumer.callWith(MetaPrimitives.Apply.convertListToArrayList(((Pair)x).cdr()),continuation);
+          return consumer.callWith(MetaPrimitives.ExpandSyntax.convertDatumOCToArrayList(((Pair)x).cdr()),continuation);
         ArrayList<Datum> args = new ArrayList<Datum>(1);
         args.add(x);
         return consumer.callWith(args,continuation); 

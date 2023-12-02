@@ -1457,4 +1457,14 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   public Trampoline.Bounce deleteNeighborDuplicates(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
     return deleteListNeighborDuplicates(binaryPredicate,0,(deldList) -> () -> continuation.run(((AssociativeCollection)deldList).toACVector()));
   }
+
+  //////////////////////////////////////
+  // array-list conversion
+  //////////////////////////////////////
+
+  public ArrayList<Datum> toArrayList() {
+    synchronized(this) {
+      return (ArrayList<Datum>)value.clone();
+    }
+  }
 }

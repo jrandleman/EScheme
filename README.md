@@ -3105,12 +3105,12 @@ next round of unfolding.
 
 #### Signatures:
 ```scheme
-(apply <callable> <arg-list>)
+(apply <callable> <argument-ordered-collection>)
 ```
 
 #### Description:
 ```
-Apply <callable> to the arguments stored in the <arg-list> list.
+Apply <callable> to the arguments stored in <argument-ordered-collection>.
 ```
 
 -------------------------------------------------------------------------------

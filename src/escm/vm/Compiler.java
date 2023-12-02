@@ -111,7 +111,7 @@ public class Compiler {
 
 
   private static Trampoline.Bounce compileMacroApplication(Symbol name, SyntaxProcedure macro, Datum macroArgs, Environment definitionEnvironment, Trampoline.Continuation continuation) throws Exception {
-    ArrayList<Datum> args = MetaPrimitives.Apply.convertListToArrayList(macroArgs);
+    ArrayList<Datum> args = MetaPrimitives.ExpandSyntax.convertDatumOCToArrayList(macroArgs);
     if(name.hasSourceInformation()) {
       return macro.loadWithInvocationSource(name.source()).callWith(args,(expandedExpr) -> () -> run(expandedExpr,definitionEnvironment,continuation));
     } else {

@@ -460,4 +460,12 @@ public class Nil extends Datum implements OrderedCollection {
   public Trampoline.Bounce deleteNeighborDuplicates(Callable binaryPredicate, Trampoline.Continuation continuation) throws Exception {
     return continuation.run(Nil.VALUE);
   }
+
+  //////////////////////////////////////
+  // array-list conversion
+  //////////////////////////////////////
+
+  public ArrayList<Datum> toArrayList() {
+    return new ArrayList<Datum>();
+  }
 }
