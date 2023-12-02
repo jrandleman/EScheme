@@ -265,3 +265,18 @@
 (ut (mutex-hold-count m1) 0)
 (ut (mutex-held? m1) #f)
 
+(def add1 #(+ 1 %1))
+(def add2 #(+ 2 %1))
+(ut (await (promise (lambda (resolve reject) 1)) add1 add2) 2)
+(ut (await (promise (lambda (resolve reject) (resolve 1) 100)) add1 add2) 2)
+(ut (await (promise (lambda (resolve reject) (reject 1) 100)) add1 add2) 3)
+(ut (await 10 (promise (lambda (resolve reject) (sleep 200) 100)) add1 id) 'timeout)
+
+(define (promise-1) (promise (lambda (a b) 1)))
+
+(ut (await (await-all (promise-1) (promise-1)) (+ map add1) (+ map add2)) '(2 2))
+(ut (await (await-all (list (promise-1) (promise-1))) (+ map add1) (+ map add2)) '(2 2))
+(ut (await (await-all [(promise-1) (promise-1)]) (+ map add1) (+ map add2)) '(2 2))
+
+(ut (promise? (promise-1)) #t)
+(ut (promise? #t) #f)

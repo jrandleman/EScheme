@@ -153,6 +153,7 @@ with EScheme's most unique features being referenced from traditional Scheme ent
   * [Characters](#Characters)
   * [Concurrency](#Concurrency)
     * [Mutexes](#Mutexes)
+    * [Promises](#Promises)
     * [Threads](#Threads)
   * [Date-Time](#Date-Time)
   * [Equality](#Equality)
@@ -1344,6 +1345,133 @@ Returns whether <obj> is a mutex.
 ```
 
 -------------------------------------------------------------------------------
+### Promises
+
+
+-------------------------------------------------------------------------------
+#### `await`
+
+##### Signatures:
+```scheme
+(await <promise> <resolve-lambda> <reject-lambda>)
+(await <timeout-ms> <promise> <resolve-lambda> <reject-lambda>)
+```
+
+##### Description:
+```
+Pause the current thread's execution until <promise> either resolves or 
+rejects. If it rejects, the value is passed to <reject-lambda>. Otherwise,
+the value is passed to <resolve-lambda>.
+
+If <timeout-ms> is provided, <await> will wait for the promise's thread to
+complete at most <timeout> milliseconds, before <reject>ing with the 'timeout
+symbol.
+
+Note that it's safe to pass non-promises to <await>: they're treated as 
+values of immediately resolved promises.
+
+<await> conceptually mirrors JavaScript's <then>/<catch> promise methods.
+
+See <promise>'s <help> entry for an example use!
+```
+
+-------------------------------------------------------------------------------
+#### `await-all`
+
+##### Signatures:
+```scheme
+(await-all <promises-ordered-collection>)
+(await-all <promise> ...)
+(await-all <timeout-ms> <promises-ordered-collection>)
+(await-all <timeout-ms> <promise> ...)
+```
+
+##### Description:
+```
+Get a new promise that either resolves to a list of <promises>'s resolved
+results, or rejects with the first error encountered. Akin to JavaScript's
+<Promise.all()>.
+
+<await-all> can be called in two ways:
+  1. (await-all <optional-timeout> <promises-ordered-collection>)
+  2. (await-all <optional-timeout> <promise> ...)
+
+If <timeout> is provided (defaults to 50), <await-all> will wait <timeout>
+milliseconds for each promise thread when cycling through its promise args.
+
+  -> Note that this can generally be ignored: exposed to support fine-tuned
+     threading performance, its default value of 50 tends to work great!
+
+Note that it's safe to pass non-promises to <await-all>: they're treated as 
+values of immediately resolved promises.
+
+Toggle <*await-all-timeout*> to determine how many milliseconds <await-all>
+ought to pause for when attempting to join each promise's thread.
+
+See <promise>'s <help> entry for an example use!
+```
+
+-------------------------------------------------------------------------------
+#### `promise`
+
+##### Signatures:
+```scheme
+(promise <promise-lambda>)
+```
+
+##### Description:
+```
+EScheme's implementation of JavaScript's <Promise> concurrency paradigm.
+
+Returns a <promise-handle> value to <await> the promise with later on.
+
+<promise-lambda> should accept two unary callables as its arguments: the 
+<resolve> and <reject> procedures.
+  * Call <resolve> with the success value of the finished promise.
+  * Call <reject> with an error value for the promise.
+  * Note that if neither's called, <promise-lambda>'s final value resolves.
+
+Example use:
+
+  (define (test resolve?)
+    (promise
+      (lambda (resolve reject)
+        (if resolve? 
+            (resolve 'success!)
+            (reject 'failed!)))))
+
+  (define (success result) result)
+  (define (failure error) error)
+
+  ; Prints 'success!
+  (println (await (test #t) success failure))
+
+  ; Prints 'failed!
+  (println (await (test #f) success failure))
+
+  ; Prints '(success! success! success!)
+  (define all-promises (await-all (test #t) (test #t) (test #t)))
+  (println (await all-promises success failure))
+
+  ; Prints 'failed!
+  (define all-promises (await-all (test #t) (test #f) (test #t)))
+  (println (await all-promises success failure))
+```
+
+-------------------------------------------------------------------------------
+#### `promise?`
+
+##### Signatures:
+```scheme
+(promise? <obj>)
+```
+
+##### Description:
+```
+Determine if <obj> came from <promise>.
+```
+
+-------------------------------------------------------------------------------
 ### Threads
 
 
@@ -2526,8 +2654,9 @@ Combine all of the associations in "<merged-hashmap> ..." into <hashmap>.
 
 #### Description:
 ```
-Associate <value> to <key> in <hashmap>.
-Returns whether replaced an existing value.
+Associate <value> to <key> in <hashmap>. Returns whether replaced an existing
+value. Note this can also be done by directly applying the hashmap to the key
+and new value (like a function).
 ```
 
 -------------------------------------------------------------------------------
@@ -7108,7 +7237,8 @@ Pushes <obj> to the front of <vector>.
 
 #### Description:
 ```
-Sets the entry at <index> in <vector> to be <obj>.
+Sets the entry at <index> in <vector> to be <obj>. Note this can also be done
+by directly applying the vector to the index and new value (like a function).
 ```
 
 -------------------------------------------------------------------------------
@@ -8054,9 +8184,13 @@ Determine if <name> is a parameter variable. See the <define-parameter>
 
 #### Description:
 ```
-Returns <obj> as a data structure. Any <unquote>d <obj>s will be
-evaluated first, and <unquote-splicing>ed <obj>s will be
-evaluated and spliced into the list.
+Returns <obj> as a data structure. Any <unquote>d <obj>s are evaluated first,
+and <unquote-splicing>ed <obj>s will be evaluated and spliced into the list.
+
+NOTE: Never quasiquote cyclic vectors/hashmaps during tricky (likely incorrect)
+      macro use! <quasiquote> has to deep copy vectors and hashmaps at runtime
+      to avoid sharing state in a single compiled function body between threads.
+
 Note that the reader will expand:
   "`<obj>" => "(quasiquote <obj>)"
   ",<obj>" => "(unquote <obj>)"
@@ -8073,8 +8207,12 @@ Note that the reader will expand:
 
 #### Description:
 ```
-Returns <obj> as a data structure.
-Note that the reader will expand "'<obj>" to "(quote <obj>)".
+Returns <obj> as a data structure. Note that the reader will expand "'<obj>"
+to "(quote <obj>)".
+
+NOTE: Never quote cyclic vectors/hashmaps during tricky (likely incorrect)
+      macro use! <quote> has to deep copy vectors and hashmaps at runtime, to
+      avoid sharing state in a single compiled function body between threads.
 
 For example:
   (quote a)  ; a

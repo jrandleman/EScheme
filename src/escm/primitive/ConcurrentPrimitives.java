@@ -8,15 +8,20 @@ import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.Void;
+import escm.type.Vector;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.number.Real;
 import escm.type.number.Exact;
+import escm.type.procedure.Procedure;
+import escm.type.procedure.PrimitiveProcedure;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.callable.Callable;
-import escm.vm.type.primitive.Primitive;
 import escm.vm.type.callable.Signature;
+import escm.vm.type.primitive.Primitive;
+import escm.vm.type.primitive.PrimitiveCallable;
+import escm.vm.type.collection.OrderedCollection;
 import escm.vm.util.Environment;
 import escm.vm.runtime.EscmThread;
 import escm.vm.runtime.GlobalState;
@@ -1021,6 +1026,356 @@ public class ConcurrentPrimitives {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Mutex))
         throw new Exceptionf("'(mutex-held? <mutex>) didn't receive exactly 1 mutex: %s", Exceptionf.profileArgs(parameters));
       return Boolean.valueOf(((escm.type.concurrent.Mutex)parameters.get(0)).isHeld());
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // promise
+  //
+  // ; returns a <promise-handle> ::= [ <promise-value> <resolved-or-rejected> <thread> ]
+  // (define (promise promise-lambda)
+  //   (def promise-thread
+  //     (thread
+  //       #(handle
+  //         0
+  //         (call/cc
+  //           (lambda (resolve)
+  //             (promise-lambda 
+  //               resolve 
+  //               (lambda (promise-result) 
+  //                 (handle 1 #f) 
+  //                 (resolve promise-result))))))))
+  //   (def handle [#f #t promise-thread]) ; defaults to <resolved>
+  //   (thread-start! promise-thread)
+  //   handle)
+  public static class Promise extends Primitive {
+    public java.lang.String escmName() {
+      return "promise";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("promise"),new Symbol("<promise-lambda>"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Concurrency:Promises\nEScheme's implementation of JavaScript's <Promise> concurrency paradigm.\n\nReturns a <promise-handle> value to <await> the promise with later on.\n\n<promise-lambda> should accept two unary callables as its arguments: the \n<resolve> and <reject> procedures.\n  * Call <resolve> with the success value of the finished promise.\n  * Call <reject> with an error value for the promise.\n  * Note that if neither's called, <promise-lambda>'s final value resolves.\n\nExample use:\n\n  (define (test resolve?)\n    (promise\n      (lambda (resolve reject)\n        (if resolve? \n            (resolve 'success!)\n            (reject 'failed!)))))\n\n  (define (success result) result)\n  (define (failure error) error)\n\n  ; Prints 'success!\n  (println (await (test #t) success failure))\n\n  ; Prints 'failed!\n  (println (await (test #f) success failure))\n\n  ; Prints '(success! success! success!)\n  (define all-promises (await-all (test #t) (test #t) (test #t)))\n  (println (await all-promises success failure))\n\n  ; Prints 'failed!\n  (define all-promises (await-all (test #t) (test #f) (test #t)))\n  (println (await all-promises success failure))";
+    }
+
+    private static PrimitiveProcedure getResolve(Trampoline.Continuation continuation) {
+      return new PrimitiveProcedure("resolve",
+        new Callable() {
+          public String docstring() {
+            return "Resolve a value to successfully complete a <promise>'s execution.";
+          }
+          public Datum signature() {
+            return Pair.List(new Symbol("resolve"),new Symbol("<obj>"));
+          }
+          public Trampoline.Bounce callWith(ArrayList<Datum> result, Trampoline.Continuation ignored) throws Exception {
+            if(result.size() != 1)
+              throw new Exceptionf("'(resolve <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(result));
+            return continuation.run(result.get(0));
+          }
+        });
+    }
+
+    private static PrimitiveProcedure getReject(Vector handle, Trampoline.Continuation continuation) {
+      return new PrimitiveProcedure("reject",
+        new Callable() {
+          public String docstring() {
+            return "Rejects a value to trigger an error during a <promise>'s execution.";
+          }
+          public Datum signature() {
+            return Pair.List(new Symbol("reject"),new Symbol("<obj>"));
+          }
+          public Trampoline.Bounce callWith(ArrayList<Datum> result, Trampoline.Continuation ignored) throws Exception {
+            if(result.size() != 1)
+              throw new Exceptionf("'(reject <obj>) expects exactly 1 arg: %s", Exceptionf.profileArgs(result));
+            handle.set(1,Boolean.FALSE); // set <rejected>
+            return continuation.run(result.get(0));
+          }
+        });
+    }
+
+    public static Datum logic(Callable promiseLambda) throws Exception {
+      Vector handle = new Vector();
+      handle.push(Boolean.FALSE);
+      handle.push(Boolean.TRUE); // defaults to <resolved>
+      escm.type.concurrent.Thread promiseThread = new escm.type.concurrent.Thread(new Callable() {
+        public String docstring() {
+          return "Runnable procedure for a <promise> object's internal thread.";
+        }
+        public Datum signature() {
+          return Pair.List(new Symbol(Procedure.DEFAULT_NAME));
+        }
+        public Trampoline.Bounce callWith(ArrayList<Datum> ignoredArgs, Trampoline.Continuation continuation) throws Exception {
+          Trampoline.Continuation savePromiseValueContinuation = (result) -> () -> {
+            handle.set(0,result); // save promise result
+            return continuation.run(Void.VALUE);
+          };
+          ArrayList<Datum> promiseArgs = new ArrayList<Datum>(2);
+          promiseArgs.add(getResolve(savePromiseValueContinuation));
+          promiseArgs.add(getReject(handle,savePromiseValueContinuation));
+          return promiseLambda.callWith(promiseArgs,savePromiseValueContinuation);
+        }
+      });
+      handle.push(promiseThread);
+      promiseThread.start();
+      return handle;
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1 || !(parameters.get(0) instanceof Callable))
+        throw new Exceptionf("'(promise <promise-lambda>) didn't receive exactly 1 callable: %s", Exceptionf.profileArgs(parameters));
+      return logic((Callable)parameters.get(0));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // promise?
+  //
+  // (define (promise? obj)
+  //   (and (vector? obj) (= (len obj) 3) (thread? (obj 2))))
+  public static class IsPromiseP extends Primitive {
+    public java.lang.String escmName() {
+      return "promise?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("promise?"),new Symbol("<obj>"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Concurrency:Promises\nDetermine if <obj> came from <promise>.";
+    }
+
+    public static boolean logic(Datum obj) throws Exception {
+      if(!(obj instanceof Vector)) return false;
+      Vector vec = (Vector)obj;
+      synchronized(vec) {
+        return vec.size() == 3 && vec.get(2) instanceof escm.type.concurrent.Thread;
+      }
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1)
+        throw new Exceptionf("'(promise? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      return Boolean.valueOf(logic(parameters.get(0)));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // await
+  //
+  // NOTE: The below EScheme code doesn't account for the optional first
+  //       <timeout> argument (defaults to #f).
+  //
+  // (define (await promise resolve-lambda reject-lambda)
+  //   (if (promise? promise)
+  //       (begin
+  //         (thread-join! (promise 2))
+  //         (if (promise 1)
+  //             (resolve-lambda (promise 0))
+  //             (reject-lambda (promise 0))))
+  //       (resolve-lambda promise)))
+  public static class Await extends PrimitiveCallable {
+    public java.lang.String escmName() {
+      return "await";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("await"),new Symbol("<promise>"),new Symbol("<resolve-lambda>"),new Symbol("<reject-lambda>")),
+        Pair.List(new Symbol("await"),new Symbol("<timeout-ms>"),new Symbol("<promise>"),new Symbol("<resolve-lambda>"),new Symbol("<reject-lambda>")));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Concurrency:Promises\nPause the current thread's execution until <promise> either resolves or \nrejects. If it rejects, the value is passed to <reject-lambda>. Otherwise,\nthe value is passed to <resolve-lambda>.\n\nIf <timeout-ms> is provided, <await> will wait for the promise's thread to\ncomplete at most <timeout> milliseconds, before <reject>ing with the 'timeout\nsymbol.\n\nNote that it's safe to pass non-promises to <await>: they're treated as \nvalues of immediately resolved promises.\n\n<await> conceptually mirrors JavaScript's <then>/<catch> promise methods.\n\nSee <promise>'s <help> entry for an example use!";
+    }
+
+    private static Integer parseTimeout(int n, ArrayList<Datum> parameters) {
+      if(n != 4) return null;
+      Datum obj = parameters.get(0);
+      if(obj instanceof Real) {
+        Real r = (Real)obj;
+        if(r.isInteger()) return r.intValue();
+      }
+      return null;
+    }
+
+    public Trampoline.Bounce callWith(ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      int n = parameters.size();
+      if(n != 3 && n != 4)
+        throw new Exceptionf("'(await <optional-timeout> <promise> <resolve-lambda> <reject-lambda>) didn't receive 3 or 4 args: %s", Exceptionf.profileArgs(parameters));
+      Integer timeout = parseTimeout(n,parameters);
+      Datum promise = parameters.get(n-3);
+      Datum resolveLambda = parameters.get(n-2);
+      Datum rejectLambda = parameters.get(n-1);
+      if(!(resolveLambda instanceof Callable))
+        throw new Exceptionf("'(await <optional-timeout> <promise> <resolve-lambda> <reject-lambda>) <resolve-lambda> isn't callable: %s", Exceptionf.profileArgs(parameters));
+      if(!(rejectLambda instanceof Callable))
+        throw new Exceptionf("'(await <optional-timeout> <promise> <resolve-lambda> <reject-lambda>) <resolve-lambda> isn't callable: %s", Exceptionf.profileArgs(parameters));
+      if(IsPromiseP.logic(promise)) {
+        Vector handle = (Vector)promise;
+        if(timeout != null) {
+          escm.type.concurrent.Thread t = (escm.type.concurrent.Thread)handle.get(2);
+          t.join(timeout);
+          if(!t.getStatus().equals("finished")) {
+            ArrayList<Datum> timeoutArgs = new ArrayList<Datum>(1);
+            timeoutArgs.add(new Symbol("timeout"));
+            return ((Callable)rejectLambda).callWith(timeoutArgs,continuation);
+          }
+        } else {
+          ((escm.type.concurrent.Thread)handle.get(2)).join();
+        }
+        ArrayList<Datum> args = new ArrayList<Datum>(1);
+        args.add(handle.get(0));
+        if(handle.get(1).isTruthy()) {
+          return ((Callable)resolveLambda).callWith(args,continuation);
+        } else {
+          return ((Callable)rejectLambda).callWith(args,continuation);
+        }
+      } else {
+        ArrayList<Datum> args = new ArrayList<Datum>(1);
+        args.add(promise);
+        return ((Callable)resolveLambda).callWith(args,continuation);
+      }
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // await-all
+  //
+  // (define *await-all-timeout* 50) ; milliseconds
+  //
+  // (define (escm-promise-finished? promise-thread)
+  //   (thread-join! promise-thread *await-all-timeout*)
+  //   (eq? (thread-status promise-thread) 'finished))
+  //
+  // (define (await-all . promises-ordered-collection)
+  //   (when (= (len promises-ordered-collection) 1)
+  //     (def arg (car promises-ordered-collection))
+  //     (if (and (oc? arg) (not (promise? arg))) 
+  //         (set! promises-ordered-collection arg)))
+  //   (promise
+  //     (lambda (resolve reject)
+  //       (def n (len promises-ordered-collection))
+  //       (def unfinished? (vector-unfold #(= %1 n) (lambda (_) #t) #(+ %1 1) 0))
+  //       (def promises (ac->vector promises-ordered-collection)) ; Theta(1) promise random-access
+  //       (def still-working? #t)
+  //       (while (still-working?)
+  //         (set! still-working? #f)
+  //         (def idx 0)
+  //         (while ((< idx n))
+  //           (when (unfinished? idx)
+  //             (def p (promises idx))
+  //             (if (promise? p)
+  //                 (if (escm-promise-finished? (p 2))
+  //                     (begin
+  //                       (if (p 1) (promises idx (p 0)) (reject (p 0)))
+  //                       (unfinished? idx #f))
+  //                     (set! still-working? #t))
+  //                 (unfinished? idx #f))) ; don't need to finish non-promises
+  //           (set! idx (+ idx 1))))
+  //       (resolve (vector->list promises)))))
+  public static class AwaitAll extends Primitive {
+    private static final int AWAIT_ALL_CYCLE_PERIOD = 50; // milliseconds
+
+    public java.lang.String escmName() {
+      return "await-all";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("await-all"),new Symbol("<promises-ordered-collection>")),
+        Pair.List(new Symbol("await-all"),new Symbol("<promise>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Concurrency:Promises\nGet a new promise that either resolves to a list of <promises>'s resolved\nresults, or rejects with the first error encountered. Akin to JavaScript's\n<Promise.all()>.\n\n<await-all> can be called in two ways:\n  1. (await-all <promises-ordered-collection>)\n  2. (await-all <promise> ...)\n\nNote that it's safe to pass non-promises to <await-all>: they're treated as \nvalues of immediately resolved promises.\n\nSee <promise>'s <help> entry for an example use!";
+    }
+
+    private ArrayList<Datum> parsePromises(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() == 1) {
+        Datum arg = parameters.get(0);
+        if(arg instanceof OrderedCollection && !IsPromiseP.logic(arg)) {
+          parameters = ((OrderedCollection)arg).toArrayList();
+        }
+      }
+      return parameters;
+    }
+
+    private boolean promiseFinished(Vector handle) throws Exception {
+      escm.type.concurrent.Thread promiseThread = (escm.type.concurrent.Thread)handle.get(2);
+      promiseThread.join(AWAIT_ALL_CYCLE_PERIOD);
+      return promiseThread.getStatus().equals("finished");
+    }
+
+    private Integer parseTimeout(ArrayList<Datum> parameters) {
+      if(parameters.size() > 0 && parameters.get(0) instanceof Real) {
+        Real r = (Real)parameters.get(0);
+        if(r.isInteger()) return r.intValue();
+      }
+      return null;
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      ArrayList<Datum> promises = parsePromises(parameters);
+      int n = promises.size();
+      return Promise.logic(new Callable() {
+        public String docstring() {
+          return "An <await-all> promise lambda: resolves to a list of resolved values, or\nrejects with the first error.";
+        }
+        public Datum signature() {
+          return Pair.List(new Symbol(Procedure.DEFAULT_NAME),new Symbol("<resolve>"),new Symbol("<reject>"));
+        }
+        public Trampoline.Bounce callWith(ArrayList<Datum> result, Trampoline.Continuation ignored) throws Exception {
+          Callable resolve = (Callable)result.get(0);
+          Callable reject = (Callable)result.get(1);
+          Datum[] resolvedValues = new Datum[n];
+          boolean[] unfinished = new boolean[n];
+          for(int i = 0; i < n; ++i) {
+            unfinished[i] = true;
+          }
+          boolean stillWorking = true;
+          while(stillWorking) {
+            stillWorking = false;
+            for(int i = 0; i < n; ++i) {
+              if(unfinished[i] == true) {
+                Datum p = promises.get(i);
+                if(IsPromiseP.logic(p)) {
+                  Vector handle = (Vector)p;
+                  if(promiseFinished(handle)) {
+                    if(handle.get(1).isTruthy()) {
+                      resolvedValues[i] = handle.get(0);
+                    } else {
+                      ArrayList<Datum> failArgs = new ArrayList<Datum>();
+                      failArgs.add(handle.get(0));
+                      return reject.callWith(failArgs,ignored);
+                    }
+                    unfinished[i] = false;
+                  } else {
+                    stillWorking = true;
+                  }
+                } else {
+                  unfinished[i] = false; // don't need to finish non-promises
+                  resolvedValues[i] = p;
+                }
+              }
+            }
+          }
+          Datum resolvedList = Nil.VALUE;
+          for(int i = resolvedValues.length-1; i >= 0; --i) {
+            resolvedList = new Pair(resolvedValues[i],resolvedList);
+          }
+          ArrayList<Datum> winArgs = new ArrayList<Datum>();
+          winArgs.add(resolvedList);
+          return resolve.callWith(winArgs,ignored);
+        }
+      });
     }
   }
 }
