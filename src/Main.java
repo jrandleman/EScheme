@@ -74,9 +74,9 @@ public class Main {
     sb.append("                     __ / '. `````.'\\\n");
     sb.append("                    /,'`|   `````.-~\"~-.\n");
     sb.append("\n");
-    sb.append("      Copyright (c) Jordan Candide Randleman 2021-2023\n");
-    sb.append(String.format("                Eerina's Scheme: Version %.1f\n",SystemPrimitives.VERSION));
-    sb.append("            Type (help) for Help, (exit) to Exit\n");
+    sb.append(              "      Copyright (c) Jordan Candide Randleman 2021-2023\n");
+    sb.append(String.format("              Eerina's Scheme (\u03bb): Version %.1f\n",SystemPrimitives.VERSION));
+    sb.append(              "            Type (help) for Help, (exit) to Exit\n");
     sb.append("\n");
     sb.append("                        \u039b\u03c8\u0aea \u039b\u03b9\u03c5 \u03bc\u0391\u0aea\u03a9\n");
     sb.append("                         \u03b4\u0395\u03a4 \u03b4\u03c0\u03a4 \u03b2\u0392\n");
