@@ -1382,8 +1382,6 @@ See <promise>'s <help> entry for an example use!
 ```scheme
 (await-all <promises-ordered-collection>)
 (await-all <promise> ...)
-(await-all <timeout-ms> <promises-ordered-collection>)
-(await-all <timeout-ms> <promise> ...)
 ```
 
 ##### Description:
@@ -1393,20 +1391,11 @@ results, or rejects with the first error encountered. Akin to JavaScript's
 <Promise.all()>.
 
 <await-all> can be called in two ways:
-  1. (await-all <optional-timeout> <promises-ordered-collection>)
-  2. (await-all <optional-timeout> <promise> ...)
-
-If <timeout> is provided (defaults to 50), <await-all> will wait <timeout>
-milliseconds for each promise thread when cycling through its promise args.
-
-  -> Note that this can generally be ignored: exposed to support fine-tuned
-     threading performance, its default value of 50 tends to work great!
+  1. (await-all <promises-ordered-collection>)
+  2. (await-all <promise> ...)
 
 Note that it's safe to pass non-promises to <await-all>: they're treated as 
 values of immediately resolved promises.
-
-Toggle <*await-all-timeout*> to determine how many milliseconds <await-all>
-ought to pause for when attempting to join each promise's thread.
 
 See <promise>'s <help> entry for an example use!
 ```
