@@ -1314,14 +1314,6 @@ public class ConcurrentPrimitives {
       return promiseThread.getStatus().equals("finished");
     }
 
-    private Integer parseTimeout(ArrayList<Datum> parameters) {
-      if(parameters.size() > 0 && parameters.get(0) instanceof Real) {
-        Real r = (Real)parameters.get(0);
-        if(r.isInteger()) return r.intValue();
-      }
-      return null;
-    }
-
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       ArrayList<Datum> promises = parsePromises(parameters);
       int n = promises.size();

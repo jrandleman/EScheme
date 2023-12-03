@@ -50,9 +50,10 @@ public class HelpPrimitives {
       System.out.println("parent directory, and . for the current directory.\n");
       System.out.println("The help menu also supports a limited number of keyword commands: behaviors");
       System.out.println("that <help> can execute to perform special actions. These include:\n");
-      System.out.println("  1. :quit | Ends the current <help> session. Equivalent to typing <EOF>");
-      System.out.println("  2. :help | Prints this menu");
-      System.out.println("  3. :~    | Changes the current directory back to the home directory\n");
+      System.out.println("  1. :quit       | Ends the current <help> session. Equivalent to typing <EOF>");
+      System.out.println("  2. :help       | Prints this menu");
+      System.out.println("  3. :~          | Changes the current directory back to the home directory");
+      System.out.println("  4. :eval <var> | Prints as if passed <var> to the <help> function.\n");
       System.out.println("Type a file name below to navigate to its help entry:");
     }
 
@@ -67,22 +68,36 @@ public class HelpPrimitives {
     }
 
 
-    private static FolderNode executeCommand(FolderNode root, String cmd) throws Exception {
-      switch(cmd) {
+    private static Datum helpEval(Environment env, String variableName) throws Exception {
+      return env.get(new Symbol(variableName.trim()));
+    }
+
+
+    private static escm.util.Pair<FolderNode,Integer> executeCommand(Environment env, FolderNode root, String[] cmds, int i) throws Exception {
+      switch(cmds[i]) {
         case ":quit": {
           throw new TerminateHelpMenuException();
         }
         case ":help": {
           helpCommand();
           root.print();
-          return root;
+          return new escm.util.Pair<FolderNode,Integer>(root,i);
         }
         case ":~": {
-          return goHome(root);
+          return new escm.util.Pair<FolderNode,Integer>(goHome(root),i);
+        }
+        case ":eval": {
+          if(i+1 >= cmds.length) {
+            System.err.printf("help> :eval command is missing a <var>: %s\n", cmds[i]);
+            return new escm.util.Pair<FolderNode,Integer>(root,i);
+          }
+          System.out.print(describeObject(helpEval(env,cmds[i+1])));
+          System.out.flush();
+          return new escm.util.Pair<FolderNode,Integer>(root,i+1);
         }
         default: {
-          System.err.printf("help> Invalid keyword command: %s\n", cmd);
-          return root;
+          System.err.printf("help> Invalid keyword command: %s\n", cmds[i]);
+          return new escm.util.Pair<FolderNode,Integer>(root,i);
         }
       }
     }
@@ -102,29 +117,29 @@ public class HelpPrimitives {
     }
 
 
-    private static FolderNode openFile(FolderNode root, String cmd) throws Exception {
-      int ancestryCount = gotoParentDirectory(cmd);
+    private static escm.util.Pair<FolderNode,Integer> openFile(FolderNode root, String[] cmds, int i) throws Exception {
+      int ancestryCount = gotoParentDirectory(cmds[i]);
       if(ancestryCount != NOT_A_PARENT_DIRECTORY) {
         for(; ancestryCount > 0; --ancestryCount) {
           root = root.getShellParent();
         }
         root.print();
-        return root;
+        return new escm.util.Pair<FolderNode,Integer>(root,i);
       }
       for(ConcurrentHashMap.Entry<String,HelpNode> entry : root.children.entrySet()) {
-        if(entry.getKey().equals(cmd)) {
+        if(entry.getKey().equals(cmds[i])) {
           HelpNode target = entry.getValue();
           target.print();
           if(target instanceof FolderNode) {
-            return (FolderNode)target;
+            return new escm.util.Pair<FolderNode,Integer>((FolderNode)target,i);
           } else {
-            return root;
+            return new escm.util.Pair<FolderNode,Integer>(root,i);
           }
         }
       }
-      System.err.printf("help> Invalid file (not in the current directory): %s\n", cmd);
+      System.err.printf("help> Invalid file (not in the current directory): %s\n", cmds[i]);
       root.print();
-      return null;
+      return new escm.util.Pair<FolderNode,Integer>(null,i);
     }
 
 
@@ -133,18 +148,22 @@ public class HelpPrimitives {
     }
 
 
-    private static FolderNode executeProcess(FolderNode root, String cmd) throws Exception {
-      if(isCommand(cmd)) {
-        return executeCommand(root,cmd);
+    // returns: {next-home, next-cmd-idx}
+    private static escm.util.Pair<FolderNode,Integer> executeProcess(Environment env, FolderNode root, String[] cmds, int i) throws Exception {
+      if(isCommand(cmds[i])) {
+        return executeCommand(env,root,cmds,i);
       } else {
-        return openFile(root,cmd);
+        return openFile(root,cmds,i);
       }
     }
 
 
     public static String[] preprocessCommand(String prompt) {
       prompt = prompt.trim();
-      if(isCommand(prompt)) return new String[]{prompt};
+      if(isCommand(prompt)) {
+        // split the command at the first space: cmds have at most 1 arg
+        return prompt.split("\\s",2);
+      }
       return prompt.split(":");
     }
 
@@ -159,7 +178,7 @@ public class HelpPrimitives {
 
 
     // Returns the root of the next prompt's execution location
-    private static FolderNode prompt(FolderNode root) throws Exception {
+    private static FolderNode prompt(Environment env, FolderNode root) throws Exception {
       System.out.println("");
       while(true) {
         System.out.print("help["+root.getPath()+"]> ");
@@ -173,8 +192,10 @@ public class HelpPrimitives {
         String[] cmds = preprocessCommand(input);
         if(isValidCommand(cmds)) {
           for(int i = 0; i < cmds.length; ++i) {
-            FolderNode newRoot = executeProcess(root,cmds[i]);
-            if(newRoot == null) return prompt(root); // error message printed
+            escm.util.Pair<FolderNode,Integer> next = executeProcess(env,root,cmds,i);
+            FolderNode newRoot = next.first;
+            i = next.second;
+            if(newRoot == null) return prompt(env,root); // error message printed
             if(i+1 < cmds.length) System.out.println("\n  -----------------------------------------------------------------------------");
             root = newRoot;
           }
@@ -196,7 +217,7 @@ public class HelpPrimitives {
       System.out.println("their help entries:");
       home.print();
       while(true) {
-        home = prompt(home);
+        home = prompt(env,home);
       }
     }
 
@@ -338,7 +359,7 @@ public class HelpPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Meta\nObj Argument:\n  Get information about <obj>.\n\nString Argument:\n  Get result of typing in <path-string> to the interactive help menu.\n\nNo Arguments:\n  Launch the interactive help menu. The help menu consists of folders, which\n  in turn hold descriptions of various variables in EScheme's environment.\n\n    * Note that the <help> menu always operates relative to the program's\n      original <stdin> and <stdout> streams, rather than the values of\n      <current-input-port> and <current-output-port>.\n\n  Type folder names in the input prompt to enter them, and use \":\" as a \n  separator to enter multiple folders (e.g. \"folder1:folder2:folder3\").\n  Type . for the current directory, .. for the parent, ... for the \n  grandparent, etc.\n\n  Type :quit to quit, :~ to return to the home directory, or :help for more \n  information.\n\n  Procedures, classes, and interfaces that want to explain how they work in \n  the <help> menu should use <docstring> syntax. Within the <docstring>, the\n  \"@help\" syntax can be used to place the variable within a certain \n  subdirectory of the help menu. For example:\n\n    (define (fact n)\n      \"\n      @help:Procedures:Numbers\n      The factorial function. Accepts an int arg.\n      \"\n      (if (< n 2)\n          1\n          (* n (fact (- n 1)))))\n\n  would put fact's <help> entry in the Numbers directory, which itself is in\n  the Procedures directory. Docstring entries without the \"@help\" syntax\n  are placed in the \"Misc\" directory.\n\nSee <define-help> to register topic documents in help's file tree.\nSee <help-directory> to get help's files as an EScheme data structure.";
+      return "@help:Procedures:Meta\nObj Argument:\n  Get information about <obj>.\n\nString Argument:\n  Get result of typing in <path-string> to the interactive help menu.\n\nNo Arguments:\n  Launch the interactive help menu. The help menu consists of folders, which\n  in turn hold descriptions of various variables in EScheme's environment.\n\n    * Note that the <help> menu always operates relative to the program's\n      original <stdin> and <stdout> streams, rather than the values of\n      <current-input-port> and <current-output-port>.\n\n  Type folder names in the input prompt to enter them, and use \":\" as a \n  separator to enter multiple folders (e.g. \"folder1:folder2:folder3\").\n  Type . for the current directory, .. for the parent, ... for the \n  grandparent, etc.\n\n  Type :quit to quit, :~ to return to the home directory, or :help for more\n  information. Type :eval <var> to print as if had passed <var> to <help>.\n\n  Procedures, classes, and interfaces that want to explain how they work in \n  the <help> menu should use <docstring> syntax. Within the <docstring>, the\n  \"@help\" syntax can be used to place the variable within a certain \n  subdirectory of the help menu. For example:\n\n    (define (fact n)\n      \"\n      @help:Procedures:Numbers\n      The factorial function. Accepts an int arg.\n      \"\n      (if (< n 2)\n          1\n          (* n (fact (- n 1)))))\n\n  would put fact's <help> entry in the Numbers directory, which itself is in\n  the Procedures directory. Docstring entries without the \"@help\" syntax\n  are placed in the \"Misc\" directory.\n\nSee <define-help> to register topic documents in help's file tree.\nSee <help-directory> to get help's files as an EScheme data structure.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -395,17 +416,17 @@ public class HelpPrimitives {
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2)
-        throw new Exceptionf("'(help <path:name-string> <docstring>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(define-help <path:name-string> <docstring>) expects exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum path = parameters.get(0);
       Datum docs = parameters.get(1);
       if(!(path instanceof escm.type.String))
-        throw new Exceptionf("'(help <path:name-string> <docstring>) <path:name> %s isn't a string: %s", path.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(define-help <path:name-string> <docstring>) <path:name> %s isn't a string: %s", path.profile(), Exceptionf.profileArgs(parameters));
       if(!(docs instanceof escm.type.String))
-        throw new Exceptionf("'(help <path:name-string> <docstring>) <docstring> %s isn't a string: %s", docs.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(define-help <path:name-string> <docstring>) <docstring> %s isn't a string: %s", docs.profile(), Exceptionf.profileArgs(parameters));
       String pathStr = ((escm.type.String)path).value();
       String docsStr = ((escm.type.String)docs).value();
       if(!Help.isValidCommand(Help.preprocessCommand(pathStr)))
-        throw new Exceptionf("'(help <path:name-string> <docstring>) <path:name> %s has invalid folder names: %s", docs.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(define-help <path:name-string> <docstring>) <path:name> %s has invalid folder names: %s", docs.profile(), Exceptionf.profileArgs(parameters));
       TOPICS.put(pathStr.trim(),docsStr);
       return Void.VALUE;
     }
