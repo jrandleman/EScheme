@@ -1099,8 +1099,8 @@ public class ConcurrentPrimitives {
 
     public static Datum logic(Callable promiseLambda) throws Exception {
       Vector handle = new Vector();
-      handle.push(Boolean.FALSE);
-      handle.push(Boolean.TRUE); // defaults to <resolved>
+      handle.push(Boolean.FALSE); // store the promise value
+      handle.push(Boolean.TRUE); // default promise to <resolved>
       escm.type.concurrent.Thread promiseThread = new escm.type.concurrent.Thread(new Callable() {
         public String docstring() {
           return "Runnable procedure for a <promise> object's internal thread.";
