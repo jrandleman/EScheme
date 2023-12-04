@@ -63,6 +63,7 @@ public class CorePrimitives {
   public static Symbol ARROW_WAND_ARG = new Symbol("<>");
   public static Symbol CURRY = new Symbol("curry");
   public static Symbol LET_VALUES = new Symbol("let-values");
+  public static Symbol WHILE = new Symbol("while");
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -75,6 +76,7 @@ public class CorePrimitives {
   public static Symbol FOLD = new Symbol("fold");
   public static Symbol CAR = new Symbol("car");
   public static Symbol CDR = new Symbol("cdr");
+  public static Symbol NOT = new Symbol("not");
   public static Symbol APPEND = new Symbol("append");
   public static Symbol MEMBER = new Symbol("member");
   public static Symbol CALL_WITH_VALUES = new Symbol("call-with-values");
@@ -1697,10 +1699,10 @@ public class CorePrimitives {
 
     public Datum signature() {
       return Pair.List(
-        Pair.List(new Symbol("while"),
+        Pair.List(WHILE,
           Pair.List(new Symbol("<condition>")),
           new Symbol("<body>"),Signature.VARIADIC),
-        Pair.List(new Symbol("while"),
+        Pair.List(WHILE,
           Pair.List(new Symbol("<condition>"),new Symbol("<return-expr>"),Signature.VARIADIC),
           new Symbol("<body>"),Signature.VARIADIC));
     }
@@ -1860,6 +1862,145 @@ public class CorePrimitives {
                   updates,
                   Pair.List(new Pair(loopProcedureName,varsAndVals.first)))))))),
         new Pair(loopProcedureName,varsAndVals.second));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // (for ((<var> <initial-val> <update-expr>) ...) ; contents are optional 
+  //      (<break-condition> <return-expr> ...)     ; contents are optional 
+  //      <body> ...)                               ; body is optional 
+  //
+  // (define-syntax for
+  //   (lambda (var-bindings break-returns . body)
+  //     (def vars (map car var-bindings))
+  //     (def vals (map cadr var-bindings))
+  //     (def updates 
+  //       (map #(ls 'set! (car %1) (caddr %1))
+  //            (filter #(= (len %1) 3) var-bindings)))
+  //     (def break-cond
+  //       (if (pair? break-returns)
+  //           (car break-returns)
+  //           #f))
+  //     (def return-exprs
+  //       (if (pair? break-returns)
+  //           (cdr break-returns)
+  //           '()))
+  //     (cons 
+  //       'begin ; we want <for> to have the same scope semantics as <while>
+  //       (append
+  //         (map #(ls 'def %1 %2) vars vals)
+  //         (ls (cons 'while
+  //               (cons 
+  //                 (cons (ls 'not break-cond) return-exprs)
+  //                 (append body updates))))))))
+  public static class For extends PrimitiveSyntax {
+    public java.lang.String escmName() {
+      return "for";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+        Pair.List(new Symbol("for"),
+          Pair.List(),
+          Pair.List()
+          ,new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("for"),
+          Pair.List(Pair.List(new Symbol("<var>"),new Symbol("<initial-value>")),Signature.VARIADIC),
+          Pair.List(),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("for"),
+          Pair.List(Pair.List(new Symbol("<var>"),new Symbol("<initial-value>"),new Symbol("<update-expression>")),Signature.VARIADIC),
+          Pair.List(),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("for"),
+          Pair.List(Pair.List(new Symbol("<var>"),new Symbol("<initial-value>"),new Symbol("<update-expression>")),Signature.VARIADIC),
+          Pair.List(new Symbol("<break-condition>")),
+          new Symbol("<body>"),Signature.VARIADIC),
+        Pair.List(new Symbol("for"),
+          Pair.List(Pair.List(new Symbol("<var>"),new Symbol("<initial-value>"),new Symbol("<update-expression>")),Signature.VARIADIC),
+          Pair.List(new Symbol("<break-condition>"),new Symbol("<return-expression>"),Signature.VARIADIC),
+          new Symbol("<body>"),Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "@help:Syntax:Core\n(for ((<var> <initial-val> <update-expr>) ...) \n     (<break-condition> <return-expr> ...) \n     <body> ...)\n\nExecute \"<body> ...\" while <break-condition> is #f. Once <break-condition> is\n#t, return \"<return-expr> ...\". \"<var>\" is set to \"<initial-val>\" at first, then\nto \"<update-expr>\" repeatedly after each iteration.\n\nNote: \n  1. \"<update-expr>\" is optional\n  2. If \"<update-expr>\" is ommited, \"<var> <initial-val>\" is optional\n  3. \"<return-expr> ...\" is optional\n  4. If \"<return-expr> ...\" is ommited, \"<break-condition>\" is optional\n  5. \"<body> ...\" is optional\n\nHence the most minimal form of \"for\" is \"(for () ())\" (an infinite loop).\n\nNote that this mirror's R4RS Scheme's \"do\" macro, but using true iteration \ninternally.";
+    }
+
+    private static Datum getVarDefinitions(escm.util.Pair<Datum,Datum> varsAndVals) throws Exception {
+      if(!(varsAndVals.first instanceof Pair) || !(varsAndVals.second instanceof Pair)) return Nil.VALUE;
+      Pair varPair = (Pair)varsAndVals.first;
+      Pair valPair = (Pair)varsAndVals.second;
+      return new Pair(
+        Pair.List(DEFINE,varPair.car(),valPair.car()),
+        getVarDefinitions(new escm.util.Pair<Datum,Datum>(varPair.cdr(),valPair.cdr())));
+    }
+
+    private static escm.util.Pair<Datum,Datum> getVarsAndVals(Datum varBindings, ArrayList<Datum> parameters) throws Exception {
+      if(!(varBindings instanceof Pair)) return new escm.util.Pair<Datum,Datum>(Nil.VALUE,Nil.VALUE);
+      Pair p = (Pair)varBindings;
+      Datum binding = p.car();
+      if(!(binding instanceof Pair))
+        throw new Exceptionf("'(for ((<var> <initial-val> <update-expr>) ...) (<break-condition> <return-expr> ...) <body> ...) invalid binding: %s", Exceptionf.profileArgs(parameters));
+      Pair bindingPair = (Pair)binding;
+      Datum value = bindingPair.cdr();
+      if(value instanceof Pair) value = ((Pair)value).car();
+      escm.util.Pair<Datum,Datum> tails = getVarsAndVals(p.cdr(),parameters);
+      return new escm.util.Pair<Datum,Datum>(
+        new Pair(bindingPair.car(),tails.first),
+        new Pair(value,tails.second));
+    }
+
+    private static Datum getUpdates(Datum varBindings, ArrayList<Datum> parameters) throws Exception {
+      if(!(varBindings instanceof Pair)) return Nil.VALUE;
+      Pair p = (Pair)varBindings;
+      Datum binding = p.car();
+      if(!(binding instanceof Pair))
+        throw new Exceptionf("'(for ((<var> <initial-val> <update-expr>) ...) (<break-condition> <return-expr> ...) <body> ...) invalid binding: %s", Exceptionf.profileArgs(parameters));
+      Pair bindingPair = (Pair)binding;
+      if(bindingPair.length() == 3) {
+        return new Pair(Pair.List(SET_BANG,bindingPair.car(),((Pair)((Pair)bindingPair.cdr()).cdr()).car()),getUpdates(p.cdr(),parameters));
+      } else {
+        return getUpdates(p.cdr(),parameters);
+      }
+    }
+
+    private static Datum getBreakCondition(Datum breakReturns) throws Exception {
+      if(breakReturns instanceof Pair) return ((Pair)breakReturns).car();
+      return Boolean.FALSE;
+    }
+
+    private static Datum getUpdates(Datum breakReturns) throws Exception {
+      if(breakReturns instanceof Pair) return ((Pair)breakReturns).car();
+      return Boolean.FALSE;
+    }
+
+    private static Datum getReturnExprs(Datum breakReturns) throws Exception {
+      if(breakReturns instanceof Pair) return ((Pair)breakReturns).cdr();
+      return Nil.VALUE;
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() < 2 || !Pair.isList(parameters.get(0)) || !Pair.isList(parameters.get(1)))
+        throw new Exceptionf("'(for ((<var> <initial-val> <update-expr>) ...) (<break-condition> <return-expr> ...) <body> ...) invalid syntax: %s", Exceptionf.profileArgs(parameters));
+      Datum varBindings = parameters.get(0);
+      escm.util.Pair<Datum,Datum> varsAndVals = getVarsAndVals(varBindings,parameters);
+      Datum defns = getVarDefinitions(varsAndVals);
+      Datum updates = getUpdates(varBindings,parameters);
+      Datum breakReturns = parameters.get(1);
+      Datum breakCondition = getBreakCondition(breakReturns);
+      Datum returnExprs = getReturnExprs(breakReturns);
+      Datum body = Lambda.getAllExpressionsAfter(parameters,1);
+      return new Pair(
+        BEGIN,
+        Pair.binaryAppend(
+          defns,
+          Pair.List(
+            new Pair(
+              WHILE,
+              new Pair(
+                new Pair(Pair.List(NOT,breakCondition),returnExprs),
+                Pair.binaryAppend(body,updates))))));
     }
   }
 

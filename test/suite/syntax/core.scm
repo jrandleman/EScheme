@@ -427,6 +427,22 @@
 (ut (begin (do ((val 0 (+ val 1))) ((= val 10)) (set! captured-val val)) captured-val) 9)
 
 
+(define val 0)
+(call/cc
+  (lambda (exit)
+    (for 
+      ()
+      ()
+      (if (< val 10) 
+          (set! val (+ val 1))
+          (exit val))))) ; exit out of the infinite loop
+(ut val 10)
+(ut (for ((val 0 (+ val 1))) ((= val 10) val)) 10)
+(ut (for ((i 0 (+ i 1)) (j 1 (* j 2))) ((= i 10) j) (set! i (+ i 1))) 32)
+(def captured-val 0)
+(ut (begin (for ((val 0 (+ val 1))) ((= val 10)) (set! captured-val val)) captured-val) 9)
+
+
 (ut (-<> 42) 42)
 (ut (-<> 42 314) 314)
 (ut (-<> 2 (* <> <>) (/ <> 3)) 4/3)
