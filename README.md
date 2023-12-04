@@ -3,7 +3,7 @@
 # Eerina's Scheme (🚧 Work In Progress 🚧)
 
 ------------------------------------------------------------------------------
-## Installing and Running EScheme
+## Installing and Running EScheme:
 ### Dependencies:
 * EScheme depends on [Java](https://adoptium.net). Make sure it's installed first!
   - Note that EScheme supports both Java 11 and 17 (LTS releases)!
@@ -35,7 +35,7 @@
 
 
 ------------------------------------------------------------------------------
-## EScheme Command-Line Flags
+## EScheme Command-Line Flags:
 1. `-v`, `--version`
    * Print EScheme version information
 2. `-h`, `--help`
@@ -111,7 +111,7 @@ Anything with the `escm-` prefix is considered reserved for use by the runtime.
 
 
 ------------------------------------------------------------------------------
-## EScheme-Specific Concepts (Scheme Extensions/Deviations)
+## EScheme-Specific Concepts (Scheme Extensions/Deviations):
 
 1. Object System (classes, interfaces, and objects!)
 2. Module System (file-specific variables & macros!)
