@@ -53,6 +53,58 @@
 
 
 ------------------------------------------------------------------------------
+## Learning EScheme
+
+EScheme builds on R4RS Scheme: designed to be the C++ to it's C, EScheme aims
+to adapt the LISP for contemporary use by supporting the many paradigms 
+programmers have come to expect from their tooling in 2023.
+
+Despite being inspired by a broad variety of lanugages (including Clojure, Scala, 
+Smalltalk, Python, JavaScript, Java, & C++), EScheme's base draws most heavily on 
+R4RS and R5RS Scheme. You can find tutorials for:
+
+  1. [R4RS here!](https://people.csail.mit.edu/jaffer/r4rs_toc.html)
+  2. [R5RS here!](https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r5rs-html/r5rs_toc.html)
+
+[While EScheme deviates from R(4/5)RS in some key ways](#escheme-specific-concepts-scheme-extensionsdeviations), having read the tutorials 
+above, you'll be broadly ready to jump directly into learning EScheme! However, 
+if you'd like a bit more practice first, you can first check out this textbook: 
+"The Structure and Interpretation of Computer Programs" (or *SICP* for short). 
+Click on the below links for:
+
+  * [SICP 1st Edition Homepage](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html): This has an outdated version of the textbook, 
+    but it still links to solid programming exercises you can try out.
+  * [SICP 2nd Edition Full Text](https://web.mit.edu/6.001/6.037/sicp.pdf): You should follow along this text with a 
+    compliant Scheme implementation at the ready, it's the best way to learn!
+  * [Chez Scheme's Homepage](https://cisco.github.io/ChezScheme/), and [Chez Scheme's Source Code](https://github.com/cisco/ChezScheme): Chez Scheme is a 
+    fantastic compliant Scheme implementation. Follow the former link for 
+    general information, and the latter to build Chez Scheme on your own system.
+    - Note: if building from source isn't your thing, just google how to install
+      Chez with any package manager of your choice (it's pretty popular). 
+  * [SICP Video Lecture Series by Scheme's Inventor](https://ocw.mit.edu/courses/6-001-structure-and-interpretation-of-computer-programs-spring-2005/video_galleries/video-lectures/): This gem of a series comes
+    thanks to MIT's "OpenCourseWare" program. Despite only following along
+    SICP's 1st edition, the books are similar enough to translate very well!
+ 
+[Beyond README.md's information on EScheme's R4RS extensions](#escheme-specific-concepts-scheme-extensionsdeviations), you can find more
+information on EScheme's broader extensions in the `doc` directory:
+  
+  * [`concurrency.md`](https://github.com/jrandleman/EScheme/tree/main/doc/examples): Threading semantics and dynamic environments.
+  * [`modules.md`](https://github.com/jrandleman/EScheme/blob/main/doc/modules.md): Module system, as well as its reflection.
+  * [`objects.md`](https://github.com/jrandleman/EScheme/blob/main/doc/objects.md): Single-inheritance multiple-interfaces object system.
+  * [`instructions.md`](https://github.com/jrandleman/EScheme/blob/main/doc/instructions.md): Inline bytecode, and learn EScheme's instruction set.
+  * [`examples`](https://github.com/jrandleman/EScheme/tree/main/doc/examples): Directory with sample EScheme files.
+
+Having learned R4RS Scheme and EScheme's deviations, you're set to code now! 🙌
+
+Keep reading this README for a table of contents on EScheme's language features!
+For an interactive solution, EScheme draws from Python with a `help` function:
+  
+  1. `(help)`: Launch EScheme's interactive `help` menu to explore the language
+  2. `(help <obj>)`: Get introspected information on the `<obj>` EScheme datum
+     * ___Tip: Always pass functions and macros to `help` the 1st time you use them!___
+
+
+------------------------------------------------------------------------------
 ## On Reserved Symbols:
 * Anything with the `escm-` prefix is considered reserved for use by the runtime.
 
