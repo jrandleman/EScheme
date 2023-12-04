@@ -55,11 +55,11 @@
 ------------------------------------------------------------------------------
 ## Learning EScheme
 
-EScheme builds on R4RS Scheme: designed to be the C++ to it's C, EScheme aims
-to adapt the LISP for contemporary use by supporting the many paradigms 
-programmers have come to expect from their tooling in 2023.
+EScheme builds on R4RS Scheme: designed to be the C++ to it's C, EScheme adapts
+the LISP for contemporary use by supporting many paradigms programmers have come 
+to expect from their tooling in 2023.
 
-Despite being inspired by a broad variety of lanugages (including Clojure, Scala, 
+Despite being inspired by a broad variety of languages (including Clojure, Scala, 
 Smalltalk, Python, JavaScript, Java, & C++), EScheme's base draws most heavily on 
 R4RS and R5RS Scheme. You can find tutorials for:
 
@@ -70,7 +70,7 @@ R4RS and R5RS Scheme. You can find tutorials for:
 above, you'll be broadly ready to jump directly into learning EScheme! However, 
 if you'd like a bit more practice first, you can first check out this textbook: 
 "The Structure and Interpretation of Computer Programs" (or *SICP* for short). 
-Click on the below links for:
+Click on the links below for:
 
   * [SICP 1st Edition Homepage](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html): This has an outdated version of the textbook, 
     but it still links to solid programming exercises you can try out.
@@ -107,30 +107,6 @@ For an interactive solution, EScheme draws from Python with a `help` function:
 ------------------------------------------------------------------------------
 ## On Reserved Symbols:
 * Anything with the `escm-` prefix is considered reserved for use by the runtime.
-
-
-
-------------------------------------------------------------------------------
-## On Threading & Continuations:
-* Threads each have their own stack, and hence their own set of continuations.
-* Continuations are delimited by the execution of the thread that created them.
-  - Hence a child thread's continuation will never "continue" back into the parent 
-    thread, rather, it will terminate where the child thread terminated.
-
-
-
-------------------------------------------------------------------------------
-## On Threading & Dynamic Environments:
-* Each thread has a so-called "dynamic environment", wherein a set of variable 
-  bindings is kept globally within the thread while being hidden from other threads.
-* After querying for a variable that doesn't exist in a thread's dynamic environment, 
-  the "meta thread"'s dynamic environment is checked. If an entry is found in the 
-  meta thread's dynamic environment, a local copy is cached into the current thread's 
-  dynamic environment and the querying operation continues.
-* This allows for us to have "environment-global-thread-local" variables! State can
-  be shared & operated upon by many procedures without having to lock, since each
-  thread only ever operates on a local copy of the state!
-  * This is used by `dynamic-wind` in order to maintain thread-local winds!
 
 
 
