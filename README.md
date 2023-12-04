@@ -97,9 +97,9 @@ information on EScheme's broader extensions in the `doc` directory:
 Having learned R4RS Scheme and EScheme's deviations, you're set to code now! 🙌
 
 Keep reading this README for a table of contents on EScheme's language features!
-For an interactive solution, EScheme draws from Python with a `help` function:
+For an interactive solution, EScheme draws from Python with [a `help` function](#help):
   
-  1. `(help)`: Launch EScheme's interactive `help` menu to explore the language
+  1. `(help)`: Launch EScheme's interactive "help" menu to explore the language
   2. `(help <obj>)`: Get introspected information on the `<obj>` EScheme datum
      * ___Tip: Always pass functions and macros to `help` the 1st time you use them!___
 
