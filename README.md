@@ -101,7 +101,7 @@ For an interactive solution, EScheme draws from Python with [a `help` function](
   
   1. `(help)`: Launch EScheme's interactive "help" menu to explore the language
   2. `(help <obj>)`: Get introspected information on the `<obj>` EScheme datum
-     * ___Tip: Always pass functions and macros to `help` the 1st time you use them!___
+     * ___Tip: Always pass functions and macros to `help` the first time you use them!___
 
 
 ------------------------------------------------------------------------------
