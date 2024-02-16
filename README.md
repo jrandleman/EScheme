@@ -166,9 +166,9 @@ yields a string of the `(help)` directory's contents in alphabetical order as
 a markdown file.
 
 Note that [primitives.md](https://github.com/jrandleman/EScheme/blob/main/doc/primitives.md) is not intended to be a Scheme programming tutorial: the internet 
-is already rife with many wonderful alternatives. Hence, the documentation below is 
-only intended to be searched by those who already know what they are looking for,
-with EScheme's most unique features being referenced from traditional Scheme entries.
+is already rife with many wonderful alternatives. Hence, the documentation is only 
+intended to be searched by those who already know what they are looking for, with 
+EScheme's most unique features being referenced from traditional Scheme entries.
 
 
 
