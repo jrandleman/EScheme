@@ -88,7 +88,8 @@ Click on the links below for:
 [Beyond README.md's information on EScheme's R4RS extensions](#escheme-specific-concepts-scheme-extensionsdeviations), you can find more
 information on EScheme's broader extensions in the `doc` directory:
   
-  * [`concurrency.md`](https://github.com/jrandleman/EScheme/tree/main/doc/examples): Threading semantics and dynamic environments.
+  * [`primitives.md`](https://github.com/jrandleman/EScheme/tree/main/doc/primitives.md): Broad overview of EScheme's primitive functions.
+  * [`concurrency.md`](https://github.com/jrandleman/EScheme/tree/main/doc/concurrency.md): Threading semantics and dynamic environments.
   * [`modules.md`](https://github.com/jrandleman/EScheme/blob/main/doc/modules.md): Module system, as well as its reflection.
   * [`objects.md`](https://github.com/jrandleman/EScheme/blob/main/doc/objects.md): Single-inheritance multiple-interfaces object system.
   * [`instructions.md`](https://github.com/jrandleman/EScheme/blob/main/doc/instructions.md): Inline bytecode, and learn EScheme's instruction set.
