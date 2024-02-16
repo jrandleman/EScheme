@@ -488,7 +488,7 @@ public class HelpPrimitives {
     }
 
     private static String getTableOfContents(TreeMap<String,HelpNode> contents) {
-      StringBuilder toc = new StringBuilder("-------------------------------------------------------------------------------\n");
+      StringBuilder toc = new StringBuilder();
       toc.append("# Table of Contents\n\n");
       for(ConcurrentHashMap.Entry<String,HelpNode> entry : contents.entrySet()) {
         toc.append(getTableOfContents(entry.getValue(),""));
