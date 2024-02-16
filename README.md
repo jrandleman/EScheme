@@ -161,11 +161,11 @@ Anything with the `escm-` prefix is considered reserved for use by the runtime.
 ------------------------------------------------------------------------------
 ## Automatically Generated Language Documentation
 
-[doc/primitive.md](https://github.com/jrandleman/EScheme/blob/main/doc/primitive.md) contains the result of executing `(help-markdown)`, which 
+[doc/primitives.md](https://github.com/jrandleman/EScheme/blob/main/doc/primitives.md) contains the result of executing `(help-markdown)`, which 
 yields a string of the `(help)` directory's contents in alphabetical order as 
 a markdown file.
 
-Note that [primitive.md](https://github.com/jrandleman/EScheme/blob/main/doc/primitive.md) is not intended to be a Scheme programming tutorial: the internet 
+Note that [primitives.md](https://github.com/jrandleman/EScheme/blob/main/doc/primitives.md) is not intended to be a Scheme programming tutorial: the internet 
 is already rife with many wonderful alternatives. Hence, the documentation below is 
 only intended to be searched by those who already know what they are looking for,
 with EScheme's most unique features being referenced from traditional Scheme entries.
