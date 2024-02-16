@@ -933,6 +933,7 @@ public class CorePrimitives {
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
+      if(n == 1) return parameters.get(0);
       Datum ifs = Boolean.TRUE;
       for(int i = 0; i < n; ++i) {
         ifs = Pair.List(IF,ifs,parameters.get(i),Boolean.FALSE);
@@ -969,6 +970,7 @@ public class CorePrimitives {
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
+      if(n == 1) return parameters.get(0);
       Datum ifs = Boolean.FALSE;
       for(int i = n-1; i >= 0; --i) {
         Symbol cachedName = UniqueSymbol.generate("or-value");
