@@ -115,7 +115,7 @@ Anything with the `escm-` prefix is considered reserved for use by the runtime.
 
 1. Object System (classes, interfaces, and objects!)
 2. Module System (file-specific variables & macros!)
-3. Multithreading Support (threads and reentrant locks!)
+3. Multithreading Support (promises, threads, & mutexes!)
 4. Compile-time procedural macros
 5. Multi-arity and optional-parameter function support via `fn`!
 6. Stackless function calls (no stack overflow from recursion!)
