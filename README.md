@@ -106,7 +106,7 @@ For an interactive solution, EScheme draws from Python with [a `help` function](
 
 
 ------------------------------------------------------------------------------
-## On Reserved Symbols
+## Reserved Symbols
 Anything with the `escm-` prefix is considered reserved for use by the runtime.
 
 
