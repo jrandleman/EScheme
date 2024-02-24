@@ -53,7 +53,7 @@
 
 
 ------------------------------------------------------------------------------
-## Learning EScheme
+## Learning EScheme:
 
 EScheme builds on R4RS Scheme: designed to be the C++ to it's C, EScheme adapts
 the LISP for contemporary use by supporting many paradigms programmers have come 
@@ -106,7 +106,7 @@ For an interactive solution, EScheme draws from Python with [a `help` function](
 
 
 ------------------------------------------------------------------------------
-## Reserved Symbols
+## Reserved Symbols:
 Anything with the `escm-` prefix is considered reserved for use by the runtime.
 
 
@@ -160,7 +160,7 @@ Anything with the `escm-` prefix is considered reserved for use by the runtime.
 
 
 ------------------------------------------------------------------------------
-## Automatically Generated Language Documentation
+## Automatically Generated Language Documentation:
 
 [doc/primitives.md](https://github.com/jrandleman/EScheme/blob/main/doc/primitives.md) contains the result of executing `(help-markdown)`, which 
 yields a string of the `(help)` directory's contents in alphabetical order as 
