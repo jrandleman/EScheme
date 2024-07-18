@@ -58,7 +58,7 @@ public class ObjectPrimitives {
   //       pre-bind our method names upon initial class construction, rather than
   //       only later when we bind a symbol to the class object in the environment. 
   //       * This allows us to reduce the number of method allocations by half!
-  //       It also doesn't parse <optional-docstring>
+  //       It also doesn't parse <optional-docstring>.
   //
   //
   // ; Returns the super object if exists, else #f 
@@ -178,15 +178,7 @@ public class ObjectPrimitives {
     public Datum signature() {
       return Pair.List(
         Pair.List(CLASS,
-          Pair.List(EXTENDS,new Symbol("<super-class>")),Pair.List(IMPLEMENTS,new Symbol("<interface>"),Signature.VARIADIC),
-          Pair.List(new Symbol("<field-name>"),new Symbol("<default-value>")),
-          Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
-          Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
-          Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
-          Signature.VARIADIC
-        ),
-        Pair.List(CLASS,
-          Pair.List(EXTENDS,new Symbol("<super-class>")),Pair.List(IMPLEMENTS,new Symbol("<interface>"),Signature.VARIADIC),
+          Pair.List(EXTENDS,new Symbol("<super>")),Pair.List(IMPLEMENTS,new Symbol("<interface>"),Signature.VARIADIC),
           new Symbol("<docstring>"),
           Pair.List(new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
@@ -437,15 +429,7 @@ public class ObjectPrimitives {
     public Datum signature() {
       return Pair.List(
         Pair.List(new Symbol("define-class"),new Symbol("<class-name>"),
-          Pair.List(EXTENDS,new Symbol("<super-class>")),Pair.List(IMPLEMENTS,new Symbol("<interface>"),Signature.VARIADIC),
-          Pair.List(new Symbol("<field-name>"),new Symbol("<default-value>")),
-          Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
-          Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
-          Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
-          Signature.VARIADIC
-        ),
-        Pair.List(new Symbol("define-class"),new Symbol("<class-name>"),
-          Pair.List(EXTENDS,new Symbol("<super-class>")),Pair.List(IMPLEMENTS,new Symbol("<interface>"),Signature.VARIADIC),
+          Pair.List(EXTENDS,new Symbol("<super>")),Pair.List(IMPLEMENTS,new Symbol("<interface>"),Signature.VARIADIC),
           new Symbol("<docstring>"),
           Pair.List(new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
@@ -531,13 +515,6 @@ public class ObjectPrimitives {
       return Pair.List(
         Pair.List(new Symbol("interface"),
           Pair.List(EXTENDS,new Symbol("<interface>"),Signature.VARIADIC),
-          new Symbol("<field-name>"),
-          Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
-          Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
-          Signature.VARIADIC
-        ),
-        Pair.List(new Symbol("interface"),
-          Pair.List(EXTENDS,new Symbol("<interface>"),Signature.VARIADIC),
           new Symbol("<docstring>"),
           new Symbol("<field-name>"),
           Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
@@ -547,7 +524,7 @@ public class ObjectPrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Objects\nCreates an anonymous interface. Similar to classes, BUT cannot be instantiated\nvia a constructor. Required property names are denoted by a symbolic property.\n\nOptionally include <docstring> to detail information on the interface in <help>.\n\nSee <object-oriented-programming> in <Topics> for more high-level object\norientation details. See <class> for more detailed object orientation\ndetails. See <meta-object> in <Types> for more type details.\n\nFor example:\n  (define-interface IHasName\n    (:static VALUE 10)\n    name)\n\n  (define-interface IHasAge\n    age)\n\n  (define-interface IPerson (:extends IHasName IHasAge))\n\n  (define-class Person (:implements IPerson)\n    (name \"\")\n    (age 0))";
+      return "@help:Syntax:Objects\nCreates an anonymous interface. Similar to classes, BUT cannot be instantiated\nvia a constructor. Required property names are denoted by a symbolic property,\n(<field-name> above).\n\nUse :extends to optionally inherit required fields from other interface objects.\nOptionally include <docstring> to detail information on the interface in <help>.\n\nSee <object-oriented-programming> in <Topics> for more high-level object\norientation details. See <class> for more detailed object orientation\ndetails. See <meta-object> in <Types> for more type details.\n\nFor example:\n  (define-interface IHasName\n    (:static VALUE 10)\n    name)\n\n  (define-interface IHasAge\n    age)\n\n  (define-interface IPerson (:extends IHasName IHasAge))\n\n  (define-class Person (:implements IPerson)\n    (name \"\")\n    (age 0))";
     }
 
     // Returns the list of implemented interfaces if exists, else NIL
@@ -659,13 +636,6 @@ public class ObjectPrimitives {
 
     public Datum signature() {
       return Pair.List(
-        Pair.List(new Symbol("define-interface"),new Symbol("<interface-name>"),
-          Pair.List(EXTENDS,new Symbol("<interface>"),Signature.VARIADIC),
-          new Symbol("<field-name>"),
-          Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
-          Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
-          Signature.VARIADIC
-        ),
         Pair.List(new Symbol("define-interface"),new Symbol("<interface-name>"),
           Pair.List(EXTENDS,new Symbol("<interface>"),Signature.VARIADIC),
           new Symbol("<docstring>"),

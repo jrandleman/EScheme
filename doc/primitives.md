@@ -3290,8 +3290,8 @@ No Arguments:
   Type . for the current directory, .. for the parent, ... for the 
   grandparent, etc.
 
-  Type :quit to quit, :~ to return to the home directory, or :help for more 
-  information.
+  Type :quit to quit, :~ to return to the home directory, or :help for more
+  information. Type :eval <var> to print as if had passed <var> to <help>.
 
   Procedures, classes, and interfaces that want to explain how they work in 
   the <help> menu should use <docstring> syntax. Within the <docstring>, the
@@ -7769,6 +7769,47 @@ For example:
 ```
 
 -------------------------------------------------------------------------------
+### `for`
+
+#### Signatures:
+```scheme
+(for () () <body> ...)
+(for ((<var> <initial-value>) ...) () <body> ...)
+(for ((<var> <initial-value> <update-expression>) ...) () <body> ...)
+(for ((<var> <initial-value> <update-expression>) ...)
+  (<break-condition>)
+  <body>
+  ...)
+(for ((<var> <initial-value> <update-expression>) ...)
+  (<break-condition> <return-expression> ...)
+  <body>
+  ...)
+```
+
+#### Description:
+```
+(for ((<var> <initial-val> <update-expr>) ...) 
+     (<break-condition> <return-expr> ...) 
+     <body> ...)
+
+Execute "<body> ..." while <break-condition> is #f. Once <break-condition> is
+#t, return "<return-expr> ...". "<var>" is set to "<initial-val>" at first, then
+to "<update-expr>" repeatedly after each iteration.
+
+Note: 
+  1. "<update-expr>" is optional
+  2. If "<update-expr>" is ommited, "<var> <initial-val>" is optional
+  3. "<return-expr> ..." is optional
+  4. If "<return-expr> ..." is ommited, "<break-condition>" is optional
+  5. "<body> ..." is optional
+
+Hence the most minimal form of "for" is "(for () ())" (an infinite loop).
+
+Note that this mirror's R4RS Scheme's "do" macro, but using true iteration 
+internally.
+```
+
+-------------------------------------------------------------------------------
 ### `get-parameter`
 
 #### Signatures:
@@ -8421,14 +8462,7 @@ details. See <meta-object> in <Types> for more type details.
 
 #### Signatures:
 ```scheme
-(class (:extends <super-class>)
-  (:implements <interface> ...)
-  (<field-name> <default-value>)
-  ((<method-name> <parameter> ...) <body> ...)
-  (:static <field-name> <default-value>)
-  (:static (<method-name> <parameter> ...) <body> ...)
-  ...)
-(class (:extends <super-class>)
+(class (:extends <super>)
   (:implements <interface> ...)
   <docstring>
   (<field-name> <default-value>)
@@ -8541,15 +8575,7 @@ For example:
 #### Signatures:
 ```scheme
 (define-class <class-name>
-  (:extends <super-class>)
-  (:implements <interface> ...)
-  (<field-name> <default-value>)
-  ((<method-name> <parameter> ...) <body> ...)
-  (:static <field-name> <default-value>)
-  (:static (<method-name> <parameter> ...) <body> ...)
-  ...)
-(define-class <class-name>
-  (:extends <super-class>)
+  (:extends <super>)
   (:implements <interface> ...)
   <docstring>
   (<field-name> <default-value>)
@@ -8579,12 +8605,6 @@ details. See <meta-object> in <Types> for more type details.
 ```scheme
 (define-interface <interface-name>
   (:extends <interface> ...)
-  <field-name>
-  (:static <field-name> <default-value>)
-  (:static (<method-name> <parameter> ...) <body> ...)
-  ...)
-(define-interface <interface-name>
-  (:extends <interface> ...)
   <docstring>
   <field-name>
   (:static <field-name> <default-value>)
@@ -8611,11 +8631,6 @@ details. See <meta-object> in <Types> for more type details.
 #### Signatures:
 ```scheme
 (interface (:extends <interface> ...)
-  <field-name>
-  (:static <field-name> <default-value>)
-  (:static (<method-name> <parameter> ...) <body> ...)
-  ...)
-(interface (:extends <interface> ...)
   <docstring>
   <field-name>
   (:static <field-name> <default-value>)
@@ -8626,8 +8641,10 @@ details. See <meta-object> in <Types> for more type details.
 #### Description:
 ```
 Creates an anonymous interface. Similar to classes, BUT cannot be instantiated
-via a constructor. Required property names are denoted by a symbolic property.
+via a constructor. Required property names are denoted by a symbolic property,
+(<field-name> above).
 
+Use :extends to optionally inherit required fields from other interface objects.
 Optionally include <docstring> to detail information on the interface in <help>.
 
 See <object-oriented-programming> in <Topics> for more high-level object
