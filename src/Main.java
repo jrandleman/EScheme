@@ -74,7 +74,7 @@ public class Main {
     sb.append("                     __ / '. `````.'\\\n");
     sb.append("                    /,'`|   `````.-~\"~-.\n");
     sb.append("\n");
-    sb.append(              "      Copyright (c) Jordan Candide Randleman 2021-2023\n");
+    sb.append(              "      Copyright (c) Jordan Candide Randleman 2021-2024\n");
     sb.append(String.format("              Eerina's Scheme (\u03bb): Version %.1f\n",SystemPrimitives.VERSION));
     sb.append(              "            Type (help) for Help, (exit) to Exit\n");
     sb.append("\n");

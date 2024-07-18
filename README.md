@@ -57,7 +57,7 @@
 
 EScheme builds on R4RS Scheme: designed to be the C++ to it's C, EScheme adapts
 the LISP for contemporary use by supporting many paradigms programmers have come 
-to expect from their tooling in 2023.
+to expect from modern tools.
 
 Despite being inspired by a broad variety of languages (including Clojure, Scala, 
 Smalltalk, Python, JavaScript, Java, & C++), EScheme's base draws most heavily on 
