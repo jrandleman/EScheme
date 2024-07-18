@@ -9756,6 +9756,18 @@ Typically returned by predicate actions that end in '?'.
 ```
 
 -------------------------------------------------------------------------------
+## `callable`
+
+### Description:
+```
+Any EScheme value that can be applied to arguments: (<callable> <argument> ...)
+
+This includes procedures, functors (objects with a '->procedure' method defined),
+classes (to invoke their constructor), as well as O(1)-access containers
+(strings, vectors, and hashmaps).
+```
+
+-------------------------------------------------------------------------------
 ## `character`
 
 ### Description:

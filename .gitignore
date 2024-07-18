@@ -1,6 +1,7 @@
 
 .DS_Store
 doc/TODO.md
-installer/speed-test.scm
 test/parallel-main.scm
+installer/speed-test.scm
 installer/cleanup.sh
+installer/update-primitives.scm

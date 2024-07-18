@@ -5,6 +5,9 @@
   "name": "ordered-collection",
   "description": "Family of collection types that associate ordered indices to values.\nUsed to provide a generic interface across algorithmic primitives!\nTheir coercion hierarchy is as follows: String < List < Vector"
 }, {
+  "name": "callable",
+  "description": "Any EScheme value that can be applied to arguments: (<callable> <argument> ...)\n\nThis includes procedures, functors (objects with a '->procedure' method defined),\nclasses (to invoke their constructor), as well as O(1)-access containers\n(strings, vectors, and hashmaps)."
+}, {
   "name": "meta-object",
   "description": "Super type of objects, classes, and interfaces, all of which support\n'dot-notation' to access a property. \n\nNote that, despite supporting dot-notation, modules are not meta-objects."
 }, {
