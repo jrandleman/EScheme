@@ -10031,13 +10031,13 @@ A lazy alternative to lists, where each item is only evaluated once accessed.
 Use <scar> and <scdr> respectively to access to the 1st and 2nd items.
 
 Example:
-  (define (sieve ints)
-    (def current-int (scar ints))
-    (scons 
-      current-int
-      (stream-filter 
-        (lambda (n) (positive? (remainder n current-int)))
-        (sieve (scdr ints)))))
+  (define (sieve int-stream)
+    (scons
+      (scar int-stream)
+      (sieve
+        (stream-filter
+          (lambda (n) (positive? (remainder n (scar int-stream))))
+          (scdr int-stream)))))
 
   (define (ints-from n)
     (scons n (ints-from (+ n 1))))
@@ -10057,13 +10057,13 @@ A lazy alternative to pairs. Each item is only evaluated once accessed.
 Nest them with #nil as the last <scdr> to create a stream.
 
 Example:
-  (define (sieve ints)
-    (def current-int (scar ints))
-    (scons 
-      current-int
-      (stream-filter 
-        (lambda (n) (positive? (remainder n current-int)))
-        (sieve (scdr ints)))))
+  (define (sieve int-stream)
+    (scons
+      (scar int-stream)
+      (sieve
+        (stream-filter
+          (lambda (n) (positive? (remainder n (scar int-stream))))
+          (scdr int-stream)))))
 
   (define (ints-from n)
     (scons n (ints-from (+ n 1))))
