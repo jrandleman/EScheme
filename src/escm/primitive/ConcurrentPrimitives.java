@@ -22,8 +22,6 @@ import escm.vm.type.callable.Signature;
 import escm.vm.type.primitive.Primitive;
 import escm.vm.type.primitive.PrimitiveCallable;
 import escm.vm.type.collection.OrderedCollection;
-import escm.vm.util.Environment;
-import escm.vm.runtime.EscmThread;
 import escm.vm.runtime.GlobalState;
 
 public class ConcurrentPrimitives {

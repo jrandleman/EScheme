@@ -5,7 +5,6 @@
 //    => NOTE THAT AC/OC PRIMITIVES EXPECT ALL ARGS TO BE LISTS!
 
 package escm.type;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Objects;
 import escm.type.bool.Boolean;

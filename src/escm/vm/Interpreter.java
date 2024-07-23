@@ -15,7 +15,6 @@ import escm.util.Trampoline;
 import escm.vm.type.callable.Callable;
 import escm.vm.util.Instruction;
 import escm.vm.util.ExecutionState;
-import escm.vm.util.Environment;
 import escm.vm.util.ObjectAccessChain;
 
 public class Interpreter {

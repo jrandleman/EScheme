@@ -14,7 +14,6 @@ import escm.type.Nil;
 import escm.type.number.Number;
 import escm.util.Pair;
 import escm.util.string.StringParser;
-import escm.util.error.Exceptionf;
 import escm.vm.util.SourceInformation;
 import escm.util.json.util.SubstringIndexError;
 import escm.primitive.FilePrimitives;

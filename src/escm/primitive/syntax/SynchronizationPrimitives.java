@@ -14,7 +14,6 @@ import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Symbol;
-import escm.type.concurrent.Mutex;
 import escm.vm.type.primitive.PrimitiveSyntax;
 import escm.vm.type.callable.Signature;
 

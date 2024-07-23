@@ -1401,7 +1401,6 @@ public class CorePrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      int n = parameters.size();
       if(parameters.size() != 1)
         throw new Exceptionf("'(quasiquote <obj>) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       Datum lst = parameters.get(0);
@@ -1831,11 +1830,6 @@ public class CorePrimitives {
       return Boolean.FALSE;
     }
 
-    private static Datum getUpdates(Datum breakReturns) throws Exception {
-      if(breakReturns instanceof Pair) return ((Pair)breakReturns).car();
-      return Boolean.FALSE;
-    }
-
     private static Datum getReturnExprs(Datum breakReturns) throws Exception {
       if(breakReturns instanceof Pair) return ((Pair)breakReturns).cdr();
       return Nil.VALUE;
@@ -1968,11 +1962,6 @@ public class CorePrimitives {
     }
 
     private static Datum getBreakCondition(Datum breakReturns) throws Exception {
-      if(breakReturns instanceof Pair) return ((Pair)breakReturns).car();
-      return Boolean.FALSE;
-    }
-
-    private static Datum getUpdates(Datum breakReturns) throws Exception {
       if(breakReturns instanceof Pair) return ((Pair)breakReturns).car();
       return Boolean.FALSE;
     }

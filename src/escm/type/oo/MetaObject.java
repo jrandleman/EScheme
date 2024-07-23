@@ -20,14 +20,12 @@
 //      * BindingsMap ::= ConcurrentHashMap<String,Datum>
 
 package escm.type.oo;
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.util.error.Exceptionf;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.procedure.CompoundProcedure;
 import escm.type.procedure.MethodProcedure;
-import escm.vm.util.ExecutionState;
 import escm.vm.util.SourceInformation;
 
 public abstract class MetaObject extends Dottable {

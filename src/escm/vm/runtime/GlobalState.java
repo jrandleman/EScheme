@@ -16,7 +16,6 @@ import escm.type.oo.EscmModule;
 import escm.type.concurrent.Mutex;
 import escm.vm.util.Environment;
 import escm.vm.runtime.installerGenerated.EscmPath;
-import escm.vm.runtime.installerGenerated.JvmPathPrefix;
 import escm.vm.runtime.installerGenerated.JavaStdLibLoader;
 import escm.primitive.FilePrimitives;
 import escm.primitive.SystemPrimitives;

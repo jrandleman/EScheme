@@ -8,7 +8,6 @@
 //    surrogate char pairs using EScheme's custom "U" literal syntax.
 
 package escm.util.string;
-import java.util.ArrayList;
 import escm.util.Pair;
 
 public class StringParser {

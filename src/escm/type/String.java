@@ -8,14 +8,12 @@ package escm.type;
 import java.util.ArrayList;
 import java.util.Objects;
 import escm.type.bool.Boolean;
-import escm.type.number.Number;
 import escm.type.number.Exact;
 import escm.type.number.Real;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.string.StringParser;
-import escm.vm.util.ExecutionState;
 import escm.vm.util.ExecutionState;
 import escm.vm.type.collection.AssociativeCollection;
 import escm.vm.type.collection.OrderedCollection;
@@ -1112,8 +1110,6 @@ public class String extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
   // dropping
   //////////////////////////////////////
-
-  private static final Boolean KEEP_DROPPING_FLAG = Boolean.valueOf(false);
 
   public OrderedCollection dropRight(int length) throws Exception {
     return slice(0,codePointLength()-length);

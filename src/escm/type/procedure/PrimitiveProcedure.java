@@ -6,7 +6,6 @@
 package escm.type.procedure;
 import java.util.Objects;
 import java.util.ArrayList;
-import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.Datum;
 import escm.type.Pair;
@@ -14,7 +13,6 @@ import escm.type.Nil;
 import escm.type.Symbol;
 import escm.vm.type.callable.Callable;
 import escm.vm.type.primitive.Primitive;
-import escm.vm.type.collection.OrderedCollection;
 import escm.vm.util.ExecutionState;
 import escm.vm.util.SourceInformation;
 import escm.vm.runtime.EscmCallStack;

@@ -4,7 +4,6 @@
 
 package escm.type;
 import java.util.Objects;
-import java.util.ArrayList;
 import escm.util.error.Exceptionf;
 import escm.type.procedure.Procedure;
 import escm.vm.util.ExecutionState;

@@ -21,7 +21,6 @@ import escm.type.Nil;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.primitive.Primitive;
-import escm.vm.type.callable.Callable;
 import escm.vm.type.primitive.PrimitiveCallable;
 import escm.vm.type.callable.Signature;
 import escm.vm.util.ObjectAccessChain;

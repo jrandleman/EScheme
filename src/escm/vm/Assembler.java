@@ -21,7 +21,6 @@ import escm.type.number.Real;
 import escm.type.procedure.CompoundProcedure;
 import escm.util.error.Exceptionf;
 import escm.vm.util.Instruction;
-import escm.vm.util.ExecutionState;
 import escm.vm.util.ObjectAccessChain;
 
 public class Assembler {

@@ -6,8 +6,6 @@
 package escm.vm.type.collection;
 import java.util.ArrayList;
 import escm.type.Datum;
-import escm.type.Void;
-import escm.util.Pair;
 import escm.util.Trampoline;
 import escm.util.error.Exceptionf;
 import escm.vm.type.callable.Callable;

@@ -20,10 +20,8 @@ import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Symbol;
-import escm.type.bool.Boolean;
 import escm.type.procedure.CompoundProcedure;
 import escm.type.procedure.MethodProcedure;
-import escm.vm.type.collection.OrderedCollection;
 import escm.vm.type.callable.Callable;
 import escm.vm.type.callable.DocString;
 

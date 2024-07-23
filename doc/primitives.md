@@ -3380,6 +3380,7 @@ macros are evaluated as a procedure argument.
 ```
 Returns the product of "<number> <number> ...".
 Note that EScheme defines (* <n> 0) to be 0 for all numeric <n>.
+
 Aliases <compose> if only given callables.
 ```
 

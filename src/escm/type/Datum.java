@@ -6,11 +6,10 @@
 //    requires the extension of this contract!
 
 package escm.type;
-import java.io.Serializable;
 import escm.vm.util.ExecutionState;
 import escm.vm.type.callable.DocString;
 
-public abstract class Datum implements Serializable, DocString {
+public abstract class Datum implements DocString {
   ////////////////////////////////////////////////////////////////////////////
   // Type
   public abstract java.lang.String type();

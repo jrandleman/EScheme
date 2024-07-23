@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.type.bool.Boolean;
-import escm.type.number.Number;
 import escm.type.number.Exact;
 import escm.type.number.Real;
 import escm.util.error.Exceptionf;
@@ -106,7 +105,7 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   public Datum get(Datum key) throws Exception {
     Datum val = value.get(key);
     if(val == null)
-      throw new Exceptionf("HASHMAP [GET]: Invalid key %s for hashmap %s", val.write(), write());
+      throw new Exceptionf("HASHMAP [GET]: Invalid key %s for hashmap %s", key.write(), write());
     return val;
   }
 

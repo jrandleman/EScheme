@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
-import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import escm.type.Datum;
@@ -28,7 +27,6 @@ import escm.vm.util.ExecutionState;
 import escm.vm.util.Environment;
 import escm.vm.type.primitive.Primitive;
 import escm.vm.type.primitive.PrimitiveCallable;
-import escm.vm.runtime.GlobalState;
 import escm.primitive.lib.serialization.InstructionSet;
 
 public class SerializationPrimitives {

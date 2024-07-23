@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import escm.type.Datum;
 import escm.type.Pair;
-import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.procedure.SyntaxProcedure;
 import escm.type.procedure.Procedure;

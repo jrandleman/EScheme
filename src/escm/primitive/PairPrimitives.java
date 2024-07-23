@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import escm.type.Datum;
 import escm.type.Pair;
 import escm.type.Symbol;
-import escm.type.Void;
 import escm.type.number.Real;
 import escm.type.bool.Boolean;
 import escm.util.error.Exceptionf;

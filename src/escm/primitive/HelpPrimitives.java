@@ -7,7 +7,6 @@
 
 package escm.primitive;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.TreeMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,15 +14,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import escm.type.Datum;
 import escm.type.Symbol;
-import escm.type.Keyword;
 import escm.type.Void;
 import escm.type.Pair;
-import escm.type.Nil;
 import escm.type.bool.Boolean;
 import escm.util.error.Exceptionf;
 import escm.vm.type.primitive.Primitive;
 import escm.vm.util.Environment;
-import escm.primitive.MetaPrimitives;
 import escm.primitive.lib.help.fs.HelpNode;
 import escm.primitive.lib.help.fs.FolderNode;
 

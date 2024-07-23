@@ -22,7 +22,6 @@
 //      - void pprint(Datum d)
 
 package escm.type.port;
-import java.util.Objects;
 import java.io.Writer;
 import java.io.OutputStreamWriter;
 import java.io.FileWriter;

@@ -19,7 +19,6 @@
 
 package escm.type.number;
 import java.util.Objects;
-import java.math.BigInteger;
 import escm.util.error.Exceptionf;
 
 public class Complex extends Number {

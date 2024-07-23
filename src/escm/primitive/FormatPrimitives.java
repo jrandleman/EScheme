@@ -277,7 +277,6 @@ public class FormatPrimitives {
     // Sign, Commas, I-Coercion, Padding, Precision (SCIPP)
     private static int displayScippNumberToken(String fmtStr, int i, StringBuilder sb, Number fmtArg, ArrayList<Datum> args) throws Exception {
       // Parse the prefix
-      int start = i;
       boolean signs = fmtStr.charAt(i) == '+';
       if(signs) ++i;
       boolean commas = fmtStr.charAt(i) == ',';

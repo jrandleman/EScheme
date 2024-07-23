@@ -19,7 +19,6 @@ import escm.type.procedure.PrimitiveProcedure;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.primitive.lib.utility.ContinuationProcedure;
-import escm.primitive.MetaPrimitives;
 import escm.vm.type.callable.Callable;
 import escm.vm.type.primitive.Primitive;
 import escm.vm.type.primitive.PrimitiveCallable;

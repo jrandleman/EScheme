@@ -4,10 +4,8 @@
 
 package escm.primitive;
 import java.util.ArrayList;
-import java.util.Collections;
 import escm.type.Datum;
 import escm.type.Pair;
-import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.bool.Boolean;
 import escm.type.procedure.Procedure;

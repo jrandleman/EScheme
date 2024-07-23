@@ -19,7 +19,6 @@ import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.Pair;
 import escm.type.Nil;
-import escm.type.bool.Boolean;
 import escm.type.procedure.CompoundProcedure;
 import escm.vm.type.callable.DocString;
 

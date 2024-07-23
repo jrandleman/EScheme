@@ -23,12 +23,10 @@
 //      - Datum readDatum()            // returns <null> if reached EOF
 
 package escm.type.port;
-import java.util.Objects;
 import java.util.ArrayDeque;
 import java.io.PushbackReader;
 import java.io.InputStreamReader;
 import java.io.FileReader;
-import java.io.File;
 import escm.util.error.Exceptionf;
 import escm.type.Datum;
 import escm.vm.Reader;
@@ -403,8 +401,6 @@ public class InputPort extends Port {
           } else if(input == '"') {
             updatePortPosition(input);
             sb.append((char)input);
-            long stringStartLine = lineNumber;
-            long stringStartColumn = columnNumber;
             int start = sb.length()-1;
             input = pr.read();
             while(input != -1) {

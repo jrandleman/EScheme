@@ -7,10 +7,8 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import escm.type.Datum;
 import escm.type.Pair;
-import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.bool.Boolean;
-import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.util.error.Exceptionf;
 import escm.util.string.StringParser;
@@ -18,7 +16,6 @@ import escm.util.Trampoline;
 import escm.vm.type.primitive.Primitive;
 import escm.vm.type.primitive.PrimitiveCallable;
 import escm.vm.type.callable.Callable;
-import escm.vm.type.collection.AssociativeCollection;
 import escm.vm.type.callable.Signature;
 
 public class StringPrimitives {

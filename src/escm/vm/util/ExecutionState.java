@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.ArrayDeque;
 import escm.type.Datum;
 import escm.type.Void;
-import escm.vm.util.Environment;
 
 public class ExecutionState {
   ////////////////////////////////////////////////////////////////////////////

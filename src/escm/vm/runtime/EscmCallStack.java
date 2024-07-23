@@ -11,7 +11,6 @@ import escm.type.Datum;
 import escm.type.Nil;
 import escm.type.bool.Boolean;
 import escm.type.number.Exact;
-import escm.type.procedure.Procedure;
 import escm.vm.util.SourceInformation;
 
 public class EscmCallStack {

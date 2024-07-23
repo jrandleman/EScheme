@@ -4,7 +4,6 @@
 
 package escm.primitive;
 import java.util.ArrayList;
-import java.util.Random;
 import escm.type.Datum;
 import escm.type.Nil;
 import escm.type.Pair;
@@ -20,8 +19,6 @@ import escm.vm.type.callable.Callable;
 import escm.vm.type.primitive.Primitive;
 import escm.vm.type.callable.Signature;
 import escm.vm.runtime.GlobalState;
-import escm.primitive.FunctionalPrimitives;
-import escm.primitive.AssociativeCollectionPrimitives;
 
 public class NumberPrimitives {
   ////////////////////////////////////////////////////////////////////////////
@@ -127,7 +124,7 @@ public class NumberPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Numbers\nReturns the product of \"<number> <number> ...\".\nNote that EScheme defines (* <n> 0) to be 0 for all numeric <n>.\nAliases <compose> if only given callables.";
+      return "@help:Procedures:Numbers\nReturns the product of \"<number> <number> ...\".\nNote that EScheme defines (* <n> 0) to be 0 for all numeric <n>.\n\nAliases <compose> if only given callables.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

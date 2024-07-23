@@ -48,7 +48,6 @@ import escm.type.bool.Boolean;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
-import escm.type.number.Number;
 import escm.type.number.Exact;
 import escm.type.number.Real;
 import escm.vm.util.ExecutionState;
@@ -1212,8 +1211,6 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   //////////////////////////////////////
   // dropping
   //////////////////////////////////////
-
-  private static final Boolean KEEP_DROPPING_FLAG = Boolean.valueOf(false);
 
   public OrderedCollection dropRight(int length) throws Exception {
     synchronized(this) {

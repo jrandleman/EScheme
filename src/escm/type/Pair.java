@@ -8,7 +8,6 @@ package escm.type;
 import java.util.ArrayList;
 import java.util.Objects;
 import escm.type.bool.Boolean;
-import escm.type.number.Number;
 import escm.type.number.Exact;
 import escm.type.number.Real;
 import escm.type.procedure.Procedure;

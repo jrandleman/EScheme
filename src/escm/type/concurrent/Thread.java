@@ -14,7 +14,6 @@ import escm.type.bool.Boolean;
 import escm.type.procedure.PrimitiveProcedure;
 import escm.vm.type.callable.Callable;
 import escm.vm.util.ExecutionState;
-import escm.vm.util.Environment;
 import escm.vm.runtime.EscmThread;
 import escm.vm.runtime.GlobalState;
 
