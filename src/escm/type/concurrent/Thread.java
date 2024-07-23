@@ -59,7 +59,7 @@ public class Thread extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Static Yield (hint to the scheduler)
   public static void yield() {
-    java.lang.Thread.currentThread().yield();
+    java.lang.Thread.yield();
   }
 
 
