@@ -3,7 +3,7 @@
 //    EScheme <callable> type annotation utility functions.
 //    Provides:
 //      1. <Predicate>: Type checking functional interface.
-//      2. <getTypePredicate(env,str)>: String-to-Predicate type compiler.
+//      2. <getPredicate(env,str)>: String-to-Predicate type compiler.
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -82,16 +82,20 @@
 
 package escm.type.procedure;
 import java.util.ArrayList;
-import escm.primitive.FunctionalPrimitives.IsCallable;
-import escm.type.Datum;
 import escm.util.Pair;
 import escm.util.error.Exceptionf;
+import escm.type.Datum;
+import escm.type.oo.EscmObject;
+import escm.type.oo.EscmClass;
+import escm.type.oo.EscmInterface;
 import escm.vm.type.collection.AssociativeCollection;
+import escm.vm.type.collection.OrderedCollection;
 import escm.vm.util.Environment;
+import escm.primitive.FunctionalPrimitives.IsCallable;
 
 public class TypeChecker {
   ////////////////////////////////////////////////////////////////////////////
-  // Type checking predicate functional interface.
+  // Type Checking Predicate Functional Interface
   public static interface Predicate {
     public boolean check(Environment env, Datum value) throws Exception;
   }
@@ -220,17 +224,17 @@ public class TypeChecker {
     }
     if(type.startsWith("object",i)) { 
       return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.oo.EscmObject;
+        return value instanceof EscmObject;
       },i+6);
     }
     if(type.startsWith("class",i)) { 
       return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.oo.EscmClass;
+        return value instanceof EscmClass;
       },i+5);
     }
     if(type.startsWith("interface",i)) { 
       return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.oo.EscmInterface;
+        return value instanceof EscmInterface;
       },i+9);
     }
 
@@ -431,8 +435,9 @@ public class TypeChecker {
     // Generic compound types
     // - Associative Collection
     } else if(type.startsWith("associative-collection",i) || type.startsWith("ac",i)) {
-      int next = i+(type.charAt(i+1) == 'c' ? 2 : 22);
-      String name = type.charAt(i+1) == 'c' ? "ac" : "associative-collection";
+      boolean shorthand = type.charAt(i+1) == 'c';
+      int next = i+(shorthand ? 2 : 22);
+      String name = shorthand ? "ac" : "associative-collection";
       // Parameterized
       if(next < typeLength && type.charAt(next) == '<') {
         Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
@@ -459,8 +464,9 @@ public class TypeChecker {
       }
     // - Ordered Collection
     } else if(type.startsWith("ordered-collection",i) || type.startsWith("oc",i)) {
-      int next = i+(type.charAt(i+1) == 'c' ? 2 : 18);
-      String name = type.charAt(i+1) == 'c' ? "oc" : "ordered-collection";
+      boolean shorthand = type.charAt(i+1) == 'c';
+      int next = i+(shorthand ? 2 : 18);
+      String name = shorthand ? "oc" : "ordered-collection";
       // Parameterized
       if(next < typeLength && type.charAt(next) == '<') {
         Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
@@ -470,11 +476,11 @@ public class TypeChecker {
         // <any> parameter
         if(parsedAnyParameter(type,next+1,parameterType.second)) {
           return new Pair<Predicate,Integer>((env, value) -> { 
-            return value instanceof escm.vm.type.collection.OrderedCollection && !escm.type.Pair.isDottedList(value);
+            return value instanceof OrderedCollection && !escm.type.Pair.isDottedList(value);
           },parameterType.second+1);
         }
         return new Pair<Predicate,Integer>((env, value) -> { 
-          if((value instanceof escm.vm.type.collection.OrderedCollection) == false || escm.type.Pair.isDottedList(value)) {
+          if((value instanceof OrderedCollection) == false || escm.type.Pair.isDottedList(value)) {
             return false;
           }
           return ((AssociativeCollection)value).containsType(parameterType.first);
@@ -482,7 +488,7 @@ public class TypeChecker {
       // No Parameter
       } else {
         return new Pair<Predicate,Integer>((env, value) -> { 
-          return value instanceof escm.vm.type.collection.OrderedCollection && !escm.type.Pair.isDottedList(value);
+          return value instanceof OrderedCollection && !escm.type.Pair.isDottedList(value);
         },next);
       }
     
@@ -510,12 +516,12 @@ public class TypeChecker {
       if(classOrInterface == null) {
         throw new Exceptionf("Invalid Class or Interface Type \"%s\" (index %d): %s",className,i,type);
       }
-      if((value instanceof escm.type.oo.EscmObject) == false) return false;
-      escm.type.oo.EscmObject obj = (escm.type.oo.EscmObject)value;
-      if(classOrInterface instanceof escm.type.oo.EscmClass) {
-        return obj.instanceOf((escm.type.oo.EscmClass)classOrInterface);
-      } else if(classOrInterface instanceof escm.type.oo.EscmInterface) {
-        return obj.instanceOf((escm.type.oo.EscmInterface)classOrInterface);
+      if((value instanceof EscmObject) == false) return false;
+      EscmObject obj = (EscmObject)value;
+      if(classOrInterface instanceof EscmClass) {
+        return obj.instanceOf((EscmClass)classOrInterface);
+      } else if(classOrInterface instanceof EscmInterface) {
+        return obj.instanceOf((EscmInterface)classOrInterface);
       } else {
         throw new Exceptionf("Invalid Class or Interface Type \"%s\" (index %d): %s",className,i,type);
       }
@@ -579,7 +585,7 @@ public class TypeChecker {
     return parseRest(type,typeLength,index,p);
   }
 
-  public static Predicate getTypePredicate(String type) throws Exception {
+  public static Predicate getPredicate(String type) throws Exception {
     return parseType(type,type.length(),0).first;
   }
 }
