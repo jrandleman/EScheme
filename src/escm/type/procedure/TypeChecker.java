@@ -3,7 +3,7 @@
 //    EScheme <callable> type annotation utility functions.
 //    Provides:
 //      1. <Predicate>: Type checking functional interface.
-//      2. <getPredicate(env,str)>: String-to-Predicate type compiler.
+//      2. <getPredicate(str)>: String-to-Predicate type compiler.
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -211,10 +211,6 @@ public class TypeChecker {
     PRIMITIVE_TYPES.put("module",(env, value) -> { 
       return value instanceof escm.type.oo.EscmModule;
     });
-  }
-
-  private static boolean isTypeDelimiter(char c) {
-    return c == '|' || c == '<' || c == '>' || c == ',';
   }
 
   private static Pair<Predicate,Integer> parsePrimitive(String type, String name, int next) {
@@ -516,6 +512,10 @@ public class TypeChecker {
   //   | >
   //   | ,
   //   | |TYPE
+  private static boolean isTypeDelimiter(char c) {
+    return c == '|' || c == '<' || c == '>' || c == ',';
+  }
+
   private static Pair<Predicate,Integer> parseType(String type, int typeLength, int index) throws Exception {
     if(index >= typeLength) {
       throw new Exceptionf("Invalid Empty Type (index %d): %s",index,type);

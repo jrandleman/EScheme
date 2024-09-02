@@ -32,7 +32,7 @@ public class Pair extends Datum implements OrderedCollection {
   private Datum car;
   private Datum cdr;
 
-  private int length;
+  private int length; // thanks immutability!
 
 
   ////////////////////////////////////////////////////////////////////////////

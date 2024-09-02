@@ -16,6 +16,7 @@ import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Vector;
 import escm.type.Hashmap;
+import escm.type.Keyword;
 import escm.type.Void;
 import escm.type.Symbol;
 import escm.type.number.Exact;
@@ -195,7 +196,8 @@ public class CorePrimitives {
   //   => NOTE: Supports optional parameters via "(<param> <dflt-value>)" syntax
   // 
   // NOTE: The EScheme code below doesn't account for allowing mixing optional
-  // ===== parameters with a variadic parameter too, nor parsing <optional-docstring>.
+  // ===== parameters with a variadic parameter too, nor parsing <optional-docstring>,
+  //       nor parsing keyword types.
   //
   // (define (escm-fn-has-optional-parameters? params)
   //   (if (pair? params) 
@@ -280,7 +282,7 @@ public class CorePrimitives {
       private Pair value = null;
     }
 
-    private static Datum parseClauseParameters(Datum params, PairBox optionalParams, ArrayList<Datum> parameters) throws Exception {
+    private static Datum parseClauseParameters(Datum params, PairBox optParams, ArrayList<Datum> parameters) throws Exception {
       if(!(params instanceof Pair)) {
         // should be unreachable since we know we have some optional args in <params>
         throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
@@ -288,26 +290,48 @@ public class CorePrimitives {
       Pair p = (Pair)params;
       Datum param = p.car();
       if(param instanceof Pair) {
-        optionalParams.value = p;
+        optParams.value = p;
         return Nil.VALUE;
       }
-      return new Pair(param,parseClauseParameters(p.cdr(),optionalParams,parameters));
+      return new Pair(param,parseClauseParameters(p.cdr(),optParams,parameters));
     }
 
-    // Extract names of optional params (.first) & create <define> expressions from optional params (.second)
-    private static escm.util.Pair<Datum,Datum> parseOptionalNamesAndDefs(Datum optionalParams) throws Exception {
-      if(!(optionalParams instanceof Pair)) {
-        if(optionalParams instanceof Symbol) {
-          return new escm.util.Pair<Datum,Datum>(optionalParams,Pair.List(Pair.List(DEFINE,optionalParams,Nil.VALUE)));
-        }
-        return new escm.util.Pair<Datum,Datum>(Nil.VALUE,Nil.VALUE);
+    // Extract types/names of optional params & create <define> expressions from optional params
+    private static class OptionalParameterValues {
+      Datum types = null; // NOTE: ENTRIES MAY BE <null> TO DENOTE NO TYPE!
+      Datum names = null;
+      Datum definitions = null;
+      public OptionalParameterValues(Datum types, Datum names, Datum definitions) {
+        this.types = types;
+        this.names = names;
+        this.definitions = definitions;
       }
-      Pair p = (Pair)optionalParams;
-      escm.util.Pair<Datum,Datum> tails = parseOptionalNamesAndDefs(p.cdr());
-      Pair optionalParam = (Pair)p.car();
-      return new escm.util.Pair<Datum,Datum>(
-        new Pair(optionalParam.car(),tails.first),
-        new Pair(new Pair(DEFINE,optionalParam),tails.second));
+    };
+
+    private static OptionalParameterValues parseOptionalParameterComponents(Datum optParams) throws Exception {
+      if(!(optParams instanceof Pair)) {
+        if(optParams instanceof Symbol) { // define variadic to be null by default
+          return new OptionalParameterValues(Nil.VALUE,optParams,Pair.List(Pair.List(DEFINE,optParams,Nil.VALUE)));
+        }
+        return new OptionalParameterValues(Nil.VALUE,Nil.VALUE,Nil.VALUE);
+      }
+      Pair p = (Pair)optParams;
+      Pair optParam = (Pair)p.car();
+      OptionalParameterValues optTails = parseOptionalParameterComponents(p.cdr());
+      if(optParam.car() instanceof Keyword) {
+        Pair name = (Pair)optParam.cdr();
+        return new OptionalParameterValues(
+          new Pair(optParam.car(),optTails.types),
+          new Pair(name.car(),optTails.names),
+          new Pair(new Pair(DEFINE,name),optTails.definitions)
+        );
+      } else {
+        return new OptionalParameterValues(
+          new Pair(null,optTails.types),
+          new Pair(optParam.car(),optTails.names),
+          new Pair(new Pair(DEFINE,optParam),optTails.definitions)
+        );
+      }
     }
 
     // Return the function clause body
@@ -329,29 +353,50 @@ public class CorePrimitives {
       return applyAppendMapCompile(defEnv,body,compiledBody,continuation);
     }
 
+    private static Datum interweave(Datum types, Datum names) {
+      if(!(names instanceof Pair)) {
+        return names; // returns the variadic param as appropriate
+      }
+      Pair pnames = (Pair)names;
+      Pair ptypes = (Pair)types;
+      if(ptypes.car() == null) {
+        return new Pair(pnames.car(),interweave(ptypes.cdr(),pnames.cdr()));
+      } else {
+        return new Pair(ptypes.car(),new Pair(pnames.car(),interweave(ptypes.cdr(),pnames.cdr())));
+      }
+    }
+
     // Generate series of compiled <define> expansions to convert 1 optional-param clause into 2+ required-param clauses
-    private static Trampoline.Bounce generateClauseDefineSequences(Environment defEnv, Datum requiredParams, Pair optionalNames, Pair optionalDefs, Datum compiledBody, int totalOptionalParams, int i, Datum expandedClauses, Trampoline.Continuation continuation) throws Exception {
+    private static Trampoline.Bounce generateClauseDefineSequences(Environment defEnv, Datum reqParams, Pair optTypes, Pair optNames, Pair optDefs, Datum compiledBody, int totalOptionalParams, int i, Datum expandedClauses, Trampoline.Continuation continuation) throws Exception {
       if(i < 0) return continuation.run(expandedClauses);
       if(i == totalOptionalParams) {
-        Datum params = Pair.binaryAppend(requiredParams,optionalNames);
+        Datum params = Pair.binaryAppend(reqParams,interweave(optTypes,optNames));
         return generateClauseDefineSequences(
           defEnv,
-          requiredParams,
-          optionalNames,
-          optionalDefs,
+          reqParams,
+          optTypes,
+          optNames,
+          optDefs,
           compiledBody,
           totalOptionalParams,
-          i-(optionalNames.length()==Pair.DOTTED_LIST_LENGTH ? 2 : 1),
+          i-(optNames.length()==Pair.DOTTED_LIST_LENGTH ? 2 : 1),
           new Pair(new Pair(params,compiledBody),expandedClauses),
           continuation);
       } else {
-        Datum params = Pair.binaryAppend(requiredParams,(Datum)optionalNames.slice(0,i));
-        return compileClauseBody(defEnv,(Datum)optionalDefs.slice(i),Nil.VALUE,(compiledDefines) -> () -> {
+        Datum params = Pair.binaryAppend(
+          reqParams,
+          interweave(
+            (Datum)optTypes.slice(0,i),
+            (Datum)optNames.slice(0,i)
+          )
+        );
+        return compileClauseBody(defEnv,(Datum)optDefs.slice(i),Nil.VALUE,(compiledDefines) -> () -> {
           return generateClauseDefineSequences(
             defEnv,
-            requiredParams,
-            optionalNames,
-            optionalDefs,
+            reqParams,
+            optTypes,
+            optNames,
+            optDefs,
             compiledBody,
             totalOptionalParams,
             i-1,
@@ -363,14 +408,26 @@ public class CorePrimitives {
 
     // Convert 1 optional params clause into 2+ required params clauses
     private static Trampoline.Bounce getExpandedClause(Environment defEnv, Pair clause, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
-      PairBox optionalParams = new PairBox();
-      Datum requiredParams = parseClauseParameters((Pair)clause.car(),optionalParams,parameters);
-      escm.util.Pair<Datum,Datum> namesAndDefs = parseOptionalNamesAndDefs(optionalParams.value);
-      Pair optionalNames = (Pair)namesAndDefs.first;
-      Pair optionalDefs = (Pair)namesAndDefs.second;
-      int totalOptionalParams = optionalDefs.length();
+      PairBox optParams = new PairBox();
+      Datum reqParams = parseClauseParameters((Pair)clause.car(),optParams,parameters); // includes types
+      OptionalParameterValues opt = parseOptionalParameterComponents(optParams.value);
+      Pair types = (Pair)opt.types;
+      Pair names = (Pair)opt.names;
+      Pair defs = (Pair)opt.definitions;
+      int totalOptionalParams = defs.length();
       return compileClauseBody(defEnv,getClauseBody(clause.cdr()),Nil.VALUE,(compiledBody) -> () -> {
-        return generateClauseDefineSequences(defEnv,requiredParams,optionalNames,optionalDefs,compiledBody,totalOptionalParams,totalOptionalParams,Nil.VALUE,continuation);
+        return generateClauseDefineSequences(
+          defEnv,
+          reqParams,
+          types,
+          names,
+          defs,
+          compiledBody,
+          totalOptionalParams,
+          totalOptionalParams,
+          Nil.VALUE,
+          continuation
+        );
       });
     }
 
@@ -378,7 +435,18 @@ public class CorePrimitives {
     private static boolean isValidClause(Datum clause) {
       if(!(clause instanceof Pair)) return false;
       Datum params = ((Pair)clause).car();
-      return params instanceof Pair || params instanceof Nil || params instanceof Symbol;
+      return params instanceof Pair || params instanceof Nil || params instanceof Symbol || params instanceof Keyword;
+    }
+
+    // Verify the optional param is either (<name> <value>) or (<type> <name> <value>)
+    private static boolean isValidOptionalParam(Pair param) {
+      Datum first = param.car();
+      if(first instanceof Symbol) return param.length() == 2;
+      if(first instanceof Keyword && param.length() == 3) {
+        Datum second = ((Pair)param.cdr()).car();
+        return second instanceof Symbol;
+      }
+      return false;
     }
 
     // Type-check clause & return if has any optional params
@@ -389,25 +457,36 @@ public class CorePrimitives {
       Datum iter = params;
       if(!(params instanceof Pair)) return false;
       boolean hasOptional = false;
+      boolean registeredType = false;
       while(iter instanceof Pair) {
         Pair p = (Pair)iter;
         Datum param = p.car();
         boolean paramIsPair = param instanceof Pair;
+        // verify type doesn't come prior an optional param
+        if(registeredType && paramIsPair)
+          throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
         // verify that all optional args are clumped (no more required args)
         if(hasOptional && !paramIsPair)
           throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
         if(paramIsPair) {
           hasOptional = true;
-          // verify first item in optional arg syntax is an arg name symbol
-          if(!(((Pair)param).car() instanceof Symbol))
+          registeredType = false;
+          if(!isValidOptionalParam((Pair)param))
             throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
-        } else if(!(param instanceof Symbol)) {
-          // verify required arg syntax is an arg name symbol
+        // verify parsing a type keyword or parameter symbol
+        } else if(param instanceof Keyword) {
+          if(registeredType)
+            throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
+          registeredType = true;
+        } else if(param instanceof Symbol) {
+          registeredType = false;
+        // verify required arg syntax is an arg name symbol
+        } else {
           throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
         }
         iter = p.cdr();
       }
-      if(!(iter instanceof Nil) && !(iter instanceof Symbol))
+      if(registeredType || (!(iter instanceof Nil) && !(iter instanceof Symbol)))
         throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid parameters %s: %s", params.profile(), Exceptionf.profileArgs(parameters));
       return hasOptional;
     }
@@ -450,6 +529,15 @@ public class CorePrimitives {
       int n = parameters.size();
       escm.type.String docstring = parseOptionalDocstring(parameters,n,0);
       int minFnSize = docstring == null ? 1 : 2;
+
+
+
+
+      // @TODO: NEED TO IMPLEMENT PARSING THE RETURN TYPE HERE (&& PASSING IT TO THE CREATED COMPOUND PROCEDURE!)
+
+
+
+
       if(n < minFnSize)
         throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) needs at least 1 body clause: %s", Exceptionf.profileArgs(parameters));
       if(docstring == null) {

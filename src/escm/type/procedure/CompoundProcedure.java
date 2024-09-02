@@ -49,6 +49,7 @@ public class CompoundProcedure extends Procedure {
   // Internal compound procedure fields
   protected static class CompileTime implements Serializable {
     public String docstring;
+    // public ArrayList<ArrayList<TypeChecker.Predicate>> parametersTypes; // "null" entry denotes all "any" types
     public ArrayList<ArrayList<Symbol>> parametersList;
     public ArrayList<Symbol> variadicParameterList; // <null> indicates non-variadic
     public ArrayList<ArrayList<Instruction>> bodyList;
@@ -193,6 +194,13 @@ public class CompoundProcedure extends Procedure {
     int totalArguments = arguments.size();
     for(int i = 0, n = compileTime.parametersList.size(); i < n; ++i) {
       int totalParameters = compileTime.parametersList.get(i).size();
+
+
+
+      // @TODO: IMPLEMENT TYPE-CHECKING ARGS HERE!
+
+
+
       if(totalArguments == totalParameters) return i;
       if(totalArguments > totalParameters && compileTime.variadicParameterList.get(i) != null) return i;
     }
@@ -222,6 +230,17 @@ public class CompoundProcedure extends Procedure {
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
     return () -> {
       int clauseNumber = validateEnvironmentExtension(arguments);
+
+
+
+      // @TODO: CONSIDER MELTING TYPE-CHECKING LOOP INTO VARIABLE-BINDING LOOP OF <getExtendedEnvironment()>
+      //        INSTEAD OF IN <validateEnvironmentExtension()>
+      //        => REDUCES PASSES BY 1 FOR SUCCESSFUL CALLS, ONLY PENALIZED WHEN RIGHT NUMBER OF ARGS BUT WRONG
+      //           TYPE OF ARGS, WHICH IS COMPARATIVELY RARE
+
+
+
+      
       Environment extendedEnvironment = getExtendedEnvironment(clauseNumber,arguments);
       EscmCallStack.Frame originalCallStack = EscmCallStack.currentStackFrame();
       EscmCallStack.push(readableName(),invocationSource);
