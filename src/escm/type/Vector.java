@@ -50,6 +50,7 @@ import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.number.Exact;
 import escm.type.number.Real;
+import escm.vm.util.Environment;
 import escm.vm.util.ExecutionState;
 import escm.type.procedure.TypeChecker.Predicate;
 import escm.vm.type.collection.AssociativeCollection;
@@ -439,11 +440,11 @@ public class Vector extends Datum implements OrderedCollection, Callable {
 
   //////////////////////////////////////////////////////////////////////
   // Type Checking
-  public boolean containsType(Predicate typePredicate) throws Exception {
+  public boolean containsType(Environment env, Predicate typePredicate) throws Exception {
     synchronized(this) {
       int n = value.size();
       for(int i = 0; i < n; ++i) {
-        if(typePredicate.check(value.get(i)) == false) return false;
+        if(typePredicate.check(env,value.get(i)) == false) return false;
       }
       return true;
     }

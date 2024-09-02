@@ -12,6 +12,7 @@ import escm.type.number.Real;
 import escm.type.number.Exact;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
+import escm.vm.util.Environment;
 import escm.vm.util.ExecutionState;
 import escm.type.procedure.TypeChecker.Predicate;
 import escm.vm.type.collection.AssociativeCollection;
@@ -113,7 +114,7 @@ public class Nil extends Datum implements OrderedCollection {
 
   //////////////////////////////////////////////////////////////////////
   // Type Checking
-  public boolean containsType(Predicate typePredicate) {
+  public boolean containsType(Environment env, Predicate typePredicate) {
     return true;
   }
 

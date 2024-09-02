@@ -82,6 +82,7 @@
 
 package escm.type.procedure;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import escm.util.Pair;
 import escm.util.error.Exceptionf;
 import escm.type.Datum;
@@ -103,166 +104,128 @@ public class TypeChecker {
   
   ////////////////////////////////////////////////////////////////////////////
   // Parse Primitive Types
-  private static Pair<Predicate,Integer> parsePrimitive(String type, int i) {
+  private static ConcurrentHashMap<String,Predicate> PRIMITIVE_TYPES = new ConcurrentHashMap<String,Predicate>();
+
+  static {
     // Any type
-    if(type.startsWith("any",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return true; 
-      },i+3);
-    }
-    
+    PRIMITIVE_TYPES.put("any",(env, value) -> { 
+      return true; 
+    });
+
     // Numeric types
-    if(type.startsWith("number",i) || type.startsWith("complex",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.number.Number;
-      },i+(type.charAt(i) == 'n' ? 6 : 7));
-    }
-    if(type.startsWith("int",i)) { // no exactness guarentee!
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.number.Real && ((escm.type.number.Real)value).isInteger();
-      },i+3);
-    }
-    if(type.startsWith("flo",i)) { // Flonum
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.number.Inexact;
-      },i+3);
-    }
-    if(type.startsWith("real",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.number.Real;
-      },i+4);
-    }
-    if(type.startsWith("exact",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.number.Number && ((escm.type.number.Number)value).isExact();
-      },i+5);
-    }
-    if(type.startsWith("inexact",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.number.Number && ((escm.type.number.Number)value).isInexact();
-      },i+7);
-    }
+    PRIMITIVE_TYPES.put("number",(env, value) -> { 
+      return value instanceof escm.type.number.Number;
+    });
+    PRIMITIVE_TYPES.put("complex",(env, value) -> { 
+      return value instanceof escm.type.number.Number;
+    });
+    PRIMITIVE_TYPES.put("int",(env, value) -> { 
+      return value instanceof escm.type.number.Real && ((escm.type.number.Real)value).isInteger();
+    });
+    PRIMITIVE_TYPES.put("flo",(env, value) -> { 
+      return value instanceof escm.type.number.Inexact;
+    });
+    PRIMITIVE_TYPES.put("real",(env, value) -> { 
+      return value instanceof escm.type.number.Real;
+    });
+    PRIMITIVE_TYPES.put("exact",(env, value) -> { 
+      return value instanceof escm.type.number.Number && ((escm.type.number.Number)value).isExact();
+    });
+    PRIMITIVE_TYPES.put("inexact",(env, value) -> { 
+      return value instanceof escm.type.number.Number && ((escm.type.number.Number)value).isInexact();
+    });
 
     // Common atomic types
-    if(type.startsWith("string",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.String;
-      },i+6);
-    }
-    if(type.startsWith("char",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.Character;
-      },i+4);
-    }
-    if(type.startsWith("key",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.Keyword;
-      },i+3);
-    }
-    if(type.startsWith("bool",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.bool.Boolean;
-      },i+4);
-    }
-    if(type.startsWith("symbol",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.Symbol;
-      },i+6);
-    }
-    if(type.startsWith("void",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.Void;
-      },i+4);
-    }
+    PRIMITIVE_TYPES.put("string",(env, value) -> { 
+      return value instanceof escm.type.String;
+    });
+    PRIMITIVE_TYPES.put("char",(env, value) -> { 
+      return value instanceof escm.type.Character;
+    });
+    PRIMITIVE_TYPES.put("key",(env, value) -> { 
+      return value instanceof escm.type.Keyword;
+    });
+    PRIMITIVE_TYPES.put("bool",(env, value) -> { 
+      return value instanceof escm.type.bool.Boolean;
+    });
+    PRIMITIVE_TYPES.put("symbol",(env, value) -> { 
+      return value instanceof escm.type.Symbol;
+    });
+    PRIMITIVE_TYPES.put("void",(env, value) -> { 
+      return value instanceof escm.type.Void;
+    });
 
     // List-base types
-    if(type.startsWith("nil",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.Nil;
-      },i+3);
-    }
-    if(type.startsWith("atom",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return !(value instanceof escm.type.Pair);
-      },i+4);
-    }
+    PRIMITIVE_TYPES.put("nil",(env, value) -> { 
+      return value instanceof escm.type.Nil;
+    });
+    PRIMITIVE_TYPES.put("atom",(env, value) -> { 
+      return !(value instanceof escm.type.Pair);
+    });
 
     // Concurrency types
-    if(type.startsWith("thread",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.concurrent.Thread;
-      },i+6);
-    }
-    if(type.startsWith("mutex",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.concurrent.Mutex;
-      },i+5);
-    }
+    PRIMITIVE_TYPES.put("thread",(env, value) -> { 
+      return value instanceof escm.type.concurrent.Thread;
+    });
+    PRIMITIVE_TYPES.put("mutex",(env, value) -> { 
+      return value instanceof escm.type.concurrent.Mutex;
+    });
 
     // Functional types
-    if(type.startsWith("fn",i)) { // Callable
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return IsCallable.logic(value);
-      },i+2);
-    }
-    if(type.startsWith("procedure",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.procedure.Procedure;
-      },i+9);
-    }
-    if(type.startsWith("syntax",i)) {
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.procedure.SyntaxProcedure;
-      },i+6);
-    }
+    PRIMITIVE_TYPES.put("fn",(env, value) -> { 
+      return IsCallable.logic(value);
+    });
+    PRIMITIVE_TYPES.put("procedure",(env, value) -> { 
+      return value instanceof escm.type.procedure.Procedure;
+    });
+    PRIMITIVE_TYPES.put("syntax",(env, value) -> { 
+      return value instanceof escm.type.procedure.SyntaxProcedure;
+    });
 
     // Object-oriented types
-    if(type.startsWith("metaobj",i)) { // includes modules!
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.oo.Dottable;
-      },i+7);
-    }
-    if(type.startsWith("object",i)) { 
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof EscmObject;
-      },i+6);
-    }
-    if(type.startsWith("class",i)) { 
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof EscmClass;
-      },i+5);
-    }
-    if(type.startsWith("interface",i)) { 
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof EscmInterface;
-      },i+9);
-    }
+    PRIMITIVE_TYPES.put("metaobj",(env, value) -> { 
+      return value instanceof escm.type.oo.Dottable;
+    });
+    PRIMITIVE_TYPES.put("object",(env, value) -> { 
+      return value instanceof EscmObject;
+    });
+    PRIMITIVE_TYPES.put("class",(env, value) -> { 
+      return value instanceof EscmClass;
+    });
+    PRIMITIVE_TYPES.put("interface",(env, value) -> { 
+      return value instanceof EscmInterface;
+    });
 
     // I/O types
-    if(type.startsWith("port",i)) { 
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.port.Port;
-      },i+4);
-    }
-    if(type.startsWith("inport",i)) { 
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.port.InputPort;
-      },i+6);
-    }
-    if(type.startsWith("outport",i)) { 
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.port.OutputPort;
-      },i+7);
-    }
+    PRIMITIVE_TYPES.put("port",(env, value) -> { 
+      return value instanceof escm.type.port.Port;
+    });
+    PRIMITIVE_TYPES.put("inport",(env, value) -> { 
+      return value instanceof escm.type.port.InputPort;
+    });
+    PRIMITIVE_TYPES.put("outport",(env, value) -> { 
+      return value instanceof escm.type.port.OutputPort;
+    });
 
     // Module types
-    if(type.startsWith("module",i)) { 
-      return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.oo.EscmModule;
-      },i+6);
-    }
+    PRIMITIVE_TYPES.put("module",(env, value) -> { 
+      return value instanceof escm.type.oo.EscmModule;
+    });
+  }
 
-    // Non-primitive types
+  private static boolean isTypeDelimiter(char c) {
+    return c == '|' || c == '<' || c == '>' || c == ',';
+  }
+
+  private static Pair<Predicate,Integer> parsePrimitive(String type, int typeLength, int i) {
+    int idx = i;
+    while(idx < typeLength && !isTypeDelimiter(type.charAt(idx))) {
+      ++idx;
+    }
+    Predicate pred = PRIMITIVE_TYPES.get(type.substring(i,idx));
+    if(pred != null) {
+      return new Pair<Predicate,Integer>(pred,idx);
+    }
     return null;
   }
 
@@ -294,7 +257,7 @@ public class TypeChecker {
           if((value instanceof escm.type.Vector) == false) {
             return false;
           }
-          return ((AssociativeCollection)value).containsType(parameterType.first);
+          return ((AssociativeCollection)value).containsType(env,parameterType.first);
         },parameterType.second+1);
       // No Parameter
       } else {
@@ -327,7 +290,7 @@ public class TypeChecker {
             if((value instanceof escm.type.Hashmap) == false) {
               return false;
             }
-            return ((escm.type.Hashmap)value).containsTypes(parameterType.first,valueParameterType.first);
+            return ((escm.type.Hashmap)value).containsTypes(env,parameterType.first,valueParameterType.first);
           },valueParameterType.second+1);
         } 
         // Single Parameter
@@ -344,7 +307,7 @@ public class TypeChecker {
           if((value instanceof escm.type.Hashmap) == false) {
             return false;
           }
-          return ((AssociativeCollection)value).containsType(parameterType.first);
+          return ((AssociativeCollection)value).containsType(env,parameterType.first);
         },parameterType.second+1);
       // No Parameter
       } else {
@@ -379,7 +342,7 @@ public class TypeChecker {
             if((value instanceof escm.type.Pair) == false) {
               return false;
             }
-            return ((escm.type.Pair)value).containsTypes(parameterType.first,valueParameterType.first);
+            return ((escm.type.Pair)value).containsTypes(env,parameterType.first,valueParameterType.first);
           },valueParameterType.second+1);
         } 
         // Single Parameter
@@ -396,7 +359,7 @@ public class TypeChecker {
           if((value instanceof escm.type.Pair) == false) {
             return false;
           }
-          return ((AssociativeCollection)value).containsType(parameterType.first);
+          return ((AssociativeCollection)value).containsType(env,parameterType.first);
         },parameterType.second+1);
       // No Parameter
       } else {
@@ -423,7 +386,7 @@ public class TypeChecker {
           if(escm.type.Pair.isList(value) == false) {
             return false;
           }
-          return ((AssociativeCollection)value).containsType(parameterType.first);
+          return ((AssociativeCollection)value).containsType(env,parameterType.first);
         },parameterType.second+1);
       // No Parameter
       } else {
@@ -454,7 +417,7 @@ public class TypeChecker {
           if((value instanceof AssociativeCollection) == false || escm.type.Pair.isDottedList(value)) {
             return false;
           }
-          return ((AssociativeCollection)value).containsType(parameterType.first);
+          return ((AssociativeCollection)value).containsType(env,parameterType.first);
         },parameterType.second+1);
       // No Parameter
       } else {
@@ -483,7 +446,7 @@ public class TypeChecker {
           if((value instanceof OrderedCollection) == false || escm.type.Pair.isDottedList(value)) {
             return false;
           }
-          return ((AssociativeCollection)value).containsType(parameterType.first);
+          return ((AssociativeCollection)value).containsType(env,parameterType.first);
         },parameterType.second+1);
       // No Parameter
       } else {
@@ -501,10 +464,6 @@ public class TypeChecker {
 
   ////////////////////////////////////////////////////////////////////////////
   // Parse Class/Interface Types
-  private static boolean isTypeDelimiter(char c) {
-    return c == '|' || c == '<' || c == '>' || c == ',';
-  }
-
   private static Pair<Predicate,Integer> parseClassOrInterface(String type, int typeLength, int i) {
     int idx = i;
     while(idx < typeLength && !isTypeDelimiter(type.charAt(idx))) {
@@ -572,7 +531,7 @@ public class TypeChecker {
     if(index >= typeLength) {
       throw new Exceptionf("Invalid Empty Type (index %d): %s",index,type);
     }
-    Pair<Predicate,Integer> p = parsePrimitive(type,index);
+    Pair<Predicate,Integer> p = parsePrimitive(type,typeLength,index);
     if(p == null) {
       p = parseContainer(type,typeLength,index);
       if(p == null) {

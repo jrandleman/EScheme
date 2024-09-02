@@ -10,6 +10,7 @@ import escm.type.procedure.TypeChecker.Predicate;
 import escm.util.Trampoline;
 import escm.util.error.Exceptionf;
 import escm.vm.type.callable.Callable;
+import escm.vm.util.Environment;
 
 public interface AssociativeCollection {
   //////////////////////////////////////////////////////////////////////
@@ -112,7 +113,7 @@ public interface AssociativeCollection {
 
   //////////////////////////////////////////////////////////////////////
   // Type Checking
-  boolean containsType(Predicate typePredicate) throws Exception;
+  boolean containsType(Environment env, Predicate typePredicate) throws Exception;
 
 
   //////////////////////////////////////////////////////////////////////

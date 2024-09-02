@@ -14,6 +14,7 @@ import escm.type.procedure.PrimitiveProcedure;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.string.StringParser;
+import escm.vm.util.Environment;
 import escm.vm.util.ExecutionState;
 import escm.type.procedure.TypeChecker.Predicate;
 import escm.vm.type.collection.AssociativeCollection;
@@ -272,11 +273,11 @@ public class String extends Datum implements OrderedCollection, Callable {
     public Exception exception = null;
   }
   
-  public boolean containsType(Predicate typePredicate) throws Exception {
+  public boolean containsType(Environment env, Predicate typePredicate) throws Exception {
     BooleanBox bb = new BooleanBox();
     forEachChar((i,chr) -> {
       try {
-        if(typePredicate.check(chr) == false) {
+        if(typePredicate.check(env,chr) == false) {
           bb.value = false;
           return false;
         }
