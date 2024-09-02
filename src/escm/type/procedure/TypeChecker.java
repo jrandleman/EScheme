@@ -3,7 +3,7 @@
 //    EScheme <callable> type annotation utility functions.
 //    Provides:
 //      1. <Predicate>: Type checking functional interface.
-//      2. <getPredicate(str)>: String-to-Predicate type compiler.
+//      2. <getPredicate(key)>: Keyword-to-Predicate type compiler.
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -86,6 +86,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import escm.util.Pair;
 import escm.util.error.Exceptionf;
 import escm.type.Datum;
+import escm.type.Keyword;
 import escm.type.oo.EscmObject;
 import escm.type.oo.EscmClass;
 import escm.type.oo.EscmInterface;
@@ -538,7 +539,8 @@ public class TypeChecker {
     return parseRest(type,typeLength,index,p);
   }
 
-  public static Predicate getPredicate(String type) throws Exception {
-    return parseType(type,type.length(),0).first;
+  public static Predicate getPredicate(Keyword type) throws Exception {
+    String name = type.value();
+    return parseType(name,name.length(),1).first;
   }
 }

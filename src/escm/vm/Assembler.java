@@ -13,12 +13,14 @@
 package escm.vm;
 import java.util.ArrayList;
 import escm.type.Datum;
+import escm.type.Keyword;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Symbol;
 import escm.type.Character;
 import escm.type.number.Real;
 import escm.type.procedure.CompoundProcedure;
+import escm.type.procedure.TypeChecker;
 import escm.util.error.Exceptionf;
 import escm.vm.util.Instruction;
 import escm.vm.util.ObjectAccessChain;
@@ -83,13 +85,27 @@ public class Assembler {
   }
 
 
-  private static escm.util.Pair<ArrayList<Symbol>,Symbol> parseSyntaxParameters(Pair instruction, Datum params) throws Exception {
+  private static class SyntaxParameterComponents {
+    ArrayList<String> typeNames = null;
+    ArrayList<TypeChecker.Predicate> types = null;
+    ArrayList<Symbol> names = null;
+    Symbol variadicName = null;
+    public SyntaxParameterComponents(ArrayList<String> typeNames, ArrayList<TypeChecker.Predicate> types, ArrayList<Symbol> names, Symbol variadicName) {
+      this.typeNames = typeNames;
+      this.types = types;
+      this.names = names;
+      this.variadicName = variadicName;
+    }
+  }
+
+
+  private static SyntaxParameterComponents parseSyntaxParameters(Pair instruction, Datum params) throws Exception {
     // No params
     if(params instanceof Nil) 
-      return new escm.util.Pair<ArrayList<Symbol>,Symbol>(new ArrayList<Symbol>(),null);
+      return new SyntaxParameterComponents(null, null,new ArrayList<Symbol>(),null);
     // Unary variadic (if the "param list" is a single symbol)
     if(params instanceof Symbol)
-      return new escm.util.Pair<ArrayList<Symbol>,Symbol>(new ArrayList<Symbol>(),(Symbol)params);
+      return new SyntaxParameterComponents(null, null,new ArrayList<Symbol>(),(Symbol)params);
     // Invalid params
     if(!(params instanceof Pair))
       throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
@@ -97,22 +113,52 @@ public class Assembler {
     // Unary variadic (if the "param list" is of 2 symbols with the first as the "." symbol)
     Symbol variadicParam = parseUnaryVariadicParameter(paramsPair);
     if(variadicParam != null)
-      return new escm.util.Pair<ArrayList<Symbol>,Symbol>(new ArrayList<Symbol>(),variadicParam);
+      return new SyntaxParameterComponents(null, null,new ArrayList<Symbol>(),variadicParam);
     // Parse params
+    ArrayList<String> typeNames = new ArrayList<String>();
+    ArrayList<TypeChecker.Predicate> types = new ArrayList<TypeChecker.Predicate>();
     ArrayList<Symbol> parameters = new ArrayList<Symbol>();
+    Keyword type = null;
+    boolean typesFound = false;
     while(params instanceof Pair) {
       paramsPair = (Pair)params;
-      if(!(paramsPair.car() instanceof Symbol))
-        throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
-      parameters.add((Symbol)paramsPair.car());
+      Datum first = paramsPair.car();
+      if(first instanceof Keyword) {
+        if(type != null)
+          throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
+        type = (Keyword)first;
+        typesFound = true;
+      } else {
+        if(!(first instanceof Symbol))
+          throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
+        if(type == null) {
+          typeNames.add(null);
+          types.add(null);
+        } else {
+          try {
+            typeNames.add(type.display());
+            types.add(TypeChecker.getPredicate(type));
+          } catch(Exception e) {
+            throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax: %s", instruction.profile(), e.getMessage());
+          }
+        }
+        parameters.add((Symbol)first);
+        type = null;
+      }
       params = paramsPair.cdr();
     }
+    // Shortcut to avoid type checking typeless signatures
+    if(typesFound == false) {
+      typeNames = null;
+      types = null;
+    }
     // No variadic
-    if(params instanceof Nil) return new escm.util.Pair<ArrayList<Symbol>,Symbol>(parameters,null);
+    if(params instanceof Nil) 
+      return new SyntaxParameterComponents(typeNames, types, parameters, null);
     // Has variadic
     if(!(params instanceof Symbol))
       throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
-    return new escm.util.Pair<ArrayList<Symbol>,Symbol>(parameters,(Symbol)params);
+    return new SyntaxParameterComponents(typeNames, types, parameters, (Symbol)params);
   }
 
 
@@ -120,6 +166,10 @@ public class Assembler {
     if(!(instruction.cdr() instanceof Pair))
       throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
     String docstring = "";
+    // Note for <typesList>: Inner arrays may be null to denote typeless signatures, and
+    //                       individual elts may be null to denote typeless parameters.
+    ArrayList<ArrayList<TypeChecker.Predicate>> typesList = new ArrayList<ArrayList<TypeChecker.Predicate>>();
+    ArrayList<ArrayList<String>> typeNamesList = new ArrayList<ArrayList<String>>();
     ArrayList<ArrayList<Symbol>> paramsList = new ArrayList<ArrayList<Symbol>>();
     ArrayList<Symbol> variadicParamList = new ArrayList<Symbol>();
     ArrayList<ArrayList<Instruction>> instructionsList = new ArrayList<ArrayList<Instruction>>();
@@ -137,13 +187,15 @@ public class Assembler {
       if(!(clause instanceof Pair))
         throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
       Pair clausePair = (Pair)clause;
-      escm.util.Pair<ArrayList<Symbol>,Symbol> params = parseSyntaxParameters(instruction,clausePair.car());
-      paramsList.add(params.first);
-      variadicParamList.add(params.second);
+      SyntaxParameterComponents params = parseSyntaxParameters(instruction,clausePair.car());
+      typeNamesList.add(params.typeNames);
+      typesList.add(params.types);
+      paramsList.add(params.names);
+      variadicParamList.add(params.variadicName);
       instructionsList.add(run(clausePair.cdr()));
       iterator = iteratorPair.cdr();
     }
-    return new CompoundProcedure(docstring,paramsList,variadicParamList,instructionsList);
+    return new CompoundProcedure(docstring,typeNamesList,typesList,paramsList,variadicParamList,instructionsList);
   }
 
 
