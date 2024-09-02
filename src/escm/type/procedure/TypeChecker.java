@@ -217,14 +217,10 @@ public class TypeChecker {
     return c == '|' || c == '<' || c == '>' || c == ',';
   }
 
-  private static Pair<Predicate,Integer> parsePrimitive(String type, int typeLength, int i) {
-    int idx = i;
-    while(idx < typeLength && !isTypeDelimiter(type.charAt(idx))) {
-      ++idx;
-    }
-    Predicate pred = PRIMITIVE_TYPES.get(type.substring(i,idx));
+  private static Pair<Predicate,Integer> parsePrimitive(String type, String name, int next) {
+    Predicate pred = PRIMITIVE_TYPES.get(name);
     if(pred != null) {
-      return new Pair<Predicate,Integer>(pred,idx);
+      return new Pair<Predicate,Integer>(pred,next);
     }
     return null;
   }
@@ -236,244 +232,237 @@ public class TypeChecker {
     return startIndex+3 == endIndex && type.startsWith("any",startIndex);
   }
 
-  private static Pair<Predicate,Integer> parseContainer(String type, int typeLength, int i) throws Exception{
-    // Common compound types
-    // - Vector
-    if(type.startsWith("vector",i)) { 
-      int next = i+6;
-      // Parameterized
-      if(next < typeLength && type.charAt(next) == '<') {
-        Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
-        if(parameterType.second >= typeLength || type.charAt(parameterType.second) != '>') {
-          throw new Exceptionf("Invalid Type \"vector<\" (index %d): %s",next+1,type);
-        }
-        // <any> parameter
-        if(parsedAnyParameter(type,next+1,parameterType.second)) {
+  private static Pair<Predicate,Integer> parseContainer(String type, int typeLength, String name, int next) throws Exception{
+    switch(name) {
+      // Common compound types
+      // - Vector
+      case "vector": {
+        // Parameterized
+        if(next < typeLength && type.charAt(next) == '<') {
+          Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
+          if(parameterType.second >= typeLength || type.charAt(parameterType.second) != '>') {
+            throw new Exceptionf("Invalid Type \"vector<\" (index %d): %s",next+1,type);
+          }
+          // <any> parameter
+          if(parsedAnyParameter(type,next+1,parameterType.second)) {
+            return new Pair<Predicate,Integer>((env, value) -> { 
+              return value instanceof escm.type.Vector;
+            },parameterType.second+1);
+          }
+          return new Pair<Predicate,Integer>((env, value) -> { 
+            if((value instanceof escm.type.Vector) == false) {
+              return false;
+            }
+            return ((AssociativeCollection)value).containsType(env,parameterType.first);
+          },parameterType.second+1);
+        // No Parameter
+        } else {
           return new Pair<Predicate,Integer>((env, value) -> { 
             return value instanceof escm.type.Vector;
-          },parameterType.second+1);
+          },next);
         }
-        return new Pair<Predicate,Integer>((env, value) -> { 
-          if((value instanceof escm.type.Vector) == false) {
-            return false;
-          }
-          return ((AssociativeCollection)value).containsType(env,parameterType.first);
-        },parameterType.second+1);
-      // No Parameter
-      } else {
-        return new Pair<Predicate,Integer>((env, value) -> { 
-          return value instanceof escm.type.Vector;
-        },next);
       }
-    // - Map
-    } else if(type.startsWith("map",i)) { 
-      int next = i+3;
-      // Parameterized
-      if(next < typeLength && type.charAt(next) == '<') {
-        Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
-        if(parameterType.second >= typeLength) {
-          throw new Exceptionf("Invalid Type \"map<\" (index %d): %s",next+1,type);
-        }
-        // Double Parameters
-        if(type.charAt(parameterType.second) == ',') {
-          Pair<Predicate,Integer> valueParameterType = parseType(type,typeLength,parameterType.second+1);
-          if(valueParameterType.second >= typeLength || type.charAt(valueParameterType.second) != '>') {
-            throw new Exceptionf("Invalid Type \"map<\" (index %d): %s",parameterType.second+1,type);
+      // - Map
+      case "map": {
+        // Parameterized
+        if(next < typeLength && type.charAt(next) == '<') {
+          Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
+          if(parameterType.second >= typeLength) {
+            throw new Exceptionf("Invalid Type \"map<\" (index %d): %s",next+1,type);
           }
-          // <any,any> parameter
-          if(parsedAnyParameter(type,next+1,parameterType.second) && parsedAnyParameter(type,parameterType.second+1,valueParameterType.second)) {
+          // Double Parameters
+          if(type.charAt(parameterType.second) == ',') {
+            Pair<Predicate,Integer> valueParameterType = parseType(type,typeLength,parameterType.second+1);
+            if(valueParameterType.second >= typeLength || type.charAt(valueParameterType.second) != '>') {
+              throw new Exceptionf("Invalid Type \"map<\" (index %d): %s",parameterType.second+1,type);
+            }
+            // <any,any> parameter
+            if(parsedAnyParameter(type,next+1,parameterType.second) && parsedAnyParameter(type,parameterType.second+1,valueParameterType.second)) {
+              return new Pair<Predicate,Integer>((env, value) -> { 
+                return value instanceof escm.type.Hashmap;
+              },valueParameterType.second+1);
+            }
+            return new Pair<Predicate,Integer>((env, value) -> { 
+              if((value instanceof escm.type.Hashmap) == false) {
+                return false;
+              }
+              return ((escm.type.Hashmap)value).containsTypes(env,parameterType.first,valueParameterType.first);
+            },valueParameterType.second+1);
+          } 
+          // Single Parameter
+          if(type.charAt(parameterType.second) != '>') {
+            throw new Exceptionf("Invalid Type \"map<\" (index %d): %s",next+1,type);
+          }
+          // <any> parameter
+          if(parsedAnyParameter(type,next+1,parameterType.second)) {
             return new Pair<Predicate,Integer>((env, value) -> { 
               return value instanceof escm.type.Hashmap;
-            },valueParameterType.second+1);
+            },parameterType.second+1);
           }
           return new Pair<Predicate,Integer>((env, value) -> { 
             if((value instanceof escm.type.Hashmap) == false) {
               return false;
             }
-            return ((escm.type.Hashmap)value).containsTypes(env,parameterType.first,valueParameterType.first);
-          },valueParameterType.second+1);
-        } 
-        // Single Parameter
-        if(type.charAt(parameterType.second) != '>') {
-          throw new Exceptionf("Invalid Type \"map<\" (index %d): %s",next+1,type);
-        }
-        // <any> parameter
-        if(parsedAnyParameter(type,next+1,parameterType.second)) {
+            return ((AssociativeCollection)value).containsType(env,parameterType.first);
+          },parameterType.second+1);
+        // No Parameter
+        } else {
           return new Pair<Predicate,Integer>((env, value) -> { 
             return value instanceof escm.type.Hashmap;
-          },parameterType.second+1);
+          },next);
         }
-        return new Pair<Predicate,Integer>((env, value) -> { 
-          if((value instanceof escm.type.Hashmap) == false) {
-            return false;
-          }
-          return ((AssociativeCollection)value).containsType(env,parameterType.first);
-        },parameterType.second+1);
-      // No Parameter
-      } else {
-        return new Pair<Predicate,Integer>((env, value) -> { 
-          return value instanceof escm.type.Hashmap;
-        },next);
       }
 
-    // List-base types
-    // - Pair
-    } else if(type.startsWith("pair",i)) { 
-      int next = i+4;
-      // Parameterized
-      if(next < typeLength && type.charAt(next) == '<') {
-        Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
-        if(parameterType.second >= typeLength) {
-          throw new Exceptionf("Invalid Type \"pair<\" (index %d): %s",next+1,type);
-        }
-        // Double Parameters
-        if(type.charAt(parameterType.second) == ',') {
-          Pair<Predicate,Integer> valueParameterType = parseType(type,typeLength,parameterType.second+1);
-          if(valueParameterType.second >= typeLength || type.charAt(valueParameterType.second) != '>') {
-            throw new Exceptionf("Invalid Type \"pair<\" (index %d): %s",parameterType.second+1,type);
+      // List-base types
+      // - Pair
+      case "pair": {
+        // Parameterized
+        if(next < typeLength && type.charAt(next) == '<') {
+          Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
+          if(parameterType.second >= typeLength) {
+            throw new Exceptionf("Invalid Type \"pair<\" (index %d): %s",next+1,type);
           }
-          // <any,any> parameter
-          if(parsedAnyParameter(type,next+1,parameterType.second) && parsedAnyParameter(type,parameterType.second+1,valueParameterType.second)) {
+          // Double Parameters
+          if(type.charAt(parameterType.second) == ',') {
+            Pair<Predicate,Integer> valueParameterType = parseType(type,typeLength,parameterType.second+1);
+            if(valueParameterType.second >= typeLength || type.charAt(valueParameterType.second) != '>') {
+              throw new Exceptionf("Invalid Type \"pair<\" (index %d): %s",parameterType.second+1,type);
+            }
+            // <any,any> parameter
+            if(parsedAnyParameter(type,next+1,parameterType.second) && parsedAnyParameter(type,parameterType.second+1,valueParameterType.second)) {
+              return new Pair<Predicate,Integer>((env, value) -> { 
+                return value instanceof escm.type.Pair;
+              },valueParameterType.second+1);
+            }
+            return new Pair<Predicate,Integer>((env, value) -> { 
+              if((value instanceof escm.type.Pair) == false) {
+                return false;
+              }
+              return ((escm.type.Pair)value).containsTypes(env,parameterType.first,valueParameterType.first);
+            },valueParameterType.second+1);
+          } 
+          // Single Parameter
+          if(type.charAt(parameterType.second) != '>') {
+            throw new Exceptionf("Invalid Type \"pair<\" (index %d): %s",next+1,type);
+          }
+          // <any> parameter
+          if(parsedAnyParameter(type,next+1,parameterType.second)) {
             return new Pair<Predicate,Integer>((env, value) -> { 
               return value instanceof escm.type.Pair;
-            },valueParameterType.second+1);
+            },parameterType.second+1);
           }
           return new Pair<Predicate,Integer>((env, value) -> { 
             if((value instanceof escm.type.Pair) == false) {
               return false;
             }
-            return ((escm.type.Pair)value).containsTypes(env,parameterType.first,valueParameterType.first);
-          },valueParameterType.second+1);
-        } 
-        // Single Parameter
-        if(type.charAt(parameterType.second) != '>') {
-          throw new Exceptionf("Invalid Type \"pair<\" (index %d): %s",next+1,type);
-        }
-        // <any> parameter
-        if(parsedAnyParameter(type,next+1,parameterType.second)) {
+            return ((AssociativeCollection)value).containsType(env,parameterType.first);
+          },parameterType.second+1);
+        // No Parameter
+        } else {
           return new Pair<Predicate,Integer>((env, value) -> { 
             return value instanceof escm.type.Pair;
-          },parameterType.second+1);
+          },next);
         }
-        return new Pair<Predicate,Integer>((env, value) -> { 
-          if((value instanceof escm.type.Pair) == false) {
-            return false;
-          }
-          return ((AssociativeCollection)value).containsType(env,parameterType.first);
-        },parameterType.second+1);
-      // No Parameter
-      } else {
-        return new Pair<Predicate,Integer>((env, value) -> { 
-          return value instanceof escm.type.Pair;
-        },next);
       }
-    // - List
-    } else if(type.startsWith("list",i)) { 
-      int next = i+4;
-      // Parameterized
-      if(next < typeLength && type.charAt(next) == '<') {
-        Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
-        if(parameterType.second >= typeLength || type.charAt(parameterType.second) != '>') {
-          throw new Exceptionf("Invalid Type \"list<\" (index %d): %s",next+1,type);
-        }
-        // <any> parameter
-        if(parsedAnyParameter(type,next+1,parameterType.second)) {
+      // - List
+      case "list": {
+        // Parameterized
+        if(next < typeLength && type.charAt(next) == '<') {
+          Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
+          if(parameterType.second >= typeLength || type.charAt(parameterType.second) != '>') {
+            throw new Exceptionf("Invalid Type \"list<\" (index %d): %s",next+1,type);
+          }
+          // <any> parameter
+          if(parsedAnyParameter(type,next+1,parameterType.second)) {
+            return new Pair<Predicate,Integer>((env, value) -> { 
+              return escm.type.Pair.isList(value);
+            },parameterType.second+1);
+          }
+          return new Pair<Predicate,Integer>((env, value) -> { 
+            if(escm.type.Pair.isList(value) == false) {
+              return false;
+            }
+            return ((AssociativeCollection)value).containsType(env,parameterType.first);
+          },parameterType.second+1);
+        // No Parameter
+        } else {
           return new Pair<Predicate,Integer>((env, value) -> { 
             return escm.type.Pair.isList(value);
-          },parameterType.second+1);
+          },next);
         }
-        return new Pair<Predicate,Integer>((env, value) -> { 
-          if(escm.type.Pair.isList(value) == false) {
-            return false;
-          }
-          return ((AssociativeCollection)value).containsType(env,parameterType.first);
-        },parameterType.second+1);
-      // No Parameter
-      } else {
-        return new Pair<Predicate,Integer>((env, value) -> { 
-          return escm.type.Pair.isList(value);
-        },next);
       }
 
-    // Generic compound types
-    // - Associative Collection
-    } else if(type.startsWith("associative-collection",i) || type.startsWith("ac",i)) {
-      boolean shorthand = type.charAt(i+1) == 'c';
-      int next = i+(shorthand ? 2 : 22);
-      String name = shorthand ? "ac" : "associative-collection";
-      // Parameterized
-      if(next < typeLength && type.charAt(next) == '<') {
-        Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
-        if(parameterType.second >= typeLength || type.charAt(parameterType.second) != '>') {
-          throw new Exceptionf("Invalid Type \"%s<\" (index %d): %s",name,next+1,type);
-        }
-        // <any> parameter
-        if(parsedAnyParameter(type,next+1,parameterType.second)) {
+      // Generic compound types
+      // - Associative Collection
+      case "associative-collection": case "ac": {
+        // Parameterized
+        if(next < typeLength && type.charAt(next) == '<') {
+          Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
+          if(parameterType.second >= typeLength || type.charAt(parameterType.second) != '>') {
+            throw new Exceptionf("Invalid Type \"%s<\" (index %d): %s",name,next+1,type);
+          }
+          // <any> parameter
+          if(parsedAnyParameter(type,next+1,parameterType.second)) {
+            return new Pair<Predicate,Integer>((env, value) -> { 
+              return value instanceof AssociativeCollection && !escm.type.Pair.isDottedList(value);
+            },parameterType.second+1);
+          }
+          return new Pair<Predicate,Integer>((env, value) -> { 
+            if((value instanceof AssociativeCollection) == false || escm.type.Pair.isDottedList(value)) {
+              return false;
+            }
+            return ((AssociativeCollection)value).containsType(env,parameterType.first);
+          },parameterType.second+1);
+        // No Parameter
+        } else {
           return new Pair<Predicate,Integer>((env, value) -> { 
             return value instanceof AssociativeCollection && !escm.type.Pair.isDottedList(value);
-          },parameterType.second+1);
+          },next);
         }
-        return new Pair<Predicate,Integer>((env, value) -> { 
-          if((value instanceof AssociativeCollection) == false || escm.type.Pair.isDottedList(value)) {
-            return false;
-          }
-          return ((AssociativeCollection)value).containsType(env,parameterType.first);
-        },parameterType.second+1);
-      // No Parameter
-      } else {
-        return new Pair<Predicate,Integer>((env, value) -> { 
-          return value instanceof AssociativeCollection && !escm.type.Pair.isDottedList(value);
-        },next);
       }
-    // - Ordered Collection
-    } else if(type.startsWith("ordered-collection",i) || type.startsWith("oc",i)) {
-      boolean shorthand = type.charAt(i+1) == 'c';
-      int next = i+(shorthand ? 2 : 18);
-      String name = shorthand ? "oc" : "ordered-collection";
-      // Parameterized
-      if(next < typeLength && type.charAt(next) == '<') {
-        Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
-        if(parameterType.second >= typeLength || type.charAt(parameterType.second) != '>') {
-          throw new Exceptionf("Invalid Type \"%s<\" (index %d): %s",name,next+1,type);
-        }
-        // <any> parameter
-        if(parsedAnyParameter(type,next+1,parameterType.second)) {
+      // - Ordered Collection
+      case "ordered-collection": case "oc": {
+        // Parameterized
+        if(next < typeLength && type.charAt(next) == '<') {
+          Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
+          if(parameterType.second >= typeLength || type.charAt(parameterType.second) != '>') {
+            throw new Exceptionf("Invalid Type \"%s<\" (index %d): %s",name,next+1,type);
+          }
+          // <any> parameter
+          if(parsedAnyParameter(type,next+1,parameterType.second)) {
+            return new Pair<Predicate,Integer>((env, value) -> { 
+              return value instanceof OrderedCollection && !escm.type.Pair.isDottedList(value);
+            },parameterType.second+1);
+          }
+          return new Pair<Predicate,Integer>((env, value) -> { 
+            if((value instanceof OrderedCollection) == false || escm.type.Pair.isDottedList(value)) {
+              return false;
+            }
+            return ((AssociativeCollection)value).containsType(env,parameterType.first);
+          },parameterType.second+1);
+        // No Parameter
+        } else {
           return new Pair<Predicate,Integer>((env, value) -> { 
             return value instanceof OrderedCollection && !escm.type.Pair.isDottedList(value);
-          },parameterType.second+1);
+          },next);
         }
-        return new Pair<Predicate,Integer>((env, value) -> { 
-          if((value instanceof OrderedCollection) == false || escm.type.Pair.isDottedList(value)) {
-            return false;
-          }
-          return ((AssociativeCollection)value).containsType(env,parameterType.first);
-        },parameterType.second+1);
-      // No Parameter
-      } else {
-        return new Pair<Predicate,Integer>((env, value) -> { 
-          return value instanceof OrderedCollection && !escm.type.Pair.isDottedList(value);
-        },next);
       }
-    
-    // Non-container types
-    } else {
-      return null;
+
+      // Non-container types
+      default: {
+        return null;
+      }
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Parse Class/Interface Types
-  private static Pair<Predicate,Integer> parseClassOrInterface(String type, int typeLength, int i) {
-    int idx = i;
-    while(idx < typeLength && !isTypeDelimiter(type.charAt(idx))) {
-      ++idx;
-    }
-    String className = type.substring(i,idx);
+  private static Pair<Predicate,Integer> parseClassOrInterface(String type, int typeLength, String name, int index, int next) {
     return new Pair<Predicate,Integer>((env, value) -> {
-      Datum classOrInterface = env.nullableGet(className);
+      Datum classOrInterface = env.nullableGet(name);
       if(classOrInterface == null) {
-        throw new Exceptionf("Invalid Class or Interface Type \"%s\" (index %d): %s",className,i,type);
+        throw new Exceptionf("Invalid Class or Interface Type \"%s\" (index %d): %s",name,index,type);
       }
       if((value instanceof EscmObject) == false) return false;
       EscmObject obj = (EscmObject)value;
@@ -482,15 +471,15 @@ public class TypeChecker {
       } else if(classOrInterface instanceof EscmInterface) {
         return obj.instanceOf((EscmInterface)classOrInterface);
       } else {
-        throw new Exceptionf("Invalid Class or Interface Type \"%s\" (index %d): %s",className,i,type);
+        throw new Exceptionf("Invalid Class or Interface Type \"%s\" (index %d): %s",name,index,type);
       }
-    }, idx);
+    }, next);
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Parse Compound "|" Types
-  private static Pair<Predicate,Integer> parseRest(String type, int typeLength, int i, Pair<Predicate,Integer> firstType) throws Exception {
+  private static Pair<Predicate,Integer> parseRest(String type, int typeLength, int index, Pair<Predicate,Integer> firstType) throws Exception {
     if(firstType.second >= typeLength) return firstType;
     char delimiter = type.charAt(firstType.second);
     if(delimiter == '>' || delimiter == ',') return firstType;
@@ -510,7 +499,7 @@ public class TypeChecker {
         return false;
       }, idx);
     }
-    throw new Exceptionf("Invalid Compound Type (index %d): %s",i,type);
+    throw new Exceptionf("Invalid Compound Type (index %d): %s",index,type);
   }
 
 
@@ -531,11 +520,16 @@ public class TypeChecker {
     if(index >= typeLength) {
       throw new Exceptionf("Invalid Empty Type (index %d): %s",index,type);
     }
-    Pair<Predicate,Integer> p = parsePrimitive(type,typeLength,index);
+    int next = index;
+    while(next < typeLength && !isTypeDelimiter(type.charAt(next))) {
+      ++next;
+    }
+    String name = type.substring(index,next);
+    Pair<Predicate,Integer> p = parsePrimitive(type,name,next);
     if(p == null) {
-      p = parseContainer(type,typeLength,index);
+      p = parseContainer(type,typeLength,name,next);
       if(p == null) {
-        p = parseClassOrInterface(type,typeLength,index);
+        p = parseClassOrInterface(type,typeLength,name,index,next);
       }
     }
     if(p == null) {
