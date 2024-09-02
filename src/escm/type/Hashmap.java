@@ -38,6 +38,7 @@ import escm.type.number.Real;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.util.ExecutionState;
+import escm.type.procedure.TypeChecker.Predicate;
 import escm.vm.type.collection.AssociativeCollection;
 import escm.vm.type.callable.Callable;
 
@@ -298,6 +299,24 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
   // Copying
   public Hashmap shallowCopy() {
     return new Hashmap(new ConcurrentHashMap<Datum,Datum>(value));
+  }
+
+
+  //////////////////////////////////////////////////////////////////////
+  // Type Checking
+  public boolean containsTypes(Predicate keyTypePredicate, Predicate valTypePredicate) throws Exception {
+    for(ConcurrentHashMap.Entry<Datum,Datum> entry : value.entrySet()) {
+      if(keyTypePredicate.check(entry.getKey()) == false) return false;
+      if(valTypePredicate.check(entry.getValue()) == false) return false;
+    }
+    return true;
+  }
+
+  public boolean containsType(Predicate typePredicate) throws Exception {
+    for(Datum entry : value.values()) {
+      if(typePredicate.check(entry) == false) return false;
+    }
+    return true;
   }
 
 

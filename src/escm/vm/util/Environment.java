@@ -113,6 +113,16 @@ public class Environment implements Serializable {
     return true;
   }
 
+  // Used by <nullableGet>: eliminates need for symbolic wrapper
+  private boolean hasString(String name) {
+    Datum result = bindings.get(name);
+    if(result == null) {
+      if(superEnv == null) return false;
+      return superEnv.hasString(name);
+    }
+    return true;
+  }
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Get value
@@ -134,6 +144,20 @@ public class Environment implements Serializable {
         }
       }
       return superEnv.get(name);
+    }
+    return result;
+  }
+
+  // Used in type-checking
+  public Datum nullableGet(String name) {
+    Datum result = bindings.get(name);
+    if(result == null) {
+      if(superEnv == null) {
+        return null;
+      } else if(superEnv == GlobalState.parameterEnvironment && !superEnv.hasString(name)) {
+        return null;
+      }
+      return superEnv.nullableGet(name);
     }
     return result;
   }

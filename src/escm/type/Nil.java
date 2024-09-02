@@ -13,6 +13,7 @@ import escm.type.number.Exact;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.util.ExecutionState;
+import escm.type.procedure.TypeChecker.Predicate;
 import escm.vm.type.collection.AssociativeCollection;
 import escm.vm.type.collection.OrderedCollection;
 import escm.vm.type.callable.Callable;
@@ -107,6 +108,13 @@ public class Nil extends Datum implements OrderedCollection {
   // Copying
   public Nil shallowCopy() {
     return this;
+  }
+
+
+  //////////////////////////////////////////////////////////////////////
+  // Type Checking
+  public boolean containsType(Predicate typePredicate) {
+    return true;
   }
 
 

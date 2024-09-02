@@ -15,6 +15,7 @@ import escm.type.procedure.PrimitiveProcedure;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.util.ExecutionState;
+import escm.type.procedure.TypeChecker.Predicate;
 import escm.vm.type.collection.AssociativeCollection;
 import escm.vm.type.collection.OrderedCollection;
 import escm.vm.type.callable.Callable;
@@ -464,6 +465,26 @@ public class Pair extends Datum implements OrderedCollection {
   // Copying
   public Pair shallowCopy() {
     return this;
+  }
+
+
+  //////////////////////////////////////////////////////////////////////
+  // Type Checking
+  public boolean containsTypes(Predicate keyTypePredicate, Predicate valTypePredicate) throws Exception {
+    return keyTypePredicate.check(car) && valTypePredicate.check(cdr);
+  }
+
+  public boolean containsType(Predicate typePredicate) throws Exception {
+    if(length == DOTTED_LIST_LENGTH || typePredicate.check(car) == false) {
+      return false;
+    }
+    Datum ptr = cdr;
+    while(ptr instanceof Pair) {
+      Pair p = (Pair)ptr;
+      if(typePredicate.check(p.car) == false) return false;
+      ptr = p.cdr;
+    }
+    return true;
   }
 
 

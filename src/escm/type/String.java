@@ -15,6 +15,7 @@ import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.util.string.StringParser;
 import escm.vm.util.ExecutionState;
+import escm.type.procedure.TypeChecker.Predicate;
 import escm.vm.type.collection.AssociativeCollection;
 import escm.vm.type.collection.OrderedCollection;
 import escm.vm.type.callable.Callable;
@@ -261,6 +262,34 @@ public class String extends Datum implements OrderedCollection, Callable {
   // Copying semantics
   public String shallowCopy() {
     return this;
+  }
+
+
+  //////////////////////////////////////////////////////////////////////
+  // Type Checking
+  private static class BooleanBox {
+    public boolean value = true;
+    public Exception exception = null;
+  }
+  
+  public boolean containsType(Predicate typePredicate) throws Exception {
+    BooleanBox bb = new BooleanBox();
+    forEachChar((i,chr) -> {
+      try {
+        if(typePredicate.check(chr) == false) {
+          bb.value = false;
+          return false;
+        }
+      } catch(Exception e) {
+        bb.exception = e;
+        return false;
+      }
+      return true;
+    });
+    if(bb.exception != null) {
+      throw bb.exception;
+    }
+    return bb.value;
   }
 
 
