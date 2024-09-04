@@ -51,7 +51,7 @@ public class CompoundProcedure extends Procedure {
   protected static class CompileTime implements Serializable {
     public String docstring;
     public ArrayList<ArrayList<String>> typeNames;
-    public ArrayList<ArrayList<TypeChecker.Predicate>> typesList; // "null" entry denotes all "any" types
+    public ArrayList<ArrayList<TypeChecker.Predicate>> typesList; // "null" entry denotes all "any" type(s)
     public ArrayList<ArrayList<Symbol>> parametersList;
     public ArrayList<Symbol> variadicParameterList; // <null> indicates non-variadic
     public ArrayList<ArrayList<Instruction>> bodyList;

@@ -1593,7 +1593,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Core\nEquivalent to <let>, but later <symbol>s may refer\nto earlier ones.";
+      return "@help:Syntax:Core\nEquivalent to <let>, but later <symbol>s may refer to earlier ones.";
     }
 
     private static Datum generateNestedLambdaCalls(Symbol baseLetSymbol, Datum bindings, Datum internalLet, ArrayList<Datum> parameters) throws Exception {
@@ -1641,7 +1641,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Core\nLike <let>, but <value> may be a recursive function that\ncalls <symbol>.";
+      return "@help:Syntax:Core\nLike <let>, but <value> may be a recursive function that calls <symbol>.";
     }
 
     private static escm.util.Pair<Datum,Datum> getParamsDefaultAndActualSettings(Datum bindings, ArrayList<Datum> parameters) throws Exception {
@@ -1696,7 +1696,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Core\nEquivalent to <letrec>, but later <symbol>s may refer\nto earlier ones.";
+      return "@help:Syntax:Core\nEquivalent to <letrec>, but later <symbol>s may refer to earlier ones.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -2132,8 +2132,8 @@ public class CorePrimitives {
   //   => NOTE: It is UNDEFINED BEHAVIOR to have a VARIADIC CURRIED lambda
   //            IE: (curry (x . xs) x) ; INVALID!
   //
-  // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>.
-  // =====
+  // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>,
+  // ===== nor parsing keyword types.
   //
   // (define-syntax curry 
   //   (lambda (params . body)
@@ -2172,6 +2172,33 @@ public class CorePrimitives {
     }
 
     private static Datum FA = Pair.List(new Symbol("f"),new Symbol("a"));
+
+    private static boolean isLastParameter(Pair paramsPair) {
+      Datum first = paramsPair.car();
+      Datum rest = paramsPair.cdr();
+      return !(rest instanceof Pair) ||
+             (first instanceof Keyword && rest instanceof Pair && !(((Pair)rest).cdr() instanceof Pair));
+    }
+
+    private static Datum firstParameter(Pair paramsPair) {
+      Datum first = paramsPair.car();
+      Datum rest = paramsPair.cdr();
+      if(first instanceof Keyword && rest instanceof Pair) {
+        return Pair.List(first,((Pair)rest).car());
+      } else {
+        return Pair.List(first);
+      }
+    }
+
+    private static Datum restParameters(Pair paramsPair) {
+      Datum first = paramsPair.car();
+      Datum rest = paramsPair.cdr();
+      if(first instanceof Keyword && rest instanceof Pair) {
+        return ((Pair)rest).cdr();
+      } else {
+        return rest;
+      }
+    }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       int n = parameters.size();
@@ -2189,7 +2216,7 @@ public class CorePrimitives {
         return new Pair(LAMBDA,new Pair(Nil.VALUE,body));
       } 
       Pair paramsPair = (Pair)params;
-      if(!(paramsPair.cdr() instanceof Pair)) {
+      if(isLastParameter(paramsPair)) {
         Datum foldExpr = Pair.List(FOLD,Pair.List(LAMBDA,FA,FA),new Pair(LAMBDA,new Pair(params,body)),Pair.List(CONS,x,xs));
         if(docstring != null) {
           return Pair.List(LAMBDA,new Pair(x,xs),docstring,foldExpr);
@@ -2202,13 +2229,13 @@ public class CorePrimitives {
           return Pair.List(LET,
             Pair.List(Pair.List(
               curriedLambdas,
-              Pair.List(LAMBDA,Pair.List(paramsPair.car()),new Pair(CURRY,new Pair(paramsPair.cdr(),new Pair(docstring,body)))))),
+              Pair.List(LAMBDA,firstParameter(paramsPair),new Pair(CURRY,new Pair(restParameters(paramsPair),new Pair(docstring,body)))))),
             Pair.List(LAMBDA,new Pair(x,xs),docstring,foldExpr));
         } else {
           return Pair.List(LET,
             Pair.List(Pair.List(
               curriedLambdas,
-              Pair.List(LAMBDA,Pair.List(paramsPair.car()),new Pair(CURRY,new Pair(paramsPair.cdr(),body))))),
+              Pair.List(LAMBDA,firstParameter(paramsPair),new Pair(CURRY,new Pair(restParameters(paramsPair),body))))),
             Pair.List(LAMBDA,new Pair(x,xs),foldExpr));
         }
       }

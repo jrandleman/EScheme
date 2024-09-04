@@ -1,5 +1,5 @@
 ;; Author: Jordan Randleman -- reader.scm
-;; => Tests for EScheme's reader literal syntax & VM-specific operations
+;; => Tests for EScheme's reader literal syntax & VM-specific operations.
 ;;    Invoked by ../main.scm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

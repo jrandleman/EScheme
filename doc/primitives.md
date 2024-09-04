@@ -7982,8 +7982,7 @@ Signature 2 (named let):
 
 #### Description:
 ```
-Equivalent to <let>, but later <symbol>s may refer
-to earlier ones.
+Equivalent to <let>, but later <symbol>s may refer to earlier ones.
 ```
 
 -------------------------------------------------------------------------------
@@ -8013,8 +8012,7 @@ and examples on using <values> expressions.
 
 #### Description:
 ```
-Like <let>, but <value> may be a recursive function that
-calls <symbol>.
+Like <let>, but <value> may be a recursive function that calls <symbol>.
 ```
 
 -------------------------------------------------------------------------------
@@ -8027,8 +8025,7 @@ calls <symbol>.
 
 #### Description:
 ```
-Equivalent to <letrec>, but later <symbol>s may refer
-to earlier ones.
+Equivalent to <letrec>, but later <symbol>s may refer to earlier ones.
 ```
 
 -------------------------------------------------------------------------------
