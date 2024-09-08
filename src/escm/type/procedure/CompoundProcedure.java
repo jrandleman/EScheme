@@ -218,59 +218,33 @@ public class CompoundProcedure extends Procedure {
   }
 
 
-  // @RETURN: the clause (param/body) index these args can be processed with
-  protected int validateEnvironmentExtension(ArrayList<Datum> arguments) throws Exception {
-    if(definitionEnvironment == null)
-      throw new Exceptionf("Can't apply procedure %s with a null definition environment!", readableName());
-    int totalArguments = arguments.size();
-    for(int i = 0, n = compileTime.parametersList.size(); i < n; ++i) {
-      int totalParameters = compileTime.parametersList.get(i).size();
-      // Type-Check Arguments
-      if(
-        totalArguments == totalParameters || 
-        (totalArguments > totalParameters && compileTime.variadicParameterList.get(i) != null)
-      ) {
-        ArrayList<TypeChecker.Predicate> types = compileTime.typesList.get(i);
-        if(types != null) {
-          boolean typeMismatch = false;
-          for(int j = 0, totalTypes = types.size(); j < totalTypes; ++j) {
-            TypeChecker.Predicate type = types.get(j);
-            if(type != null && !type.check(definitionEnvironment,arguments.get(j))) {
-              typeMismatch = true;
-              break;
-            }
-          }
-          if(typeMismatch) continue;
-        }
-        return i;
-      }
-
-
-
-
-
-      // // @TODO: RM
-      // if(totalArguments == totalParameters) return i;
-      // if(totalArguments > totalParameters && compileTime.variadicParameterList.get(i) != null) return i;
-
-
-
-
-
-
-    }
-    throw new Exceptionf("Args (%s) don't match any signatures in procedure \"%s\":%s", Exceptionf.profileArgs(arguments), readableName(), stringifyParameterSignatures());
+  protected boolean validParameterArity(int i, int totalArguments) {
+    int totalParameters = compileTime.parametersList.get(i).size();
+    return totalArguments == totalParameters || 
+           (totalArguments > totalParameters && compileTime.variadicParameterList.get(i) != null);
   }
 
 
   protected Environment getExtendedEnvironment(int clauseNumber, ArrayList<Datum> arguments) throws Exception {
     Environment extendedEnvironment = new Environment(definitionEnvironment);
+    ArrayList<TypeChecker.Predicate> types = compileTime.typesList.get(clauseNumber);
     ArrayList<Symbol> parameters = compileTime.parametersList.get(clauseNumber);
     Symbol variadicParameter = compileTime.variadicParameterList.get(clauseNumber);
     int n = parameters.size();
     // register non-variadic arguments
-    for(int i = 0; i < n; ++i)
-      extendedEnvironment.define(parameters.get(i),arguments.get(i));
+    if(types == null) {
+      for(int i = 0; i < n; ++i) {
+        extendedEnvironment.define(parameters.get(i),arguments.get(i));
+      }
+    } else {
+      for(int i = 0; i < n; ++i) {
+        TypeChecker.Predicate type = types.get(i);
+        Datum arg = arguments.get(i);
+        if(type != null && !type.check(definitionEnvironment,arg))
+          return null; // indicates type mismatch
+        extendedEnvironment.define(parameters.get(i),arg);
+      }
+    }
     // register variadic arguments
     if(variadicParameter != null) {
       Datum variadicArgumentList = Nil.VALUE;
@@ -282,28 +256,29 @@ public class CompoundProcedure extends Procedure {
   }
 
 
+  protected Trampoline.Bounce callTheFunction(int i, Environment extendedEnvironment, Trampoline.Continuation continuation) throws Exception {
+    EscmCallStack.Frame originalCallStack = EscmCallStack.currentStackFrame();
+    EscmCallStack.push(readableName(),invocationSource);
+    Trampoline.Continuation popContinuation = (value) -> () -> {
+      EscmCallStack.restore(originalCallStack);
+      return continuation.run(value);
+    };
+    return Interpreter.run(new ExecutionState(extendedEnvironment,compileTime.bodyList.get(i)),popContinuation);
+  }
+
+
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
     return () -> {
-      int clauseNumber = validateEnvironmentExtension(arguments);
-
-
-
-      // @TODO: CONSIDER MELTING TYPE-CHECKING LOOP INTO VARIABLE-BINDING LOOP OF <getExtendedEnvironment()>
-      //        INSTEAD OF IN <validateEnvironmentExtension()>
-      //        => REDUCES PASSES BY 1 FOR SUCCESSFUL CALLS, ONLY PENALIZED WHEN RIGHT NUMBER OF ARGS BUT WRONG
-      //           TYPE OF ARGS, WHICH IS COMPARATIVELY RARE
-
-
-
-      
-      Environment extendedEnvironment = getExtendedEnvironment(clauseNumber,arguments);
-      EscmCallStack.Frame originalCallStack = EscmCallStack.currentStackFrame();
-      EscmCallStack.push(readableName(),invocationSource);
-      Trampoline.Continuation popContinuation = (value) -> () -> {
-        EscmCallStack.restore(originalCallStack);
-        return continuation.run(value);
-      };
-      return Interpreter.run(new ExecutionState(extendedEnvironment,compileTime.bodyList.get(clauseNumber)),popContinuation);
+      if(definitionEnvironment == null)
+        throw new Exceptionf("Can't apply procedure %s with a null definition environment!", readableName());
+      int totalArguments = arguments.size();
+      for(int i = 0, n = compileTime.parametersList.size(); i < n; ++i) {
+        if(!validParameterArity(i,totalArguments)) continue; // arity mismatch
+        Environment extendedEnvironment = getExtendedEnvironment(i,arguments);
+        if(extendedEnvironment == null) continue; // type mismatch
+        return callTheFunction(i,extendedEnvironment,continuation);
+      }
+      throw new Exceptionf("Args (%s) don't match any signatures in procedure \"%s\":%s", Exceptionf.profileArgs(arguments), readableName(), stringifyParameterSignatures());
     };
   }
 }
