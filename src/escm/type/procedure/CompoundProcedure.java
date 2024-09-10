@@ -50,15 +50,30 @@ public class CompoundProcedure extends Procedure {
   // Internal compound procedure fields
   protected static class CompileTime implements Serializable {
     public String docstring;
-    public ArrayList<ArrayList<String>> typeNames;
-    public ArrayList<ArrayList<TypeChecker.Predicate>> typesList; // "null" entry denotes all "any" type(s)
+    // For <parameterTypeNames> & <parameterTypesList>:
+    //   * "parameterTypeNames == null" => no bodies have types
+    //   * "parameterTypeNames[i] != null" => ith body has no types
+    //   * "parameterTypeNames[i][j] == null" => ith body's jth parameter is the ":any" type
+    private ArrayList<ArrayList<String>> parameterTypeNames;
+    private ArrayList<ArrayList<TypeChecker.Predicate>> parameterTypesList;
     public ArrayList<ArrayList<Symbol>> parametersList;
     public ArrayList<Symbol> variadicParameterList; // <null> indicates non-variadic
     public ArrayList<ArrayList<Instruction>> bodyList;
-    public CompileTime(String docstring, ArrayList<ArrayList<String>> typeNames, ArrayList<ArrayList<TypeChecker.Predicate>> typesList, ArrayList<ArrayList<Symbol>> parametersList, ArrayList<Symbol> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
-      this.typeNames = typeNames;
+
+    public ArrayList<String> getParameterTypeName(int index) {
+      if(parameterTypeNames == null) return null;
+      return parameterTypeNames.get(index);
+    }
+
+    public ArrayList<TypeChecker.Predicate> getParameterTypes(int index) {
+      if(parameterTypesList == null) return null;
+      return parameterTypesList.get(index);
+    }
+
+    public CompileTime(String docstring, ArrayList<ArrayList<String>> parameterTypeNames, ArrayList<ArrayList<TypeChecker.Predicate>> parameterTypesList, ArrayList<ArrayList<Symbol>> parametersList, ArrayList<Symbol> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
+      this.parameterTypeNames = parameterTypeNames;
       this.docstring = docstring;
-      this.typesList = typesList;
+      this.parameterTypesList = parameterTypesList;
       this.parametersList = parametersList;
       this.variadicParameterList = variadicParameterList;
       this.bodyList = bodyList;
@@ -73,16 +88,16 @@ public class CompoundProcedure extends Procedure {
   // Constructor
   public CompoundProcedure(
     String docstring, 
-    ArrayList<ArrayList<String>> typeNamesList, 
-    ArrayList<ArrayList<TypeChecker.Predicate>> typesList, 
+    ArrayList<ArrayList<String>> parameterTypeNames,
+    ArrayList<ArrayList<TypeChecker.Predicate>> parameterTypesList, 
     ArrayList<ArrayList<Symbol>> parametersList, 
     ArrayList<Symbol> variadicParameterList, 
     ArrayList<ArrayList<Instruction>> bodyList
   ) {
     this.compileTime = new CompileTime(
       DocString.format(docstring),
-      typeNamesList,
-      typesList,
+      parameterTypeNames,
+      parameterTypesList,
       parametersList,
       variadicParameterList,
       bodyList
@@ -157,12 +172,12 @@ public class CompoundProcedure extends Procedure {
   private static final Symbol DOT = new Symbol(".");
 
   // returns parameter clause with this procedure's name at the front
-  private Datum clauseSignature(ArrayList<String> typeNames, ArrayList<Symbol> parameters, Symbol variadic) {
+  private Datum clauseSignature(ArrayList<String> parameterTypeNames, ArrayList<Symbol> parameters, Symbol variadic) {
     Datum sig = variadic == null ? Nil.VALUE : Pair.List(DOT,variadic);
     for(int i = parameters.size()-1; i >= 0; --i) {
       sig = new Pair(parameters.get(i),sig);
-      if(typeNames != null) {
-        String name = typeNames.get(i);
+      if(parameterTypeNames != null) {
+        String name = parameterTypeNames.get(i);
         if(name != null) {
           sig = new Pair(new Keyword(name.substring(1)),sig);
         }
@@ -174,11 +189,11 @@ public class CompoundProcedure extends Procedure {
   public Datum signature() {
     int n = compileTime.parametersList.size();
     if(n == 1) {
-      return clauseSignature(compileTime.typeNames.get(0),compileTime.parametersList.get(0),compileTime.variadicParameterList.get(0));
+      return clauseSignature(compileTime.getParameterTypeName(0),compileTime.parametersList.get(0),compileTime.variadicParameterList.get(0));
     }
     Datum sigs = Nil.VALUE;
     for(int i = n-1; i >= 0; --i) {
-      sigs = new Pair(clauseSignature(compileTime.typeNames.get(i),compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i)),sigs);
+      sigs = new Pair(clauseSignature(compileTime.getParameterTypeName(i),compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i)),sigs);
     }
     return sigs;
   }
@@ -186,13 +201,13 @@ public class CompoundProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // Application Abstraction
-  protected String stringifyParameters(ArrayList<String> typeNames, ArrayList<Symbol> params, Symbol variadic) {
+  protected String stringifyParameters(ArrayList<String> parameterTypeNames, ArrayList<Symbol> params, Symbol variadic) {
     int n = params.size();
     if(n == 0 && variadic == null) return "expected 0 args";
     StringBuilder sb = new StringBuilder("(");
     for(int i = 0; i < n; ++i) {
-      if(typeNames != null) {
-        String name = typeNames.get(i);
+      if(parameterTypeNames != null) {
+        String name = parameterTypeNames.get(i);
         if(name != null) {
           sb.append(name);
           sb.append(" ");
@@ -212,7 +227,7 @@ public class CompoundProcedure extends Procedure {
   protected String stringifyParameterSignatures() {
     StringBuilder sb = new StringBuilder("\n>> Available Signatures:");
     for(int i = 0, n = compileTime.parametersList.size(); i < n; ++i) {
-      sb.append(String.format("\n   %2d) ", i+1) + stringifyParameters(compileTime.typeNames.get(i),compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i)));
+      sb.append(String.format("\n   %2d) ", i+1) + stringifyParameters(compileTime.getParameterTypeName(i),compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i)));
     }
     return sb.toString();
   }
@@ -227,7 +242,7 @@ public class CompoundProcedure extends Procedure {
 
   protected Environment getExtendedEnvironment(int clauseNumber, ArrayList<Datum> arguments) throws Exception {
     Environment extendedEnvironment = new Environment(definitionEnvironment);
-    ArrayList<TypeChecker.Predicate> types = compileTime.typesList.get(clauseNumber);
+    ArrayList<TypeChecker.Predicate> types = compileTime.getParameterTypes(clauseNumber);
     ArrayList<Symbol> parameters = compileTime.parametersList.get(clauseNumber);
     Symbol variadicParameter = compileTime.variadicParameterList.get(clauseNumber);
     int n = parameters.size();

@@ -409,6 +409,11 @@ public class CorePrimitives {
     // Convert 1 optional params clause into 2+ required params clauses
     private static Trampoline.Bounce getExpandedClause(Environment defEnv, Pair clause, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       PairBox optParams = new PairBox();
+
+      
+      // @TODO: NEED TO IMPLEMENT PARSING THE RETURN TYPE HERE
+
+      
       Datum reqParams = parseClauseParameters((Pair)clause.car(),optParams,parameters); // includes types
       OptionalParameterValues opt = parseOptionalParameterComponents(optParams.value);
       Pair types = (Pair)opt.types;
@@ -431,11 +436,20 @@ public class CorePrimitives {
       });
     }
 
-    // Determine if clause follows basic required syntax
+    // Determine if clause follows basic required parameter syntax
+    private static boolean isValidClauseParameter(Datum params) {
+      return params instanceof Pair || params instanceof Nil || params instanceof Symbol;
+    }
+
     private static boolean isValidClause(Datum clause) {
       if(!(clause instanceof Pair)) return false;
-      Datum params = ((Pair)clause).car();
-      return params instanceof Pair || params instanceof Nil || params instanceof Symbol || params instanceof Keyword;
+      Pair pclause = (Pair)clause;
+      Datum params = pclause.car();
+      if(params instanceof Keyword) { // return type
+        Datum rest = pclause.cdr();
+        return rest instanceof Pair && isValidClauseParameter(((Pair)rest).car());
+      }
+      return isValidClauseParameter(params);
     }
 
     // Verify the optional param is either (<name> <value>) or (<type> <name> <value>)
@@ -451,8 +465,6 @@ public class CorePrimitives {
 
     // Type-check clause & return if has any optional params
     private static boolean clauseHasOptionalParam(Datum clause, ArrayList<Datum> parameters) throws Exception {
-      if(!isValidClause(clause))
-        throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid clause %s: %s", clause.profile(), Exceptionf.profileArgs(parameters));
       Datum params = ((Pair)clause).car();
       Datum iter = params;
       if(!(params instanceof Pair)) return false;
@@ -493,6 +505,11 @@ public class CorePrimitives {
 
     // Compile a clause w/o optional parameters
     private static Trampoline.Bounce compileSingleClause(Environment defEnv, Pair clause, Trampoline.Continuation continuation) throws Exception {
+
+      
+      // @TODO: NEED TO IMPLEMENT PARSING THE RETURN TYPE HERE
+
+
       return compileClauseBody(defEnv,clause.cdr(),Nil.VALUE,(compiledBody) -> () -> {
         return continuation.run(new Pair(clause.car(),compiledBody));
       });
@@ -503,6 +520,8 @@ public class CorePrimitives {
     private static Trampoline.Bounce getExpandedClauses(Environment defEnv, ArrayList<Datum> parameters, int i, int n, Datum expandedClauses, Trampoline.Continuation continuation) throws Exception {
       if(i >= n) return continuation.run(expandedClauses);
       Datum clause = parameters.get(i);
+      if(!isValidClause(clause))
+        throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid clause %s: %s", clause.profile(), Exceptionf.profileArgs(parameters));
       if(clauseHasOptionalParam(clause,parameters)) {
         return getExpandedClause(defEnv,(Pair)clause,parameters,(expandedClause) -> () -> {
           return getExpandedClauses(defEnv,parameters,i+1,n,new Pair(expandedClause,expandedClauses),continuation);
@@ -529,15 +548,6 @@ public class CorePrimitives {
       int n = parameters.size();
       escm.type.String docstring = parseOptionalDocstring(parameters,n,0);
       int minFnSize = docstring == null ? 1 : 2;
-
-
-
-
-      // @TODO: NEED TO IMPLEMENT PARSING THE RETURN TYPE HERE (&& PASSING IT TO THE CREATED COMPOUND PROCEDURE!)
-
-
-
-
       if(n < minFnSize)
         throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) needs at least 1 body clause: %s", Exceptionf.profileArgs(parameters));
       if(docstring == null) {

@@ -181,6 +181,7 @@ public class Assembler {
       if(!(iterator instanceof Pair))
         throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
     }
+    boolean notypes = true;
     while(iterator instanceof Pair) {
       Pair iteratorPair = (Pair)iterator;
       Datum clause = iteratorPair.car();
@@ -193,7 +194,12 @@ public class Assembler {
       paramsList.add(params.names);
       variadicParamList.add(params.variadicName);
       instructionsList.add(run(clausePair.cdr()));
+      notypes = notypes && params.types == null;
       iterator = iteratorPair.cdr();
+    }
+    if(notypes) {
+      typeNamesList = null;
+      typesList = null;
     }
     return new CompoundProcedure(docstring,typeNamesList,typesList,paramsList,variadicParamList,instructionsList);
   }
