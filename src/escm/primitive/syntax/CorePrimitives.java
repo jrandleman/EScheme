@@ -638,18 +638,35 @@ public class CorePrimitives {
       return body;
     }
 
+    private static escm.util.Pair<Keyword,Datum> getReturnTypeAndParams(int n, ArrayList<Datum> parameters) throws Exception {
+      Datum first = parameters.get(0);
+      if(first instanceof Keyword) {
+        if(n < 2)
+          throw new Exceptionf("'(lambda (<param> ...) <optional-docstring> <body> ...) didn't receive (<param> ...): %s", Exceptionf.profileArgs(parameters));
+        return new escm.util.Pair<Keyword,Datum>((Keyword)first, parameters.get(1));
+      }
+      return new escm.util.Pair<Keyword,Datum>(null,first);
+    }
+
     public static Trampoline.Bounce logic(Environment defEnv, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       int n = parameters.size();
       if(n < 1)
         throw new Exceptionf("'(lambda (<param> ...) <optional-docstring> <body> ...) didn't receive (<param> ...): %s", Exceptionf.profileArgs(parameters));
-      Datum params = parameters.get(0);
-      escm.type.String docstring = Fn.parseOptionalDocstring(parameters,n,1);
-      int priorBodyIdx = docstring == null ? 0 : 1;
+      escm.util.Pair<Keyword,Datum> returnTypeAndParams = getReturnTypeAndParams(n,parameters);
+      Keyword returnType = returnTypeAndParams.first;
+      Datum params = returnTypeAndParams.second;
+      int docstringIdx = returnType == null ? 1 : 2;
+      escm.type.String docstring = Fn.parseOptionalDocstring(parameters,n,docstringIdx);
+      int priorBodyIdx = docstring == null ? docstringIdx-1 : docstringIdx;
       Datum body = getAllExpressionsAfter(parameters,priorBodyIdx);
       if(body instanceof Nil) body = new Pair(Void.VALUE,Nil.VALUE);
       parameters.clear();
       if(docstring != null) parameters.add(docstring);
-      parameters.add(new Pair(params,body));
+      if(returnType != null) {
+        parameters.add(new Pair(returnType,new Pair(params,body)));
+      } else {
+        parameters.add(new Pair(params,body));
+      }
       return Fn.logic(defEnv,parameters,continuation);
     }
     
