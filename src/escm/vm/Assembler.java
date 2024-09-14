@@ -17,6 +17,7 @@ import escm.type.Keyword;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Symbol;
+import escm.primitive.syntax.CorePrimitives;
 import escm.type.Character;
 import escm.type.number.Real;
 import escm.type.procedure.CompoundProcedure;
@@ -166,10 +167,15 @@ public class Assembler {
     if(!(instruction.cdr() instanceof Pair))
       throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
     String docstring = "";
-    // Note for <typesList>: Inner arrays may be null to denote typeless signatures, and
-    //                       individual elts may be null to denote typeless parameters.
-    ArrayList<ArrayList<TypeChecker.Predicate>> typesList = new ArrayList<ArrayList<TypeChecker.Predicate>>();
-    ArrayList<ArrayList<String>> typeNamesList = new ArrayList<ArrayList<String>>();
+    // Note for <returnTypeList> & <returnTypeNameList>:
+    //   Individual elts may be null to denote typeless return values.
+    ArrayList<TypeChecker.Predicate> returnTypeList = new ArrayList<TypeChecker.Predicate>();
+    ArrayList<String> returnTypeNameList = new ArrayList<String>();
+    // Note for <typesList>, <typeNamesList>: 
+    //   Inner arrays may be null to denote typeless signatures, and
+    //   individual elts may be null to denote typeless parameters.
+    ArrayList<ArrayList<TypeChecker.Predicate>> typesLists = new ArrayList<ArrayList<TypeChecker.Predicate>>();
+    ArrayList<ArrayList<String>> typeNamesLists = new ArrayList<ArrayList<String>>();
     ArrayList<ArrayList<Symbol>> paramsList = new ArrayList<ArrayList<Symbol>>();
     ArrayList<Symbol> variadicParamList = new ArrayList<Symbol>();
     ArrayList<ArrayList<Instruction>> instructionsList = new ArrayList<ArrayList<Instruction>>();
@@ -181,27 +187,55 @@ public class Assembler {
       if(!(iterator instanceof Pair))
         throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
     }
-    boolean notypes = true;
+    boolean noReturnTypes = true;
+    boolean noParameterTypes = true;
     while(iterator instanceof Pair) {
       Pair iteratorPair = (Pair)iterator;
-      Datum clause = iteratorPair.car();
+      escm.util.Pair<Keyword,Datum> returnTypeAndClause = CorePrimitives.Fn.analyzeClause(iteratorPair.car());
+      if(returnTypeAndClause == null)
+        throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
+      // Account for return type
+      Keyword returnType = returnTypeAndClause.first; // <null> if no return type
+      if(returnType == null) {
+        returnTypeNameList.add(null);
+        returnTypeList.add(null);
+      } else {
+        returnTypeNameList.add(returnType.display());
+        returnTypeList.add(TypeChecker.getPredicate(returnType));
+      }
+      noReturnTypes = noReturnTypes && returnType == null;
+      // Account for parameters and body
+      Datum clause = returnTypeAndClause.second;
       if(!(clause instanceof Pair))
         throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax!", instruction.profile());
       Pair clausePair = (Pair)clause;
       SyntaxParameterComponents params = parseSyntaxParameters(instruction,clausePair.car());
-      typeNamesList.add(params.typeNames);
-      typesList.add(params.types);
+      typeNamesLists.add(params.typeNames);
+      typesLists.add(params.types);
       paramsList.add(params.names);
       variadicParamList.add(params.variadicName);
       instructionsList.add(run(clausePair.cdr()));
-      notypes = notypes && params.types == null;
+      noParameterTypes = noParameterTypes && params.types == null;
       iterator = iteratorPair.cdr();
     }
-    if(notypes) {
-      typeNamesList = null;
-      typesList = null;
+    if(noReturnTypes) {
+      returnTypeNameList = null;
+      returnTypeList = null;
     }
-    return new CompoundProcedure(docstring,typeNamesList,typesList,paramsList,variadicParamList,instructionsList);
+    if(noParameterTypes) {
+      typeNamesLists = null;
+      typesLists = null;
+    }
+    return new CompoundProcedure(
+      docstring,
+      returnTypeNameList,
+      returnTypeList,
+      typeNamesLists,
+      typesLists,
+      paramsList,
+      variadicParamList,
+      instructionsList
+    );
   }
 
 

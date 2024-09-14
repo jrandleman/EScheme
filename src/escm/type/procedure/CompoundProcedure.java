@@ -50,30 +50,56 @@ public class CompoundProcedure extends Procedure {
   // Internal compound procedure fields
   protected static class CompileTime implements Serializable {
     public String docstring;
-    // For <parameterTypeNames> & <parameterTypesList>:
-    //   * "parameterTypeNames == null" => no bodies have types
-    //   * "parameterTypeNames[i] != null" => ith body has no types
-    //   * "parameterTypeNames[i][j] == null" => ith body's jth parameter is the ":any" type
-    private ArrayList<ArrayList<String>> parameterTypeNames;
-    private ArrayList<ArrayList<TypeChecker.Predicate>> parameterTypesList;
+    // For <returnTypeNamesLists> & <returnTypeLists>:
+    //   * "returnTypeNamesLists == null" => no bodies have return types
+    //   * "returnTypeNamesLists[i] == null" => ith body has no return type
+    private ArrayList<String> returnTypeNamesLists;
+    private ArrayList<TypeChecker.Predicate> returnTypeLists;
+    // For <parameterTypeNamesLists> & <parameterTypesLists>:
+    //   * "parameterTypeNamesLists == null" => no bodies have types
+    //   * "parameterTypeNamesLists[i] == null" => ith body has no types
+    //   * "parameterTypeNamesLists[i][j] == null" => ith body's jth parameter has no type
+    private ArrayList<ArrayList<String>> parameterTypeNamesLists;
+    private ArrayList<ArrayList<TypeChecker.Predicate>> parameterTypesLists;
     public ArrayList<ArrayList<Symbol>> parametersList;
     public ArrayList<Symbol> variadicParameterList; // <null> indicates non-variadic
     public ArrayList<ArrayList<Instruction>> bodyList;
 
     public ArrayList<String> getParameterTypeName(int index) {
-      if(parameterTypeNames == null) return null;
-      return parameterTypeNames.get(index);
+      if(parameterTypeNamesLists == null) return null;
+      return parameterTypeNamesLists.get(index);
     }
 
     public ArrayList<TypeChecker.Predicate> getParameterTypes(int index) {
-      if(parameterTypesList == null) return null;
-      return parameterTypesList.get(index);
+      if(parameterTypesLists == null) return null;
+      return parameterTypesLists.get(index);
     }
 
-    public CompileTime(String docstring, ArrayList<ArrayList<String>> parameterTypeNames, ArrayList<ArrayList<TypeChecker.Predicate>> parameterTypesList, ArrayList<ArrayList<Symbol>> parametersList, ArrayList<Symbol> variadicParameterList, ArrayList<ArrayList<Instruction>> bodyList) {
-      this.parameterTypeNames = parameterTypeNames;
+    public String getReturnTypeName(int index) {
+      if(returnTypeNamesLists == null) return null;
+      return returnTypeNamesLists.get(index);
+    }
+
+    public TypeChecker.Predicate getReturnType(int index) {
+      if(returnTypeLists == null) return null;
+      return returnTypeLists.get(index);
+    }
+
+    public CompileTime(
+      String docstring, 
+      ArrayList<String> returnTypeNames, // @TODO: USE THIS WHEN PRINTING SIGNATURES!
+      ArrayList<TypeChecker.Predicate> returnTypeLists, 
+      ArrayList<ArrayList<String>> parameterTypeNames, 
+      ArrayList<ArrayList<TypeChecker.Predicate>> parameterTypesList, 
+      ArrayList<ArrayList<Symbol>> parametersList, 
+      ArrayList<Symbol> variadicParameterList, 
+      ArrayList<ArrayList<Instruction>> bodyList
+    ) {
       this.docstring = docstring;
-      this.parameterTypesList = parameterTypesList;
+      this.returnTypeNamesLists = returnTypeNames;
+      this.returnTypeLists = returnTypeLists;
+      this.parameterTypeNamesLists = parameterTypeNames;
+      this.parameterTypesLists = parameterTypesList;
       this.parametersList = parametersList;
       this.variadicParameterList = variadicParameterList;
       this.bodyList = bodyList;
@@ -88,6 +114,8 @@ public class CompoundProcedure extends Procedure {
   // Constructor
   public CompoundProcedure(
     String docstring, 
+    ArrayList<String> returnTypeNames, 
+    ArrayList<TypeChecker.Predicate> returnTypeLists, 
     ArrayList<ArrayList<String>> parameterTypeNames,
     ArrayList<ArrayList<TypeChecker.Predicate>> parameterTypesList, 
     ArrayList<ArrayList<Symbol>> parametersList, 
@@ -96,6 +124,8 @@ public class CompoundProcedure extends Procedure {
   ) {
     this.compileTime = new CompileTime(
       DocString.format(docstring),
+      returnTypeNames,
+      returnTypeLists,
       parameterTypeNames,
       parameterTypesList,
       parametersList,
@@ -274,11 +304,27 @@ public class CompoundProcedure extends Procedure {
   protected Trampoline.Bounce callTheFunction(int i, Environment extendedEnvironment, Trampoline.Continuation continuation) throws Exception {
     EscmCallStack.Frame originalCallStack = EscmCallStack.currentStackFrame();
     EscmCallStack.push(readableName(),invocationSource);
-    Trampoline.Continuation popContinuation = (value) -> () -> {
-      EscmCallStack.restore(originalCallStack);
-      return continuation.run(value);
-    };
-    return Interpreter.run(new ExecutionState(extendedEnvironment,compileTime.bodyList.get(i)),popContinuation);
+    TypeChecker.Predicate returnType = compileTime.getReturnType(i);
+    String returnTypeName = compileTime.getReturnTypeName(i);
+    if(returnType == null) {
+      return Interpreter.run(new ExecutionState(extendedEnvironment,compileTime.bodyList.get(i)),(value) -> () -> {
+        EscmCallStack.restore(originalCallStack);
+        return continuation.run(value);
+      });
+    } else {
+      return Interpreter.run(new ExecutionState(extendedEnvironment,compileTime.bodyList.get(i)),(value) -> () -> {
+        if(!returnType.check(definitionEnvironment,value)) {
+          throw new Exceptionf(
+            "Procedure %s invalid return: type %s is not satisfied by %s", 
+            readableName(), 
+            returnTypeName, 
+            value.profile()
+          );
+        }
+        EscmCallStack.restore(originalCallStack);
+        return continuation.run(value);
+      });
+    }
   }
 
 

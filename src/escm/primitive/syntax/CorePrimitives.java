@@ -367,12 +367,13 @@ public class CorePrimitives {
     }
 
     // Generate series of compiled <define> expansions to convert 1 optional-param clause into 2+ required-param clauses
-    private static Trampoline.Bounce generateClauseDefineSequences(Environment defEnv, Datum reqParams, Pair optTypes, Pair optNames, Pair optDefs, Datum compiledBody, int totalOptionalParams, int i, Datum expandedClauses, Trampoline.Continuation continuation) throws Exception {
+    private static Trampoline.Bounce generateClauseDefineSequences(Environment defEnv, Keyword returnType, Datum reqParams, Pair optTypes, Pair optNames, Pair optDefs, Datum compiledBody, int totalOptionalParams, int i, Datum expandedClauses, Trampoline.Continuation continuation) throws Exception {
       if(i < 0) return continuation.run(expandedClauses);
       if(i == totalOptionalParams) {
         Datum params = Pair.binaryAppend(reqParams,interweave(optTypes,optNames));
         return generateClauseDefineSequences(
           defEnv,
+          returnType,
           reqParams,
           optTypes,
           optNames,
@@ -380,7 +381,9 @@ public class CorePrimitives {
           compiledBody,
           totalOptionalParams,
           i-(optNames.length()==Pair.DOTTED_LIST_LENGTH ? 2 : 1),
-          new Pair(new Pair(params,compiledBody),expandedClauses),
+          (returnType == null 
+              ? new Pair(new Pair(params,compiledBody),expandedClauses)
+              : new Pair(new Pair(returnType,new Pair(params,compiledBody)),expandedClauses)),
           continuation);
       } else {
         Datum params = Pair.binaryAppend(
@@ -393,6 +396,7 @@ public class CorePrimitives {
         return compileClauseBody(defEnv,(Datum)optDefs.slice(i),Nil.VALUE,(compiledDefines) -> () -> {
           return generateClauseDefineSequences(
             defEnv,
+            returnType,
             reqParams,
             optTypes,
             optNames,
@@ -400,20 +404,17 @@ public class CorePrimitives {
             compiledBody,
             totalOptionalParams,
             i-1,
-            new Pair(new Pair(params,Pair.binaryAppend(compiledDefines,compiledBody)),expandedClauses),
+            (returnType == null 
+              ? new Pair(new Pair(params,Pair.binaryAppend(compiledDefines,compiledBody)),expandedClauses)
+              : new Pair(new Pair(returnType,new Pair(params,Pair.binaryAppend(compiledDefines,compiledBody))),expandedClauses)),
             continuation);
         });
       }
     }
 
     // Convert 1 optional params clause into 2+ required params clauses
-    private static Trampoline.Bounce getExpandedClause(Environment defEnv, Pair clause, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+    private static Trampoline.Bounce getExpandedClause(Environment defEnv, Keyword returnType, Pair clause, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
       PairBox optParams = new PairBox();
-
-      
-      // @TODO: NEED TO IMPLEMENT PARSING THE RETURN TYPE HERE
-
-      
       Datum reqParams = parseClauseParameters((Pair)clause.car(),optParams,parameters); // includes types
       OptionalParameterValues opt = parseOptionalParameterComponents(optParams.value);
       Pair types = (Pair)opt.types;
@@ -423,6 +424,7 @@ public class CorePrimitives {
       return compileClauseBody(defEnv,getClauseBody(clause.cdr()),Nil.VALUE,(compiledBody) -> () -> {
         return generateClauseDefineSequences(
           defEnv,
+          returnType,
           reqParams,
           types,
           names,
@@ -441,15 +443,21 @@ public class CorePrimitives {
       return params instanceof Pair || params instanceof Nil || params instanceof Symbol;
     }
 
-    private static boolean isValidClause(Datum clause) {
-      if(!(clause instanceof Pair)) return false;
+    // Returns {type, clause}, or <null> for an invalid clause
+    public static escm.util.Pair<Keyword,Datum> analyzeClause(Datum clause) {
+      if(!(clause instanceof Pair)) return null;
       Pair pclause = (Pair)clause;
       Datum params = pclause.car();
       if(params instanceof Keyword) { // return type
+        Keyword type = (Keyword)params;
         Datum rest = pclause.cdr();
-        return rest instanceof Pair && isValidClauseParameter(((Pair)rest).car());
+        if(rest instanceof Pair && isValidClauseParameter(((Pair)rest).car()))
+          return new escm.util.Pair<Keyword,Datum>(type,rest);
+        return null;
       }
-      return isValidClauseParameter(params);
+      if(isValidClauseParameter(params))
+        return new escm.util.Pair<Keyword,Datum>(null,clause);
+      return null;
     }
 
     // Verify the optional param is either (<name> <value>) or (<type> <name> <value>)
@@ -504,15 +512,16 @@ public class CorePrimitives {
     }
 
     // Compile a clause w/o optional parameters
-    private static Trampoline.Bounce compileSingleClause(Environment defEnv, Pair clause, Trampoline.Continuation continuation) throws Exception {
-
-      
-      // @TODO: NEED TO IMPLEMENT PARSING THE RETURN TYPE HERE
-
-
-      return compileClauseBody(defEnv,clause.cdr(),Nil.VALUE,(compiledBody) -> () -> {
-        return continuation.run(new Pair(clause.car(),compiledBody));
-      });
+    private static Trampoline.Bounce compileSingleClause(Environment defEnv, Keyword returnType, Pair clause, Trampoline.Continuation continuation) throws Exception {
+      if(returnType == null) {
+        return compileClauseBody(defEnv,clause.cdr(),Nil.VALUE,(compiledBody) -> () -> {  
+          return continuation.run(new Pair(clause.car(),compiledBody));
+        });
+      } else {
+        return compileClauseBody(defEnv,clause.cdr(),Nil.VALUE,(compiledBody) -> () -> {  
+          return continuation.run(new Pair(returnType,new Pair(clause.car(),compiledBody)));
+        });
+      }
     }
 
     // Convert all of the function's clauses w/ optional params to clauses w/ required params.
@@ -520,14 +529,17 @@ public class CorePrimitives {
     private static Trampoline.Bounce getExpandedClauses(Environment defEnv, ArrayList<Datum> parameters, int i, int n, Datum expandedClauses, Trampoline.Continuation continuation) throws Exception {
       if(i >= n) return continuation.run(expandedClauses);
       Datum clause = parameters.get(i);
-      if(!isValidClause(clause))
+      escm.util.Pair<Keyword,Datum> returnTypeAndClause = analyzeClause(clause);
+      if(returnTypeAndClause == null)
         throw new Exceptionf("'(fn <optional-docstring> ((<param> ...) <body> ...) ...) invalid clause %s: %s", clause.profile(), Exceptionf.profileArgs(parameters));
-      if(clauseHasOptionalParam(clause,parameters)) {
-        return getExpandedClause(defEnv,(Pair)clause,parameters,(expandedClause) -> () -> {
+      Keyword returnType = returnTypeAndClause.first;
+      Pair typedClause = (Pair)returnTypeAndClause.second;
+      if(clauseHasOptionalParam(typedClause,parameters)) {
+        return getExpandedClause(defEnv,returnType,typedClause,parameters,(expandedClause) -> () -> {
           return getExpandedClauses(defEnv,parameters,i+1,n,new Pair(expandedClause,expandedClauses),continuation);
         });
       } else {
-        return compileSingleClause(defEnv,(Pair)clause,(compiledClause) -> () -> {
+        return compileSingleClause(defEnv,returnType,typedClause,(compiledClause) -> () -> {
           return getExpandedClauses(defEnv,parameters,i+1,n,new Pair(Pair.List(compiledClause),expandedClauses),continuation);
         });
       }
