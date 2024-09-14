@@ -583,7 +583,8 @@ public class CorePrimitives {
   // (lambda (<param> ...) <optional-docstring> <body> ...)
   //   => NOTE: Supports optional parameters via "(<param> <dflt-value>)" syntax
   //
-  // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>.
+  // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>,
+  //       nor parsing keyword types.
   // =====
   //
   // (define-syntax lambda
@@ -870,7 +871,7 @@ public class CorePrimitives {
   // (define (<function-name> <param> ...) <optional-docstring> <body> ...)
   //
   // NOTE: The EScheme code below doesn't account for parsing <optional-docstring>,
-  //       nor multiple variable bindings.
+  //       nor multiple variable bindings, nor parsing keyword types.
   //
   //       For a multiple variable bindings example,
   //
@@ -929,13 +930,21 @@ public class CorePrimitives {
     }
 
     private Trampoline.Bounce compileProcedureDefine(Datum bindings, int n, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      Keyword returnType = null;
+      if(bindings instanceof Keyword) {
+        if(n < 2)
+          throw new Exceptionf("'(define (<function-name> <param> ...) <body> ...) invalid syntax: %s", Exceptionf.profileArgs(parameters));
+        returnType = (Keyword)bindings;
+        bindings = parameters.get(1);
+      }
       if(!(bindings instanceof Pair))
         throw new Exceptionf("'(define (<function-name> <param> ...) <body> ...) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       Pair bindingsPair = (Pair)bindings;
       Datum functionName = bindingsPair.car();
       if(!(functionName instanceof Symbol))
         throw new Exceptionf("'(define (<function-name> <param> ...) <body> ...) <function-name> isn't a symbol: %s", Exceptionf.profileArgs(parameters));
-      parameters.set(0,bindingsPair.cdr());
+      int bindingsIdx = returnType == null ? 0 : 1;
+      parameters.set(bindingsIdx,bindingsPair.cdr());
       return Lambda.logic(this.definitionEnvironment,parameters,(expandedLambda) -> () -> {
         return continuation.run(Pair.binaryAppend(expandedLambda,Pair.List(Pair.List(DEFINE,functionName))));
       });
