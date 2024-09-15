@@ -58,7 +58,7 @@ public class ObjectPrimitives {
   //       pre-bind our method names upon initial class construction, rather than
   //       only later when we bind a symbol to the class object in the environment. 
   //       * This allows us to reduce the number of method allocations by half!
-  //       It also doesn't parse <optional-docstring>.
+  //       It also doesn't parse <optional-docstring>, nor keyword types.
   //
   //
   // ; Returns the super object if exists, else #f 
@@ -291,13 +291,42 @@ public class ObjectPrimitives {
 
     // Return whether the property (stripped of :static) is an inlined method
     public static boolean isInlinedMethod(Datum property) {
-      return property instanceof Pair && ((Pair)property).car() instanceof Pair;
+      if(!(property instanceof Pair)) return false;
+      Pair pproperty = (Pair)property;
+      Datum first = pproperty.car();
+      if(first instanceof Pair) return true; // immediately found parameters, no return type!
+      Datum rest = pproperty.cdr();
+      return first instanceof Keyword && rest instanceof Pair && ((Pair)rest).car() instanceof Pair;
     }
 
     // Given an inlined method property (stripped of :static), returns it expanded as a lambda property
+    private static class InlinedMethodComponents {
+      public Keyword returnType = null;
+      public Pair bindings = null;
+      public Datum body = null;
+      public InlinedMethodComponents(Keyword returnType, Pair bindings, Datum body) {
+        this.returnType = returnType;
+        this.bindings = bindings;
+        this.body = body;
+      }
+    }
+
+    private static InlinedMethodComponents getReturnTypeAndParams(Pair inlinedMethodProperty) {
+      Datum first = inlinedMethodProperty.car();
+      if(first instanceof Pair) 
+        return new InlinedMethodComponents(null,(Pair)first,inlinedMethodProperty.cdr());
+      Pair rest = (Pair)inlinedMethodProperty.cdr();
+      return new InlinedMethodComponents((Keyword)first,(Pair)rest.car(),rest.cdr());
+    }
+
     public static Datum expandInlinedMethod(Pair inlinedMethodProperty) {
-      Pair bindings = (Pair)inlinedMethodProperty.car();
-      return Pair.List(bindings.car(),new Pair(CorePrimitives.LAMBDA,new Pair(bindings.cdr(),inlinedMethodProperty.cdr())));
+      InlinedMethodComponents method = getReturnTypeAndParams(inlinedMethodProperty);
+      if(method.returnType == null) {
+        return Pair.List(method.bindings.car(),
+          new Pair(CorePrimitives.LAMBDA,new Pair(method.bindings.cdr(),method.body)));
+      }
+      return Pair.List(method.bindings.car(),
+        new Pair(CorePrimitives.LAMBDA,new Pair(method.returnType,new Pair(method.bindings.cdr(),method.body))));
     }
 
     // Determine if the given property is static

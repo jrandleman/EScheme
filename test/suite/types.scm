@@ -307,7 +307,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; LAMBDA SUPPORT (can't check failed type match due to fatal error)
+;; LAMBDA PARAMETER SUPPORT (can't check failed type match due to fatal error)
 ; Required parameters
 (ut ((lambda (:int x) x) 42) 42)
 (ut ((lambda (:int x :string y) x) 42 "42") 42)
@@ -335,7 +335,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; FN SUPPORT
+;; FN PARAMETER SUPPORT
 ; Required parameters
 (ut ((fn ((:int x) x) ((:any x) #f)) 42) 42)
 (ut ((fn ((:int x) x) ((:any x) #f)) "42") #f)
@@ -373,7 +373,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; DEFINE SUPPORT (inline procedure syntax)
+;; DEFINE PARAMETER SUPPORT (inline procedure syntax)
 ; Required parameters
 (ut ((begin (define (test-function :int x) x) test-function) 42) 42)
 (ut ((begin (define (test-function :int x :string y) x) test-function) 42 "42") 42)
@@ -401,7 +401,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; DEFN SUPPORT
+;; DEFN PARAMETER SUPPORT
 ; Required parameters
 (ut ((begin (defn test-function ((:int x) x) ((:any x) #f)) test-function) 42) 42)
 (ut ((begin (defn test-function ((:int x) x) ((:any x) #f)) test-function) "42") #f)
@@ -439,7 +439,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; DEFINE-GENERATOR SUPPORT
+;; DEFINE-GENERATOR PARAMETER SUPPORT
 ; Required parameters
 (ut (((begin (define-generator (test-function :int x) x) test-function) 42)) 42)
 (ut (((begin (define-generator (test-function :int x :string y) x) test-function) 42 "42")) 42)
@@ -467,7 +467,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CURRY SUPPORT (can't check failed type match due to fatal error)
+;; CURRY PARAMETER SUPPORT (can't check failed type match due to fatal error)
 (ut ((curry (:int a) a) 42) 42)
 (ut ((curry (:int a :string b :key c) c) 42 "hi" :key) :key)
 (ut (((curry (:int a :string b :key c) c) 42) "hi" :key) :key)
@@ -476,7 +476,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CLASS METHOD SUPPORT (instance and static methods)
+;; CLASS METHOD PARAMETER SUPPORT (instance and static methods)
 (define-class TestClass
   ((method1 :int a) a)
   ((method2 :int a . xs) xs)
@@ -512,7 +512,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; INTERFACE METHOD SUPPORT (static methods)
+;; INTERFACE PARAMETER METHOD SUPPORT (static methods)
 (define-interface TestInterface
   (:static (method1 :int a) a)
   (:static (method2 :int a . xs) xs)
@@ -521,6 +521,106 @@
   (:static (method5 (:int a 314) (:string b "hi")) b)
   (:static (method6 :key z (:int a 314)) a)
   (:static (method7 :key z (:int a 314) (:string b "hi")) b))
+
+(ut (TestInterface.method1 42) 42)
+(ut (TestInterface.method2 42 1 2 3) '(1 2 3))
+(ut (TestInterface.method3 42 "hello") "hello")
+(ut (TestInterface.method4) 314)
+(ut (TestInterface.method5 42) "hi")
+(ut (TestInterface.method6 :hi) 314)
+(ut (TestInterface.method7 :hi 42) "hi")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; FN RETURN SUPPORT
+(ut ((fn (:int () 42))) 42)
+(ut ((fn "docstring" (:int () 42))) 42)
+(ut ((fn (:int () 42) (:string (x) x)) "hello") "hello")
+(ut ((fn "docstring" (:int () 42) (:string (x) x)) "hello") "hello")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DEFN RETURN SUPPORT
+(ut ((begin (defn test-function (:int () 42)) test-function)) 42)
+(ut ((begin (defn test-function "docstring" (:int () 42)) test-function)) 42)
+(ut ((begin (defn test-function (:int () 42) (:string (x) x)) test-function) "hello") "hello")
+(ut ((begin (defn test-function "docstring" (:int () 42) (:string (x) x)) test-function) "hello") "hello")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LAMBDA RETURN SUPPORT
+(ut ((lambda :int () 42)) 42)
+(ut ((lambda :int () "docstring" 42)) 42)
+(ut ((lambda :string (x) x) "hello") "hello")
+(ut ((lambda :string (x) "docstring" x) "hello") "hello")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DEFINE RETURN SUPPORT (inline procedure syntax)
+(ut ((begin (define :int (test-function) 42) test-function)) 42)
+(ut ((begin (define :int (test-function) "docstring" 42) test-function)) 42)
+(ut ((begin (define :string (test-function x) x) test-function) "hello") "hello")
+(ut ((begin (define :string (test-function x) "docstring" x) test-function) "hello") "hello")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CURRY RETURN SUPPORT (only type-checks once all parameters are given)
+(ut ((curry :int () 42)) 42)
+(ut ((curry :int () "docstring" 42)) 42)
+(ut ((curry :int (a) a) 42) 42)
+(ut ((curry :int (a) "docstring" a) 42) 42)
+(ut ((curry :int (a b) b) 42 314) 314)
+(ut ((curry :int (a b) "docstring" b) 42 314) 314)
+(ut (((curry :int (a b) b) 42) 314) 314)
+(ut (((curry :int (a b) "docstring" b) 42) 314) 314)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CLASS METHOD RETURN SUPPORT (instance and static methods)
+(define-class TestClass
+  (:int (method1 a) a)
+  (:list (method2 :int a . xs) xs)
+  (:string (method3 a b) b)
+  (:int (method4 (a 314)) a)
+  (:string (method5 (a 314) (b "hi")) b)
+  (:int (method6 z (a 314)) a)
+  (:string (method7 z (a 314) (b "hi")) b)
+  (:static :int (method1 a) a)
+  (:static :list (method2 a . xs) xs)
+  (:static :string (method3 a b) b)
+  (:static :int (method4 (a 314)) a)
+  (:static :string (method5 (a 314) (b "hi")) b)
+  (:static :int (method6 z (a 314)) a)
+  (:static :string (method7 z (a 314) (b "hi")) b))
+
+(def testObj (TestClass))
+
+(ut (testObj.method1 42) 42)
+(ut (testObj.method2 42 1 2 3) '(1 2 3))
+(ut (testObj.method3 42 "hello") "hello")
+(ut (testObj.method4) 314)
+(ut (testObj.method5 42) "hi")
+(ut (testObj.method6 :hi) 314)
+(ut (testObj.method7 :hi 42) "hi")
+(ut (TestClass.method1 42) 42)
+(ut (TestClass.method2 42 1 2 3) '(1 2 3))
+(ut (TestClass.method3 42 "hello") "hello")
+(ut (TestClass.method4) 314)
+(ut (TestClass.method5 42) "hi")
+(ut (TestClass.method6 :hi) 314)
+(ut (TestClass.method7 :hi 42) "hi")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; INTERFACE RETURN METHOD SUPPORT (static methods)
+(define-interface TestInterface
+  (:static :int (method1 a) a)
+  (:static :list (method2 a . xs) xs)
+  (:static :string (method3 a b) b)
+  (:static :int (method4 (a 314)) a)
+  (:static :string (method5 (a 314) (b "hi")) b)
+  (:static :int (method6 z (a 314)) a)
+  (:static :string (method7 z (a 314) (b "hi")) b))
 
 (ut (TestInterface.method1 42) 42)
 (ut (TestInterface.method2 42 1 2 3) '(1 2 3))
