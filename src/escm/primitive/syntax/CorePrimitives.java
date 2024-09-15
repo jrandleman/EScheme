@@ -639,21 +639,22 @@ public class CorePrimitives {
       return body;
     }
 
-    private static escm.util.Pair<Keyword,Datum> getReturnTypeAndParams(int n, ArrayList<Datum> parameters) throws Exception {
+    public static escm.util.Pair<Keyword,Datum> getReturnTypeAndParams(int n, ArrayList<Datum> parameters, String errorMessage) throws Exception {
       Datum first = parameters.get(0);
       if(first instanceof Keyword) {
         if(n < 2)
-          throw new Exceptionf("'(lambda (<param> ...) <optional-docstring> <body> ...) didn't receive (<param> ...): %s", Exceptionf.profileArgs(parameters));
+          throw new Exceptionf(errorMessage, Exceptionf.profileArgs(parameters));
         return new escm.util.Pair<Keyword,Datum>((Keyword)first, parameters.get(1));
       }
       return new escm.util.Pair<Keyword,Datum>(null,first);
     }
 
     public static Trampoline.Bounce logic(Environment defEnv, ArrayList<Datum> parameters, Trampoline.Continuation continuation) throws Exception {
+      String lambdaErrorMessage = "'(lambda (<param> ...) <optional-docstring> <body> ...) didn't receive (<param> ...): %s";
       int n = parameters.size();
       if(n < 1)
-        throw new Exceptionf("'(lambda (<param> ...) <optional-docstring> <body> ...) didn't receive (<param> ...): %s", Exceptionf.profileArgs(parameters));
-      escm.util.Pair<Keyword,Datum> returnTypeAndParams = getReturnTypeAndParams(n,parameters);
+        throw new Exceptionf(lambdaErrorMessage, Exceptionf.profileArgs(parameters));
+      escm.util.Pair<Keyword,Datum> returnTypeAndParams = getReturnTypeAndParams(n,parameters,lambdaErrorMessage);
       Keyword returnType = returnTypeAndParams.first;
       Datum params = returnTypeAndParams.second;
       int docstringIdx = returnType == null ? 1 : 2;
@@ -2249,23 +2250,34 @@ public class CorePrimitives {
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      String curryErrorMessage = "'(curry (<param> ...) <body> ...) invalid syntax: %s";
       int n = parameters.size();
       if(n < 1)
-        throw new Exceptionf("'(curry (<param> ...) <body> ...) invalid syntax: %s", Exceptionf.profileArgs(parameters));
-      Datum params = parameters.get(0);
-      escm.type.String docstring = Fn.parseOptionalDocstring(parameters,n,1);
-      int priorBodyIdx = docstring == null ? 0 : 1;
+        throw new Exceptionf(curryErrorMessage, Exceptionf.profileArgs(parameters));
+      escm.util.Pair<Keyword,Datum> returnTypeAndParams = Lambda.getReturnTypeAndParams(n,parameters,curryErrorMessage);
+      Keyword returnType = returnTypeAndParams.first;
+      Datum params = returnTypeAndParams.second;
+      int docstringIdx = returnType == null ? 1 : 2;
+      escm.type.String docstring = Fn.parseOptionalDocstring(parameters,n,docstringIdx);
+      int priorBodyIdx = docstring == null ? docstringIdx-1 : docstringIdx;
       Datum body = Lambda.getAllExpressionsAfter(parameters,priorBodyIdx);
       Symbol curriedLambdas = UniqueSymbol.generate("curry-lambdas");
       Symbol x = UniqueSymbol.generate("curry-x");
       Symbol xs = UniqueSymbol.generate("curry-xs");
       if(!(params instanceof Pair)) {
         if(docstring != null) body = new Pair(docstring,body);
-        return new Pair(LAMBDA,new Pair(Nil.VALUE,body));
+        if(returnType == null)
+          return new Pair(LAMBDA,new Pair(Nil.VALUE,body));
+        return new Pair(LAMBDA,new Pair(returnType,new Pair(Nil.VALUE,body)));
       } 
       Pair paramsPair = (Pair)params;
       if(isLastParameter(paramsPair)) {
-        Datum foldExpr = Pair.List(FOLD,Pair.List(LAMBDA,FA,FA),new Pair(LAMBDA,new Pair(params,body)),Pair.List(CONS,x,xs));
+        Datum foldExpr = null;
+        if(returnType == null) {
+          foldExpr = Pair.List(FOLD,Pair.List(LAMBDA,FA,FA),new Pair(LAMBDA,new Pair(params,body)),Pair.List(CONS,x,xs)); 
+        } else {
+          foldExpr = Pair.List(FOLD,Pair.List(LAMBDA,FA,FA),new Pair(LAMBDA,new Pair(returnType,new Pair(params,body))),Pair.List(CONS,x,xs));
+        }
         if(docstring != null) {
           return Pair.List(LAMBDA,new Pair(x,xs),docstring,foldExpr);
         } else {
@@ -2274,16 +2286,30 @@ public class CorePrimitives {
       } else {
         Datum foldExpr = Pair.List(FOLD,Pair.List(LAMBDA,FA,FA),curriedLambdas,Pair.List(CONS,x,xs));
         if(docstring != null) {
+          if(returnType == null) {
+            return Pair.List(LET,
+              Pair.List(Pair.List(
+                curriedLambdas,
+                Pair.List(LAMBDA,firstParameter(paramsPair),new Pair(CURRY,new Pair(restParameters(paramsPair),new Pair(docstring,body)))))),
+              Pair.List(LAMBDA,new Pair(x,xs),docstring,foldExpr));
+          }
           return Pair.List(LET,
             Pair.List(Pair.List(
               curriedLambdas,
-              Pair.List(LAMBDA,firstParameter(paramsPair),new Pair(CURRY,new Pair(restParameters(paramsPair),new Pair(docstring,body)))))),
+              Pair.List(LAMBDA,firstParameter(paramsPair),new Pair(CURRY,new Pair(returnType,new Pair(restParameters(paramsPair),new Pair(docstring,body))))))),
             Pair.List(LAMBDA,new Pair(x,xs),docstring,foldExpr));
         } else {
+          if(returnType == null) {
+            return Pair.List(LET,
+              Pair.List(Pair.List(
+                curriedLambdas,
+                Pair.List(LAMBDA,firstParameter(paramsPair),new Pair(CURRY,new Pair(restParameters(paramsPair),body))))),
+              Pair.List(LAMBDA,new Pair(x,xs),foldExpr));
+          }
           return Pair.List(LET,
             Pair.List(Pair.List(
               curriedLambdas,
-              Pair.List(LAMBDA,firstParameter(paramsPair),new Pair(CURRY,new Pair(restParameters(paramsPair),body))))),
+              Pair.List(LAMBDA,firstParameter(paramsPair),new Pair(CURRY,new Pair(returnType,new Pair(restParameters(paramsPair),body)))))),
             Pair.List(LAMBDA,new Pair(x,xs),foldExpr));
         }
       }

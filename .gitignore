@@ -1,7 +1,6 @@
 
 .DS_Store
 doc/TODO.md
-test/parallel-main.scm
 installer/speed-test.scm
 installer/typed-speed-test.scm
 installer/cleanup.sh
