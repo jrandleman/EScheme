@@ -578,14 +578,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CLASS METHOD RETURN SUPPORT (instance and static methods)
 (define-class TestClass
-  (:int (method1 a) a)
+  (:int (method1 a) "docstring" a)
   (:list (method2 :int a . xs) xs)
   (:string (method3 a b) b)
   (:int (method4 (a 314)) a)
   (:string (method5 (a 314) (b "hi")) b)
   (:int (method6 z (a 314)) a)
   (:string (method7 z (a 314) (b "hi")) b)
-  (:static :int (method1 a) a)
+  (:static :int (method1 a) "docstring" a)
   (:static :list (method2 a . xs) xs)
   (:static :string (method3 a b) b)
   (:static :int (method4 (a 314)) a)
@@ -614,7 +614,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INTERFACE RETURN METHOD SUPPORT (static methods)
 (define-interface TestInterface
-  (:static :int (method1 a) a)
+  (:static :int (method1 a) "docstring" a)
   (:static :list (method2 a . xs) xs)
   (:static :string (method3 a b) b)
   (:static :int (method4 (a 314)) a)

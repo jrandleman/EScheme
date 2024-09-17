@@ -157,13 +157,9 @@ public class GeneratorPrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(
-        Pair.List(new Symbol("define-generator"),
-          Pair.List(new Symbol("<generator-name>"), new Symbol("<parameter>"),Signature.VARIADIC),
-          new Symbol("<body>"),Signature.VARIADIC),
-        Pair.List(new Symbol("define-generator"),
-          Pair.List(new Symbol("<generator-name>"), new Symbol("<parameter>"),Signature.VARIADIC),
-          new Symbol("<docstring>"),new Symbol("<body>"),Signature.VARIADIC));
+      return Pair.List(new Symbol("define-generator"),
+        Pair.List(new Symbol("<generator-name>"), new Symbol("<parameter>"),Signature.VARIADIC),
+        new Symbol("<optional-docstring>"),new Symbol("<body>"),Signature.VARIADIC);
     }
 
     public String docstring() {

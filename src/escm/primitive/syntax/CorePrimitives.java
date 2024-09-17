@@ -261,7 +261,7 @@ public class CorePrimitives {
                             new Symbol("."),new Symbol("<variadic-parameter>")),
           new Symbol("<body>"),Signature.VARIADIC),
         Signature.VARIADIC);
-      return Pair.List(new Pair(FN,fnSignatures),new Pair(FN,new Pair(new Symbol("<docstring>"),fnSignatures)));
+      return new Pair(FN,new Pair(new Symbol("<optional-docstring>"),fnSignatures));
     }
 
     public String docstring() {
@@ -603,25 +603,15 @@ public class CorePrimitives {
       Symbol DEFAULT_VALUE = new Symbol("<default-value>");
       Symbol DOT = new Symbol(".");
       Symbol VARIADIC_PARAM = new Symbol("<variadic-parameter>");
-      Symbol DOCSTRING = new Symbol("<docstring>");
+      Symbol DOCSTRING = new Symbol("<optional-docstring>");
       return Pair.List(
-        Pair.List(LAMBDA,Pair.List(),BODY,Signature.VARIADIC),
         Pair.List(LAMBDA,Pair.List(),DOCSTRING,BODY,Signature.VARIADIC),
-        Pair.List(LAMBDA,VARIADIC_PARAM,BODY,Signature.VARIADIC),
         Pair.List(LAMBDA,VARIADIC_PARAM,DOCSTRING,BODY,Signature.VARIADIC),
-        Pair.List(LAMBDA,Pair.List(PARAMETER,Signature.VARIADIC),BODY,Signature.VARIADIC),
         Pair.List(LAMBDA,Pair.List(PARAMETER,Signature.VARIADIC),DOCSTRING,BODY,Signature.VARIADIC),
-        Pair.List(LAMBDA,Pair.List(PARAMETER,Signature.VARIADIC,DOT,VARIADIC_PARAM),BODY,Signature.VARIADIC),
         Pair.List(LAMBDA,Pair.List(PARAMETER,Signature.VARIADIC,DOT,VARIADIC_PARAM),DOCSTRING,BODY,Signature.VARIADIC),
         Pair.List(LAMBDA,
           Pair.List(PARAM,Signature.VARIADIC,Pair.List(OPTIONAL_PARAM,DEFAULT_VALUE),Signature.VARIADIC),
-          BODY,Signature.VARIADIC),
-        Pair.List(LAMBDA,
-          Pair.List(PARAM,Signature.VARIADIC,Pair.List(OPTIONAL_PARAM,DEFAULT_VALUE),Signature.VARIADIC),
           DOCSTRING,BODY,Signature.VARIADIC),
-        Pair.List(LAMBDA,
-          Pair.List(PARAM,Signature.VARIADIC,Pair.List(OPTIONAL_PARAM,DEFAULT_VALUE),Signature.VARIADIC,DOT,VARIADIC_PARAM),
-          BODY,Signature.VARIADIC),
         Pair.List(LAMBDA,
           Pair.List(PARAM,Signature.VARIADIC,Pair.List(OPTIONAL_PARAM,DEFAULT_VALUE),Signature.VARIADIC,DOT,VARIADIC_PARAM),
           DOCSTRING,BODY,Signature.VARIADIC));
@@ -914,8 +904,7 @@ public class CorePrimitives {
       return Pair.List(
         Pair.List(DEFINE,new Symbol("<symbol>"),new Symbol("<obj>")),
         Pair.List(DEFINE,new Symbol("<symbol1>"),new Symbol("<symbol2>"),Signature.VARIADIC,new Symbol("<symbolN>"),new Symbol("<N-length-list-expression>")),
-        Pair.List(DEFINE,Pair.List(new Symbol("<function-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
-        Pair.List(DEFINE,Pair.List(new Symbol("<function-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<docstring>"),new Symbol("<body>"),Signature.VARIADIC));
+        Pair.List(DEFINE,Pair.List(new Symbol("<function-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<optional-docstring>"),new Symbol("<body>"),Signature.VARIADIC));
     }
 
     public String docstring() {
@@ -1022,9 +1011,7 @@ public class CorePrimitives {
                             new Symbol("."),new Symbol("<variadic-parameter>")),
           new Symbol("<body>"),Signature.VARIADIC),
         Signature.VARIADIC);
-      return Pair.List(
-        new Pair(DEFN,new Pair(FCN_NAME,defnSignatures)),
-        new Pair(DEFN,new Pair(FCN_NAME,new Pair(new Symbol("<docstring>"),defnSignatures))));
+      return new Pair(DEFN,new Pair(FCN_NAME,new Pair(new Symbol("<optional-docstring>"),defnSignatures)));
     }
 
     public String docstring() {
@@ -1317,10 +1304,7 @@ public class CorePrimitives {
           new Symbol("<body>"),Signature.VARIADIC),
         Pair.List(LET,new Symbol("<function-name>"),
           Pair.List(Pair.List(new Symbol("<parameter>"),new Symbol("<initial-value>")),Signature.VARIADIC),
-          new Symbol("<body>"),Signature.VARIADIC),
-        Pair.List(LET,new Symbol("<function-name>"),
-          Pair.List(Pair.List(new Symbol("<parameter>"),new Symbol("<initial-value>")),Signature.VARIADIC),
-          new Symbol("<docstring>"),new Symbol("<body>"),Signature.VARIADIC));
+          new Symbol("<optional-docstring>"),new Symbol("<body>"),Signature.VARIADIC));
     }
 
     public String docstring() {
@@ -2207,13 +2191,9 @@ public class CorePrimitives {
     }
 
     public Datum signature() {
-      return Pair.List(
-        Pair.List(CURRY,
-          Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),
-          new Symbol("<body>"),Signature.VARIADIC),
-        Pair.List(CURRY,
-          Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),
-          new Symbol("<docstring>"),new Symbol("<body>"),Signature.VARIADIC));
+      return Pair.List(CURRY,
+        Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),
+        new Symbol("<optional-docstring>"),new Symbol("<body>"),Signature.VARIADIC);
     }
 
     public String docstring() {

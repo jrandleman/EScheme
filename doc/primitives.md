@@ -7548,8 +7548,7 @@ With '=>' syntax, <condition> is passed to <callable> iff <condition> is #t.
 
 #### Signatures:
 ```scheme
-(curry (<parameter> ...) <body> ...)
-(curry (<parameter> ...) <docstring> <body> ...)
+(curry (<parameter> ...) <optional-docstring> <body> ...)
 ```
 
 #### Description:
@@ -7571,8 +7570,7 @@ procedure's intended purpose in the <help> menu.
 ```scheme
 (define <symbol> <obj>)
 (define <symbol1> <symbol2> ... <symbolN> <N-length-list-expression>)
-(define (<function-name> <parameter> ...) <body> ...)
-(define (<function-name> <parameter> ...) <docstring> <body> ...)
+(define (<function-name> <parameter> ...) <optional-docstring> <body> ...)
 ```
 
 #### Description:
@@ -7658,17 +7656,7 @@ For example:
 #### Signatures:
 ```scheme
 (defn <function-name>
-  (() <body> ...)
-  (<variadic-parameter> <body> ...)
-  ((<parameter> ...) <body> ...)
-  ((<parameter> ... . <variadic-parameter>) <body> ...)
-  ((<param> ... (<optional-param> <default-value>) ...) <body> ...)
-  ((<param> ... (<optional-param> <default-value>) ... . <variadic-parameter>)
-    <body>
-    ...)
-  ...)
-(defn <function-name>
-  <docstring>
+  <optional-docstring>
   (() <body> ...)
   (<variadic-parameter> <body> ...)
   ((<parameter> ...) <body> ...)
@@ -7746,16 +7734,7 @@ Hence the most minimal form of "do" is "(do () ())" (an infinite loop).
 
 #### Signatures:
 ```scheme
-(fn (() <body> ...)
-  (<variadic-parameter> <body> ...)
-  ((<parameter> ...) <body> ...)
-  ((<parameter> ... . <variadic-parameter>) <body> ...)
-  ((<param> ... (<optional-param> <default-value>) ...) <body> ...)
-  ((<param> ... (<optional-param> <default-value>) ... . <variadic-parameter>)
-    <body>
-    ...)
-  ...)
-(fn <docstring>
+(fn <optional-docstring>
   (() <body> ...)
   (<variadic-parameter> <body> ...)
   ((<parameter> ...) <body> ...)
@@ -7919,26 +7898,20 @@ Conditional branching:
 
 #### Signatures:
 ```scheme
-(lambda () <body> ...)
-(lambda () <docstring> <body> ...)
-(lambda <variadic-parameter> <body> ...)
-(lambda <variadic-parameter> <docstring> <body> ...)
-(lambda (<parameter> ...) <body> ...)
-(lambda (<parameter> ...) <docstring> <body> ...)
-(lambda (<parameter> ... . <variadic-parameter>) <body> ...)
-(lambda (<parameter> ... . <variadic-parameter>) <docstring> <body> ...)
-(lambda (<param> ... (<optional-param> <default-value>) ...) <body> ...)
+(lambda () <optional-docstring> <body> ...)
+(lambda <variadic-parameter> <optional-docstring> <body> ...)
+(lambda (<parameter> ...) <optional-docstring> <body> ...)
+(lambda (<parameter> ... . <variadic-parameter>)
+  <optional-docstring>
+  <body>
+  ...)
 (lambda (<param> ... (<optional-param> <default-value>) ...)
-  <docstring>
+  <optional-docstring>
   <body>
   ...)
 (lambda 
   (<param> ... (<optional-param> <default-value>) ... . <variadic-parameter>)
-  <body>
-  ...)
-(lambda 
-  (<param> ... (<optional-param> <default-value>) ... . <variadic-parameter>)
-  <docstring>
+  <optional-docstring>
   <body>
   ...)
 ```
@@ -7992,8 +7965,11 @@ For example:
 #### Signatures:
 ```scheme
 (let ((<symbol> <obj>) ...) <body> ...)
-(let <function-name> ((<parameter> <initial-value>) ...) <body> ...)
-(let <function-name> ((<parameter> <initial-value>) ...) <docstring> <body> ...)
+(let <function-name>
+  ((<parameter> <initial-value>) ...)
+  <optional-docstring>
+  <body>
+  ...)
 ```
 
 #### Description:
@@ -8265,8 +8241,10 @@ Continues cycling through the generators until at least <n> of them have complet
 
 #### Signatures:
 ```scheme
-(define-generator (<generator-name> <parameter> ...) <body> ...)
-(define-generator (<generator-name> <parameter> ...) <docstring> <body> ...)
+(define-generator (<generator-name> <parameter> ...)
+  <optional-docstring>
+  <body>
+  ...)
 ```
 
 #### Description:
@@ -8496,7 +8474,7 @@ details. See <meta-object> in <Types> for more type details.
 ```scheme
 (class (:extends <super>)
   (:implements <interface> ...)
-  <docstring>
+  <optional-docstring>
   (<field-name> <default-value>)
   ((<method-name> <parameter> ...) <body> ...)
   (:static <field-name> <default-value>)
@@ -8609,7 +8587,7 @@ For example:
 (define-class <class-name>
   (:extends <super>)
   (:implements <interface> ...)
-  <docstring>
+  <optional-docstring>
   (<field-name> <default-value>)
   ((<method-name> <parameter> ...) <body> ...)
   (:static <field-name> <default-value>)
@@ -8637,7 +8615,7 @@ details. See <meta-object> in <Types> for more type details.
 ```scheme
 (define-interface <interface-name>
   (:extends <interface> ...)
-  <docstring>
+  <optional-docstring>
   <field-name>
   (:static <field-name> <default-value>)
   (:static (<method-name> <parameter> ...) <body> ...)
@@ -8663,7 +8641,7 @@ details. See <meta-object> in <Types> for more type details.
 #### Signatures:
 ```scheme
 (interface (:extends <interface> ...)
-  <docstring>
+  <optional-docstring>
   <field-name>
   (:static <field-name> <default-value>)
   (:static (<method-name> <parameter> ...) <body> ...)

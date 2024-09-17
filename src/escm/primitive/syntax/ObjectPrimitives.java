@@ -179,7 +179,7 @@ public class ObjectPrimitives {
       return Pair.List(
         Pair.List(CLASS,
           Pair.List(EXTENDS,new Symbol("<super>")),Pair.List(IMPLEMENTS,new Symbol("<interface>"),Signature.VARIADIC),
-          new Symbol("<docstring>"),
+          new Symbol("<optional-docstring>"),
           Pair.List(new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
           Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
@@ -459,7 +459,7 @@ public class ObjectPrimitives {
       return Pair.List(
         Pair.List(new Symbol("define-class"),new Symbol("<class-name>"),
           Pair.List(EXTENDS,new Symbol("<super>")),Pair.List(IMPLEMENTS,new Symbol("<interface>"),Signature.VARIADIC),
-          new Symbol("<docstring>"),
+          new Symbol("<optional-docstring>"),
           Pair.List(new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
           Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
@@ -544,7 +544,7 @@ public class ObjectPrimitives {
       return Pair.List(
         Pair.List(new Symbol("interface"),
           Pair.List(EXTENDS,new Symbol("<interface>"),Signature.VARIADIC),
-          new Symbol("<docstring>"),
+          new Symbol("<optional-docstring>"),
           new Symbol("<field-name>"),
           Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
@@ -667,7 +667,7 @@ public class ObjectPrimitives {
       return Pair.List(
         Pair.List(new Symbol("define-interface"),new Symbol("<interface-name>"),
           Pair.List(EXTENDS,new Symbol("<interface>"),Signature.VARIADIC),
-          new Symbol("<docstring>"),
+          new Symbol("<optional-docstring>"),
           new Symbol("<field-name>"),
           Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
