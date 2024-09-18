@@ -40,6 +40,6 @@ public class ExecutionState {
   }
 
   public ExecutionState getContinuationState(Datum value) {
-    return new ExecutionState(env,instructions,(ArrayDeque<Datum>)stack.clone(),value,cii);
+    return new ExecutionState(env,instructions,new ArrayDeque<Datum>(stack),value,cii);
   }
 }

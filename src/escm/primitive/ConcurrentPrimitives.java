@@ -130,7 +130,7 @@ public class ConcurrentPrimitives {
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof escm.type.concurrent.Thread))
         throw new Exceptionf("'(thread-id <thread>) didn't receive exactly 1 thread: %s", Exceptionf.profileArgs(parameters));
-      return new Exact(((escm.type.concurrent.Thread)parameters.get(0)).getId());
+      return new Exact(((escm.type.concurrent.Thread)parameters.get(0)).threadId());
     }
   }
 

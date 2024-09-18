@@ -75,8 +75,8 @@ public class Thread extends Datum {
     return thread.getName();
   }
 
-  public long getId() {
-    return thread.getId();
+  public long threadId() {
+    return thread.threadId();
   }
 
   public Datum getRunnable() {
@@ -308,7 +308,7 @@ public class Thread extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Documentation String
   public String docstring() {
-    return "Thread: id=" + thread.getId() + ", name=" + thread.getName();
+    return "Thread: id=" + thread.threadId() + ", name=" + thread.getName();
   }
 
 
@@ -322,7 +322,7 @@ public class Thread extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public String display() {
-    return "#<thread (id=" + thread.getId() + ") " + thread.getName() + ">";
+    return "#<thread (id=" + thread.threadId() + ") " + thread.getName() + ">";
   }
 
   public String write() {

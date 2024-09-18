@@ -13,7 +13,7 @@ public class UniqueSymbol {
     EscmThread currentThread = (EscmThread)Thread.currentThread();
     BigInteger currentCount = currentThread.uniqueCounter;
     currentThread.uniqueCounter = currentThread.uniqueCounter.add(BigInteger.ONE);
-    return "escm-"+nameForReadability+"-" + currentThread.getId() + "-" + currentCount;
+    return "escm-"+nameForReadability+"-" + currentThread.threadId() + "-" + currentCount;
   }
 
   public static escm.type.Symbol generate() {

@@ -2,12 +2,14 @@
 // Purpose:
 //    Wrapper around <Runtime.getRuntime().exec()> to synchronously execute
 //    cmd(s) in a seperate process. Returns the <stdout>, <stderr>, and exit 
-//    value from the execution.
+//    code from the execution.
 
 package escm.util;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.io.File;
+import escm.util.error.Exceptionf;
 
 public class ExecuteSystemCommand {
   ////////////////////////////////////////////////////////////////////////////
@@ -24,6 +26,49 @@ public class ExecuteSystemCommand {
   // => e.g. stream reading & finished status setting
   private static long TIMEOUT_MS_BUFFER = (long)100;
 
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Split a command string into an array of arguments
+  // => Splits along whitespace while respecting quotes & escaped characters.
+  public static String[] splitCommand(String command) throws Exception {
+    ArrayList<String> tokens = new ArrayList<String>();
+    StringBuilder current = new StringBuilder();
+    boolean inSingleQuotes = false;
+    boolean inDoubleQuotes = false;
+    boolean escaping = false;
+    for (int i = 0; i < command.length(); i++) {
+      char c = command.charAt(i);
+      if (escaping) {
+        current.append(c); // Append the escaped character regardless of its type
+        escaping = false;
+      } else if (c == '\\') {
+        escaping = true; // Next character is escaped
+      } else if (c == '\'' && !inDoubleQuotes) {
+        inSingleQuotes = !inSingleQuotes; // Toggle single quotes if not inside double quotes
+      } else if (c == '"' && !inSingleQuotes) {
+        inDoubleQuotes = !inDoubleQuotes; // Toggle double quotes if not inside single quotes
+      } else if (Character.isWhitespace(c) && !inSingleQuotes && !inDoubleQuotes) {
+        if (current.length() > 0) {
+          tokens.add(current.toString()); // Token delimiter found outside quotes
+          current.setLength(0);
+        }
+      } else {
+        current.append(c); // Regular character
+      }
+    }
+    // After processing all characters, check for unclosed quotes or escaping
+    if(escaping) {
+      throw new Exceptionf("Bad <system> command; Incomplete escape sequence: %s", command);
+    }
+    if(inSingleQuotes || inDoubleQuotes) {
+      throw new Exceptionf("Bad <system> command; Mismatched quotes: %s", command);
+    }
+    if(current.length() > 0) {
+      tokens.add(current.toString());
+    }
+    return tokens.toArray(new String[0]);
+  }
+  
 
   ////////////////////////////////////////////////////////////////////////////
   // Process main execution logic
@@ -74,7 +119,7 @@ public class ExecuteSystemCommand {
 
   public static Result run(long millisecondTimeout, String command, String[] environmentVariableSettings, File workingDirectory) throws Exception {
     long timeout = preprocessMillisecondTimeout(millisecondTimeout);
-    Process pro = Runtime.getRuntime().exec(command,environmentVariableSettings,workingDirectory);
+    Process pro = Runtime.getRuntime().exec(splitCommand(command),environmentVariableSettings,workingDirectory);
     Result res = new Result();
     ClosureBoolean finished = new ClosureBoolean();
     Thread processThread = new Thread(() -> {
@@ -99,7 +144,7 @@ public class ExecuteSystemCommand {
   }
 
   public static Result run(String command, String[] environmentVariableSettings, File workingDirectory) throws Exception {
-    Process pro = Runtime.getRuntime().exec(command,environmentVariableSettings,workingDirectory);
+    Process pro = Runtime.getRuntime().exec(splitCommand(command),environmentVariableSettings,workingDirectory);
     Result res = new Result();
     getInputStreamLines(res,pro);
     res.exit = pro.exitValue();

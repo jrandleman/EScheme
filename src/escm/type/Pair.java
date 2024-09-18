@@ -1184,7 +1184,7 @@ public class Pair extends Datum implements OrderedCollection {
     ArrayList<Datum> params = new ArrayList<Datum>(1);
     params.add(plis.car);
     return () -> foldRightIter(c,seed,plis.cdr,(acc) -> () -> {
-      ArrayList<Datum> args = (ArrayList<Datum>)params.clone();
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
       args.add(acc);
       return c.callWith(args,continuation);
     });
@@ -1209,7 +1209,7 @@ public class Pair extends Datum implements OrderedCollection {
       acs[i] = (AssociativeCollection)acs[i].tail(); // can mutate <acs> since never captured in a continuation (unlike <fold>)!
     }
     return () -> FoldRightIter(c,seed,acs,(acc) -> () -> {
-      ArrayList<Datum> args = (ArrayList<Datum>)params.clone();
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
       args.add(acc);
       return c.callWith(args,continuation);
     });

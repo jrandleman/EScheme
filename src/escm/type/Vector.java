@@ -83,7 +83,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   }
 
   public Vector(ArrayList<Datum> arr) {
-    value = (ArrayList<Datum>)arr.clone();
+    value = new ArrayList<Datum>(arr);
   }
 
   public Vector(Datum[] arr) {
@@ -221,7 +221,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
 
   public Vector reversed() {
     synchronized(this) {
-      ArrayList<Datum> copy = (ArrayList<Datum>)value.clone();
+      ArrayList<Datum> copy = new ArrayList<Datum>(value);
       Collections.reverse(copy);
       return new Vector(0,copy);
     }
@@ -433,7 +433,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   // Copying
   public Vector shallowCopy() {
     synchronized(this) {
-      return new Vector(0,(ArrayList<Datum>)value.clone());
+      return new Vector(0,new ArrayList<Datum>(value));
     }
   }
 
@@ -704,7 +704,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   public AssociativeCollection append(AssociativeCollection ac) throws Exception {
     ArrayList<Datum> appended = null;
     synchronized(this) {
-      appended = (ArrayList<Datum>)value.clone();
+      appended = new ArrayList<Datum>(value);
     }
     Vector v = (Vector)ac;
     synchronized(v) {
@@ -1005,7 +1005,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   public OrderedCollection conj(Datum value) throws Exception {
     ArrayList<Datum> conjd;
     synchronized(this) {
-      conjd = (ArrayList<Datum>)this.value.clone();
+      conjd = new ArrayList<Datum>(this.value);
     }
     conjd.add(value);
     return new Vector(0,conjd);
@@ -1018,7 +1018,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
   public OrderedCollection init() throws Exception {
     synchronized(this) {
       if(value.size() == 0) throw new Exceptionf("VECTOR [INIT]: can't get <init> of []!");
-      ArrayList<Datum> initVals = (ArrayList<Datum>)value.clone();
+      ArrayList<Datum> initVals = new ArrayList<Datum>(value);
       initVals.remove(value.size()-1);
       return new Vector(0,initVals);
     }
@@ -1097,7 +1097,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       return predicate.callWith(args,(shouldRemove) -> () -> {
         if(shouldRemove.isTruthy()) {
           synchronized(this) {
-            ArrayList<Datum> removed = (ArrayList<Datum>)value.clone();
+            ArrayList<Datum> removed = new ArrayList<Datum>(value);
             if(i < removed.size()) removed.remove(i);
             return continuation.run(new Vector(0,removed));
           }
@@ -1155,7 +1155,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       params.add(v.value.get(eltIdx));
     }
     return () -> foldRightIter(c,seed,eltIdx+1,v,(acc) -> () -> {
-      ArrayList<Datum> args = (ArrayList<Datum>)params.clone();
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
       args.add(acc);
       return c.callWith(args,continuation);
     });
@@ -1179,7 +1179,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
       }
     }
     return () -> FoldRightArray(c,seed,eltIdx+1,acs,(acc) -> () -> {
-      ArrayList<Datum> args = (ArrayList<Datum>)params.clone();
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
       args.add(acc);
       return c.callWith(args,continuation);
     });
@@ -1476,7 +1476,7 @@ public class Vector extends Datum implements OrderedCollection, Callable {
 
   public ArrayList<Datum> toArrayList() {
     synchronized(this) {
-      return (ArrayList<Datum>)value.clone();
+      return new ArrayList<Datum>(value);
     }
   }
 }

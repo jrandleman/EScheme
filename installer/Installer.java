@@ -19,7 +19,7 @@
        a Java-stdlib-loader that instantiates each Inner Class of the file (iff it implements 1 
        of the primitive function object interfaces) to be defined in EScheme's global environments.
 
-    5. Compile the EScheme <Main.java> file using Java11 via <Runtime.exec()>
+    5. Compile the EScheme <Main.java> file using Java 21 via <Runtime.exec()>
 
     6. Execute `escm --generate-java-stdlib-loader` to re-generate the Java-stdlib-loader.
 
@@ -88,6 +88,49 @@ public class Installer {
   // JVM/JRE Command Decoration
   private static String decorateJvmCmdPath(String cmd) {
     return JAVA_BIN_PATH + cmd;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Command String Splitting
+  // => Splits along whitespace while respecting quotes & escaped characters.
+  public static String[] splitCommand(String command) throws Exception {
+    ArrayList<String> tokens = new ArrayList<String>();
+    StringBuilder current = new StringBuilder();
+    boolean inSingleQuotes = false;
+    boolean inDoubleQuotes = false;
+    boolean escaping = false;
+    for (int i = 0; i < command.length(); i++) {
+      char c = command.charAt(i);
+      if (escaping) {
+        current.append(c); // Append the escaped character regardless of its type
+        escaping = false;
+      } else if (c == '\\') {
+        escaping = true; // Next character is escaped
+      } else if (c == '\'' && !inDoubleQuotes) {
+        inSingleQuotes = !inSingleQuotes; // Toggle single quotes if not inside double quotes
+      } else if (c == '"' && !inSingleQuotes) {
+        inDoubleQuotes = !inDoubleQuotes; // Toggle double quotes if not inside single quotes
+      } else if (Character.isWhitespace(c) && !inSingleQuotes && !inDoubleQuotes) {
+        if (current.length() > 0) {
+          tokens.add(current.toString()); // Token delimiter found outside quotes
+          current.setLength(0);
+        }
+      } else {
+        current.append(c); // Regular character
+      }
+    }
+    // After processing all characters, check for unclosed quotes or escaping
+    if(escaping) {
+      throw new Exception(String.format("Bad <system> command; Incomplete escape sequence: %s", command));
+    }
+    if(inSingleQuotes || inDoubleQuotes) {
+      throw new Exception(String.format("Bad <system> command; Mismatched quotes: %s", command));
+    }
+    if(current.length() > 0) {
+      tokens.add(current.toString());
+    }
+    return tokens.toArray(new String[0]);
   }
 
 
@@ -166,7 +209,7 @@ public class Installer {
       System.out.println("> Executing Command:");
       System.out.println("  \"" + command + "\"");
     }
-    Process pro = Runtime.getRuntime().exec(command);
+    Process pro = Runtime.getRuntime().exec(splitCommand(command));
     ExecuteCommandResult res = new ExecuteCommandResult();
     getInputStreamLines(res,pro,reportLive);
     pro.waitFor();
@@ -508,7 +551,7 @@ public class Installer {
   }
 
   private static void compileEScheme(String escmDir) {
-    String compileCmd = decorateJvmCmdPath("javac")+" -source 11 -target 11 -d "+escmDir+File.separator+"bin -classpath "+escmDir+File.separator+"src "+escmDir+File.separator+"src"+File.separator+"Main.java";
+    String compileCmd = decorateJvmCmdPath("javac")+" -source 21 -target 21 -d "+escmDir+File.separator+"bin -classpath "+escmDir+File.separator+"src "+escmDir+File.separator+"src"+File.separator+"Main.java";
     deleteBinIfExists(escmDir+File.separator+"bin");
     try {
       ExecuteCommandResult res = executeCommand(compileCmd,false);

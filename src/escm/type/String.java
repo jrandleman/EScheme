@@ -1068,7 +1068,7 @@ public class String extends Datum implements OrderedCollection, Callable {
     int increment = java.lang.Character.charCount(codepoint);
     params.add(new escm.type.Character(codepoint));
     return () -> foldRightIter(c,seed,offset+increment,n,s,(acc) -> () -> {
-      ArrayList<Datum> args = (ArrayList<Datum>)params.clone();
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
       args.add(acc);
       return c.callWith(args,continuation);
     });
@@ -1092,7 +1092,7 @@ public class String extends Datum implements OrderedCollection, Callable {
       offsets[i] += java.lang.Character.charCount(codepoint); // can mutate <offsets> since never captured in a continuation (unlike <fold>)!
     }
     return () -> FoldRightArray(c,seed,offsets,acs,(acc) -> () -> {
-      ArrayList<Datum> args = (ArrayList<Datum>)params.clone();
+      ArrayList<Datum> args = new ArrayList<Datum>(params);
       args.add(acc);
       return c.callWith(args,continuation);
     });

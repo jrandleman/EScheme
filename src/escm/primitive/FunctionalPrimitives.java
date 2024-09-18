@@ -179,7 +179,7 @@ public class FunctionalPrimitives {
           return Pair.List(new Symbol(Procedure.DEFAULT_NAME),new Symbol("<arg>"),Signature.VARIADIC);
         }
         public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
-          ArrayList<Datum> args = (ArrayList<Datum>)parameters.clone();
+          ArrayList<Datum> args = new ArrayList<Datum>(parameters);
           args.addAll(params);
           return p.callWith(args,cont);
         }
