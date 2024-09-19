@@ -147,6 +147,11 @@
 (ut ((fn ((:pair<int,int> x) #t) ((:any x) #f)) (cons 1 1)) #t) ; "<type,type>" checks "car" and "cdr"
 (ut ((fn ((:pair<int,int> x) #t) ((:any x) #f)) (cons "1" 1)) #f)
 (ut ((fn ((:pair<int,int> x) #t) ((:any x) #f)) (cons 1 "1")) #f)
+(ut ((fn ((:pair<any,any> x) #t) ((:any x) #f)) (cons 1 "2")) #t)
+(ut ((fn ((:pair<any,int> x) #t) ((:any x) #f)) (cons "1" 2)) #t)
+(ut ((fn ((:pair<any,int> x) #t) ((:any x) #f)) (cons 2 "1")) #f)
+(ut ((fn ((:pair<int,any> x) #t) ((:any x) #f)) (cons 2 "1")) #t)
+(ut ((fn ((:pair<int,any> x) #t) ((:any x) #f)) (cons "1" 2)) #f)
 (ut ((fn ((:pair x) #t) ((:any x) #f)) 42) #f)
 (ut ((fn ((:list x) #t) ((:any x) #f)) '()) #t)
 (ut ((fn ((:list x) #t) ((:any x) #f)) (list 1 2 3)) #t)
@@ -177,6 +182,11 @@
 (ut ((fn ((:map<int,string> x) #t) ((:any x) #f)) (hashmap 1 "2" 3 "4")) #t) ; "<type,type>" checks both keys and values
 (ut ((fn ((:map<int,string> x) #t) ((:any x) #f)) (hashmap 1 2 3 "4")) #f)
 (ut ((fn ((:map<int,string> x) #t) ((:any x) #f)) (hashmap 1 "2" 3 4)) #f)
+(ut ((fn ((:map<any,any> x) #t) ((:any x) #f)) (hashmap 1 "2" 3 4)) #t)
+(ut ((fn ((:map<any,int> x) #t) ((:any x) #f)) (hashmap "1" 2 "3" 4)) #t)
+(ut ((fn ((:map<any,int> x) #t) ((:any x) #f)) (hashmap 2 "1" 4 "3")) #f)
+(ut ((fn ((:map<int,any> x) #t) ((:any x) #f)) (hashmap 2 "1" 4 "3")) #t)
+(ut ((fn ((:map<int,any> x) #t) ((:any x) #f)) (hashmap "1" 2 "3" 4)) #f)
 (ut ((fn ((:map x) #t) ((:any x) #f)) 42) #f)
 
 ; Generic Containers
