@@ -313,6 +313,20 @@ public class Hashmap extends Datum implements AssociativeCollection, Callable {
     return true;
   }
 
+  public boolean containsKeyType(Environment env, Predicate keyTypePredicate) throws Exception {
+    for(Datum key : value.keySet()) {
+      if(keyTypePredicate.check(env,key) == false) return false;
+    }
+    return true;
+  }
+
+  public boolean containsValueType(Environment env, Predicate valTypePredicate) throws Exception {
+    for(Datum val : value.values()) {
+      if(valTypePredicate.check(env,val) == false) return false;
+    }
+    return true;
+  }
+
   public boolean containsType(Environment env, Predicate typePredicate) throws Exception {
     for(Datum entry : value.values()) {
       if(typePredicate.check(env,entry) == false) return false;

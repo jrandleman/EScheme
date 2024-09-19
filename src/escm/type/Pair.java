@@ -475,6 +475,14 @@ public class Pair extends Datum implements OrderedCollection {
     return keyTypePredicate.check(env,car) && valTypePredicate.check(env,cdr);
   }
 
+  public boolean containsKeyType(Environment env, Predicate keyTypePredicate) throws Exception {
+    return keyTypePredicate.check(env,car);
+  }
+
+  public boolean containsValueType(Environment env, Predicate valTypePredicate) throws Exception {
+    return valTypePredicate.check(env,cdr);
+  }
+
   public boolean containsType(Environment env, Predicate typePredicate) throws Exception {
     if(length == DOTTED_LIST_LENGTH || typePredicate.check(env,car) == false) {
       return false;

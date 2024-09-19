@@ -98,6 +98,7 @@ import escm.primitive.FunctionalPrimitives.IsCallable;
 public class TypeChecker {
   ////////////////////////////////////////////////////////////////////////////
   // Type Checking Predicate Functional Interface
+  @FunctionalInterface
   public static interface Predicate {
     public boolean check(Environment env, Datum value) throws Exception;
   }
@@ -273,10 +274,26 @@ public class TypeChecker {
             if(valueParameterType.second >= typeLength || type.charAt(valueParameterType.second) != '>') {
               throw new Exceptionf("Invalid Type \"map<\" (index %d): %s",parameterType.second+1,type);
             }
-            // <any,any> parameter
-            if(parsedAnyParameter(type,next+1,parameterType.second) && parsedAnyParameter(type,parameterType.second+1,valueParameterType.second)) {
+            // parsed <any,*> or <*,any> parameter
+            if(parsedAnyParameter(type,next+1,parameterType.second)) {
+              if(parsedAnyParameter(type,parameterType.second+1,valueParameterType.second)) { // <any,any>
+                return new Pair<Predicate,Integer>((env, value) -> { 
+                  return value instanceof escm.type.Hashmap;
+                },valueParameterType.second+1);
+              } else { // <any,*>
+                return new Pair<Predicate,Integer>((env, value) -> { 
+                  if((value instanceof escm.type.Hashmap) == false) {
+                    return false;
+                  }
+                  return ((escm.type.Hashmap)value).containsValueType(env,valueParameterType.first);
+                },valueParameterType.second+1);
+              }
+            } else if(parsedAnyParameter(type,parameterType.second+1,valueParameterType.second)) { // <*,any>
               return new Pair<Predicate,Integer>((env, value) -> { 
-                return value instanceof escm.type.Hashmap;
+                if((value instanceof escm.type.Hashmap) == false) {
+                  return false;
+                }
+                return ((escm.type.Hashmap)value).containsKeyType(env,parameterType.first);
               },valueParameterType.second+1);
             }
             return new Pair<Predicate,Integer>((env, value) -> { 
