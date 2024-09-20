@@ -82,7 +82,6 @@
 
 package escm.type.procedure;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 import escm.util.Pair;
 import escm.util.error.Exceptionf;
 import escm.type.Datum;
@@ -98,7 +97,6 @@ import escm.primitive.FunctionalPrimitives.IsCallable;
 public class TypeChecker {
   ////////////////////////////////////////////////////////////////////////////
   // Type Checking Predicate Functional Interface
-  @FunctionalInterface
   public static interface Predicate {
     public boolean check(Environment env, Datum value) throws Exception;
   }
@@ -106,121 +104,113 @@ public class TypeChecker {
   
   ////////////////////////////////////////////////////////////////////////////
   // Parse Primitive Types
-  private static ConcurrentHashMap<String,Predicate> PRIMITIVE_TYPES = new ConcurrentHashMap<String,Predicate>();
-
-  static {
-    // Any type
-    PRIMITIVE_TYPES.put("any",(env, value) -> { 
-      return true; 
-    });
-
-    // Numeric types
-    PRIMITIVE_TYPES.put("number",(env, value) -> { 
-      return value instanceof escm.type.number.Number;
-    });
-    PRIMITIVE_TYPES.put("complex",(env, value) -> { 
-      return value instanceof escm.type.number.Number;
-    });
-    PRIMITIVE_TYPES.put("int",(env, value) -> { 
-      return value instanceof escm.type.number.Real && ((escm.type.number.Real)value).isInteger();
-    });
-    PRIMITIVE_TYPES.put("flo",(env, value) -> { 
-      return value instanceof escm.type.number.Inexact;
-    });
-    PRIMITIVE_TYPES.put("real",(env, value) -> { 
-      return value instanceof escm.type.number.Real;
-    });
-    PRIMITIVE_TYPES.put("exact",(env, value) -> { 
-      return value instanceof escm.type.number.Number && ((escm.type.number.Number)value).isExact();
-    });
-    PRIMITIVE_TYPES.put("inexact",(env, value) -> { 
-      return value instanceof escm.type.number.Number && ((escm.type.number.Number)value).isInexact();
-    });
-
-    // Common atomic types
-    PRIMITIVE_TYPES.put("string",(env, value) -> { 
-      return value instanceof escm.type.String;
-    });
-    PRIMITIVE_TYPES.put("char",(env, value) -> { 
-      return value instanceof escm.type.Character;
-    });
-    PRIMITIVE_TYPES.put("key",(env, value) -> { 
-      return value instanceof escm.type.Keyword;
-    });
-    PRIMITIVE_TYPES.put("bool",(env, value) -> { 
-      return value instanceof escm.type.bool.Boolean;
-    });
-    PRIMITIVE_TYPES.put("symbol",(env, value) -> { 
-      return value instanceof escm.type.Symbol;
-    });
-    PRIMITIVE_TYPES.put("void",(env, value) -> { 
-      return value instanceof escm.type.Void;
-    });
-
-    // List-base types
-    PRIMITIVE_TYPES.put("nil",(env, value) -> { 
-      return value instanceof escm.type.Nil;
-    });
-    PRIMITIVE_TYPES.put("atom",(env, value) -> { 
-      return !(value instanceof escm.type.Pair);
-    });
-
-    // Concurrency types
-    PRIMITIVE_TYPES.put("thread",(env, value) -> { 
-      return value instanceof escm.type.concurrent.Thread;
-    });
-    PRIMITIVE_TYPES.put("mutex",(env, value) -> { 
-      return value instanceof escm.type.concurrent.Mutex;
-    });
-
-    // Functional types
-    PRIMITIVE_TYPES.put("fn",(env, value) -> { 
-      return IsCallable.logic(value);
-    });
-    PRIMITIVE_TYPES.put("procedure",(env, value) -> { 
-      return value instanceof escm.type.procedure.Procedure;
-    });
-    PRIMITIVE_TYPES.put("syntax",(env, value) -> { 
-      return value instanceof escm.type.procedure.SyntaxProcedure;
-    });
-
-    // Object-oriented types
-    PRIMITIVE_TYPES.put("metaobj",(env, value) -> { 
-      return value instanceof escm.type.oo.Dottable;
-    });
-    PRIMITIVE_TYPES.put("object",(env, value) -> { 
-      return value instanceof EscmObject;
-    });
-    PRIMITIVE_TYPES.put("class",(env, value) -> { 
-      return value instanceof EscmClass;
-    });
-    PRIMITIVE_TYPES.put("interface",(env, value) -> { 
-      return value instanceof EscmInterface;
-    });
-
-    // I/O types
-    PRIMITIVE_TYPES.put("port",(env, value) -> { 
-      return value instanceof escm.type.port.Port;
-    });
-    PRIMITIVE_TYPES.put("inport",(env, value) -> { 
-      return value instanceof escm.type.port.InputPort;
-    });
-    PRIMITIVE_TYPES.put("outport",(env, value) -> { 
-      return value instanceof escm.type.port.OutputPort;
-    });
-
-    // Module types
-    PRIMITIVE_TYPES.put("module",(env, value) -> { 
-      return value instanceof escm.type.oo.EscmModule;
-    });
-  }
-
   private static Pair<Predicate,Integer> parsePrimitive(String type, String name, int next) {
-    Predicate pred = PRIMITIVE_TYPES.get(name);
-    if(pred != null) {
-      return new Pair<Predicate,Integer>(pred,next);
+    switch(name) {
+      // Any type
+      case "any": return new Pair<Predicate,Integer>((env, value) -> { 
+        return true; 
+      },next);
+
+      // Numeric types
+      case "number": case "complex": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.number.Number;
+      },next);
+      case "int": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.number.Real && ((escm.type.number.Real)value).isInteger();
+      },next);
+      case "flo": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.number.Inexact;
+      },next);
+      case "real": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.number.Real;
+      },next);
+      case "exact": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.number.Number && ((escm.type.number.Number)value).isExact();
+      },next);
+      case "inexact": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.number.Number && ((escm.type.number.Number)value).isInexact();
+      },next);
+
+      // Common atomic types
+      case "string": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.String;
+      },next);
+      case "char": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.Character;
+      },next);
+      case "key": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.Keyword;
+      },next);
+      case "bool": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.bool.Boolean;
+      },next);
+      case "symbol": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.Symbol;
+      },next);
+      case "void": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.Void;
+      },next);
+
+      // List-base types
+      case "nil": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.Nil;
+      },next);
+      case "atom": return new Pair<Predicate,Integer>((env, value) -> { 
+        return !(value instanceof escm.type.Pair);
+      },next);
+
+      // Concurrency types
+      case "thread": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.concurrent.Thread;
+      },next);
+      case "mutex": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.concurrent.Mutex;
+      },next);
+
+      // Functional types
+      case "fn": return new Pair<Predicate,Integer>((env, value) -> { 
+        return IsCallable.logic(value);
+      },next);
+      case "procedure": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.procedure.Procedure;
+      },next);
+      case "syntax": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.procedure.SyntaxProcedure;
+      },next);
+
+      // Object-oriented types
+      case "metaobj": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.oo.Dottable;
+      },next);
+      case "object": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof EscmObject;
+      },next);
+      case "class": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof EscmClass;
+      },next);
+      case "interface": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof EscmInterface;
+      },next);
+
+      // I/O types
+      case "port": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.port.Port;
+      },next);
+      case "inport": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.port.InputPort;
+      },next);
+      case "outport": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.port.OutputPort;
+      },next);
+
+      // Module types
+      case "module": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.oo.EscmModule;
+      },next);
+
+      // Non-primitive type
+      default: return null;
     }
-    return null;
   }
 
 
