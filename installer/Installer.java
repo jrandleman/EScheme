@@ -551,7 +551,7 @@ public class Installer {
   }
 
   private static void compileEScheme(String escmDir) {
-    String compileCmd = decorateJvmCmdPath("javac")+" -source 21 -target 21 -d "+escmDir+File.separator+"bin -classpath "+escmDir+File.separator+"src "+escmDir+File.separator+"src"+File.separator+"Main.java";
+    String compileCmd = decorateJvmCmdPath("javac")+" -source 21 -target 21 -d \""+escmDir+File.separator+"bin\" -classpath \""+escmDir+File.separator+"src\" \""+escmDir+File.separator+"src"+File.separator+"Main.java\"";
     deleteBinIfExists(escmDir+File.separator+"bin");
     try {
       ExecuteCommandResult res = executeCommand(compileCmd,false);
@@ -576,7 +576,7 @@ public class Installer {
   ////////////////////////////////////////////////////////////////////////////
   // Execute EScheme's Java-stdlib-loader-generator File
   private static void executeJavaStdLibLoaderGenerator(String escmDir) {
-    String unitTestCmd = decorateJvmCmdPath("java")+" -classpath "+escmDir+File.separator+"bin Main --generate-java-stdlib-loader";
+    String unitTestCmd = decorateJvmCmdPath("java")+" -classpath \""+escmDir+File.separator+"bin\" Main --generate-java-stdlib-loader";
     try {
       ExecuteCommandResult res = executeCommand(unitTestCmd,true);
       if(res.exit != 0) {
@@ -600,7 +600,7 @@ public class Installer {
   ////////////////////////////////////////////////////////////////////////////
   // Execute EScheme's Unit Test Suite
   private static void executeUnitTests(String escmDir) {
-    String unitTestCmd = decorateJvmCmdPath("java")+" -classpath "+escmDir+File.separator+"bin Main --unit-tests";
+    String unitTestCmd = decorateJvmCmdPath("java")+" -classpath \""+escmDir+File.separator+"bin\" Main --unit-tests";
     try {
       ExecuteCommandResult res = executeCommand(unitTestCmd,true);
       if(res.exit != 0) {
@@ -636,7 +636,7 @@ public class Installer {
   // Generate the Shell Alias to Invoke EScheme
   private static void printEscmShellAliasString(String escmDir) {
     System.out.println("> [ OPTIONAL ] Alias for the REPL to put in `~/.bashrc` OR `~/.zshrc`:");
-    System.out.println("  alias escm='"+decorateJvmCmdPath("java")+" -classpath "+escmDir+File.separator+"bin Main'");
+    System.out.println("  alias escm='"+decorateJvmCmdPath("java")+" -classpath \""+escmDir+File.separator+"bin\" Main'");
   }
 
 

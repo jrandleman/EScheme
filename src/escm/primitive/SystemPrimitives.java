@@ -39,7 +39,7 @@ public class SystemPrimitives {
 
   ////////////////////////////////////////////////////////////////////////////
   // Get the EScheme command-line execution command
-  public static final String ESCM_EXECUTION_COMMAND = " "+JvmPathPrefix.VALUE+"java -classpath "+EscmPath.VALUE+File.separator+"bin Main ";
+  public static final String ESCM_EXECUTION_COMMAND = " "+JvmPathPrefix.VALUE+"java -classpath \""+EscmPath.VALUE+File.separator+"bin\" Main ";
 
 
   ////////////////////////////////////////////////////////////////////////////

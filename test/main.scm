@@ -16,7 +16,7 @@
   (set! total-files (+ total-files 1))
   (define test-file-name (slice file (+ (length *file-separator*) (length *escm-path*))))
   (verbose-displayf "    %n) Executing Test File: %wa ..." total-files test-file-name)
-  (define time-length test-result (time system (append *escm-execution-command* file)))
+  (define time-length test-result (time system (append *escm-execution-command* "\"" file "\"")))
   (define output errput errcode test-result)
   (verbose-displayf " Time: %nms; Exit Code: %n\n" time-length errcode)
   (if (not (= 0 errcode))

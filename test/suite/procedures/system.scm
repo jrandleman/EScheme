@@ -18,26 +18,26 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TESTS
-(define system-result (system (append *escm-execution-command* exit-test-file " 0")))
+(define system-result (system (append *escm-execution-command* "\"" exit-test-file "\"" " 0")))
 (ut (list? system-result) #t)
 (ut (length system-result) 3)
 (ut (string? (car system-result)) #t)
 (ut (string? (cadr system-result)) #t)
 (ut (number? (caddr system-result)) #t)
 
-(ut (caddr (system (append *escm-execution-command* exit-test-file " 1"))) 1)
-(ut (caddr (system (append *escm-execution-command* exit-test-file " 0"))) 0) ; file
-(ut (caddr (system (append *escm-execution-command* exit-test-file " 0") '())) 0) ; file + env dir list
-(ut (caddr (system (append *escm-execution-command* exit-test-file " 0") data-directory)) 0) ; file + working dir
-(ut (caddr (system (append *escm-execution-command* exit-test-file " 0") '() data-directory)) 0) ; file + env dir list + working dir
+(ut (caddr (system (append *escm-execution-command* "\"" exit-test-file "\" 1"))) 1)
+(ut (caddr (system (append *escm-execution-command* "\"" exit-test-file "\" 0"))) 0) ; file
+(ut (caddr (system (append *escm-execution-command* "\"" exit-test-file "\" 0") '())) 0) ; file + env dir list
+(ut (caddr (system (append *escm-execution-command* "\"" exit-test-file "\" 0") data-directory)) 0) ; file + working dir
+(ut (caddr (system (append *escm-execution-command* "\"" exit-test-file "\" 0") '() data-directory)) 0) ; file + env dir list + working dir
 
-(ut (< (car (time system 300 (append *escm-execution-command* process-killer-file))) 60000) #t) ; timeout + file
-(ut (< (car (time system 300 (append *escm-execution-command* process-killer-file) '())) 60000) #t) ; timeout + file+ env dir list
-(ut (< (car (time system 300 (append *escm-execution-command* process-killer-file) data-directory)) 60000) #t) ; timeout + file+ working dir
-(ut (< (car (time system 300 (append *escm-execution-command* process-killer-file) '() data-directory)) 60000) #t) ; timeout + file+ env dir list + working dir
+(ut (< (car (time system 300 (append *escm-execution-command* "\"" process-killer-file "\""))) 60000) #t) ; timeout + file
+(ut (< (car (time system 300 (append *escm-execution-command* "\"" process-killer-file "\"") '())) 60000) #t) ; timeout + file+ env dir list
+(ut (< (car (time system 300 (append *escm-execution-command* "\"" process-killer-file "\"") data-directory)) 60000) #t) ; timeout + file+ working dir
+(ut (< (car (time system 300 (append *escm-execution-command* "\"" process-killer-file "\"") '() data-directory)) 60000) #t) ; timeout + file+ env dir list + working dir
 
-(ut (caddr (escm exit-test-file 1)) 1)
-(ut (caddr (escm exit-test-file 0)) 0) ; file
+(ut (caddr (escm (append "\"" exit-test-file "\"") 1)) 1)
+(ut (caddr (escm (append "\"" exit-test-file "\"") 0)) 0) ; file
 (ut (< (car (time escm 300 process-killer-file)) 60000) #t) ; timeout + file
 
 (define *var1* 2)

@@ -15,7 +15,7 @@ import escm.vm.util.SourceInformation;
 public class MethodProcedure extends CompoundProcedure {
   ////////////////////////////////////////////////////////////////////////////
   // Internal Super Object (used by <loadWithDynamicSelf>)
-  Datum superObj = Boolean.FALSE;
+  private Datum superObj = Boolean.FALSE;
 
 
   ////////////////////////////////////////////////////////////////////////////
