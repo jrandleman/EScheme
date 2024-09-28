@@ -7661,8 +7661,12 @@ For example:
   (<variadic-parameter> <body> ...)
   ((<parameter> ...) <body> ...)
   ((<parameter> ... . <variadic-parameter>) <body> ...)
-  ((<param> ... (<optional-param> <default-value>) ...) <body> ...)
-  ((<param> ... (<optional-param> <default-value>) ... . <variadic-parameter>)
+  ((<parameter> ... (<optional-parameter> <default-value>) ...) <body> ...)
+  ((<parameter> ...
+      (<optional-parameter> <default-value>)
+      ...
+      .
+      <variadic-parameter>)
     <body>
     ...)
   ...)
@@ -7739,8 +7743,12 @@ Hence the most minimal form of "do" is "(do () ())" (an infinite loop).
   (<variadic-parameter> <body> ...)
   ((<parameter> ...) <body> ...)
   ((<parameter> ... . <variadic-parameter>) <body> ...)
-  ((<param> ... (<optional-param> <default-value>) ...) <body> ...)
-  ((<param> ... (<optional-param> <default-value>) ... . <variadic-parameter>)
+  ((<parameter> ... (<optional-parameter> <default-value>) ...) <body> ...)
+  ((<parameter> ...
+      (<optional-parameter> <default-value>)
+      ...
+      .
+      <variadic-parameter>)
     <body>
     ...)
   ...)
@@ -7749,8 +7757,8 @@ Hence the most minimal form of "do" is "(do () ())" (an infinite loop).
 #### Description:
 ```
 Create a multi-arity procedure, with support for optional parameters via the
-"(<param-name> <default-value>)" syntax. Denote variadic parameters via the
-"(<param> ... . <variadic-param>)" or "<variadic-param>" syntax.
+"(<optional-parameter> <default-value>)" syntax. Denote variadic parameters via
+the "(<parameter> ... . <variadic-parameter>)" or "<variadic-parameter>" syntax.
 
 Optionally include <docstring> to yield further details on the procedure's
 intended purpose in the <help> menu.
@@ -7905,12 +7913,16 @@ Conditional branching:
   <optional-docstring>
   <body>
   ...)
-(lambda (<param> ... (<optional-param> <default-value>) ...)
+(lambda (<parameter> ... (<optional-parameter> <default-value>) ...)
   <optional-docstring>
   <body>
   ...)
 (lambda 
-  (<param> ... (<optional-param> <default-value>) ... . <variadic-parameter>)
+  (<parameter> ...
+    (<optional-parameter> <default-value>)
+    ...
+    .
+    <variadic-parameter>)
   <optional-docstring>
   <body>
   ...)
@@ -7919,9 +7931,9 @@ Conditional branching:
 #### Description:
 ```
 Shorthand for single-arity procedures. Expands to <fn> under the hood.
-Supports optional parameters via the "(<param-name> <default-value>)"
-syntax. Denote variadic parameters via "(<param> ... . <variadic-param>)"
-or "<variadic-param>" syntax. Reader-shorthand support via the <#(> syntax.
+Supports optional parameters via the "(<optional-parameter> <default-value>)"
+syntax. Denote variadic parameters via "(<parameter> ... . <variadic-parameter>)"
+or "<variadic-parameter>" syntax. Reader-shorthand support via the <#(> syntax.
 
 Optionally include <docstring> to yield further details on the procedure's
 intended purpose in the <help> menu.

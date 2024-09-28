@@ -253,11 +253,11 @@ public class CorePrimitives {
         Pair.List(new Symbol("<variadic-parameter>"),new Symbol("<body>"),Signature.VARIADIC),
         Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
         Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,new Symbol("."),new Symbol("<variadic-parameter>")),new Symbol("<body>"),Signature.VARIADIC),
-        Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
-                            Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC),
+        Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,
+                            Pair.List(new Symbol("<optional-parameter>"),new Symbol("<default-value>")),Signature.VARIADIC),
           new Symbol("<body>"),Signature.VARIADIC),
-        Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
-                            Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC,
+        Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,
+                            Pair.List(new Symbol("<optional-parameter>"),new Symbol("<default-value>")),Signature.VARIADIC,
                             new Symbol("."),new Symbol("<variadic-parameter>")),
           new Symbol("<body>"),Signature.VARIADIC),
         Signature.VARIADIC);
@@ -265,7 +265,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Core\nCreate a multi-arity procedure, with support for optional parameters via the\n\"(<param-name> <default-value>)\" syntax. Denote variadic parameters via the\n\"(<param> ... . <variadic-param>)\" or \"<variadic-param>\" syntax.\n\nOptionally include <docstring> to yield further details on the procedure's\nintended purpose in the <help> menu.\n\nFor example:\n  ; Using Mult-arity\n  (define factorial \n    (fn ((n) (factorial n 1))\n        ((n p)\n          (if (< n 2)\n              p\n              (factorial (- n 1) (* n p))))))\n\n\n  ; Using optional parameters: p is <1> by default\n  (define factorial\n    (fn ((n (p 1))\n          (if (< n 2)\n              p\n              (factorial (- n 1) (* n p))))))\n\n\n  ; Combine <fn> and <define> via <defn>:\n  (defn factorial \n    ((n) (factorial n 1))\n    ((n p)\n      (if (< n 2)\n          p\n          (factorial (- n 1) (* n p)))))";
+      return "@help:Syntax:Core\nCreate a multi-arity procedure, with support for optional parameters via the\n\"(<optional-parameter> <default-value>)\" syntax. Denote variadic parameters via\nthe \"(<parameter> ... . <variadic-parameter>)\" or \"<variadic-parameter>\" syntax.\n\nOptionally include <docstring> to yield further details on the procedure's\nintended purpose in the <help> menu.\n\nFor example:\n  ; Using Mult-arity\n  (define factorial \n    (fn ((n) (factorial n 1))\n        ((n p)\n          (if (< n 2)\n              p\n              (factorial (- n 1) (* n p))))))\n\n\n  ; Using optional parameters: p is <1> by default\n  (define factorial\n    (fn ((n (p 1))\n          (if (< n 2)\n              p\n              (factorial (- n 1) (* n p))))))\n\n\n  ; Combine <fn> and <define> via <defn>:\n  (defn factorial \n    ((n) (factorial n 1))\n    ((n p)\n      (if (< n 2)\n          p\n          (factorial (- n 1) (* n p)))))";
     }
 
     // Extract <docstring> if exists, else <null>
@@ -598,8 +598,8 @@ public class CorePrimitives {
     public Datum signature() {
       Symbol BODY = new Symbol("<body>");
       Symbol PARAMETER = new Symbol("<parameter>");
-      Symbol PARAM = new Symbol("<param>");
-      Symbol OPTIONAL_PARAM = new Symbol("<optional-param>");
+      Symbol PARAM = new Symbol("<parameter>");
+      Symbol OPTIONAL_PARAM = new Symbol("<optional-parameter>");
       Symbol DEFAULT_VALUE = new Symbol("<default-value>");
       Symbol DOT = new Symbol(".");
       Symbol VARIADIC_PARAM = new Symbol("<variadic-parameter>");
@@ -618,7 +618,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Core\nShorthand for single-arity procedures. Expands to <fn> under the hood.\nSupports optional parameters via the \"(<param-name> <default-value>)\"\nsyntax. Denote variadic parameters via \"(<param> ... . <variadic-param>)\"\nor \"<variadic-param>\" syntax. Reader-shorthand support via the <#(> syntax.\n\nOptionally include <docstring> to yield further details on the procedure's\nintended purpose in the <help> menu.\n\nFor example:\n  ; Using optional parameters: p is <1> by default\n  (define factorial\n    (lambda (n (p 1))\n      (if (< n 2)\n          p\n          (factorial (- n 1) (* n p)))))\n\n\n  ; Combine <lambda> and <define> via:\n  (define (factorial n (p 1))\n    (if (< n 2)\n        p\n        (factorial (- n 1) (* n p))))\n\n\n  ;; Reader-shorthand via <#(>: #<expr> => (lambda () <expr>)\n  ;; Denote the Nth parameter via %N, with N starting at 1. \n  ;; Use %% to denote the variadic parameter.\n\n  ; Add 2:\n  (define add2 #(+ %1 2))\n\n  ; Get the 2nd parameter:\n  (define get-2nd #(begin %2))\n\n  ; The 'id' procedure:\n  (define id #(begin %1))\n\n  ; The 'list' procedure:\n  (define list #(begin %%))";
+      return "@help:Syntax:Core\nShorthand for single-arity procedures. Expands to <fn> under the hood.\nSupports optional parameters via the \"(<optional-parameter> <default-value>)\"\nsyntax. Denote variadic parameters via \"(<parameter> ... . <variadic-parameter>)\"\nor \"<variadic-parameter>\" syntax. Reader-shorthand support via the <#(> syntax.\n\nOptionally include <docstring> to yield further details on the procedure's\nintended purpose in the <help> menu.\n\nFor example:\n  ; Using optional parameters: p is <1> by default\n  (define factorial\n    (lambda (n (p 1))\n      (if (< n 2)\n          p\n          (factorial (- n 1) (* n p)))))\n\n\n  ; Combine <lambda> and <define> via:\n  (define (factorial n (p 1))\n    (if (< n 2)\n        p\n        (factorial (- n 1) (* n p))))\n\n\n  ;; Reader-shorthand via <#(>: #<expr> => (lambda () <expr>)\n  ;; Denote the Nth parameter via %N, with N starting at 1. \n  ;; Use %% to denote the variadic parameter.\n\n  ; Add 2:\n  (define add2 #(+ %1 2))\n\n  ; Get the 2nd parameter:\n  (define get-2nd #(begin %2))\n\n  ; The 'id' procedure:\n  (define id #(begin %1))\n\n  ; The 'list' procedure:\n  (define list #(begin %%))";
     }
 
     public static Datum getAllExpressionsAfter(ArrayList<Datum> parameters, int startingIdx) {
@@ -1003,11 +1003,11 @@ public class CorePrimitives {
         Pair.List(new Symbol("<variadic-parameter>"),new Symbol("<body>"),Signature.VARIADIC),
         Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
         Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,new Symbol("."),new Symbol("<variadic-parameter>")),new Symbol("<body>"),Signature.VARIADIC),
-        Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
-                            Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC),
+        Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,
+                            Pair.List(new Symbol("<optional-parameter>"),new Symbol("<default-value>")),Signature.VARIADIC),
           new Symbol("<body>"),Signature.VARIADIC),
-        Pair.List(Pair.List(new Symbol("<param>"),Signature.VARIADIC,
-                            Pair.List(new Symbol("<optional-param>"),new Symbol("<default-value>")),Signature.VARIADIC,
+        Pair.List(Pair.List(new Symbol("<parameter>"),Signature.VARIADIC,
+                            Pair.List(new Symbol("<optional-parameter>"),new Symbol("<default-value>")),Signature.VARIADIC,
                             new Symbol("."),new Symbol("<variadic-parameter>")),
           new Symbol("<body>"),Signature.VARIADIC),
         Signature.VARIADIC);
