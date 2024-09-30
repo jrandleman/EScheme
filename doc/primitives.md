@@ -7561,6 +7561,14 @@ With '=>' syntax, <condition> is passed to <callable> iff <condition> is #t.
 
 Optionally include <docstring> to yield further details on the
 procedure's intended purpose in the <help> menu.
+
+Optionally include keyword types to perform runtime type checks! Argument
+types are placed prior their names, and the return type is placed prior the
+parameters. For example, (curry :int (:list x) (length x)) ensures <x> is
+a list, and that the <curry> returns an integer.
+  => Note that the return type is only checked once all parameters have
+     been applied to the curried function.
+  => See <type-system> in <Topics> for more details on EScheme's types!
 ```
 
 -------------------------------------------------------------------------------
@@ -7588,6 +7596,12 @@ The 3rd signature is equivalent to:
 
 Optionally include <docstring> to yield further details on
 the procedure's intended purpose in the <help> menu.
+
+Optionally include keyword types to perform runtime type checks! Argument
+types are placed prior their names, and the return type is placed prior the
+parameter/name clause. For example, (define :int (f :list x) (length x))
+ensures <x> is a list, and that <f> returns an integer.
+  => See <type-system> in <Topics> for more details on EScheme's types!
 
 Aliased by <def>.
 ```
@@ -7679,6 +7693,12 @@ Combines <define> and <fn> by binding <function-name> to
 
 Optionally include <docstring> to yield further details
 on the procedure's intended purpose in the <help> menu.
+
+Optionally include keyword types to perform runtime type checks! Argument
+types are placed prior their names, and return types are placed prior
+parameter clauses. For example, (defn f (:int (:list x) (length x)))
+ensures <x> is a list, and that <f> returns an integer.
+  => See <type-system> in <Topics> for more details on EScheme's types!
 ```
 
 -------------------------------------------------------------------------------
@@ -7762,6 +7782,12 @@ the "(<parameter> ... . <variadic-parameter>)" or "<variadic-parameter>" syntax.
 
 Optionally include <docstring> to yield further details on the procedure's
 intended purpose in the <help> menu.
+
+Optionally include keyword types to perform runtime type checks! Argument
+types are placed prior their names, and return types are placed prior
+parameter clauses. For example, (fn (:int (:list x) (length x))) ensures
+<x> is a list, and that the <fn> returns an integer.
+  => See <type-system> in <Topics> for more details on EScheme's types!
 
 For example:
   ; Using Mult-arity
@@ -7937,6 +7963,12 @@ or "<variadic-parameter>" syntax. Reader-shorthand support via the <#(> syntax.
 
 Optionally include <docstring> to yield further details on the procedure's
 intended purpose in the <help> menu.
+
+Optionally include keyword types to perform runtime type checks! Argument
+types are placed prior their names, and the return type is placed prior the
+parameters. For example, (lambda :int (:list x) (length x)) ensures <x> is
+a list, and that the <lambda> returns an integer.
+  => See <type-system> in <Topics> for more details on EScheme's types!
 
 For example:
   ; Using optional parameters: p is <1> by default
@@ -8272,7 +8304,15 @@ Instead, define an inner procedure or use the "named let" construct.
 Optionally include <docstring> to yield further details on the generator
 constructor's intended purpose in the <help> menu.
 
+Optionally include keyword types to perform runtime type checks! Argument
+types go prior their names. For example, (define-generator (f :int x) x)
+ensures <x> is an int.
+  => Note that <define-generator> does not support return types, as such
+     could conflict with the final '*generator-complete* value.
+  => See <type-system> in <Topics> for more details on EScheme's types!
+
 Aliased by <defgen>.
+
 For example:
   ;; Printing Numbers and Strings:
   (define-generator (print-numbers start total)
@@ -8506,6 +8546,7 @@ Regarding inter-class/interface relations:
   3. Both :extends and :implements are optional.
 
 Optionally include <docstring> to detail information on the class in <help>.
+Methods support keyword runtime types exactly like <lambda>.
 
 
 Similar to Java, we support single inheritance for classes and multiple
@@ -8568,6 +8609,7 @@ macro to initialize the super object with a list of values.
 
 See <meta-object> in <Types> for more type details.
 
+
 For example:
   (define-class Rectangle
     (length 0)
@@ -8611,7 +8653,9 @@ For example:
 ```
 Simple wrapper macro combining <define> and <class> to bind <class-name>.
 Also generates a (<class-name>? <obj>) predicate procedure!
+
 Optionally include <docstring> to detail information on the class in <help>.
+Methods support keyword runtime types exactly like <lambda>.
 
 Aliased by <defclass>.
 
@@ -8638,7 +8682,9 @@ details. See <meta-object> in <Types> for more type details.
 ```
 Simple wrapper macro combining <define> and <interface> to bind <interface-name>.
 Also generates a (<interface-name>? <obj>) predicate procedure!
+
 Optionally include <docstring> to detail information on the interface in <help>.
+Static methods support keyword runtime types exactly like <lambda>.
 
 Aliased by <definterface>.
 
@@ -8667,7 +8713,9 @@ via a constructor. Required property names are denoted by a symbolic property,
 (<field-name> above).
 
 Use :extends to optionally inherit required fields from other interface objects.
+
 Optionally include <docstring> to detail information on the interface in <help>.
+Static methods support keyword runtime types exactly like <lambda>.
 
 See <object-oriented-programming> in <Topics> for more high-level object
 orientation details. See <class> for more detailed object orientation
