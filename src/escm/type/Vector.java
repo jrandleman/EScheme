@@ -52,7 +52,7 @@ import escm.type.number.Exact;
 import escm.type.number.Real;
 import escm.vm.util.Environment;
 import escm.vm.util.ExecutionState;
-import escm.type.procedure.TypeChecker.Predicate;
+import escm.type.procedure.types.TypeChecker.Predicate;
 import escm.vm.type.collection.AssociativeCollection;
 import escm.vm.type.collection.OrderedCollection;
 import escm.vm.type.callable.Callable;

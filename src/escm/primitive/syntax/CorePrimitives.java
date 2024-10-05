@@ -91,6 +91,7 @@ public class CorePrimitives {
   public static Symbol ESCM_SET_PARAMETER_BANG = new Symbol("escm-set-parameter!");
   public static Symbol ESCM_GET_PARAMETER = new Symbol("escm-get-parameter");
   public static Symbol ESCM_IS_PARAMETER_P = new Symbol("escm-parameter?");
+  public static Symbol TYPE_ALIAS = new Symbol("type-alias");
 
   
   ////////////////////////////////////////////////////////////////////////////
@@ -2614,6 +2615,36 @@ public class CorePrimitives {
       if(parameters.size() != 1 || !(parameters.get(0) instanceof Symbol))
         throw new Exceptionf("'(parameter? <symbol>) invalid syntax: %s", Exceptionf.profileArgs(parameters));
       return Pair.List(ESCM_IS_PARAMETER_P,Pair.List(QUOTE,parameters.get(0)));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // (define-type <alias-symbol> <type-keyword>)
+  //
+  // (define-syntax define-type
+  //   (lambda (alias-symbol type-keyword)
+  //     (list (quote define) alias-symbol (list (quote type-alias) type-keyword))))
+  public static class DefineType extends PrimitiveSyntax {
+    public java.lang.String escmName() {
+      return "define-type";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("define-type"),new Symbol("<alias-symbol>"),new Symbol("<type-keyword>"));
+    }
+
+    public String docstring() {
+      return "@help:Syntax:Core\nConvenience macro wrapping <define> and <type-alias>. See <type-alias>\nfor more details.";
+    }
+    
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2)
+        throw new Exceptionf("'(define-type <alias-symbol> <type-keyword>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum name = parameters.get(0);
+      if(!(name instanceof Symbol))
+        throw new Exceptionf("'(define-type <alias-symbol> <type-keyword>) 1st arg %s isn't a symbol: %s", name.profile(), Exceptionf.profileArgs(parameters));
+      return Pair.List(DEFINE,name,Pair.List(TYPE_ALIAS,parameters.get(1)));
     }
   }
 }

@@ -8,3 +8,5 @@
   ((new :string name :int age)
     (define self.name name)
     (define self.age age)))
+
+(define-type personalias :Person)

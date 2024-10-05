@@ -532,3 +532,11 @@
 (set-parameter! val2 11)
 (ut val2 0)
 (ut (get-parameter val2) 11)
+
+
+(ut (begin (define-type mytype :int|char) ((fn ((:mytype x) #t) ((x) #f)) 42)) #t)
+(ut (begin (define-type mytype :int|char) ((fn ((:mytype x) #t) ((x) #f)) #\a)) #t)
+(ut (begin (define-type mytype :int|char) ((fn ((:mytype x) #t) ((x) #f)) "a")) #f)
+(ut (begin (deftype mytype :int|char) ((fn ((:mytype x) #t) ((x) #f)) 42)) #t)
+(ut (begin (deftype mytype :int|char) ((fn ((:mytype x) #t) ((x) #f)) #\a)) #t)
+(ut (begin (deftype mytype :int|char) ((fn ((:mytype x) #t) ((x) #f)) "a")) #f)

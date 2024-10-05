@@ -21,7 +21,7 @@ import escm.primitive.syntax.CorePrimitives;
 import escm.type.Character;
 import escm.type.number.Real;
 import escm.type.procedure.CompoundProcedure;
-import escm.type.procedure.TypeChecker;
+import escm.type.procedure.types.TypeChecker;
 import escm.util.error.Exceptionf;
 import escm.vm.util.Instruction;
 import escm.vm.util.ObjectAccessChain;

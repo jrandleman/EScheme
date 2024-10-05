@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.io.Serializable;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
+import escm.type.procedure.types.TypeChecker;
 import escm.type.Datum;
 import escm.type.Keyword;
 import escm.type.Symbol;

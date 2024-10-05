@@ -150,6 +150,9 @@ public class GlobalState {
   private static final Symbol DEFHELP = new Symbol("defhelp");
   private static final Symbol DEFINE_HELP = new Symbol("define-help");
 
+  private static final Symbol DEFTYPE = new Symbol("deftype");
+  private static final Symbol DEFINE_TYPE = new Symbol("define-type");
+
   private static final Symbol CALLCC = new Symbol("call/cc");
   private static final Symbol CALL_WITH_CURRENT_CONTINUATION = new Symbol("call-with-current-continuation");
 
@@ -215,6 +218,7 @@ public class GlobalState {
     definitionEnvironment.define(DEFCLASS,definitionEnvironment.get(DEFINE_CLASS));
     definitionEnvironment.define(DEFINTERFACE,definitionEnvironment.get(DEFINE_INTERFACE));
     definitionEnvironment.define(DEFHELP,definitionEnvironment.get(DEFINE_HELP));
+    definitionEnvironment.define(DEFTYPE,definitionEnvironment.get(DEFINE_TYPE));
     definitionEnvironment.define(CALLCC,definitionEnvironment.get(CALL_WITH_CURRENT_CONTINUATION));
     definitionEnvironment.define(PPRINT,definitionEnvironment.get(PRETTY_PRINT));
     definitionEnvironment.define(PPRINTF,definitionEnvironment.get(PRETTY_PRINTF));

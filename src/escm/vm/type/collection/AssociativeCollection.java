@@ -6,7 +6,7 @@
 package escm.vm.type.collection;
 import java.util.ArrayList;
 import escm.type.Datum;
-import escm.type.procedure.TypeChecker.Predicate;
+import escm.type.procedure.types.TypeChecker.Predicate;
 import escm.util.Trampoline;
 import escm.util.error.Exceptionf;
 import escm.vm.type.callable.Callable;

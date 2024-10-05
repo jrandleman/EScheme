@@ -1,4 +1,4 @@
-// Author: Jordan Randleman - escm.type.procedure.TypeChecker
+// Author: Jordan Randleman - escm.type.procedure.types.TypeChecker
 // Purpose:
 //    EScheme <callable> type annotation utility functions.
 //    Provides:
@@ -13,10 +13,11 @@
 //
 //  EScheme types are typically either a "primitive" or "container" type.
 //  If a type is neither a primitive nor a container, it is presumed to
-//  represent some class or interface: if the type doesn't resolve to a valid
-//  class or interface during a runtime type-check, an error is thrown.
-//    * Note that EScheme supports referencing classes/interfaces in modules!
-//      Hence ":Module.ClassName" is a valid type.
+//  represent some class, interface, or type-alias: if the type doesn't 
+//  resolve to a valid class, interface, or type-alias during a runtime 
+//  type-check, an error is thrown.
+//    * Note that EScheme supports referencing classes/interfaces/aliases
+//      in modules! Hence ":Module.ClassName" is a valid type.
 //
 //  EScheme types are parsed and converted to predicates during compilation, 
 //  with the predicates being applied at runtime.
@@ -59,6 +60,8 @@
 :outport
 
 :module
+
+:type-alias
  */
 
 
@@ -82,7 +85,7 @@
   */
 
 
-package escm.type.procedure;
+package escm.type.procedure.types;
 import java.util.ArrayList;
 import escm.util.Pair;
 import escm.util.error.Exceptionf;
@@ -210,6 +213,11 @@ public class TypeChecker {
       // Module types
       case "module": return new Pair<Predicate,Integer>((env, value) -> { 
         return value instanceof escm.type.oo.EscmModule;
+      },next);
+
+      // Type Alias types
+      case "type-alias": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.procedure.types.TypeAlias;
       },next);
 
       // Non-primitive type
@@ -482,48 +490,56 @@ public class TypeChecker {
 
   ////////////////////////////////////////////////////////////////////////////
   // Parse Class/Interface Types
-  private static Pair<Predicate,Integer> parseModuleClassOrInterface(String type, int typeLength, String name, int index, int next) throws Exception{
+  private static Pair<Predicate,Integer> parseModuleClassOrInterfaceOrAlias(String type, int typeLength, String name, int index, int next) throws Exception{
     ObjectAccessChain moduleClassChain = new ObjectAccessChain(new Symbol(name));
     return new Pair<Predicate,Integer>((env, value) -> {
-      Datum classOrInterface = moduleClassChain.nullableLoadWithState(env);
-      if(classOrInterface == null) {
-        throw new Exceptionf("Invalid Module Class or Interface Type \"%s\" (index %d): %s",name,index,type);
+      Datum classOrInterfaceOrAlias = moduleClassChain.nullableLoadWithState(env);
+      if(classOrInterfaceOrAlias == null) {
+        throw new Exceptionf("Invalid Module Class/Interface/Alias Type \"%s\" (index %d): %s",name,index,type);
       }
-      if((value instanceof EscmObject) == false) return false;
+      if(classOrInterfaceOrAlias instanceof TypeAlias) {
+        return ((TypeAlias)classOrInterfaceOrAlias).check(value);
+      } else if((value instanceof EscmObject) == false) {
+        return false;
+      }
       EscmObject obj = (EscmObject)value;
-      if(classOrInterface instanceof EscmClass) {
-        return obj.instanceOf((EscmClass)classOrInterface);
-      } else if(classOrInterface instanceof EscmInterface) {
-        return obj.instanceOf((EscmInterface)classOrInterface);
+      if(classOrInterfaceOrAlias instanceof EscmClass) {
+        return obj.instanceOf((EscmClass)classOrInterfaceOrAlias);
+      } else if(classOrInterfaceOrAlias instanceof EscmInterface) {
+        return obj.instanceOf((EscmInterface)classOrInterfaceOrAlias);
       } else {
-        throw new Exceptionf("Invalid Module Class or Interface Type \"%s\" (index %d): %s",name,index,type);
+        throw new Exceptionf("Invalid Module Class/Interface/Alias Type \"%s\" (index %d): %s",name,index,type);
       }
     }, next);
   }
 
-  private static Pair<Predicate,Integer> parseLocalClassOrInterface(String type, int typeLength, String name, int index, int next) {
+  private static Pair<Predicate,Integer> parseLocalClassOrInterfaceOrAlias(String type, int typeLength, String name, int index, int next) {
     return new Pair<Predicate,Integer>((env, value) -> {
-      Datum classOrInterface = env.nullableGet(name);
-      if(classOrInterface == null) {
-        throw new Exceptionf("Invalid Class or Interface Type \"%s\" (index %d): %s",name,index,type);
+      Datum classOrInterfaceOrAlias = env.nullableGet(name);
+      if(classOrInterfaceOrAlias == null) {
+        throw new Exceptionf("Invalid Class/Interface/Alias Type \"%s\" (index %d): %s",name,index,type);
       }
-      if((value instanceof EscmObject) == false) return false;
+      if(classOrInterfaceOrAlias instanceof TypeAlias) {
+        return ((TypeAlias)classOrInterfaceOrAlias).check(value);
+      } else if((value instanceof EscmObject) == false) {
+        return false;
+      }
       EscmObject obj = (EscmObject)value;
-      if(classOrInterface instanceof EscmClass) {
-        return obj.instanceOf((EscmClass)classOrInterface);
-      } else if(classOrInterface instanceof EscmInterface) {
-        return obj.instanceOf((EscmInterface)classOrInterface);
+      if(classOrInterfaceOrAlias instanceof EscmClass) {
+        return obj.instanceOf((EscmClass)classOrInterfaceOrAlias);
+      } else if(classOrInterfaceOrAlias instanceof EscmInterface) {
+        return obj.instanceOf((EscmInterface)classOrInterfaceOrAlias);
       } else {
-        throw new Exceptionf("Invalid Class or Interface Type \"%s\" (index %d): %s",name,index,type);
+        throw new Exceptionf("Invalid Class/Interface/Alias Type \"%s\" (index %d): %s",name,index,type);
       }
     }, next);
   }
 
-  private static Pair<Predicate,Integer> parseClassOrInterface(String type, int typeLength, String name, int index, int next) throws Exception{
+  private static Pair<Predicate,Integer> parseClassOrInterfaceOrAlias(String type, int typeLength, String name, int index, int next) throws Exception{
     if(ObjectAccessChain.is(name)) {
-      return parseModuleClassOrInterface(type,typeLength,name,index,next);
+      return parseModuleClassOrInterfaceOrAlias(type,typeLength,name,index,next);
     } else {
-      return parseLocalClassOrInterface(type,typeLength,name,index,next);
+      return parseLocalClassOrInterfaceOrAlias(type,typeLength,name,index,next);
     }
   }
 
@@ -562,6 +578,7 @@ public class TypeChecker {
   //   | container<TYPE,TYPE>REST
   //   | classREST
   //   | interfaceREST
+  //   | typealiasREST
   // REST ::=
   //   | ε
   //   | >
@@ -584,7 +601,7 @@ public class TypeChecker {
     if(p == null) {
       p = parseContainer(type,typeLength,name,next);
       if(p == null) {
-        p = parseClassOrInterface(type,typeLength,name,index,next);
+        p = parseClassOrInterfaceOrAlias(type,typeLength,name,index,next);
       }
     }
     if(p == null) {

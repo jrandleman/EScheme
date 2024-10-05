@@ -3382,6 +3382,46 @@ macros are evaluated as a procedure argument.
 ```
 
 -------------------------------------------------------------------------------
+### `type-alias`
+
+#### Signatures:
+```scheme
+(type-alias <type-keyword>)
+```
+
+#### Description:
+```
+Creates a type alias value for <type-keyword>. When bound via <define> to a
+symbolic alias, that alias may be used as a keyword to reference <type-keyword>
+in procedural type dispatch.
+  => See <type-system> in <Topics> for more details on EScheme's types!
+
+See <type-alias?> to determine if a value is a type alias, as well as
+<define-type> for a convenience macro that wraps <define> and <type-alias>.
+
+For example:
+  ; Have :my-type alias :int|char
+  (define my-type (type-alias :int|char))
+
+  ; Use :my-type as a keyword type
+  (define :my-type (f :bool choice)
+    (if choice 1 #))
+```
+
+-------------------------------------------------------------------------------
+### `type-alias?`
+
+#### Signatures:
+```scheme
+(type-alias? <obj>)
+```
+
+#### Description:
+```
+Returns whether <obj> is a type-alias. See <type-alias> for more details.
+```
+
+-------------------------------------------------------------------------------
 ## Numbers
 
 
@@ -7680,6 +7720,20 @@ For example:
       (fold (lambda (acc item) (list (quote if) acc item #f))
             #t
             conditions)))
+```
+
+-------------------------------------------------------------------------------
+### `define-type`
+
+#### Signatures:
+```scheme
+(define-type <alias-symbol> <type-keyword>)
+```
+
+#### Description:
+```
+Convenience macro wrapping <define> and <type-alias>. See <type-alias>
+for more details.
 ```
 
 -------------------------------------------------------------------------------

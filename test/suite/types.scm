@@ -138,6 +138,11 @@
 (ut ((fn ((:module x) #t) ((:any x) #f)) file-name) #f)
 (ut ((fn ((:module x) #t) ((:any x) #f)) 42) #f)
 
+; Type Aliases
+(ut ((fn ((:type-alias x) #t) ((:any x) #f)) (type-alias :int|char)) #t)
+(ut ((fn ((:type-alias x) #t) ((:any x) #f)) 42) #f)
+(ut ((fn ((:type-alias x) #t) ((:any x) #f)) "42") #f)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CONTAINER TESTS
@@ -652,3 +657,7 @@
 ; Module interface dispatch
 (ut ((fn ((:objects.IPerson p) #t) ((x) #f)) 42) #f)
 (ut ((fn ((:objects.IPerson p) #t) ((x) #f)) (objects.Person "John" 42)) #t)
+
+; Module alias dispatch
+(ut ((fn ((:objects.personalias p) #t) ((x) #f)) 42) #f)
+(ut ((fn ((:objects.personalias p) #t) ((x) #f)) (objects.Person "John" 42)) #t)
