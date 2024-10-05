@@ -15,6 +15,8 @@
 //  If a type is neither a primitive nor a container, it is presumed to
 //  represent some class or interface: if the type doesn't resolve to a valid
 //  class or interface during a runtime type-check, an error is thrown.
+//    * Note that EScheme supports referencing classes/interfaces in modules!
+//      Hence ":Module.ClassName" is a valid type.
 //
 //  EScheme types are parsed and converted to predicates during compilation, 
 //  with the predicates being applied at runtime.
@@ -86,12 +88,14 @@ import escm.util.Pair;
 import escm.util.error.Exceptionf;
 import escm.type.Datum;
 import escm.type.Keyword;
+import escm.type.Symbol;
 import escm.type.oo.EscmObject;
 import escm.type.oo.EscmClass;
 import escm.type.oo.EscmInterface;
 import escm.vm.type.collection.AssociativeCollection;
 import escm.vm.type.collection.OrderedCollection;
 import escm.vm.util.Environment;
+import escm.vm.util.ObjectAccessChain;
 import escm.primitive.FunctionalPrimitives.IsCallable;
 
 public class TypeChecker {
@@ -478,7 +482,26 @@ public class TypeChecker {
 
   ////////////////////////////////////////////////////////////////////////////
   // Parse Class/Interface Types
-  private static Pair<Predicate,Integer> parseClassOrInterface(String type, int typeLength, String name, int index, int next) {
+  private static Pair<Predicate,Integer> parseModuleClassOrInterface(String type, int typeLength, String name, int index, int next) throws Exception{
+    ObjectAccessChain moduleClassChain = new ObjectAccessChain(new Symbol(name));
+    return new Pair<Predicate,Integer>((env, value) -> {
+      Datum classOrInterface = moduleClassChain.nullableLoadWithState(env);
+      if(classOrInterface == null) {
+        throw new Exceptionf("Invalid Module Class or Interface Type \"%s\" (index %d): %s",name,index,type);
+      }
+      if((value instanceof EscmObject) == false) return false;
+      EscmObject obj = (EscmObject)value;
+      if(classOrInterface instanceof EscmClass) {
+        return obj.instanceOf((EscmClass)classOrInterface);
+      } else if(classOrInterface instanceof EscmInterface) {
+        return obj.instanceOf((EscmInterface)classOrInterface);
+      } else {
+        throw new Exceptionf("Invalid Module Class or Interface Type \"%s\" (index %d): %s",name,index,type);
+      }
+    }, next);
+  }
+
+  private static Pair<Predicate,Integer> parseLocalClassOrInterface(String type, int typeLength, String name, int index, int next) {
     return new Pair<Predicate,Integer>((env, value) -> {
       Datum classOrInterface = env.nullableGet(name);
       if(classOrInterface == null) {
@@ -494,6 +517,14 @@ public class TypeChecker {
         throw new Exceptionf("Invalid Class or Interface Type \"%s\" (index %d): %s",name,index,type);
       }
     }, next);
+  }
+
+  private static Pair<Predicate,Integer> parseClassOrInterface(String type, int typeLength, String name, int index, int next) throws Exception{
+    if(ObjectAccessChain.is(name)) {
+      return parseModuleClassOrInterface(type,typeLength,name,index,next);
+    } else {
+      return parseLocalClassOrInterface(type,typeLength,name,index,next);
+    }
   }
 
 

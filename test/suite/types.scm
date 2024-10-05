@@ -639,3 +639,16 @@
 (ut (TestInterface.method5 42) "hi")
 (ut (TestInterface.method6 :hi) 314)
 (ut (TestInterface.method7 :hi 42) "hi")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; MODULE TYPE DISPATCH FOR CLASSES AND INTERFACES
+(import examples.types.objects)
+
+; Module class dispatch
+(ut ((fn ((:objects.Person p) #t) ((x) #f)) 42) #f)
+(ut ((fn ((:objects.Person p) #t) ((x) #f)) (objects.Person "John" 42)) #t)
+
+; Module interface dispatch
+(ut ((fn ((:objects.IPerson p) #t) ((x) #f)) 42) #f)
+(ut ((fn ((:objects.IPerson p) #t) ((x) #f)) (objects.Person "John" 42)) #t)

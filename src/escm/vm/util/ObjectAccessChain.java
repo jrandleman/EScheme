@@ -231,7 +231,30 @@ public class ObjectAccessChain extends Datum {
     return loadWithState(state.env);
   }
 
+  // Used in type-checking
+  public Datum nullableLoadWithState(Environment env) {
+    Datum result = env.nullableGet(value[0].value());
+    if(result == null || !(result instanceof Dottable)) return null;
+    for(int i = 1, n = value.length; i < n; ++i) {
+      try {
+        result = ((Dottable)result).get(value[i]);
+      } catch(Exception e) {
+        return null;
+      }
+      if(i+1 < n) {
+        if(!(result instanceof Dottable)) return null;
+      } else if(result instanceof Procedure && value[i].hasSourceInformation()) {
+        try {
+          result = ((Procedure)result).loadWithInvocationSource(value[i].source());
+        } catch(Exception e) {
+          return null;
+        }
+      }
+    }
+    return result;
+  }
 
+  
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
   public ObjectAccessChain loadWithName(String name) {
