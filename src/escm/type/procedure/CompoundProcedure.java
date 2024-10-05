@@ -324,7 +324,6 @@ public class CompoundProcedure extends Procedure {
     EscmCallStack.Frame originalCallStack = EscmCallStack.currentStackFrame();
     EscmCallStack.push(readableName(),invocationSource);
     TypeChecker.Predicate returnType = compileTime.getReturnType(i);
-    String returnTypeName = compileTime.getReturnTypeName(i);
     if(returnType == null) {
       return Interpreter.run(new ExecutionState(extendedEnvironment,compileTime.bodyList.get(i)),(value) -> () -> {
         EscmCallStack.restore(originalCallStack);
@@ -336,7 +335,7 @@ public class CompoundProcedure extends Procedure {
           throw new Exceptionf(
             "Procedure %s invalid return: type %s is not satisfied by %s", 
             readableName(), 
-            returnTypeName, 
+            compileTime.getReturnTypeName(i), 
             value.profile()
           );
         }
