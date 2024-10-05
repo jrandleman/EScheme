@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import escm.type.Datum;
+import escm.type.Keyword;
 import escm.type.Pair;
 import escm.type.Symbol;
 import escm.type.procedure.SyntaxProcedure;
@@ -40,7 +41,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Meta\nGet the <callable> call signature as EScheme data, or #f if unavailable.\n\nFor unary parameter lists: returns the parameter clause as a list of symbols.\nFor binary+ parameter lists: returns a list of parameter clauses.\n\nNote that the symbols '... & '. denote variadic parameters.\n\nAn argument list may be used to denote a default argument value.";
+      return "@help:Procedures:Meta\nGet the <callable> call signature as EScheme data, or #f if unavailable.\n\nFor unary parameter lists: returns the parameter clause as a list of symbols.\nFor binary+ parameter lists: returns a list of parameter clauses.\n\nKeyword types are also included for typed signatures!\n  => See <type-system> in <Topics> for more details on EScheme's types!\n\nNote that the symbols '... & '. denote variadic parameters.\nAn argument list may be used to denote a default argument value.\n\nFor example:\n  ; signature: (f a b c)\n  (define (f a b c) a)\n\n  ; signature: (f :int a :char b :string c)\n  (define (f :int a :char b :string c) a)\n\n  ; signature: (:int (f :int a :char b :string c))\n  (define :int (f :int a :char b :string c) a)\n\n  ; signature: ((f a b) (f c))\n  (defn f ((a b) a) ((c) c))\n\n  ; signature: (:int (f :int a :char b) :string (f :string c))\n  (defn f (:int (:int a :char b) a) (:string (:string c) c))";
     }
 
     public static Datum logic(Datum obj) {
@@ -76,7 +77,13 @@ public class MetaPrimitives {
       if(obj instanceof Procedure) return new Symbol(((Procedure)obj).readableName());
       Datum sig = ((Callable)obj).signature();
       if(sig instanceof Pair) {
-        Datum head = ((Pair)sig).car();
+        Pair psig = (Pair)sig;
+        Datum head = psig.car();
+        if(head instanceof Keyword) {
+          Datum tail = psig.cdr();
+          if(!(tail instanceof Pair)) return Boolean.FALSE;
+          head = ((Pair)tail).car();
+        }
         if(head instanceof Pair) head = ((Pair)head).car();
         if(head instanceof Symbol) return head;
       }

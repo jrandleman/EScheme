@@ -9,7 +9,8 @@
     (scar int-stream)
     (sieve 
       (stream-filter 
-        (lambda (n) (positive? (remainder n (scar int-stream))))
+        (lambda (n) 
+          (positive? (remainder n (scar int-stream))))
         (scdr int-stream)))))
 
 (define int-stream-from-2

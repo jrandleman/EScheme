@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.ArrayList;
 import escm.util.Trampoline;
 import escm.type.Datum;
+import escm.type.Keyword;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Symbol;
@@ -102,43 +103,57 @@ public class PrimitiveProcedure extends Procedure {
     return prm.docstring();
   }
 
-  private boolean signatureShouldBindName(Datum name) {
+  private static boolean signatureShouldBindName(Datum name) {
     return name instanceof Symbol && ((Symbol)name).value().equals(Procedure.DEFAULT_NAME);
   }
 
-  public Datum signature() {
-    Datum sig = prm.signature();
+  static Datum tagCallableSignature(Datum sig, String readableName) {
     if(!(sig instanceof Pair)) return sig;
     Pair psig = (Pair)sig;
     Datum head = psig.car();
-    if(signatureShouldBindName(head)) {
-      return new Pair(new Symbol(readableName()),psig.cdr());
+    if(head instanceof Keyword) {
+      return new Pair(head,tagCallableSignature(psig.cdr(),readableName));
+    } else if(signatureShouldBindName(head)) {
+      return new Pair(new Symbol(readableName),psig.cdr());
     } else if(head instanceof Pair) {
       Datum sigs = Nil.VALUE;
       while(sig instanceof Pair) {
         Pair sigp = (Pair)sig;
         Datum signature = sigp.car();
+        Datum restSignatures = sigp.cdr();
+        if(signature instanceof Keyword) {
+          sigs = new Pair(signature,sigs);
+          signature = restSignatures;
+          if(signature instanceof Pair) {
+            Pair psigClause = (Pair)signature;
+            signature = psigClause.car();
+            restSignatures = psigClause.cdr();
+          }
+        }
         if(signature instanceof Pair) {
           Pair psignature = (Pair)signature;
           if(signatureShouldBindName(psignature.car())) {
-            sigs = new Pair(new Pair(new Symbol(readableName()),psignature.cdr()),sigs);
+            sigs = new Pair(new Pair(new Symbol(readableName),psignature.cdr()),sigs);
           } else {
             sigs = new Pair(signature,sigs);
           }
-        } else {
-          sigs = new Pair(signature,sigs);
         }
-        sig = sigp.cdr();
+        sig = restSignatures;
       }
       if(sigs instanceof Pair) {
         return (Datum)((Pair)sigs).reverse();
       } else { // if(sigs instanceof Nil)
-        return Nil.VALUE;
+        return sigs;
       }
     } else {
       return sig;
     }
   }
+
+  public Datum signature() {
+    return tagCallableSignature(prm.signature(),readableName());
+  }
+
 
   public Trampoline.Bounce callWith(ArrayList<Datum> arguments, Trampoline.Continuation continuation) throws Exception {
     return () -> {

@@ -34,7 +34,13 @@
 (ut (list? (expand-syntax '(if 1 2 3))) #t)
 (ut (expand-syntax '(module-test.*3 5)) '(* 5 3)) ; verify works with modules
 
+(ut (callable-name (begin (define (f x) x) f)) 'f) ; dynamic lambda
+(ut (callable-name (begin (define :int (f :int x) x) f)) 'f) ; typed lambda
+(ut (callable-name (begin (defn f ((x) x) ((y) y)) f)) 'f) ; dynamic fn
+(ut (callable-name (begin (defn f (:int (:int x) x) (:char (:char y) y)) f)) 'f) ; typed fn
+(ut (callable-name (begin (defclass C) C)) 'C) ; constructor
+(ut (callable-name callable-name) 'callable-name) ; primitive
+
 ; can't verify these reflections programmatically, just check we can call it.
 (ut (pair? (callable-signature callable-signature)) #t) 
-(ut (callable-name callable-name) 'callable-name)
 (ut (string? (docstring docstring)) #t)

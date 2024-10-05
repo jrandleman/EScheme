@@ -87,7 +87,7 @@ public class CompoundProcedure extends Procedure {
 
     public CompileTime(
       String docstring, 
-      ArrayList<String> returnTypeNames, // @TODO: USE THIS WHEN PRINTING SIGNATURES!
+      ArrayList<String> returnTypeNames,
       ArrayList<TypeChecker.Predicate> returnTypeLists, 
       ArrayList<ArrayList<String>> parameterTypeNames, 
       ArrayList<ArrayList<TypeChecker.Predicate>> parameterTypesList, 
@@ -219,11 +219,23 @@ public class CompoundProcedure extends Procedure {
   public Datum signature() {
     int n = compileTime.parametersList.size();
     if(n == 1) {
-      return clauseSignature(compileTime.getParameterTypeName(0),compileTime.parametersList.get(0),compileTime.variadicParameterList.get(0));
+      String returnTypeName = compileTime.getReturnTypeName(0);
+      Datum parameterClause = clauseSignature(compileTime.getParameterTypeName(0),compileTime.parametersList.get(0),compileTime.variadicParameterList.get(0));
+      if(returnTypeName == null) {
+        return parameterClause;
+      } else {
+        return Pair.List(new Keyword(returnTypeName.substring(1)),parameterClause);
+      }
     }
     Datum sigs = Nil.VALUE;
     for(int i = n-1; i >= 0; --i) {
-      sigs = new Pair(clauseSignature(compileTime.getParameterTypeName(i),compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i)),sigs);
+      String returnTypeName = compileTime.getReturnTypeName(i);
+      Datum parameterClause = clauseSignature(compileTime.getParameterTypeName(i),compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i));
+      if(returnTypeName == null) {
+        sigs = new Pair(parameterClause,sigs);
+      } else {
+        sigs = new Pair(new Keyword(returnTypeName.substring(1)),new Pair(parameterClause,sigs));
+      }
     }
     return sigs;
   }
@@ -231,9 +243,14 @@ public class CompoundProcedure extends Procedure {
 
   ////////////////////////////////////////////////////////////////////////////
   // Application Abstraction
+  protected String stringifyReturnType(String returnTypeName) {
+    if(returnTypeName == null) return "";
+    return returnTypeName + " ";
+  }
+
   protected String stringifyParameters(ArrayList<String> parameterTypeNames, ArrayList<Symbol> params, Symbol variadic) {
     int n = params.size();
-    if(n == 0 && variadic == null) return "expected 0 args";
+    if(n == 0 && variadic == null) return "()";
     StringBuilder sb = new StringBuilder("(");
     for(int i = 0; i < n; ++i) {
       if(parameterTypeNames != null) {
@@ -257,7 +274,9 @@ public class CompoundProcedure extends Procedure {
   protected String stringifyParameterSignatures() {
     StringBuilder sb = new StringBuilder("\n>> Available Signatures:");
     for(int i = 0, n = compileTime.parametersList.size(); i < n; ++i) {
-      sb.append(String.format("\n   %2d) ", i+1) + stringifyParameters(compileTime.getParameterTypeName(i),compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i)));
+      sb.append(String.format("\n   %2d) ", i+1));
+      sb.append(stringifyReturnType(compileTime.getReturnTypeName(i)));
+      sb.append(stringifyParameters(compileTime.getParameterTypeName(i),compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i)));
     }
     return sb.toString();
   }

@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.Datum;
+import escm.type.Keyword;
 import escm.type.Pair;
 import escm.type.Nil;
 import escm.type.Symbol;
@@ -103,34 +104,68 @@ public class EscmClass extends MetaObject implements Callable {
   }
 
   // Replaces names of <signature> with <newName>.
-  // Also used by <EscmObject>.
+  // Also used by <EscmObject> and <EscmInterface>.
   static Datum tagMethodWithName(Datum newName, Datum signature) {
     if(!(signature instanceof Pair)) return Pair.List(newName);
     Pair ctorSignaturePair = (Pair)signature;
     Datum fst = ctorSignaturePair.car();
-    if(!(fst instanceof Pair)) return new Pair(newName,ctorSignaturePair.cdr());
+    if(fst instanceof Keyword) {
+      return new Pair(fst,tagMethodWithName(newName,ctorSignaturePair.cdr()));
+    } else if(!(fst instanceof Pair)) {
+      return new Pair(newName,ctorSignaturePair.cdr());
+    }
     Datum sigs = Nil.VALUE;
     while(signature instanceof Pair) {
-      Pair p = (Pair)signature;
-      if(p.car() instanceof Pair) {
-        sigs = new Pair(new Pair(newName,((Pair)p.car()).cdr()),sigs);
+      Pair psignature = (Pair)signature;
+      Datum sigClause = psignature.car();
+      Datum restClauses = psignature.cdr();
+      if(sigClause instanceof Keyword) {
+        sigs = new Pair(sigClause,sigs);
+        sigClause = restClauses;
+        if(sigClause instanceof Pair) {
+          Pair psigClause = (Pair)sigClause;
+          sigClause = psigClause.car();
+          restClauses = psigClause.cdr();
+        }
+      } 
+      if(sigClause instanceof Pair) {
+        sigs = new Pair(new Pair(newName,((Pair)sigClause).cdr()),sigs);
       }
-      signature = p.cdr();
+      signature = restClauses;
     }
-    if(sigs instanceof Nil) return sigs;
-    return (Datum)((Pair)sigs).reverse();
+    if(sigs instanceof Pair) {
+      return (Datum)((Pair)sigs).reverse();
+    }
+    return sigs;
+  }
+
+  private static boolean hasMultipleOrTypedSignatures(Pair signatures) {
+    Datum fst = signatures.car();
+    if(fst instanceof Pair) return true;
+    if(fst instanceof Keyword) {
+      Datum rest = signatures.cdr();
+      return rest instanceof Pair && ((Pair)rest).car() instanceof Pair;
+    }
+    return false;
   }
 
   // @PRECONDITION: <signatures instanceof Pair>
-  private void accumulateMethodSignatureAndDocstring(StringBuilder sb, Datum signatures, String docstring) {
+  // Also used by <EscmInterface>.
+  static void accumulateMethodSignatureAndDocstring(StringBuilder sb, Datum signatures, String docstring) {
     Pair psig = (Pair)signatures;
-    // print multiple signatures
-    if(psig.car() instanceof Pair) {
+    // print multiple/typed signatures
+    if(hasMultipleOrTypedSignatures(psig)) {
       sb.append("\n   ");
       while(signatures instanceof Pair) {
         psig = (Pair)signatures;
-        sb.append(" "+psig.car().write());
-        signatures = psig.cdr();
+        Datum fst = psig.car();
+        Datum rest = psig.cdr();
+        sb.append(" "+fst.write());
+        // if printing multiple parameter clauses
+        if(!(fst instanceof Keyword) && rest instanceof Pair) {
+          sb.append("\n   ");
+        }
+        signatures = rest;
       }
     // print single signatures
     } else {

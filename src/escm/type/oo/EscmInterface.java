@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.Pair;
-import escm.type.Nil;
 import escm.type.procedure.CompoundProcedure;
 import escm.vm.type.callable.DocString;
 
@@ -107,47 +106,11 @@ public class EscmInterface extends MetaObject {
     return printed;
   }
 
-  // Replaces names of <signature> with <newName>.
-  private Datum tagMethodWithName(Datum newName, Datum signature) {
-    if(!(signature instanceof Pair)) return Pair.List(newName);
-    Pair ctorSignaturePair = (Pair)signature;
-    Datum fst = ctorSignaturePair.car();
-    if(!(fst instanceof Pair)) return new Pair(newName,ctorSignaturePair.cdr());
-    Datum sigs = Nil.VALUE;
-    while(signature instanceof Pair) {
-      Pair p = (Pair)signature;
-      if(p.car() instanceof Pair) {
-        sigs = new Pair(new Pair(newName,((Pair)p.car()).cdr()),sigs);
-      }
-      signature = p.cdr();
-    }
-    if(sigs instanceof Nil) return sigs;
-    return (Datum)((Pair)sigs).reverse();
-  }
-
   // Print method signature + user docstring (if given)
   private void accumulateMethod(StringBuilder sb, String name, CompoundProcedure val) {
-    Datum signatures = tagMethodWithName(new Symbol(name),val.signature());
+    Datum signatures = EscmClass.tagMethodWithName(new Symbol(name),val.signature());
     if(!(signatures instanceof Pair)) return;
-    Pair psig = (Pair)signatures;
-    // print multiple signatures
-    if(psig.car() instanceof Pair) {
-      sb.append("\n   ");
-      while(signatures instanceof Pair) {
-        psig = (Pair)signatures;
-        sb.append(" "+psig.car().write());
-        signatures = psig.cdr();
-      }
-    // print single signatures
-    } else {
-      sb.append("\n    "+psig.write());
-    }
-    // print user docstring (if given)
-    String docs = val.docstring();
-    if(docs.length() > 0) {
-      sb.append("\n      "+docs.replaceAll("\n","\n      "));
-    }
-    sb.append("\n");
+    EscmClass.accumulateMethodSignatureAndDocstring(sb,signatures,val.docstring());
   }
 
   // Print static fields & methods

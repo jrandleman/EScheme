@@ -3112,9 +3112,27 @@ Get the <callable> call signature as EScheme data, or #f if unavailable.
 For unary parameter lists: returns the parameter clause as a list of symbols.
 For binary+ parameter lists: returns a list of parameter clauses.
 
-Note that the symbols '... & '. denote variadic parameters.
+Keyword types are also included for typed signatures!
+  => See <type-system> in <Topics> for more details on EScheme's types!
 
+Note that the symbols '... & '. denote variadic parameters.
 An argument list may be used to denote a default argument value.
+
+For example:
+  ; signature: (f a b c)
+  (define (f a b c) a)
+
+  ; signature: (f :int a :char b :string c)
+  (define (f :int a :char b :string c) a)
+
+  ; signature: (:int (f :int a :char b :string c))
+  (define :int (f :int a :char b :string c) a)
+
+  ; signature: ((f a b) (f c))
+  (defn f ((a b) a) ((c) c))
+
+  ; signature: (:int (f :int a :char b) :string (f :string c))
+  (defn f (:int (:int a :char b) a) (:string (:string c) c))
 ```
 
 -------------------------------------------------------------------------------
