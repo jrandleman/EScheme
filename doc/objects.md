@@ -2,7 +2,7 @@
 
 # Object Orientation in EScheme
 
-### Describes escm's OO system!
+### Describes EScheme's optional object system!
 
 ## Object System Overview
 

@@ -3397,7 +3397,9 @@ in procedural type dispatch.
   => See <type-system> in <Topics> for more details on EScheme's types!
 
 See <type-alias?> to determine if a value is a type alias, as well as
-<define-type> for a convenience macro that wraps <define> and <type-alias>.
+<type-alias-source> to get the keyword type that an alias references.
+
+See <define-type> for a convenience macro wrapping <define> and <type-alias>.
 
 For example:
   ; Have :my-type alias :int|char
@@ -3406,6 +3408,20 @@ For example:
   ; Use :my-type as a keyword type
   (define :my-type (f :bool choice)
     (if choice 1 #))
+```
+
+-------------------------------------------------------------------------------
+### `type-alias-source`
+
+#### Signatures:
+```scheme
+(type-alias-source <type-alias>)
+```
+
+#### Description:
+```
+Returns the keyword type that <type-alias> references. See <type-alias>
+for more details.
 ```
 
 -------------------------------------------------------------------------------
@@ -7734,6 +7750,8 @@ For example:
 ```
 Convenience macro wrapping <define> and <type-alias>. See <type-alias>
 for more details.
+
+Aliased by <deftype>.
 ```
 
 -------------------------------------------------------------------------------

@@ -51,3 +51,5 @@
 
 (ut (type-alias? 42) #f)
 (ut (type-alias? (type-alias :int|char)) #t)
+
+(ut (type-alias-source (type-alias :int|char)) :int|char)

@@ -1,9 +1,11 @@
 <!-- modules.md -->
 
 # Modules in EScheme
-### Describes EScheme's module system
+
+### Describes EScheme's module system!
 
 ## Motivation and Overview
+
 The value created by an `import` expression.
 
 Modules present an alternative to Scheme's usual inter-file semantics.
@@ -25,8 +27,8 @@ to EScheme's standard library. Note that this means that operations that depend
 on global variables (e.g. `load-once`) are hence only able to operate on
 a module-relative basis.
 
-* Note that `dosync` notably works across modules, since its internal lock was 
-  created via `define-parameter`. Use `dosync-module` for module-relative locking 
+- Note that `dosync` notably works across modules, since its internal lock was
+  created via `define-parameter`. Use `dosync-module` for module-relative locking
   behavior.
 
 Both variables and macros can be access from a module by using EScheme's
@@ -47,7 +49,7 @@ Modules may be introspected upon by 2 primitives:
 2. `module-bindings`: yield a list of the symbols defined in a module (beware:
    every module redefines the entire EScheme standard library!).
 
-Note that the 'meta-thread's environment (see `thread-define`) is module 
+Note that the 'meta-thread's environment (see `thread-define`) is module
 independant!
 
 Use the `*import*` variable to determine if the current file was `import`ed.
@@ -62,15 +64,18 @@ Lastly, note that the concept of 'parameter' variables exist in order to
 have global state shared across modules. See the `define-parameter` and
 `parameter?` 'help' entries for more details.
 
-------------------------
+---
+
 ## Accessing variable `<var>` from module `<module>`
+
 ```scheme
 <module>.<var>
 ```
 
+---
 
-------------------------
 ## Regular Imports
+
 ```scheme
 (import <module-path-symbol>)
 (import <module-path-symbol> :as <module-alias-symbol>)
@@ -85,26 +90,27 @@ Seeks the module from `<filepath-string>`, if provided.
 Module variables are named `<module-path-symbol>` by default, though there are
 2 caveats:
 
- 1. `<module-alias-symbol>` is provided: this overrides the default name and
+1.  `<module-alias-symbol>` is provided: this overrides the default name and
     will be what the module is loaded into the environment as.
 
- 2. `<module-path-symbol>` is a dotted list of symbols: this is how we denote
+2.  `<module-path-symbol>` is a dotted list of symbols: this is how we denote
     access to a module that is in a different folder than the current
     directory. For example, suppose we have the following directory layout:
-      ```
-      Root
-      |____ Folder1
-      |     |_______ Module.scm
-      |
-      |____ Folder2
-            |_______ Main.scm
-      ```
+
+    ```
+    Root
+    |____ Folder1
+    |     |_______ Module.scm
+    |
+    |____ Folder2
+          |_______ Main.scm
+    ```
 
     For `Main.scm` to import `Module.scm`, it would contain:
 
-      ```scheme
-      (import Folder1.Module) ; within 'Main.scm'. '(import Root.Folder1.Module)' also works
-      ```
+    ```scheme
+    (import Folder1.Module) ; within 'Main.scm'. '(import Root.Folder1.Module)' also works
+    ```
 
     In this example, the module variable would be named `Module`. Note that
     the file extension of the target module file is left out from the `import`
@@ -123,9 +129,10 @@ See the `from` details below for an alternative to `import` that extracts specif
 fields from the `<module-path-symbol>` module, without adding the module itself to
 your current environment's namespace.
 
+---
 
-------------------------
 ## Reloading Modules
+
 ```scheme
 (reload <module-alias-symbol>)
 ```
@@ -133,9 +140,10 @@ your current environment's namespace.
 Forcefully re-evaluate `<module-alias-symbol>` (note that `import` caches
 modules by default).
 
+---
 
-------------------------
 ## Loading Module Variables
+
 ```scheme
 (from <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ...)
 (from <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ... :as <alias1-symbol> <alias2-symbol> ...)
@@ -147,38 +155,40 @@ Import `<obj1-symbol> <obj2-symbol> ...` from `<module-path-symbol>`, without
 exposing the module itself as a variable within the current environment.
 
 Equivalent to:
- 
- ```scheme
- (begin
-   (import <module-path-symbol> :as <hidden-name>)
-   (define <obj1-symbol> <hidden-name>.<obj1-symbol>)
-   (define <obj2-symbol> <hidden-name>.<obj2-symbol>)
-   ...)
- ```
+
+```scheme
+(begin
+  (import <module-path-symbol> :as <hidden-name>)
+  (define <obj1-symbol> <hidden-name>.<obj1-symbol>)
+  (define <obj2-symbol> <hidden-name>.<obj2-symbol>)
+  ...)
+```
 
 Or, if `<alias1-symbol> ...` is provided:
 
- ```scheme
- (begin
-   (import <module-path-symbol> :as <hidden-name>)
-   (define <alias1-symbol> <hidden-name>.<obj1-symbol>)
-   (define <alias2-symbol> <hidden-name>.<obj2-symbol>)
-   ...)
- ```
+```scheme
+(begin
+  (import <module-path-symbol> :as <hidden-name>)
+  (define <alias1-symbol> <hidden-name>.<obj1-symbol>)
+  (define <alias2-symbol> <hidden-name>.<obj2-symbol>)
+  ...)
+```
 
 If given `<filepath-string>`, `from` simply adds it to the above `import`
 statement.
 
+---
 
-------------------------
 ## Module Introspection Primitives
 
 ### Module Predicate
+
 ```scheme
 (module? <obj>)
 ```
 
 ### Module Absolute Path Source Location
+
 ```scheme
 (module-path <module>)
 ```
@@ -187,6 +197,7 @@ The absolute file path string of the module file's location, what
 distinguishes one module from another under the hood.
 
 ### Module Variable Name Bindings List
+
 ```scheme
 (module-bindings <module>)
 ```

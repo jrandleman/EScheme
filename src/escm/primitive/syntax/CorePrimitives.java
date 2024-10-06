@@ -2635,7 +2635,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Core\nConvenience macro wrapping <define> and <type-alias>. See <type-alias>\nfor more details.";
+      return "@help:Syntax:Core\nConvenience macro wrapping <define> and <type-alias>. See <type-alias>\nfor more details.\n\nAliased by <deftype>.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

@@ -409,7 +409,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Meta\nCreates a type alias value for <type-keyword>. When bound via <define> to a\nsymbolic alias, that alias may be used as a keyword to reference <type-keyword>\nin procedural type dispatch.\n  => See <type-system> in <Topics> for more details on EScheme's types!\n\nSee <type-alias?> to determine if a value is a type alias, as well as\n<define-type> for a convenience macro that wraps <define> and <type-alias>.\n\nFor example:\n  ; Have :my-type alias :int|char\n  (define my-type (type-alias :int|char))\n\n  ; Use :my-type as a keyword type\n  (define :my-type (f :bool choice)\n    (if choice 1 #\1))";
+      return "@help:Procedures:Meta\nCreates a type alias value for <type-keyword>. When bound via <define> to a\nsymbolic alias, that alias may be used as a keyword to reference <type-keyword>\nin procedural type dispatch.\n  => See <type-system> in <Topics> for more details on EScheme's types!\n\nSee <type-alias?> to determine if a value is a type alias, as well as\n<type-alias-source> to get the keyword type that an alias references.\n\nSee <define-type> for a convenience macro wrapping <define> and <type-alias>.\n\nFor example:\n  ; Have :my-type alias :int|char\n  (define my-type (type-alias :int|char))\n\n  ; Use :my-type as a keyword type\n  (define :my-type (f :bool choice)\n    (if choice 1 #\1))";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -442,6 +442,32 @@ public class MetaPrimitives {
       if(parameters.size() != 1)
         throw new Exceptionf("'(type-alias? <obj>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
       return Boolean.valueOf(parameters.get(0) instanceof escm.type.procedure.types.TypeAlias);
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // type-alias-source
+  public static class TypeAliasSource extends Primitive {
+    public java.lang.String escmName() {
+      return "type-alias-source";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("type-alias-source"),new Symbol("<type-alias>"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Meta\nReturns the keyword type that <type-alias> references. See <type-alias>\nfor more details.";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1)
+        throw new Exceptionf("'(type-alias-source <type-alias>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      Datum alias = parameters.get(0);
+      if(!(alias instanceof escm.type.procedure.types.TypeAlias))
+        throw new Exceptionf("'(type-alias-source <type-alias>) arg %s isn't a type-alias: %s", alias.profile(), Exceptionf.profileArgs(parameters));
+      return new Keyword(((escm.type.procedure.types.TypeAlias)alias).typeName().substring(1));
     }
   }
 }

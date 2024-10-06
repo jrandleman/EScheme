@@ -1,89 +1,10 @@
 // Author: Jordan Randleman - escm.type.procedure.types.TypeChecker
 // Purpose:
 //    EScheme <callable> type annotation utility functions.
+//    See doc/types.md for more information on using EScheme's types.
 //    Provides:
 //      1. <Predicate>: Type checking functional interface.
 //      2. <getPredicate(key)>: Keyword-to-Predicate type compiler.
-
-
-//////////////////////////////////////////////////////////////////////////////
-// SYNTAX OVERVIEW
-//  EScheme denotes types with keywords, and "compound types" via "|" syntax.
-//    * EX: ":string|number" represents either a string or a number.
-//
-//  EScheme types are typically either a "primitive" or "container" type.
-//  If a type is neither a primitive nor a container, it is presumed to
-//  represent some class, interface, or type-alias: if the type doesn't 
-//  resolve to a valid class, interface, or type-alias during a runtime 
-//  type-check, an error is thrown.
-//    * Note that EScheme supports referencing classes/interfaces/aliases
-//      in modules! Hence ":Module.ClassName" is a valid type.
-//
-//  EScheme types are parsed and converted to predicates during compilation, 
-//  with the predicates being applied at runtime.
-//
-//  EScheme's primitive types are as follows:
-/**
-:any
-
-:number ; aliased by ":complex"
-:int
-:flo
-:real
-:exact
-:inexact
-
-:string
-:char
-:key
-:bool
-:symbol
-:void
-
-:thread
-:mutex
-
-:nil
-:atom
-
-:fn ; all callables
-:procedure
-:syntax
-
-:metaobj ; includes modules
-:object
-:class
-:interface
-
-:port
-:inport
-:outport
-
-:module
-
-:type-alias
- */
-
-
-// EScheme types support the following containers:
-//   * Note: All containers may be parameterized by adding the "<type>" suffix.
-//     - EX: ":list<string|symbol>" is a list where each element is either a
-//       string or symbol.
-//       * For either a list that only has strings OR a list that only has
-//         symbols, use ":list<string>|list<symbol>".
-//     - Furthermore, ":pair" and ":map" may also be parameterized with the
-//       "<type,type>" suffix in order to type-check their keys and values.
- /**
-:vector
-:map
-
-:pair
-:list
-
-:associative-collection ; aliased by ":ac"
-:ordered-collection ; aliased by ":oc"
-  */
-
 
 package escm.type.procedure.types;
 import java.util.ArrayList;
