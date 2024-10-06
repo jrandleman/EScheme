@@ -2,7 +2,7 @@
 
 # Modules in EScheme
 
-### Describes EScheme's module system!
+### Describes EScheme's optional module system!
 
 ## Motivation and Overview
 

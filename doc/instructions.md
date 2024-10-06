@@ -1,7 +1,5 @@
 # An Introduction to EScheme's Bytecode
 
-### Describes EScheme's bytecode!
-
 ## Brief Insight
 
 EScheme's bytecode structure can be thought of as a chain of instruction sets

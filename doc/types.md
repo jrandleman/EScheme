@@ -1,6 +1,6 @@
 <!-- types.md -->
 
-# EScheme's Type System
+# Types in EScheme
 
 ### Describes EScheme's optional type system!
 

@@ -1,6 +1,6 @@
 <!-- objects.md -->
 
-# Object Orientation in EScheme
+# Objects in EScheme
 
 ### Describes EScheme's optional object system!
 
