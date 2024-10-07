@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Intrinsic-Types](#Intrinsic-Types)
 * [Procedures](#Procedures)
   * [Associative-Collections](#Associative-Collections)
   * [Booleans](#Booleans)
@@ -37,9 +38,428 @@
   * [Streams](#Streams)
   * [Synchronization](#Synchronization)
 * [Topics](#Topics)
-* [Types](#Types)
 * [Variables](#Variables)
 
+
+-------------------------------------------------------------------------------
+# Intrinsic-Types
+
+
+-------------------------------------------------------------------------------
+## `associative-collection`
+
+### Description:
+```
+Family of collection types that associate keys to values.
+Used to provide a generic interface across algorithmic primitives!
+
+Hashmaps are the most flexible example of such (supporting arbitrary key &
+value types), while strings are the most restrictive (only supporting index
+keys and character values).
+
+Their coercion hierarchy is as follows: String < List < Vector < Hashmap
+```
+
+-------------------------------------------------------------------------------
+## `boolean`
+
+### Description:
+```
+The boolean type. #t is true and #f is false. Any non-false value is truthy.
+Typically returned by predicate actions that end in '?'.
+```
+
+-------------------------------------------------------------------------------
+## `callable`
+
+### Description:
+```
+Any EScheme value that can be applied to arguments: (<callable> <argument> ...)
+
+This includes procedures, functors (objects with a '->procedure' method defined),
+classes (to invoke their constructor), as well as O(1)-access containers
+(strings, vectors, and hashmaps).
+```
+
+-------------------------------------------------------------------------------
+## `character`
+
+### Description:
+```
+Reader literals have the '#\' prefix: #\h #\e #\l #\l #\o #\!
+
+Represented by a 32bit codepoint internally:
+  * In keeping with Java, any codepoint <= 16bits correlates to a true, single
+    character in strings.
+  * Any codepoint above 16bits (as in Java) becomes 2 separate characters in 
+    strings. However, most EScheme string operations (like <length>) operate 
+    relative to the number of codepoints in a string, NOT to the number of
+    'java characters'.
+    - The only exceptions to this rule are EScheme's regex primtives, which 
+      operate relative to 16bit characters since they wrap Java's regex ops.
+
+Supports Named Characters:
+  #\space,     #\tab, #\newline, #\page, #\return,
+  #\backspace, #\nul, #\esc,     #\delete
+
+Supports Unicode Codepoints (note 'u' vs. 'U'):
+  #\uXXXX (create a 16bit hex-code character)
+  #\UXXXXXXXX (create a 32bit hex-code character)
+
+Displaying characters prints them in a human-readable way, whereas writing them
+prints characters with their prefix such that they can be re-read by the reader
+as EScheme data.
+```
+
+-------------------------------------------------------------------------------
+## `eof`
+
+### Description:
+```
+The "end-of-file" value terminating files.
+Denoted via #eof and detected via (eof? <obj>).
+Ends file/REPL evaluation early if read in as a single expression.
+```
+
+-------------------------------------------------------------------------------
+## `hashmap`
+
+### Description:
+```
+Also see the <hashmap> procedure.
+A hashmap containing key-value associations of "<key> <value> ...".
+Create hashmap literals via the {<key> <value> ...} syntax.
+Hashmaps are applicable to a key to get their entry: (<hashmap> <key>)
+```
+
+-------------------------------------------------------------------------------
+## `keyword`
+
+### Description:
+```
+Similar to symbols, but they always evaluate to themselves.
+Denoted as a symbol prefixed with ':'.
+```
+
+-------------------------------------------------------------------------------
+## `list`
+
+### Description:
+```
+Also see the <list> procedure.
+A linked list containing "<obj> ...". The empty list is (quote ()).
+Lists are right-nested pairs ending in nil: (quote ())
+Create list literals via the (<item> ...) syntax.
+```
+
+-------------------------------------------------------------------------------
+## `meta-object`
+
+### Description:
+```
+Super type of objects, classes, and interfaces, all of which support
+'dot-notation' to access a property. 
+
+Note that, despite supporting dot-notation, modules are not meta-objects.
+```
+
+-------------------------------------------------------------------------------
+## `module`
+
+### Description:
+```
+The value created by an <import> expression.
+
+Modules present an alternative to Scheme's usual inter-file semantics.
+
+The <load> function has always served as a means by which to execute the code
+of another Scheme file in the calling file's global environment. This simplicity
+is a double edged sword though: while making <load> easy to implement, it leaves
+much to be desired with respect to enabling encapsulation of code across
+coordinated Scheme files.
+
+As such, in addition to <load>, EScheme offers a minimalistic module system
+that strives to enable file-specific encapsulation of EScheme code. Files
+processed via the <import> macro are defined as <module> objects within the
+enclosing enivironment. See the <import> 'help' entry for more details on how
+EScheme evaluates modules.
+
+Each module has its own isolated global environment, and has automatic access
+to EScheme's standard library. Note that this means that operations that depend
+on global variables (e.g. <load-once>) are hence only able to operate on
+a module-relative basis.
+
+  * Note that <dosync> notably works across modules, since its internal lock
+    was created via <define-parameter>. Use <dosync-module> for module-relative
+    locking behavior.
+
+Both variables and macros can be access from a module by using EScheme's
+dot-notation: for example, to access variable 'PersonClass' from module 'Mod',
+we write 'Mod.PersonClass'.
+
+Further note that imported modules are cached! Importing the same module
+multiple times does not cause multiple evaluations of that module. Use the
+<reload> macro if you'd like to forcefully re-evaluate the module in question.
+
+Additionally, the <from> macro may be used to load specific variables within
+a given module, without defining that module itself as a local variable.
+
+Modules may be introspected upon by 2 primitives:
+
+  1. <module-path>: yield the absolute file path to the module (this is what
+     distinguishes one module from another under the hood).
+  2. <module-bindings>: yield a list of the symbols defined in a module (beware:
+     every module redefines the entire EScheme standard library!).
+
+Note that the 'meta-thread's environment (see <thread-define>) is module
+independant!
+
+Use the '*import*' variable to determine if the current file was <import>ed.
+Can combine with <unless> to mimic Python's "if __name__=='__main__':" pattern:
+
+  (unless *import*
+    <execute-main-escheme-code-here> ...)
+
+Lastly, note that the concept of 'parameter' variables exist in order to
+have global state shared across modules. See the <define-parameter> and
+<parameter?> 'help' entries for more details.
+```
+
+-------------------------------------------------------------------------------
+## `nil`
+
+### Description:
+```
+The "null" type terminating lists. Denoted via (quote ()) and #nil
+```
+
+-------------------------------------------------------------------------------
+## `number`
+
+### Description:
+```
+
+EScheme provides a rich numeric tower, in keeping with its second namesake.
+
+This entails fully supporting big integers, fractions, doubles, complex numbers, 
+exactness conversions, radix-dependant parsing, and more!
+
+An overview of EScheme's numeric literal syntax is provided below. See <help>
+for more information on EScheme's numeric primitive functions.
+
+4 Number Types:
+ 0. Exact/Ratnum (rational number)
+    *) Arbitrary precision numerator & denominator (automatically reduced to simplest form!)
+    *) Special Case: denominator of 1 creates a BigInt
+
+       -1/2 ; stays as a fraction!
+       3    ; ratnum w/ denom of 1 = bigint
+       4/2  ; gets simplified to bigint 2
+
+ 1. Inexact/Flonum (floating-point number)
+    * Java <double> under the hood
+
+       1.0
+       3.5e10 ; scientific notation
+       -4E12  ; also scientific notation
+
+ 2. Special Constants:
+    *) Positive Infinity: Infinity
+    *) Negative Infinity: -Infinity
+    *) Not-a-Number: NaN
+
+ 3. Complex Numbers:
+    *) Both the real and imaginary components will match in exactness
+    *) Supports Infinity or -Infinity components (NaN is unique & never complex!)
+    *) Special Case: imaginary value of 0 becomes a real (non-complex) number!
+
+       3/4+1/2i
+       3/4+0.5i ; becomes 0.75+0.5i to match exactness
+       -i       ; valid complex number!
+       -44+0i   ; becomes -44
+
+2 Prefix Types:
+ 0. Radix:
+    *) Binary: #b, Octal: #o, Hexadecimal: #x
+    *) Nary: #Nr (for N in [*min-radix*, *max-radix*])
+       - Note that (typically) *min-radix* is 2 and *max-radix* is 36
+
+       #b-101      ; -5
+       #b10/11     ; 2/3
+       #o77        ; 63
+       #xC0DE      ; 49374
+       #xc0de      ; 49374
+       #29rEScheme ; 8910753077
+       #2r-101/10  ; -5/2
+
+ 1. Exactness:
+    *) Inexact: #i, Exact: #e
+
+       #i3      ; 3.0
+       #i1/2    ; 0.5
+       #e3.5    ; 7/2
+       #e1.0    ; 1
+       #i#2r101 ; Inexact & Binary! => 5.0
+```
+
+-------------------------------------------------------------------------------
+## `ordered-collection`
+
+### Description:
+```
+Family of collection types that associate ordered indices to values.
+Used to provide a generic interface across algorithmic primitives!
+Their coercion hierarchy is as follows: String < List < Vector
+```
+
+-------------------------------------------------------------------------------
+## `pair`
+
+### Description:
+```
+An immutable pair of objects. <car> and <cdr> respectively get the 1st and 2nd
+items. Right-nest them and end with #nil as the last <cdr> to create a list.
+Create pair literals via the (<car> . <cdr>) syntax.
+
+For example, the following are equivalent:
+  (list 1 2 3)
+  (cons 1 (cons 2 (cons 3 #nil)))
+```
+
+-------------------------------------------------------------------------------
+## `port`
+
+### Description:
+```
+Input and output ports are handles for read and write files (respectively).
+Note that output functions that end in "+" append to the port, whereas the
+alternative clears it out first.
+```
+
+-------------------------------------------------------------------------------
+## `stream`
+
+### Description:
+```
+A lazy alternative to lists, where each item is only evaluated once accessed.
+Use <scar> and <scdr> respectively to access to the 1st and 2nd items.
+
+Example:
+  (define (sieve int-stream)
+    (scons
+      (scar int-stream)
+      (sieve
+        (stream-filter
+          (lambda (n) (positive? (remainder n (scar int-stream))))
+          (scdr int-stream)))))
+
+  (define (ints-from n)
+    (scons n (ints-from (+ n 1))))
+
+  (define primes (sieve (ints-from 2))) ; infinite stream of prime numbers!
+
+  (display (stream->list primes 13))
+  (newline)
+```
+
+-------------------------------------------------------------------------------
+## `stream-pair`
+
+### Description:
+```
+A lazy alternative to pairs. Each item is only evaluated once accessed.
+Nest them with #nil as the last <scdr> to create a stream.
+
+Example:
+  (define (sieve int-stream)
+    (scons
+      (scar int-stream)
+      (sieve
+        (stream-filter
+          (lambda (n) (positive? (remainder n (scar int-stream))))
+          (scdr int-stream)))))
+
+  (define (ints-from n)
+    (scons n (ints-from (+ n 1))))
+
+  (define primes (sieve (ints-from 2))) ; infinite stream of prime numbers!
+
+  (display (stream->list primes 13))
+  (newline)
+```
+
+-------------------------------------------------------------------------------
+## `string`
+
+### Description:
+```
+Also see the <string> procedure.
+
+Represents a Java <string> under the hood (hence immutable).
+Literals are denoted via double-quotes.
+
+Strings support the following control characters:
+  1) "\t": tab,             represented as a char by #\tab
+  2) "\n": newline,         represented as a char by #\newline
+  3) "\f": form feed,       represented as a char by #\page
+  4) "\r": carriage return, represented as a char by #\return
+  5) "\b": backspace,       represented as a char by #\backspace
+
+Octal literals may be used by prefixing up to 6 octal digits with "\", ranging from
+\0-\177777 (0-65535 in decimal). This range ensures that each value fits neatly
+within a single 16bit Java char internally.
+  => Note this extends Java's octals, which only support \0-\377 (0-255 in decimal).
+
+Java 16bit unicode literals may be used by prefixing up to 4 hex digits with "\u".
+  => Adjacent unicode literals may be used to create "surrogate pairs" that render
+     as a single unicode image for unicode values that require 32bit encoding.
+
+EScheme also extends Java unicode literals with syntax for 32bit unicode values.
+Prefixing up to 8 hex digits with "\U" compiles to 2 seperate "\u" instances.
+  => For example, both "\U1f608" and "\ud83d\ude08" create the same string, but the
+     former is easier to write out after referencing the "U+" code from the internet.
+
+Strings are also applicable to an index to get a character: (<string> <index>)
+```
+
+-------------------------------------------------------------------------------
+## `symbol`
+
+### Description:
+```
+Extensively used by metaprograms, symbols are variables that
+evaluate to another value.
+```
+
+-------------------------------------------------------------------------------
+## `syntax`
+
+### Description:
+```
+The value that macros evaluate to when passed as a procedure argument.
+The only value that yields true with <syntax?>, and can be applied to
+a list of quoted macros arguments via <apply> like any other procedure.
+```
+
+-------------------------------------------------------------------------------
+## `vector`
+
+### Description:
+```
+Also see the <vector> procedure.
+A vector containing "<obj> ...".
+Create vector literals via the [<item> ...] syntax.
+Vectors are applicable to an index to get an entry: (<vector> <index>)
+```
+
+-------------------------------------------------------------------------------
+## `void`
+
+### Description:
+```
+The "nothing" type, typically returned by non-pure actions that end in '!'.
+Denoted via #void
+```
 
 -------------------------------------------------------------------------------
 # Procedures
@@ -8568,7 +8988,8 @@ See the <from> <help> entry for an alternative to <import> that extracts specifi
 fields from the <module-path-symbol> module, without adding the module itself to
 your current environment's namespace.
 
-See the <module> entry in <Types> for more details on EScheme's module system.
+See the <module> entry in <Intrinsic-Types> for more details on EScheme's
+module system.
 ```
 
 -------------------------------------------------------------------------------
@@ -8604,9 +9025,9 @@ applying its <new> constructor to <list-of-args>.
 ONLY valid as the FIRST expression in a class constructor:
 any other use risks undefined behavior!
 
-See <object-oriented-programming> in <Topics> for more high-level object
-orientation details. See <class> for more detailed object orientation
-details. See <meta-object> in <Types> for more type details.
+See <object-system> in <Topics> for more high-level object orientation details.
+See <class> for more detailed object orientation
+details. See <meta-object> in <Intrinsic-Types> for more type details.
 ```
 
 -------------------------------------------------------------------------------
@@ -8627,8 +9048,8 @@ details. See <meta-object> in <Types> for more type details.
 #### Description:
 ```
 Creates an anonymous class. See <define-class> to bind a name to a class
-in one expression. See <object-oriented-programming> in <Topics> for
-more high-level object orientation details.
+in one expression. See <object-system> in <Topics> for more high-level object
+orientation details.
 
 Regarding inter-class/interface relations: 
   1. <super> MUST be an expression that evals to a class type.
@@ -8697,7 +9118,7 @@ macro to initialize the super object with a list of values.
     (super! 42)) ; undefined behavior
 
 
-See <meta-object> in <Types> for more type details.
+See <meta-object> in <Intrinsic-Types> for more type details.
 
 
 For example:
@@ -8749,9 +9170,9 @@ Methods support keyword runtime types exactly like <lambda>.
 
 Aliased by <defclass>.
 
-See <object-oriented-programming> in <Topics> for more high-level object
-orientation details. See <class> for more detailed object orientation
-details. See <meta-object> in <Types> for more type details.
+See <object-system> in <Topics> for more high-level object orientation details.
+See <class> for more detailed object orientation
+details. See <meta-object> in <Intrinsic-Types> for more type details.
 ```
 
 -------------------------------------------------------------------------------
@@ -8778,9 +9199,9 @@ Static methods support keyword runtime types exactly like <lambda>.
 
 Aliased by <definterface>.
 
-See <object-oriented-programming> in <Topics> for more high-level object
-orientation details. See <class> for more detailed object orientation
-details. See <meta-object> in <Types> for more type details.
+See <object-system> in <Topics> for more high-level object orientation details.
+See <class> for more detailed object orientation
+details. See <meta-object> in <Intrinsic-Types> for more type details.
 ```
 
 -------------------------------------------------------------------------------
@@ -8807,9 +9228,9 @@ Use :extends to optionally inherit required fields from other interface objects.
 Optionally include <docstring> to detail information on the interface in <help>.
 Static methods support keyword runtime types exactly like <lambda>.
 
-See <object-oriented-programming> in <Topics> for more high-level object
-orientation details. See <class> for more detailed object orientation
-details. See <meta-object> in <Types> for more type details.
+See <object-system> in <Topics> for more high-level object orientation details.
+See <class> for more detailed object orientation
+details. See <meta-object> in <Intrinsic-Types> for more type details.
 
 For example:
   (define-interface IHasName
@@ -8841,9 +9262,9 @@ Initialize the super object via its non-nullary constructor.
 ONLY valid as the FIRST expression in a class constructor:
 any other use risks undefined behavior!
 
-See <object-oriented-programming> in <Topics> for more high-level object
-orientation details. See <class> for more detailed object orientation
-details. See <meta-object> in <Types> for more type details.
+See <object-system> in <Topics> for more high-level object orientation details.
+See <class> for more detailed object orientation
+details. See <meta-object> in <Intrinsic-Types> for more type details.
 ```
 
 -------------------------------------------------------------------------------
@@ -9808,13 +10229,13 @@ as a macro!
 ```
 
 -------------------------------------------------------------------------------
-## `object-oriented-programming`
+## `object-system`
 
 ### Description:
 ```
 EScheme has a totally optional object system. See the <class> 'help' entry
-for more nitty-gritty usage details, and <meta-object> in <Types> for type
-details.
+for more nitty-gritty usage details, and <meta-object> in <Intrinsic-Types> for
+type details.
 
 At a high-level, EScheme supports classes and interfaces. Like Java, there's
 single inheritance for classes and multiple inheritance for interfaces.
@@ -9888,423 +10309,266 @@ OF NOTE: The semantics of thread/port serialization won't be an issue for 99.999
 ```
 
 -------------------------------------------------------------------------------
-# Types
-
-
--------------------------------------------------------------------------------
-## `associative-collection`
+## `type-system`
 
 ### Description:
 ```
-Family of collection types that associate keys to values.
-Used to provide a generic interface across algorithmic primitives!
+# Types in EScheme
 
-Hashmaps are the most flexible example of such (supporting arbitrary key &
-value types), while strings are the most restrictive (only supporting index
-keys and character values).
+### Describes EScheme's optional type system!
 
-Their coercion hierarchy is as follows: String < List < Vector < Hashmap
+## Overview
+
+EScheme denotes types with keywords, and "compound types" via `|` syntax.
+
+- EX: `:string|number` represents either a string or a number.
+
+EScheme types are typically either a "primitive" or "container" type.
+If a type is neither a primitive nor a container, it is presumed to
+represent some class, interface, or type-alias: if the type doesn't
+resolve to a valid class, interface, or type-alias during a runtime
+type-check, an error is thrown.
+
+- Note that EScheme supports referencing classes/interfaces/aliases
+  in modules! Hence `:Module.ClassName` is a valid type.
+
+EScheme types are parsed and converted to Java functional interface
+predicates internally during compilation, with the predicates being
+applied at runtime. Types are supported for function parameters and
+return values.
+
+### EScheme Primitive Types
+
+Primitive types represent an intrinsic atomic EScheme type. Their
+type-checks are typically as fast as a single `instanceof` check,
+with a few exceptions like `:int` requiring slightly more work.
+
+EScheme's primitive types include:
+
+```
+:any
+
+:number ; aliased by ":complex"
+:int
+:flo
+:real
+:exact
+:inexact
+
+:string
+:char
+:key
+:bool
+:symbol
+:void
+
+:thread
+:mutex
+
+:nil
+:atom
+
+:fn ; all callables
+:procedure
+:syntax
+
+:metaobj ; includes modules
+:object
+:class
+:interface
+
+:port
+:inport
+:outport
+
+:module
+
+:type-alias
 ```
 
--------------------------------------------------------------------------------
-## `boolean`
+### EScheme Container Types
 
-### Description:
+Container types represent an intrinsic EScheme collection type. By
+default, collections are just checked to match whatever type of
+collection the keyword stands for (without regard for the types of
+its contents). However, containers may be parameterized by adding
+the `<type>` suffix in order to type-check its contents as well.
+
+For example, `:list<string|symbol>` is a list where each element is
+either a string or symbol.
+
+- For either a list that only has strings OR a list that only has
+  symbols, use `:list<string>|list<symbol>`.
+- Furthermore, `:pair` and `:map` may also be parameterized with the
+  `<type,type>` suffix in order to type-check their keys and values.
+
+EScheme's collection types include:
+
 ```
-The boolean type. #t is true and #f is false. Any non-false value is truthy.
-Typically returned by predicate actions that end in '?'.
-```
+:vector
+:map
 
--------------------------------------------------------------------------------
-## `callable`
+:pair
+:list
 
-### Description:
-```
-Any EScheme value that can be applied to arguments: (<callable> <argument> ...)
-
-This includes procedures, functors (objects with a '->procedure' method defined),
-classes (to invoke their constructor), as well as O(1)-access containers
-(strings, vectors, and hashmaps).
-```
-
--------------------------------------------------------------------------------
-## `character`
-
-### Description:
-```
-Reader literals have the '#\' prefix: #\h #\e #\l #\l #\o #\!
-
-Represented by a 32bit codepoint internally:
-  * In keeping with Java, any codepoint <= 16bits correlates to a true, single
-    character in strings.
-  * Any codepoint above 16bits (as in Java) becomes 2 separate characters in 
-    strings. However, most EScheme string operations (like <length>) operate 
-    relative to the number of codepoints in a string, NOT to the number of
-    'java characters'.
-    - The only exceptions to this rule are EScheme's regex primtives, which 
-      operate relative to 16bit characters since they wrap Java's regex ops.
-
-Supports Named Characters:
-  #\space,     #\tab, #\newline, #\page, #\return,
-  #\backspace, #\nul, #\esc,     #\delete
-
-Supports Unicode Codepoints (note 'u' vs. 'U'):
-  #\uXXXX (create a 16bit hex-code character)
-  #\UXXXXXXXX (create a 32bit hex-code character)
-
-Displaying characters prints them in a human-readable way, whereas writing them
-prints characters with their prefix such that they can be re-read by the reader
-as EScheme data.
+:associative-collection ; aliased by ":ac"
+:ordered-collection ; aliased by ":oc"
 ```
 
--------------------------------------------------------------------------------
-## `eof`
+---
 
-### Description:
-```
-The "end-of-file" value terminating files.
-Denoted via #eof and detected via (eof? <obj>).
-Ends file/REPL evaluation early if read in as a single expression.
-```
+## Type Syntax Examples
 
--------------------------------------------------------------------------------
-## `hashmap`
+Notes on optional and variadic parameters:
 
-### Description:
-```
-Also see the <hashmap> procedure.
-A hashmap containing key-value associations of "<key> <value> ...".
-Create hashmap literals via the {<key> <value> ...} syntax.
-Hashmaps are applicable to a key to get their entry: (<hashmap> <key>)
-```
+- Optional parameters only type-check user args, _not_ their default values
+  - Hence `(:int a "hello")` is a valid optional parameter clause
+- Variadic values cannot be typed (they're implicitly `:list<any>`)
 
--------------------------------------------------------------------------------
-## `keyword`
+### `fn` and `defn`
 
-### Description:
-```
-Similar to symbols, but they always evaluate to themselves.
-Denoted as a symbol prefixed with ':'.
-```
+- `defn` uses the same type syntax as `fn`
 
--------------------------------------------------------------------------------
-## `list`
-
-### Description:
 ```
-Also see the <list> procedure.
-A linked list containing "<obj> ...". The empty list is (quote ()).
-Lists are right-nested pairs ending in nil: (quote ())
-Create list literals via the (<item> ...) syntax.
+(fn
+  ; Typed <:int> return and <:list>/<:char> parameters
+  (:int (:list a :char b . rest-args)
+    (length (cons b (cons a rest-args))))
+
+  ; Typeless return, required <:flo> parameter and optional <:int> parameter
+  ((:flo a (:int b 42))
+    (+ a b)))
+
+
+(defn function-name
+  ; Typed <:int> return and <:list>/<:char> parameters
+  (:int (:list a :char b . rest-args)
+    (length (cons b (cons a rest-args))))
+
+  ; Typeless return, required <:flo> and optional <:int> parameters
+  ((:flo a (:int b 42))
+    (+ a b)))
 ```
 
--------------------------------------------------------------------------------
-## `meta-object`
+### `lambda`
 
-### Description:
 ```
-Super type of objects, classes, and interfaces, all of which support
-'dot-notation' to access a property. 
+; Typed <:int> return and <:list>/<:char> parameters
+(lambda :int (:list a :char b . rest-args)
+  (length (cons b (cons a rest-args))))
 
-Note that, despite supporting dot-notation, modules are not meta-objects.
-```
-
--------------------------------------------------------------------------------
-## `module`
-
-### Description:
-```
-The value created by an <import> expression.
-
-Modules present an alternative to Scheme's usual inter-file semantics.
-
-The <load> function has always served as a means by which to execute the code
-of another Scheme file in the calling file's global environment. This simplicity
-is a double edged sword though: while making <load> easy to implement, it leaves
-much to be desired with respect to enabling encapsulation of code across
-coordinated Scheme files.
-
-As such, in addition to <load>, EScheme offers a minimalistic module system
-that strives to enable file-specific encapsulation of EScheme code. Files
-processed via the <import> macro are defined as <module> objects within the
-enclosing enivironment. See the <import> 'help' entry for more details on how
-EScheme evaluates modules.
-
-Each module has its own isolated global environment, and has automatic access
-to EScheme's standard library. Note that this means that operations that depend
-on global variables (e.g. <load-once>) are hence only able to operate on
-a module-relative basis.
-
-  * Note that <dosync> notably works across modules, since its internal lock
-    was created via <define-parameter>. Use <dosync-module> for module-relative
-    locking behavior.
-
-Both variables and macros can be access from a module by using EScheme's
-dot-notation: for example, to access variable 'PersonClass' from module 'Mod',
-we write 'Mod.PersonClass'.
-
-Further note that imported modules are cached! Importing the same module
-multiple times does not cause multiple evaluations of that module. Use the
-<reload> macro if you'd like to forcefully re-evaluate the module in question.
-
-Additionally, the <from> macro may be used to load specific variables within
-a given module, without defining that module itself as a local variable.
-
-Modules may be introspected upon by 2 primitives:
-
-  1. <module-path>: yield the absolute file path to the module (this is what
-     distinguishes one module from another under the hood).
-  2. <module-bindings>: yield a list of the symbols defined in a module (beware:
-     every module redefines the entire EScheme standard library!).
-
-Note that the 'meta-thread's environment (see <thread-define>) is module
-independant!
-
-Use the '*import*' variable to determine if the current file was <import>ed.
-Can combine with <unless> to mimic Python's "if __name__=='__main__':" pattern:
-
-  (unless *import*
-    <execute-main-escheme-code-here> ...)
-
-Lastly, note that the concept of 'parameter' variables exist in order to
-have global state shared across modules. See the <define-parameter> and
-<parameter?> 'help' entries for more details.
+; Typeless return, required <:flo> and optional <:int> parameters
+(lambda (:flo a (:int b 42))
+  (+ a b))
 ```
 
--------------------------------------------------------------------------------
-## `nil`
+### `define`
 
-### Description:
 ```
-The "null" type terminating lists. Denoted via (quote ()) and #nil
-```
+; Typed <:int> return and <:list>/<:char> parameters
+(define :int (function-name :list a :char b . rest-args)
+  (length (cons b (cons a rest-args))))
 
--------------------------------------------------------------------------------
-## `number`
-
-### Description:
+; Typeless return, required <:flo> and optional <:int> parameters
+(define (function-name :flo a (:int b 42))
+  (+ a b))
 ```
 
-EScheme provides a rich numeric tower, in keeping with its second namesake.
+### `define-generator`
 
-This entails fully supporting big integers, fractions, doubles, complex numbers, 
-exactness conversions, radix-dependant parsing, and more!
+- Only supports typed parameters, not typed returns, to account for
+  `*generator-complete*` being returned from finite generators.
 
-An overview of EScheme's numeric literal syntax is provided below. See <help>
-for more information on EScheme's numeric primitive functions.
-
-4 Number Types:
- 0. Exact/Ratnum (rational number)
-    *) Arbitrary precision numerator & denominator (automatically reduced to simplest form!)
-    *) Special Case: denominator of 1 creates a BigInt
-
-       -1/2 ; stays as a fraction!
-       3    ; ratnum w/ denom of 1 = bigint
-       4/2  ; gets simplified to bigint 2
-
- 1. Inexact/Flonum (floating-point number)
-    * Java <double> under the hood
-
-       1.0
-       3.5e10 ; scientific notation
-       -4E12  ; also scientific notation
-
- 2. Special Constants:
-    *) Positive Infinity: Infinity
-    *) Negative Infinity: -Infinity
-    *) Not-a-Number: NaN
-
- 3. Complex Numbers:
-    *) Both the real and imaginary components will match in exactness
-    *) Supports Infinity or -Infinity components (NaN is unique & never complex!)
-    *) Special Case: imaginary value of 0 becomes a real (non-complex) number!
-
-       3/4+1/2i
-       3/4+0.5i ; becomes 0.75+0.5i to match exactness
-       -i       ; valid complex number!
-       -44+0i   ; becomes -44
-
-2 Prefix Types:
- 0. Radix:
-    *) Binary: #b, Octal: #o, Hexadecimal: #x
-    *) Nary: #Nr (for N in [*min-radix*, *max-radix*])
-       - Note that (typically) *min-radix* is 2 and *max-radix* is 36
-
-       #b-101      ; -5
-       #b10/11     ; 2/3
-       #o77        ; 63
-       #xC0DE      ; 49374
-       #xc0de      ; 49374
-       #29rEScheme ; 8910753077
-       #2r-101/10  ; -5/2
-
- 1. Exactness:
-    *) Inexact: #i, Exact: #e
-
-       #i3      ; 3.0
-       #i1/2    ; 0.5
-       #e3.5    ; 7/2
-       #e1.0    ; 1
-       #i#2r101 ; Inexact & Binary! => 5.0
+```
+; Required <:flo> and optional <:int> parameters
+(define-generator (generator-factory-name :flo a (:int b 42))
+  (let loop ((i b))
+    (yield (+ i a))
+    (loop (+ i 1))))
 ```
 
--------------------------------------------------------------------------------
-## `ordered-collection`
+### `curry`
 
-### Description:
+- Only type-checks the return value once all parameters have been applied.
+
 ```
-Family of collection types that associate ordered indices to values.
-Used to provide a generic interface across algorithmic primitives!
-Their coercion hierarchy is as follows: String < List < Vector
-```
-
--------------------------------------------------------------------------------
-## `pair`
-
-### Description:
-```
-An immutable pair of objects. <car> and <cdr> respectively get the 1st and 2nd
-items. Right-nest them and end with #nil as the last <cdr> to create a list.
-Create pair literals via the (<car> . <cdr>) syntax.
-
-For example, the following are equivalent:
-  (list 1 2 3)
-  (cons 1 (cons 2 (cons 3 #nil)))
+; Typed <:int> return and <:list>/<:char> parameters
+(curry :int (:list a :char b)
+  (length (cons b a)))
 ```
 
--------------------------------------------------------------------------------
-## `port`
+### `class`/`define-class` and `interface`/`define-interface`
 
-### Description:
+- `class` supports types on instance and static methods
+- `interface` only supports types on static methods
+- `define-class` uses the same type syntax as `class`
+  - as `define-interface` does with `interface`
+
 ```
-Input and output ports are handles for read and write files (respectively).
-Note that output functions that end in "+" append to the port, whereas the
-alternative clears it out first.
-```
+(define-class ClassName
+  ; Instance: typed <:int> return and <:list>/<:char> parameters
+  (:int (method-name-1 :list a :char b . rest-args)
+    (length (cons b (cons a rest-args))))
 
--------------------------------------------------------------------------------
-## `stream`
+  ; Instance: typeless return, required <:flo> and optional <:int> parameters
+  ((method-name-2 :flo a (:int b 42))
+    (+ a b))
 
-### Description:
-```
-A lazy alternative to lists, where each item is only evaluated once accessed.
-Use <scar> and <scdr> respectively to access to the 1st and 2nd items.
+  ; Static: typed <:int> return and <:list>/<:char> parameters
+  (:static :int (method-name-1 :list a :char b . rest-args)
+    (length (cons b (cons a rest-args))))
 
-Example:
-  (define (sieve int-stream)
-    (scons
-      (scar int-stream)
-      (sieve
-        (stream-filter
-          (lambda (n) (positive? (remainder n (scar int-stream))))
-          (scdr int-stream)))))
+  ; Static: typeless return, required <:flo> and optional <:int> parameters
+  (:static (method-name-2 :flo a (:int b 42))
+    (+ a b)))
 
-  (define (ints-from n)
-    (scons n (ints-from (+ n 1))))
 
-  (define primes (sieve (ints-from 2))) ; infinite stream of prime numbers!
+(define-interface InterfaceName
+  ; Static: typed <:int> return and <:list>/<:char> parameters
+  (:static :int (method-name-1 :list a :char b . rest-args)
+    (length (cons b (cons a rest-args))))
 
-  (display (stream->list primes 13))
-  (newline)
-```
+  ; Static: typeless return, required <:flo> and optional <:int> parameters
+  (:static (method-name-2 :flo a (:int b 42))
+    (+ a b)))
 
--------------------------------------------------------------------------------
-## `stream-pair`
 
-### Description:
-```
-A lazy alternative to pairs. Each item is only evaluated once accessed.
-Nest them with #nil as the last <scdr> to create a stream.
-
-Example:
-  (define (sieve int-stream)
-    (scons
-      (scar int-stream)
-      (sieve
-        (stream-filter
-          (lambda (n) (positive? (remainder n (scar int-stream))))
-          (scdr int-stream)))))
-
-  (define (ints-from n)
-    (scons n (ints-from (+ n 1))))
-
-  (define primes (sieve (ints-from 2))) ; infinite stream of prime numbers!
-
-  (display (stream->list primes 13))
-  (newline)
+; Mandating that <function-name> returns either <ClassName> or <InterfaceName>
+(define :ClassName|InterfaceName (function-name)
+  (ClassName))
 ```
 
--------------------------------------------------------------------------------
-## `string`
+---
 
-### Description:
+## Type Aliases
+
+Type aliases reference a preexisting keyword type, typically to
+mask type complexity. For example, when implementing a `UserProfile`
+class, it might be nicer to define a `:phone-number` type instead of
+always using `:string|list<int>`.
+
+Type aliases can be created by using `define-type` (aliased by `deftype`)
+which is simply a convenience wrapper around `define` and `type-alias`.
+
+- `(type-alias <type-keyword>)` creates a type alias value
+- `(type-alias? <obj>)` returns whether `<obj>` is a type alias
+- `(type-alias-source <type-alias>)` returns the original keyword type
+  that `<type-alias>` references
+
+### Example
+
 ```
-Also see the <string> procedure.
+; Create a type-alias and dispatch on it
+(define-type phone-number :string|list<int>)
 
-Represents a Java <string> under the hood (hence immutable).
-Literals are denoted via double-quotes.
+(defn function-name
+  ((:phone-number x) #t)
+  ((:any x) #f))
 
-Strings support the following control characters:
-  1) "\t": tab,             represented as a char by #\tab
-  2) "\n": newline,         represented as a char by #\newline
-  3) "\f": form feed,       represented as a char by #\page
-  4) "\r": carriage return, represented as a char by #\return
-  5) "\b": backspace,       represented as a char by #\backspace
-
-Octal literals may be used by prefixing up to 6 octal digits with "\", ranging from
-\0-\177777 (0-65535 in decimal). This range ensures that each value fits neatly
-within a single 16bit Java char internally.
-  => Note this extends Java's octals, which only support \0-\377 (0-255 in decimal).
-
-Java 16bit unicode literals may be used by prefixing up to 4 hex digits with "\u".
-  => Adjacent unicode literals may be used to create "surrogate pairs" that render
-     as a single unicode image for unicode values that require 32bit encoding.
-
-EScheme also extends Java unicode literals with syntax for 32bit unicode values.
-Prefixing up to 8 hex digits with "\U" compiles to 2 seperate "\u" instances.
-  => For example, both "\U1f608" and "\ud83d\ude08" create the same string, but the
-     former is easier to write out after referencing the "U+" code from the internet.
-
-Strings are also applicable to an index to get a character: (<string> <index>)
+(function-name "555-555-5555") ; #t
+(function-name '(555 555 5555)) ; #t
+(function-name 5555555555) ; #f
 ```
-
--------------------------------------------------------------------------------
-## `symbol`
-
-### Description:
-```
-Extensively used by metaprograms, symbols are variables that
-evaluate to another value.
-```
-
--------------------------------------------------------------------------------
-## `syntax`
-
-### Description:
-```
-The value that macros evaluate to when passed as a procedure argument.
-The only value that yields true with <syntax?>, and can be applied to
-a list of quoted macros arguments via <apply> like any other procedure.
-```
-
--------------------------------------------------------------------------------
-## `vector`
-
-### Description:
-```
-Also see the <vector> procedure.
-A vector containing "<obj> ...".
-Create vector literals via the [<item> ...] syntax.
-Vectors are applicable to an index to get an entry: (<vector> <index>)
-```
-
--------------------------------------------------------------------------------
-## `void`
-
-### Description:
-```
-The "nothing" type, typically returned by non-pure actions that end in '!'.
-Denoted via #void
 ```
 
 -------------------------------------------------------------------------------
