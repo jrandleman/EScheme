@@ -97,7 +97,7 @@ public class GlobalState {
   public static final Datum USER_NAME = getSystemProperty("user.name");
 
   public static final escm.type.String ESCM_PATH = new escm.type.String(EscmPath.VALUE);
-  public static final escm.type.String ESCM_VERSION = new escm.type.String(String.format("%.1f",SystemPrimitives.VERSION));
+  public static final escm.type.String ESCM_VERSION = new escm.type.String(SystemPrimitives.VERSION);
   public static final escm.type.String ESCM_EXECUTION_COMMAND = new escm.type.String(SystemPrimitives.ESCM_EXECUTION_COMMAND);
 
   public static final Exact MIN_RADIX = new Exact(Number.MIN_RADIX);
