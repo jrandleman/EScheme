@@ -119,21 +119,22 @@ Anything with the `escm-` prefix is considered reserved for use by the runtime.
 
 ## EScheme-Specific Concepts (Scheme Extensions/Deviations):
 
-1. Object System (classes, interfaces, and objects!)
-2. Module System (file-specific variables & macros!)
-3. Multithreading Support (promises, threads, and mutexes!)
-4. Compile-time procedural macros
-5. Multi-arity and optional-parameter function support via `fn`!
-6. Stackless function calls (no stack overflow from recursion!)
-7. Trivially `define`/`set!` multiple values: `(define a b '(1 2))`
-8. Generic collection algorithm primitives (string, list, vector, hashmap)
-9. Vector literals have been reworked
-   - Uses `[<obj> ...]` instead of `#(<obj> ...)`
-   - Quotes aren't always required:
-     - `[a b c]` compiles to vector of `a`, `b`, & `c` evaluated as variables
-   - Quotes can be used though to get expected results:
-     - `(quote [a b c])` => `[(quote a) (quote b) (quote c)]`
-10. Hashmap literals have been added in
+1. Type System (optional procedural runtime types, union and parameterized types)
+2. Object System (classes, interfaces, and objects)
+3. Module System (file-specific variables & macros)
+4. Multithreading Support (promises, threads, and mutexes)
+5. Compile-time procedural macros
+6. Multiple dispatch procedures via `fn` with optional parameter support
+7. Stackless function calls (no stack overflow from recursion)
+8. Trivially `define`/`set!` multiple values: `(define a b '(1 2))`
+9. Generic collection algorithm primitives (string, list, vector, hashmap)
+10. Vector literals have been reworked
+    - Uses `[<obj> ...]` instead of `#(<obj> ...)`
+    - Quotes aren't always required:
+      - `[a b c]` compiles to vector of `a`, `b`, & `c` evaluated as variables
+    - Quotes can be used though to get expected results:
+      - `(quote [a b c])` => `[(quote a) (quote b) (quote c)]`
+11. Hashmap literals have been added in
     - Use `{<key> <value> ...}`
     - A note on hashing:
       - Immutable values hash based on contents (think numbers, symbols, pairs, etc.)
@@ -143,24 +144,24 @@ Anything with the `escm-` prefix is considered reserved for use by the runtime.
       - `{a 42}` compiles to a hashmap with key `a` evaluated as variable
     - Quotes can be used though to get expected results:
       - `(quote {a 42})` => `{(quote a) (quote 42)}`
-11. `#(` reader lambda literal support
+12. `#(` reader lambda literal support
     - 1-indexed params of index `i` via `%i` syntax, and a variadic param via `%%`
     - `#(+ 3.14 %2)` => `(lambda (%1 %2) (+ 3.14 %2))`
-12. Immutable pairs & strings
-    - Mutable pairs may be implemented by users via the object system!
-13. Keyword primitive types
+13. Immutable pairs and strings
+    - Mutable pairs may be implemented by users via the object system
+14. Keyword primitive types
     - Like symbols, but prefixed with `:`, & they always evaluate to themselves
-14. Reader extensions:
+15. Reader extensions:
     - `(. <obj>)` is equivalent to `<obj>` for the reader
     - `#eof`, `#void`, `#nil` reader literals yield their respective values
     - `#path` reader literal expands to the current file's parent path string
-15. Support for `bytecode`, `compile`, `eval-bytecode`
+16. Support for `bytecode`, `compile`, `eval-bytecode`
     - `bytecode`: special form to have the compiler reflect the given bytecode
     - `compile`: convert a quoted escm expression into a quoted bytecode list
     - `eval-bytecode`: evaluate the given quoted bytecode list in the global environment
-      - Hence `eval` is equivalent to `(compose eval-bytecode compile)`!
-16. No `eqv?`: only `eq?` and `equal?`
-17. And so much more! :)
+      - Hence `eval` is equivalent to `(compose eval-bytecode compile)`
+17. No `eqv?`: only `eq?` and `equal?`
+18. And so much more! :)
 
 ---
 

@@ -10319,7 +10319,7 @@ OF NOTE: The semantics of thread/port serialization won't be an issue for 99.999
 
 ## Overview
 
-EScheme denotes types with keywords, and "compound types" via `|` syntax.
+EScheme denotes types with keywords, and "union types" via `|` syntax.
 
 - EX: `:string|number` represents either a string or a number.
 

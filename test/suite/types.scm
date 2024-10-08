@@ -280,7 +280,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; COMPOUND TESTS
+;; UNION TESTS
 (ut ((fn ((:number|string|key x) #t) ((:any x) #f)) 42) #t)
 (ut ((fn ((:number|string|key x) #t) ((:any x) #f)) "42") #t)
 (ut ((fn ((:number|string|key x) #t) ((:any x) #f)) :hi) #t)

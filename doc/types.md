@@ -6,7 +6,7 @@
 
 ## Overview
 
-EScheme denotes types with keywords, and "compound types" via `|` syntax.
+EScheme denotes types with keywords, and "union types" via `|` syntax.
 
 - EX: `:string|number` represents either a string or a number.
 

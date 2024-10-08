@@ -155,7 +155,7 @@ public class TypeChecker {
 
   private static Pair<Predicate,Integer> parseContainer(String type, int typeLength, String name, int next) throws Exception{
     switch(name) {
-      // Common compound types
+      // Common collection types
       // - Vector
       case "vector": {
         // Parameterized
@@ -250,7 +250,7 @@ public class TypeChecker {
         }
       }
 
-      // List-base types
+      // List-base collection types
       // - Pair
       case "pair": {
         // Parameterized
@@ -345,7 +345,7 @@ public class TypeChecker {
         }
       }
 
-      // Generic compound types
+      // Abstract collection types
       // - Associative Collection
       case "associative-collection": case "ac": {
         // Parameterized
@@ -466,7 +466,7 @@ public class TypeChecker {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Parse Compound "|" Types
+  // Parse Union "|" Types
   private static Pair<Predicate,Integer> parseRest(String type, int typeLength, int index, Pair<Predicate,Integer> firstType) throws Exception {
     if(firstType.second >= typeLength) return firstType;
     char delimiter = type.charAt(firstType.second);
@@ -487,7 +487,7 @@ public class TypeChecker {
         return false;
       }, idx);
     }
-    throw new Exceptionf("Invalid Compound Type (index %d): %s",index,type);
+    throw new Exceptionf("Invalid Union Type (index %d): %s",index,type);
   }
 
 
