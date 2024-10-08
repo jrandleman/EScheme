@@ -53,3 +53,10 @@
 (ut (type-alias? (type-alias :int|char)) #t)
 
 (ut (type-alias-source (type-alias :int|char)) :int|char)
+
+(ut (type-is? 42 :int) #t)
+(ut (type-is? 42 :string) #f)
+(ut (type-is? 42 (type-alias :int|char)) #t) ; support for passing alias objects too
+(ut (type-is? #\a (type-alias :int|char)) #t)
+(ut (type-is? "a" (type-alias :int|char)) #f)
+(ut (type-is? 42 :ClassNameThatDoesNotExist) #f) ; doesn't throw for non-existent types

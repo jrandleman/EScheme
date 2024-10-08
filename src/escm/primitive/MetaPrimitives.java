@@ -11,6 +11,7 @@ import escm.type.Keyword;
 import escm.type.Pair;
 import escm.type.Symbol;
 import escm.type.procedure.SyntaxProcedure;
+import escm.type.procedure.types.TypeChecker;
 import escm.type.procedure.Procedure;
 import escm.type.bool.Boolean;
 import escm.util.error.Exceptionf;
@@ -418,7 +419,7 @@ public class MetaPrimitives {
       Datum typeKeyword = parameters.get(0);
       if(!(typeKeyword instanceof Keyword))
         throw new Exceptionf("'(type-alias <type-keyword>) arg %s isn't a keyword: %s", typeKeyword.profile(), Exceptionf.profileArgs(parameters));
-      return new escm.type.procedure.types.TypeAlias(definitionEnvironment,(Keyword)typeKeyword);
+      return new escm.type.procedure.types.TypeAlias(this.definitionEnvironment,(Keyword)typeKeyword);
     }
   }
 
@@ -468,6 +469,46 @@ public class MetaPrimitives {
       if(!(alias instanceof escm.type.procedure.types.TypeAlias))
         throw new Exceptionf("'(type-alias-source <type-alias>) arg %s isn't a type-alias: %s", alias.profile(), Exceptionf.profileArgs(parameters));
       return new Keyword(((escm.type.procedure.types.TypeAlias)alias).typeName().substring(1));
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // type-is?
+  public static class IsTypeIsP extends Primitive {
+    public java.lang.String escmName() {
+      return "type-is?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("type-is?"),new Symbol("<obj>"),new Symbol("<type-keyword>"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Meta\nReturns whether <obj> is a <type-keyword>.\n  => See <type-system> in <Topics> for more details on EScheme's types!";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2)
+        throw new Exceptionf("'(type-is? <obj> <type-keyword>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum type = parameters.get(1);
+      if(type instanceof Keyword) {
+        try {
+          Keyword keyType = (Keyword)type;
+          return Boolean.valueOf(TypeChecker.getPredicate(keyType).check(this.definitionEnvironment,parameters.get(0)));
+        } catch(Exception e) {
+          return Boolean.FALSE;
+        }
+      } else if(type instanceof escm.type.procedure.types.TypeAlias) {
+        try {
+          escm.type.procedure.types.TypeAlias aliasType = (escm.type.procedure.types.TypeAlias)type;
+          return Boolean.valueOf(aliasType.check(parameters.get(0)));
+        } catch(Exception e) {
+          return Boolean.FALSE;
+        }
+      } else {
+        throw new Exceptionf("'(type-is? <obj> <type-keyword>) 2nd arg %s isn't a keyword: %s", type.profile(), Exceptionf.profileArgs(parameters));
+      }
     }
   }
 }

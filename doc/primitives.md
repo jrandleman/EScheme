@@ -3858,6 +3858,20 @@ Returns whether <obj> is a type-alias. See <type-alias> for more details.
 ```
 
 -------------------------------------------------------------------------------
+### `type-is?`
+
+#### Signatures:
+```scheme
+(type-is? <obj> <type-keyword>)
+```
+
+#### Description:
+```
+Returns whether <obj> is a <type-keyword>.
+  => See <type-system> in <Topics> for more details on EScheme's types!
+```
+
+-------------------------------------------------------------------------------
 ## Numbers
 
 
@@ -10569,6 +10583,12 @@ which is simply a convenience wrapper around `define` and `type-alias`.
 (function-name '(555 555 5555)) ; #t
 (function-name 5555555555) ; #f
 ```
+
+---
+
+## Type Primitive
+
+Use `(type-is? <obj> <type-keyword>)` to determine if `<obj>` is a `<type-keyword>`.
 ```
 
 -------------------------------------------------------------------------------

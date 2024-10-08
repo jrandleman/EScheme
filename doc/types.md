@@ -104,7 +104,7 @@ EScheme's collection types include:
 
 ---
 
-## Type Syntax Examples
+## Type Syntax
 
 Notes on optional and variadic parameters:
 
@@ -256,3 +256,9 @@ which is simply a convenience wrapper around `define` and `type-alias`.
 (function-name '(555 555 5555)) ; #t
 (function-name 5555555555) ; #f
 ```
+
+---
+
+## Type Primitive
+
+Use `(type-is? <obj> <type-keyword>)` to determine if `<obj>` is a `<type-keyword>`.
