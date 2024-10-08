@@ -45,7 +45,7 @@
   },
   {
     "name": "keyword",
-    "description": "Similar to symbols, but they always evaluate to themselves.\nDenoted as a symbol prefixed with ':'."
+    "description": "Similar to symbols, but they always evaluate to themselves.\nDenoted as a symbol prefixed with ':'.\n\nCan be used to denote runtime types for procedures!\n  => See <type-system> in <Topics> for more details on EScheme's types!"
   },
   {
     "name": "symbol",

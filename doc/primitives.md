@@ -139,6 +139,9 @@ Hashmaps are applicable to a key to get their entry: (<hashmap> <key>)
 ```
 Similar to symbols, but they always evaluate to themselves.
 Denoted as a symbol prefixed with ':'.
+
+Can be used to denote runtime types for procedures!
+  => See <type-system> in <Topics> for more details on EScheme's types!
 ```
 
 -------------------------------------------------------------------------------
