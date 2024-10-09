@@ -3545,17 +3545,17 @@ For example:
   ; signature: (f a b c)
   (define (f a b c) a)
 
-  ; signature: (f :int a :char b :string c)
-  (define (f :int a :char b :string c) a)
+  ; signature: (f :int a :char b :str c)
+  (define (f :int a :char b :str c) a)
 
-  ; signature: (:int (f :int a :char b :string c))
-  (define :int (f :int a :char b :string c) a)
+  ; signature: (:int (f :int a :char b :str c))
+  (define :int (f :int a :char b :str c) a)
 
   ; signature: ((f a b) (f c))
   (defn f ((a b) a) ((c) c))
 
-  ; signature: (:int (f :int a :char b) :string (f :string c))
-  (defn f (:int (:int a :char b) a) (:string (:string c) c))
+  ; signature: (:int (f :int a :char b) :str (f :str c))
+  (defn f (:int (:int a :char b) a) (:str (:str c) c))
 ```
 
 -------------------------------------------------------------------------------
@@ -10338,7 +10338,7 @@ OF NOTE: The semantics of thread/port serialization won't be an issue for 99.999
 
 EScheme denotes types with keywords, and "union types" via `|` syntax.
 
-- EX: `:string|number` represents either a string or a number.
+- EX: `:str|num` represents either a string or a number.
 
 EScheme types are typically either a "primitive" or "container" type.
 If a type is neither a primitive nor a container, it is presumed to
@@ -10365,18 +10365,18 @@ EScheme's primitive types include:
 ```
 :any
 
-:number ; aliased by ":complex"
+:num ; aliased by ":complex"
 :int
 :flo
 :real
 :exact
 :inexact
 
-:string
+:str
 :char
 :key
 :bool
-:symbol
+:sym
 :void
 
 :thread
@@ -10389,7 +10389,7 @@ EScheme's primitive types include:
 :procedure
 :syntax
 
-:metaobj ; includes modules
+:metaobj ; includes objects, classes, interfaces, and modules
 :object
 :class
 :interface
@@ -10411,18 +10411,18 @@ collection the keyword stands for (without regard for the types of
 its contents). However, containers may be parameterized by adding
 the `<type>` suffix in order to type-check its contents as well.
 
-For example, `:list<string|symbol>` is a list where each element is
-either a string or symbol.
+For example, `:list<str|sym>` is a list where each element is either
+a string or symbol.
 
 - For either a list that only has strings OR a list that only has
-  symbols, use `:list<string>|list<symbol>`.
+  symbols, use `:list<str>|list<sym>`.
 - Furthermore, `:pair` and `:map` may also be parameterized with the
   `<type,type>` suffix in order to type-check their keys and values.
 
 EScheme's collection types include:
 
 ```
-:vector
+:vec
 :map
 
 :pair
@@ -10434,7 +10434,7 @@ EScheme's collection types include:
 
 ---
 
-## Type Syntax Examples
+## Type Syntax
 
 Notes on optional and variadic parameters:
 
@@ -10562,7 +10562,7 @@ Notes on optional and variadic parameters:
 Type aliases reference a preexisting keyword type, typically to
 mask type complexity. For example, when implementing a `UserProfile`
 class, it might be nicer to define a `:phone-number` type instead of
-always using `:string|list<int>`.
+always using `:str|list<int>`.
 
 Type aliases can be created by using `define-type` (aliased by `deftype`)
 which is simply a convenience wrapper around `define` and `type-alias`.
@@ -10576,7 +10576,7 @@ which is simply a convenience wrapper around `define` and `type-alias`.
 
 ```
 ; Create a type-alias and dispatch on it
-(define-type phone-number :string|list<int>)
+(define-type phone-number :str|list<int>)
 
 (defn function-name
   ((:phone-number x) #t)

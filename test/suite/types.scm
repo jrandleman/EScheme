@@ -13,11 +13,11 @@
 (ut ((lambda (:any x) x) 42) 42)
 
 ; Numerics
-; => ":number" is aliased by ":complex"
-(ut ((fn ((:number x) #t) ((:any x) #f)) 42) #t)
-(ut ((fn ((:number x) #t) ((:any x) #f)) 42.0) #t)
-(ut ((fn ((:number x) #t) ((:any x) #f)) 42.0+3.14i) #t)
-(ut ((fn ((:number x) #t) ((:any x) #f)) "42") #f)
+; => "num" is aliased by ":complex"
+(ut ((fn ((:num x) #t) ((:any x) #f)) 42) #t)
+(ut ((fn ((:num x) #t) ((:any x) #f)) 42.0) #t)
+(ut ((fn ((:num x) #t) ((:any x) #f)) 42.0+3.14i) #t)
+(ut ((fn ((:num x) #t) ((:any x) #f)) "42") #f)
 (ut ((fn ((:int x) #t) ((:any x) #f)) 42) #t)
 (ut ((fn ((:int x) #t) ((:any x) #f)) 42.0) #t) ; still passes "integer?"
 (ut ((fn ((:int x) #t) ((:any x) #f)) 42.5) #f)
@@ -41,16 +41,16 @@
 (ut ((fn ((:inexact x) #t) ((:any x) #f)) "42") #f)
 
 ; Common Atomics
-(ut ((fn ((:string x) #t) ((:any x) #f)) "42") #t)
-(ut ((fn ((:string x) #t) ((:any x) #f)) 42) #f)
+(ut ((fn ((:str x) #t) ((:any x) #f)) "42") #t)
+(ut ((fn ((:str x) #t) ((:any x) #f)) 42) #f)
 (ut ((fn ((:char x) #t) ((:any x) #f)) #\a) #t)
 (ut ((fn ((:char x) #t) ((:any x) #f)) 42) #f)
 (ut ((fn ((:key x) #t) ((:any x) #f)) :a) #t)
 (ut ((fn ((:key x) #t) ((:any x) #f)) 42) #f)
 (ut ((fn ((:bool x) #t) ((:any x) #f)) #t) #t)
 (ut ((fn ((:bool x) #t) ((:any x) #f)) 42) #f)
-(ut ((fn ((:symbol x) #t) ((:any x) #f)) 'a) #t)
-(ut ((fn ((:symbol x) #t) ((:any x) #f)) 42) #f)
+(ut ((fn ((:sym x) #t) ((:any x) #f)) 'a) #t)
+(ut ((fn ((:sym x) #t) ((:any x) #f)) 42) #f)
 (ut ((fn ((:void x) #t) ((:any x) #f)) #void) #t)
 (ut ((fn ((:void x) #t) ((:any x) #f)) 42) #f)
 
@@ -168,14 +168,14 @@
 (ut ((fn ((:list x) #t) ((:any x) #f)) 42) #f)
 
 ; Fast Containers
-(ut ((fn ((:vector x) #t) ((:any x) #f)) []) #t)
-(ut ((fn ((:vector x) #t) ((:any x) #f)) (vector 1 2 3)) #t)
-(ut ((fn ((:vector<int> x) #t) ((:any x) #f)) []) #t)
-(ut ((fn ((:vector<int> x) #t) ((:any x) #f)) (vector 1 2 3)) #t)
-(ut ((fn ((:vector<int> x) #t) ((:any x) #f)) (vector 1 "2" 3)) #f)
-(ut ((fn ((:vector<int> x) #t) ((:any x) #f)) (vector "1" 2 3)) #f)
-(ut ((fn ((:vector<int> x) #t) ((:any x) #f)) (vector 1 2 "3")) #f)
-(ut ((fn ((:vector x) #t) ((:any x) #f)) 42) #f)
+(ut ((fn ((:vec x) #t) ((:any x) #f)) []) #t)
+(ut ((fn ((:vec x) #t) ((:any x) #f)) (vector 1 2 3)) #t)
+(ut ((fn ((:vec<int> x) #t) ((:any x) #f)) []) #t)
+(ut ((fn ((:vec<int> x) #t) ((:any x) #f)) (vector 1 2 3)) #t)
+(ut ((fn ((:vec<int> x) #t) ((:any x) #f)) (vector 1 "2" 3)) #f)
+(ut ((fn ((:vec<int> x) #t) ((:any x) #f)) (vector "1" 2 3)) #f)
+(ut ((fn ((:vec<int> x) #t) ((:any x) #f)) (vector 1 2 "3")) #f)
+(ut ((fn ((:vec x) #t) ((:any x) #f)) 42) #f)
 (ut ((fn ((:map x) #t) ((:any x) #f)) {}) #t)
 (ut ((fn ((:map x) #t) ((:any x) #f)) (hashmap 1 2 3 4)) #t)
 (ut ((fn ((:map<int> x) #t) ((:any x) #f)) {}) #t)
@@ -184,9 +184,9 @@
 (ut ((fn ((:map<int> x) #t) ((:any x) #f)) (hashmap "1" 2 3 4)) #t) ; "<type>" only checks values
 (ut ((fn ((:map<int> x) #t) ((:any x) #f)) (hashmap 1 2 "3" 4)) #t)
 (ut ((fn ((:map<int> x) #t) ((:any x) #f)) (hashmap 1 2 3 "4")) #f)
-(ut ((fn ((:map<int,string> x) #t) ((:any x) #f)) (hashmap 1 "2" 3 "4")) #t) ; "<type,type>" checks both keys and values
-(ut ((fn ((:map<int,string> x) #t) ((:any x) #f)) (hashmap 1 2 3 "4")) #f)
-(ut ((fn ((:map<int,string> x) #t) ((:any x) #f)) (hashmap 1 "2" 3 4)) #f)
+(ut ((fn ((:map<int,str> x) #t) ((:any x) #f)) (hashmap 1 "2" 3 "4")) #t) ; "<type,type>" checks both keys and values
+(ut ((fn ((:map<int,str> x) #t) ((:any x) #f)) (hashmap 1 2 3 "4")) #f)
+(ut ((fn ((:map<int,str> x) #t) ((:any x) #f)) (hashmap 1 "2" 3 4)) #f)
 (ut ((fn ((:map<any,any> x) #t) ((:any x) #f)) (hashmap 1 "2" 3 4)) #t)
 (ut ((fn ((:map<any,int> x) #t) ((:any x) #f)) (hashmap "1" 2 "3" 4)) #t)
 (ut ((fn ((:map<any,int> x) #t) ((:any x) #f)) (hashmap 2 "1" 4 "3")) #f)
@@ -281,65 +281,65 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; UNION TESTS
-(ut ((fn ((:number|string|key x) #t) ((:any x) #f)) 42) #t)
-(ut ((fn ((:number|string|key x) #t) ((:any x) #f)) "42") #t)
-(ut ((fn ((:number|string|key x) #t) ((:any x) #f)) :hi) #t)
-(ut ((fn ((:number|string|key x) #t) ((:any x) #f)) []) #f)
+(ut ((fn ((:num|str|key x) #t) ((:any x) #f)) 42) #t)
+(ut ((fn ((:num|str|key x) #t) ((:any x) #f)) "42") #t)
+(ut ((fn ((:num|str|key x) #t) ((:any x) #f)) :hi) #t)
+(ut ((fn ((:num|str|key x) #t) ((:any x) #f)) []) #f)
 
-(ut ((fn ((:pair<number|string|key> x) #t) ((:any x) #f)) '("1" 1 :hi)) #t)
-(ut ((fn ((:pair<number|string|key> x) #t) ((:any x) #f)) '("1" 1 :hi [])) #f)
-(ut ((fn ((:pair<number|string|key,number|string|key> x) #t) ((:any x) #f)) '("1" . 1)) #t)
-(ut ((fn ((:pair<number|string|key,number|string|key> x) #t) ((:any x) #f)) '(:hi . 1)) #t)
-(ut ((fn ((:pair<number|string|key,number|string|key> x) #t) ((:any x) #f)) '(:hi . [])) #f)
-(ut ((fn ((:list<number|string|key> x) #t) ((:any x) #f)) '("1" 1 :hi)) #t)
-(ut ((fn ((:list<number|string|key> x) #t) ((:any x) #f)) '("1" 1 :hi [])) #f)
-(ut ((fn ((:vector<number|string|key> x) #t) ((:any x) #f)) ["1" 1 :hi]) #t)
-(ut ((fn ((:vector<number|string|key> x) #t) ((:any x) #f)) ["1" 1 :hi []]) #f)
-(ut ((fn ((:map<number|string|key> x) #t) ((:any x) #f)) {"1" 1 [] :hi}) #t)
-(ut ((fn ((:map<number|string|key> x) #t) ((:any x) #f)) {"1" 1 :hi []}) #f)
-(ut ((fn ((:map<number|string|key,number|string|key> x) #t) ((:any x) #f)) {"1" 1 [] :hi}) #f)
-(ut ((fn ((:map<number|string|key,number|string|key> x) #t) ((:any x) #f)) {"1" 1 2 :hi}) #t)
+(ut ((fn ((:pair<num|str|key> x) #t) ((:any x) #f)) '("1" 1 :hi)) #t)
+(ut ((fn ((:pair<num|str|key> x) #t) ((:any x) #f)) '("1" 1 :hi [])) #f)
+(ut ((fn ((:pair<num|str|key,num|str|key> x) #t) ((:any x) #f)) '("1" . 1)) #t)
+(ut ((fn ((:pair<num|str|key,num|str|key> x) #t) ((:any x) #f)) '(:hi . 1)) #t)
+(ut ((fn ((:pair<num|str|key,num|str|key> x) #t) ((:any x) #f)) '(:hi . [])) #f)
+(ut ((fn ((:list<num|str|key> x) #t) ((:any x) #f)) '("1" 1 :hi)) #t)
+(ut ((fn ((:list<num|str|key> x) #t) ((:any x) #f)) '("1" 1 :hi [])) #f)
+(ut ((fn ((:vec<num|str|key> x) #t) ((:any x) #f)) ["1" 1 :hi]) #t)
+(ut ((fn ((:vec<num|str|key> x) #t) ((:any x) #f)) ["1" 1 :hi []]) #f)
+(ut ((fn ((:map<num|str|key> x) #t) ((:any x) #f)) {"1" 1 [] :hi}) #t)
+(ut ((fn ((:map<num|str|key> x) #t) ((:any x) #f)) {"1" 1 :hi []}) #f)
+(ut ((fn ((:map<num|str|key,num|str|key> x) #t) ((:any x) #f)) {"1" 1 [] :hi}) #f)
+(ut ((fn ((:map<num|str|key,num|str|key> x) #t) ((:any x) #f)) {"1" 1 2 :hi}) #t)
 
-(ut ((fn ((:vector<vector<int>> x) #t) ((:any x) #f)) []) #t)
-(ut ((fn ((:vector<vector<int>> x) #t) ((:any x) #f)) [[]]) #t)
-(ut ((fn ((:vector<vector<int>> x) #t) ((:any x) #f)) [[] []]) #t)
-(ut ((fn ((:vector<vector<int>> x) #t) ((:any x) #f)) [[1 2] [3 4]]) #t)
-(ut ((fn ((:vector<vector<int>> x) #t) ((:any x) #f)) [[1 "2"] [3 4]]) #f)
-(ut ((fn ((:vector<vector<int>|string> x) #t) ((:any x) #f)) []) #t)
-(ut ((fn ((:vector<vector<int>|string> x) #t) ((:any x) #f)) [[]]) #t)
-(ut ((fn ((:vector<vector<int>|string> x) #t) ((:any x) #f)) [[] []]) #t)
-(ut ((fn ((:vector<vector<int>|string> x) #t) ((:any x) #f)) [[1 2] [3 4] "hi"]) #t)
-(ut ((fn ((:vector<vector<int>|string> x) #t) ((:any x) #f)) [[1 "2"] [3 4] :hi]) #f)
-(ut ((fn ((:vector<vector<int>|string> x) #t) ((:any x) #f)) [[1 "2"] [3 4] "hi"]) #f)
-(ut ((fn ((:vector<vector<int>>|string x) #t) ((:any x) #f)) 42) #f)
-(ut ((fn ((:vector<vector<int>>|string x) #t) ((:any x) #f)) "hi") #t)
-(ut ((fn ((:vector<vector<int>>|string x) #t) ((:any x) #f)) []) #t)
-(ut ((fn ((:vector<vector<int>>|string x) #t) ((:any x) #f)) [[]]) #t)
-(ut ((fn ((:vector<vector<int>>|string x) #t) ((:any x) #f)) [[] []]) #t)
-(ut ((fn ((:vector<vector<int>>|string x) #t) ((:any x) #f)) [[1 2] [3 4] "hi"]) #f)
-(ut ((fn ((:vector<vector<int>>|string x) #t) ((:any x) #f)) [[1 "2"] [3 4] :hi]) #f)
-(ut ((fn ((:vector<vector<int>>|string x) #t) ((:any x) #f)) [[1 "2"] [3 4] "hi"]) #f)
+(ut ((fn ((:vec<vec<int>> x) #t) ((:any x) #f)) []) #t)
+(ut ((fn ((:vec<vec<int>> x) #t) ((:any x) #f)) [[]]) #t)
+(ut ((fn ((:vec<vec<int>> x) #t) ((:any x) #f)) [[] []]) #t)
+(ut ((fn ((:vec<vec<int>> x) #t) ((:any x) #f)) [[1 2] [3 4]]) #t)
+(ut ((fn ((:vec<vec<int>> x) #t) ((:any x) #f)) [[1 "2"] [3 4]]) #f)
+(ut ((fn ((:vec<vec<int>|str> x) #t) ((:any x) #f)) []) #t)
+(ut ((fn ((:vec<vec<int>|str> x) #t) ((:any x) #f)) [[]]) #t)
+(ut ((fn ((:vec<vec<int>|str> x) #t) ((:any x) #f)) [[] []]) #t)
+(ut ((fn ((:vec<vec<int>|str> x) #t) ((:any x) #f)) [[1 2] [3 4] "hi"]) #t)
+(ut ((fn ((:vec<vec<int>|str> x) #t) ((:any x) #f)) [[1 "2"] [3 4] :hi]) #f)
+(ut ((fn ((:vec<vec<int>|str> x) #t) ((:any x) #f)) [[1 "2"] [3 4] "hi"]) #f)
+(ut ((fn ((:vec<vec<int>>|str x) #t) ((:any x) #f)) 42) #f)
+(ut ((fn ((:vec<vec<int>>|str x) #t) ((:any x) #f)) "hi") #t)
+(ut ((fn ((:vec<vec<int>>|str x) #t) ((:any x) #f)) []) #t)
+(ut ((fn ((:vec<vec<int>>|str x) #t) ((:any x) #f)) [[]]) #t)
+(ut ((fn ((:vec<vec<int>>|str x) #t) ((:any x) #f)) [[] []]) #t)
+(ut ((fn ((:vec<vec<int>>|str x) #t) ((:any x) #f)) [[1 2] [3 4] "hi"]) #f)
+(ut ((fn ((:vec<vec<int>>|str x) #t) ((:any x) #f)) [[1 "2"] [3 4] :hi]) #f)
+(ut ((fn ((:vec<vec<int>>|str x) #t) ((:any x) #f)) [[1 "2"] [3 4] "hi"]) #f)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LAMBDA PARAMETER SUPPORT (can't check failed type match due to fatal error)
 ; Required parameters
 (ut ((lambda (:int x) x) 42) 42)
-(ut ((lambda (:int x :string y) x) 42 "42") 42)
+(ut ((lambda (:int x :str y) x) 42 "42") 42)
 
 ; Optional parameters
 (ut ((lambda ((:int x 314)) x)) 314)
 (ut ((lambda ((:int x 314)) x) 42) 42)
-(ut ((lambda ((:int x 314) (:string y "314")) x)) 314)
-(ut ((lambda ((:int x 314) (:string y "314")) x) 42) 42)
-(ut ((lambda ((:int x 314) (:string y "314")) x) 42 "hi") 42)
+(ut ((lambda ((:int x 314) (:str y "314")) x)) 314)
+(ut ((lambda ((:int x 314) (:str y "314")) x) 42) 42)
+(ut ((lambda ((:int x 314) (:str y "314")) x) 42 "hi") 42)
 
 ; Mixing required and optional parameters
 (ut ((lambda (:int a (:int x 314)) x) 27) 314)
 (ut ((lambda (:int a (:int x 314)) x) 27 42) 42)
-(ut ((lambda (:int a (:int x 314) (:string y "314")) x) 27) 314)
-(ut ((lambda (:int a (:int x 314) (:string y "314")) x) 27 42) 42)
-(ut ((lambda (:int a (:int x 314) (:string y "314")) x) 27 42 "hi") 42)
+(ut ((lambda (:int a (:int x 314) (:str y "314")) x) 27) 314)
+(ut ((lambda (:int a (:int x 314) (:str y "314")) x) 27 42) 42)
+(ut ((lambda (:int a (:int x 314) (:str y "314")) x) 27 42 "hi") 42)
 
 ; Variadic parameter
 (ut ((lambda (:int x . xs) xs) 42) '())
@@ -354,26 +354,26 @@
 ; Required parameters
 (ut ((fn ((:int x) x) ((:any x) #f)) 42) 42)
 (ut ((fn ((:int x) x) ((:any x) #f)) "42") #f)
-(ut ((fn ((:int x :string y) x) ((:any x :any y) #f)) 42 "hi") 42)
-(ut ((fn ((:int x :string y) x) ((:any x :any y) #f)) 42 :hi) #f)
+(ut ((fn ((:int x :str y) x) ((:any x :any y) #f)) 42 "hi") 42)
+(ut ((fn ((:int x :str y) x) ((:any x :any y) #f)) 42 :hi) #f)
 
 ; Optional parameters
 (ut ((fn (((:int x 314)) x))) 314)
 (ut ((fn (((:int x 314)) x) (((:any x #f)) #f)) 42) 42)
 (ut ((fn (((:int x 314)) x) (((:any x #f)) #f)) "42") #f)
-(ut ((fn (((:int x 314) (:string y "314")) x) (((:any x #f) (:any y #f)) #f))) 314)
-(ut ((fn (((:int x 314) (:string y "314")) x) (((:any x #f) (:any y #f)) #f)) 42) 42)
-(ut ((fn (((:int x 314) (:string y "314")) x) (((:any x #f) (:any y #f)) #f)) 42 "hi") 42)
-(ut ((fn (((:int x 314) (:string y "314")) x) (((:any x #f) (:any y #f)) #f)) 42 :hi) #f)
+(ut ((fn (((:int x 314) (:str y "314")) x) (((:any x #f) (:any y #f)) #f))) 314)
+(ut ((fn (((:int x 314) (:str y "314")) x) (((:any x #f) (:any y #f)) #f)) 42) 42)
+(ut ((fn (((:int x 314) (:str y "314")) x) (((:any x #f) (:any y #f)) #f)) 42 "hi") 42)
+(ut ((fn (((:int x 314) (:str y "314")) x) (((:any x #f) (:any y #f)) #f)) 42 :hi) #f)
 
 ; Mixing required and optional parameters
 (ut ((fn ((:int a (:int x 314)) x) ((:any a) #f)) 27) 314)
 (ut ((fn ((:int a (:int x 314)) x) ((:any a :any x) #f)) 27 42) 42)
 (ut ((fn ((:int a (:int x 314)) x) ((:any a :any x) #f)) 27 "42") #f)
-(ut ((fn ((:int a (:int x 314) (:string y "314")) x) ((:any a :any x :any y) #f)) 27) 314)
-(ut ((fn ((:int a (:int x 314) (:string y "314")) x) ((:any a :any x :any y) #f)) 27 42) 42)
-(ut ((fn ((:int a (:int x 314) (:string y "314")) x) ((:any a :any x :any y) #f)) 27 42 "hi") 42)
-(ut ((fn ((:int a (:int x 314) (:string y "314")) x) ((:any a :any x :any y) #f)) 27 42 :hi) #f)
+(ut ((fn ((:int a (:int x 314) (:str y "314")) x) ((:any a :any x :any y) #f)) 27) 314)
+(ut ((fn ((:int a (:int x 314) (:str y "314")) x) ((:any a :any x :any y) #f)) 27 42) 42)
+(ut ((fn ((:int a (:int x 314) (:str y "314")) x) ((:any a :any x :any y) #f)) 27 42 "hi") 42)
+(ut ((fn ((:int a (:int x 314) (:str y "314")) x) ((:any a :any x :any y) #f)) 27 42 :hi) #f)
 
 ; Variadic parameter
 (ut ((fn ((:int x . xs) xs) ((:any x) #f)) 42) '())
@@ -391,21 +391,21 @@
 ;; DEFINE PARAMETER SUPPORT (inline procedure syntax)
 ; Required parameters
 (ut ((begin (define (test-function :int x) x) test-function) 42) 42)
-(ut ((begin (define (test-function :int x :string y) x) test-function) 42 "42") 42)
+(ut ((begin (define (test-function :int x :str y) x) test-function) 42 "42") 42)
 
 ; Optional parameters
 (ut ((begin (define (test-function (:int x 314)) x) test-function)) 314)
 (ut ((begin (define (test-function (:int x 314)) x) test-function) 42) 42)
-(ut ((begin (define (test-function (:int x 314) (:string y "314")) x) test-function)) 314)
-(ut ((begin (define (test-function (:int x 314) (:string y "314")) x) test-function) 42) 42)
-(ut ((begin (define (test-function (:int x 314) (:string y "314")) x) test-function) 42 "hi") 42)
+(ut ((begin (define (test-function (:int x 314) (:str y "314")) x) test-function)) 314)
+(ut ((begin (define (test-function (:int x 314) (:str y "314")) x) test-function) 42) 42)
+(ut ((begin (define (test-function (:int x 314) (:str y "314")) x) test-function) 42 "hi") 42)
 
 ; Mixing required and optional parameters
 (ut ((begin (define (test-function :int a (:int x 314)) x) test-function) 27) 314)
 (ut ((begin (define (test-function :int a (:int x 314)) x) test-function) 27 42) 42)
-(ut ((begin (define (test-function :int a (:int x 314) (:string y "314")) x) test-function) 27) 314)
-(ut ((begin (define (test-function :int a (:int x 314) (:string y "314")) x) test-function) 27 42) 42)
-(ut ((begin (define (test-function :int a (:int x 314) (:string y "314")) x) test-function) 27 42 "hi") 42)
+(ut ((begin (define (test-function :int a (:int x 314) (:str y "314")) x) test-function) 27) 314)
+(ut ((begin (define (test-function :int a (:int x 314) (:str y "314")) x) test-function) 27 42) 42)
+(ut ((begin (define (test-function :int a (:int x 314) (:str y "314")) x) test-function) 27 42 "hi") 42)
 
 ; Variadic parameter
 (ut ((begin (define (test-function :int x . xs) xs) test-function) 42) '())
@@ -420,26 +420,26 @@
 ; Required parameters
 (ut ((begin (defn test-function ((:int x) x) ((:any x) #f)) test-function) 42) 42)
 (ut ((begin (defn test-function ((:int x) x) ((:any x) #f)) test-function) "42") #f)
-(ut ((begin (defn test-function ((:int x :string y) x) ((:any x :any y) #f)) test-function) 42 "hi") 42)
-(ut ((begin (defn test-function ((:int x :string y) x) ((:any x :any y) #f)) test-function) 42 :hi) #f)
+(ut ((begin (defn test-function ((:int x :str y) x) ((:any x :any y) #f)) test-function) 42 "hi") 42)
+(ut ((begin (defn test-function ((:int x :str y) x) ((:any x :any y) #f)) test-function) 42 :hi) #f)
 
 ; Optional parameters
 (ut ((begin (defn test-function (((:int x 314)) x)) test-function)) 314)
 (ut ((begin (defn test-function (((:int x 314)) x) (((:any x #f)) #f)) test-function) 42) 42)
 (ut ((begin (defn test-function (((:int x 314)) x) (((:any x #f)) #f)) test-function) "42") #f)
-(ut ((begin (defn test-function (((:int x 314) (:string y "314")) x) (((:any x #f) (:any y #f)) #f)) test-function)) 314)
-(ut ((begin (defn test-function (((:int x 314) (:string y "314")) x) (((:any x #f) (:any y #f)) #f)) test-function) 42) 42)
-(ut ((begin (defn test-function (((:int x 314) (:string y "314")) x) (((:any x #f) (:any y #f)) #f)) test-function) 42 "hi") 42)
-(ut ((begin (defn test-function (((:int x 314) (:string y "314")) x) (((:any x #f) (:any y #f)) #f)) test-function) 42 :hi) #f)
+(ut ((begin (defn test-function (((:int x 314) (:str y "314")) x) (((:any x #f) (:any y #f)) #f)) test-function)) 314)
+(ut ((begin (defn test-function (((:int x 314) (:str y "314")) x) (((:any x #f) (:any y #f)) #f)) test-function) 42) 42)
+(ut ((begin (defn test-function (((:int x 314) (:str y "314")) x) (((:any x #f) (:any y #f)) #f)) test-function) 42 "hi") 42)
+(ut ((begin (defn test-function (((:int x 314) (:str y "314")) x) (((:any x #f) (:any y #f)) #f)) test-function) 42 :hi) #f)
 
 ; Mixing required and optional parameters
 (ut ((begin (defn test-function ((:int a (:int x 314)) x) ((:any a) #f)) test-function) 27) 314)
 (ut ((begin (defn test-function ((:int a (:int x 314)) x) ((:any a :any x) #f)) test-function) 27 42) 42)
 (ut ((begin (defn test-function ((:int a (:int x 314)) x) ((:any a :any x) #f)) test-function) 27 "42") #f)
-(ut ((begin (defn test-function ((:int a (:int x 314) (:string y "314")) x) ((:any a :any x :any y) #f)) test-function) 27) 314)
-(ut ((begin (defn test-function ((:int a (:int x 314) (:string y "314")) x) ((:any a :any x :any y) #f)) test-function) 27 42) 42)
-(ut ((begin (defn test-function ((:int a (:int x 314) (:string y "314")) x) ((:any a :any x :any y) #f)) test-function) 27 42 "hi") 42)
-(ut ((begin (defn test-function ((:int a (:int x 314) (:string y "314")) x) ((:any a :any x :any y) #f)) test-function) 27 42 :hi) #f)
+(ut ((begin (defn test-function ((:int a (:int x 314) (:str y "314")) x) ((:any a :any x :any y) #f)) test-function) 27) 314)
+(ut ((begin (defn test-function ((:int a (:int x 314) (:str y "314")) x) ((:any a :any x :any y) #f)) test-function) 27 42) 42)
+(ut ((begin (defn test-function ((:int a (:int x 314) (:str y "314")) x) ((:any a :any x :any y) #f)) test-function) 27 42 "hi") 42)
+(ut ((begin (defn test-function ((:int a (:int x 314) (:str y "314")) x) ((:any a :any x :any y) #f)) test-function) 27 42 :hi) #f)
 
 ; Variadic parameter
 (ut ((begin (defn test-function ((:int x . xs) xs) ((:any x) #f)) test-function) 42) '())
@@ -457,21 +457,21 @@
 ;; DEFINE-GENERATOR PARAMETER SUPPORT
 ; Required parameters
 (ut (((begin (define-generator (test-function :int x) x) test-function) 42)) 42)
-(ut (((begin (define-generator (test-function :int x :string y) x) test-function) 42 "42")) 42)
+(ut (((begin (define-generator (test-function :int x :str y) x) test-function) 42 "42")) 42)
 
 ; Optional parameters
 (ut (((begin (define-generator (test-function (:int x 314)) x) test-function))) 314)
 (ut (((begin (define-generator (test-function (:int x 314)) x) test-function) 42)) 42)
-(ut (((begin (define-generator (test-function (:int x 314) (:string y "314")) x) test-function))) 314)
-(ut (((begin (define-generator (test-function (:int x 314) (:string y "314")) x) test-function) 42)) 42)
-(ut (((begin (define-generator (test-function (:int x 314) (:string y "314")) x) test-function) 42 "hi")) 42)
+(ut (((begin (define-generator (test-function (:int x 314) (:str y "314")) x) test-function))) 314)
+(ut (((begin (define-generator (test-function (:int x 314) (:str y "314")) x) test-function) 42)) 42)
+(ut (((begin (define-generator (test-function (:int x 314) (:str y "314")) x) test-function) 42 "hi")) 42)
 
 ; Mixing required and optional parameters
 (ut (((begin (define-generator (test-function :int a (:int x 314)) x) test-function) 27)) 314)
 (ut (((begin (define-generator (test-function :int a (:int x 314)) x) test-function) 27 42)) 42)
-(ut (((begin (define-generator (test-function :int a (:int x 314) (:string y "314")) x) test-function) 27)) 314)
-(ut (((begin (define-generator (test-function :int a (:int x 314) (:string y "314")) x) test-function) 27 42)) 42)
-(ut (((begin (define-generator (test-function :int a (:int x 314) (:string y "314")) x) test-function) 27 42 "hi")) 42)
+(ut (((begin (define-generator (test-function :int a (:int x 314) (:str y "314")) x) test-function) 27)) 314)
+(ut (((begin (define-generator (test-function :int a (:int x 314) (:str y "314")) x) test-function) 27 42)) 42)
+(ut (((begin (define-generator (test-function :int a (:int x 314) (:str y "314")) x) test-function) 27 42 "hi")) 42)
 
 ; Variadic parameter
 (ut (((begin (define-generator (test-function :int x . xs) xs) test-function) 42)) '())
@@ -484,10 +484,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CURRY PARAMETER SUPPORT (can't check failed type match due to fatal error)
 (ut ((curry (:int a) a) 42) 42)
-(ut ((curry (:int a :string b :key c) c) 42 "hi" :key) :key)
-(ut (((curry (:int a :string b :key c) c) 42) "hi" :key) :key)
-(ut (((curry (:int a :string b :key c) c) 42 "hi") :key) :key)
-(ut ((((curry (:int a :string b :key c) c) 42) "hi") :key) :key)
+(ut ((curry (:int a :str b :key c) c) 42 "hi" :key) :key)
+(ut (((curry (:int a :str b :key c) c) 42) "hi" :key) :key)
+(ut (((curry (:int a :str b :key c) c) 42 "hi") :key) :key)
+(ut ((((curry (:int a :str b :key c) c) 42) "hi") :key) :key)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -495,18 +495,18 @@
 (define-class TestClass
   ((method1 :int a) a)
   ((method2 :int a . xs) xs)
-  ((method3 :int a :string b) b)
+  ((method3 :int a :str b) b)
   ((method4 (:int a 314)) a)
-  ((method5 (:int a 314) (:string b "hi")) b)
+  ((method5 (:int a 314) (:str b "hi")) b)
   ((method6 :key z (:int a 314)) a)
-  ((method7 :key z (:int a 314) (:string b "hi")) b)
+  ((method7 :key z (:int a 314) (:str b "hi")) b)
   (:static (method1 :int a) a)
   (:static (method2 :int a . xs) xs)
-  (:static (method3 :int a :string b) b)
+  (:static (method3 :int a :str b) b)
   (:static (method4 (:int a 314)) a)
-  (:static (method5 (:int a 314) (:string b "hi")) b)
+  (:static (method5 (:int a 314) (:str b "hi")) b)
   (:static (method6 :key z (:int a 314)) a)
-  (:static (method7 :key z (:int a 314) (:string b "hi")) b))
+  (:static (method7 :key z (:int a 314) (:str b "hi")) b))
 
 (def testObj (TestClass))
 
@@ -531,11 +531,11 @@
 (define-interface TestInterface
   (:static (method1 :int a) a)
   (:static (method2 :int a . xs) xs)
-  (:static (method3 :int a :string b) b)
+  (:static (method3 :int a :str b) b)
   (:static (method4 (:int a 314)) a)
-  (:static (method5 (:int a 314) (:string b "hi")) b)
+  (:static (method5 (:int a 314) (:str b "hi")) b)
   (:static (method6 :key z (:int a 314)) a)
-  (:static (method7 :key z (:int a 314) (:string b "hi")) b))
+  (:static (method7 :key z (:int a 314) (:str b "hi")) b))
 
 (ut (TestInterface.method1 42) 42)
 (ut (TestInterface.method2 42 1 2 3) '(1 2 3))
@@ -550,32 +550,32 @@
 ;; FN RETURN SUPPORT
 (ut ((fn (:int () 42))) 42)
 (ut ((fn "docstring" (:int () 42))) 42)
-(ut ((fn (:int () 42) (:string (x) x)) "hello") "hello")
-(ut ((fn "docstring" (:int () 42) (:string (x) x)) "hello") "hello")
+(ut ((fn (:int () 42) (:str (x) x)) "hello") "hello")
+(ut ((fn "docstring" (:int () 42) (:str (x) x)) "hello") "hello")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; DEFN RETURN SUPPORT
 (ut ((begin (defn test-function (:int () 42)) test-function)) 42)
 (ut ((begin (defn test-function "docstring" (:int () 42)) test-function)) 42)
-(ut ((begin (defn test-function (:int () 42) (:string (x) x)) test-function) "hello") "hello")
-(ut ((begin (defn test-function "docstring" (:int () 42) (:string (x) x)) test-function) "hello") "hello")
+(ut ((begin (defn test-function (:int () 42) (:str (x) x)) test-function) "hello") "hello")
+(ut ((begin (defn test-function "docstring" (:int () 42) (:str (x) x)) test-function) "hello") "hello")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LAMBDA RETURN SUPPORT
 (ut ((lambda :int () 42)) 42)
 (ut ((lambda :int () "docstring" 42)) 42)
-(ut ((lambda :string (x) x) "hello") "hello")
-(ut ((lambda :string (x) "docstring" x) "hello") "hello")
+(ut ((lambda :str (x) x) "hello") "hello")
+(ut ((lambda :str (x) "docstring" x) "hello") "hello")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; DEFINE RETURN SUPPORT (inline procedure syntax)
 (ut ((begin (define :int (test-function) 42) test-function)) 42)
 (ut ((begin (define :int (test-function) "docstring" 42) test-function)) 42)
-(ut ((begin (define :string (test-function x) x) test-function) "hello") "hello")
-(ut ((begin (define :string (test-function x) "docstring" x) test-function) "hello") "hello")
+(ut ((begin (define :str (test-function x) x) test-function) "hello") "hello")
+(ut ((begin (define :str (test-function x) "docstring" x) test-function) "hello") "hello")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -595,18 +595,18 @@
 (define-class TestClass
   (:int (method1 a) "docstring" a)
   (:list (method2 :int a . xs) xs)
-  (:string (method3 a b) b)
+  (:str (method3 a b) b)
   (:int (method4 (a 314)) a)
-  (:string (method5 (a 314) (b "hi")) b)
+  (:str (method5 (a 314) (b "hi")) b)
   (:int (method6 z (a 314)) a)
-  (:string (method7 z (a 314) (b "hi")) b)
+  (:str (method7 z (a 314) (b "hi")) b)
   (:static :int (method1 a) "docstring" a)
   (:static :list (method2 a . xs) xs)
-  (:static :string (method3 a b) b)
+  (:static :str (method3 a b) b)
   (:static :int (method4 (a 314)) a)
-  (:static :string (method5 (a 314) (b "hi")) b)
+  (:static :str (method5 (a 314) (b "hi")) b)
   (:static :int (method6 z (a 314)) a)
-  (:static :string (method7 z (a 314) (b "hi")) b))
+  (:static :str (method7 z (a 314) (b "hi")) b))
 
 (def testObj (TestClass))
 
@@ -631,11 +631,11 @@
 (define-interface TestInterface
   (:static :int (method1 a) "docstring" a)
   (:static :list (method2 a . xs) xs)
-  (:static :string (method3 a b) b)
+  (:static :str (method3 a b) b)
   (:static :int (method4 (a 314)) a)
-  (:static :string (method5 (a 314) (b "hi")) b)
+  (:static :str (method5 (a 314) (b "hi")) b)
   (:static :int (method6 z (a 314)) a)
-  (:static :string (method7 z (a 314) (b "hi")) b))
+  (:static :str (method7 z (a 314) (b "hi")) b))
 
 (ut (TestInterface.method1 42) 42)
 (ut (TestInterface.method2 42 1 2 3) '(1 2 3))

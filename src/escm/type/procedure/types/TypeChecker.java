@@ -40,7 +40,7 @@ public class TypeChecker {
       },next);
 
       // Numeric types
-      case "number": case "complex": return new Pair<Predicate,Integer>((env, value) -> { 
+      case "num": case "complex": return new Pair<Predicate,Integer>((env, value) -> { 
         return value instanceof escm.type.number.Number;
       },next);
       case "int": return new Pair<Predicate,Integer>((env, value) -> { 
@@ -60,7 +60,7 @@ public class TypeChecker {
       },next);
 
       // Common atomic types
-      case "string": return new Pair<Predicate,Integer>((env, value) -> { 
+      case "str": return new Pair<Predicate,Integer>((env, value) -> { 
         return value instanceof escm.type.String;
       },next);
       case "char": return new Pair<Predicate,Integer>((env, value) -> { 
@@ -72,7 +72,7 @@ public class TypeChecker {
       case "bool": return new Pair<Predicate,Integer>((env, value) -> { 
         return value instanceof escm.type.bool.Boolean;
       },next);
-      case "symbol": return new Pair<Predicate,Integer>((env, value) -> { 
+      case "sym": return new Pair<Predicate,Integer>((env, value) -> { 
         return value instanceof escm.type.Symbol;
       },next);
       case "void": return new Pair<Predicate,Integer>((env, value) -> { 
@@ -157,12 +157,12 @@ public class TypeChecker {
     switch(name) {
       // Common collection types
       // - Vector
-      case "vector": {
+      case "vec": {
         // Parameterized
         if(next < typeLength && type.charAt(next) == '<') {
           Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
           if(parameterType.second >= typeLength || type.charAt(parameterType.second) != '>') {
-            throw new Exceptionf("Invalid Type \"vector<\" (index %d): %s",next+1,type);
+            throw new Exceptionf("Invalid Type \"vec<\" (index %d): %s",next+1,type);
           }
           // <any> parameter
           if(parsedAnyParameter(type,next+1,parameterType.second)) {
