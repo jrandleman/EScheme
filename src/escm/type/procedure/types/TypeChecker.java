@@ -347,7 +347,7 @@ public class TypeChecker {
 
       // Abstract collection types
       // - Associative Collection
-      case "associative-collection": case "ac": {
+      case "ac": {
         // Parameterized
         if(next < typeLength && type.charAt(next) == '<') {
           Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);
@@ -374,7 +374,7 @@ public class TypeChecker {
         }
       }
       // - Ordered Collection
-      case "ordered-collection": case "oc": {
+      case "oc": {
         // Parameterized
         if(next < typeLength && type.charAt(next) == '<') {
           Pair<Predicate,Integer> parameterType = parseType(type,typeLength,next+1);

@@ -36,7 +36,7 @@ EScheme's primitive types include:
 :any
 
 :num ; aliased by ":complex"
-:int
+:int ; matches floats without fractionals too
 :flo
 :real
 :exact
@@ -44,9 +44,9 @@ EScheme's primitive types include:
 
 :str
 :char
-:key
+:key ; keyword
 :bool
-:sym
+:sym ; symbol
 :void
 
 :thread
@@ -92,14 +92,14 @@ a string or symbol.
 EScheme's collection types include:
 
 ```
-:vec
-:map
+:vec ; vector
+:map ; hashmap
 
 :pair
 :list
 
-:associative-collection ; aliased by ":ac"
-:ordered-collection ; aliased by ":oc"
+:ac ; associative-collection
+:oc ; ordered-collection
 ```
 
 ---
