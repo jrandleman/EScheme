@@ -112,6 +112,23 @@ as EScheme data.
 ```
 
 -------------------------------------------------------------------------------
+## `class`
+
+### Description:
+```
+The value created by the <class> macro. Access static fields and methods via
+"." syntax:
+
+  class.static-field
+  (class.static-method <arg1> <arg2> ...)
+
+See the <class> macro from <Objects> in <Syntax> for more class details.
+See <object-system> in <Topics> for more general OO details.
+See <object>, <interface>, and <meta-object> in <Intrinsic-Types> for more 
+specific object oriented typing details.
+```
+
+-------------------------------------------------------------------------------
 ## `eof`
 
 ### Description:
@@ -130,6 +147,23 @@ Also see the <hashmap> procedure.
 A hashmap containing key-value associations of "<key> <value> ...".
 Create hashmap literals via the {<key> <value> ...} syntax.
 Hashmaps are applicable to a key to get their entry: (<hashmap> <key>)
+```
+
+-------------------------------------------------------------------------------
+## `interface`
+
+### Description:
+```
+The value created by the <interface> macro. Access static fields and methods
+via "." syntax:
+
+  interface.static-field
+  (interface.static-method <arg1> <arg2> ...)
+
+See the <interface> macro from <Objects> in <Syntax> for more interface details.
+See <object-system> in <Topics> for more general OO details.
+See <object>, <class>, and <meta-object> in <Intrinsic-Types> for more specific 
+object oriented typing details.
 ```
 
 -------------------------------------------------------------------------------
@@ -161,9 +195,13 @@ Create list literals via the (<item> ...) syntax.
 ### Description:
 ```
 Super type of objects, classes, and interfaces, all of which support
-'dot-notation' to access a property. 
+'dot-notation' to access a property via ".". 
 
 Note that, despite supporting dot-notation, modules are not meta-objects.
+
+See <object-system> in <Topics> for more general OO details.
+See <object>, <class>, and <interface> in <Intrinsic-Types> for more
+specific object oriented typing details.
 ```
 
 -------------------------------------------------------------------------------
@@ -226,6 +264,16 @@ Can combine with <unless> to mimic Python's "if __name__=='__main__':" pattern:
 Lastly, note that the concept of 'parameter' variables exist in order to
 have global state shared across modules. See the <define-parameter> and
 <parameter?> 'help' entries for more details.
+```
+
+-------------------------------------------------------------------------------
+## `mutex`
+
+### Description:
+```
+The value created by the <mutex> function, using a true JVM reentrant-lock
+under the hood. See the <mutex> function for creation details, and <concurrency>
+in <Topics> for more details on leveraging parallelism in EScheme.
 ```
 
 -------------------------------------------------------------------------------
@@ -303,6 +351,28 @@ for more information on EScheme's numeric primitive functions.
        #e3.5    ; 7/2
        #e1.0    ; 1
        #i#2r101 ; Inexact & Binary! => 5.0
+```
+
+-------------------------------------------------------------------------------
+## `object`
+
+### Description:
+```
+The value created by invoking a class constructor. Access fields and methods
+via "." syntax:
+
+  object.field
+  (object.method <arg1> <arg2> ...)
+
+Objects that have a "->procedure" method can be applied directly to arguments
+as a functor:
+
+  ; implicitely applies <arg1> <arg2> ... to <object.->procedure>
+  (object <arg1> <arg2> ...)
+
+See <object-system> in <Topics> for more general OO details.
+See <class>, <interface>, and <meta-object> in <Intrinsic-Types> for more 
+specific object oriented typing details.
 ```
 
 -------------------------------------------------------------------------------
@@ -430,8 +500,8 @@ Strings are also applicable to an index to get a character: (<string> <index>)
 
 ### Description:
 ```
-Extensively used by metaprograms, symbols are variables that
-evaluate to another value.
+Extensively used by metaprograms, symbols are variables that evaluate to
+another value.
 ```
 
 -------------------------------------------------------------------------------
@@ -442,6 +512,31 @@ evaluate to another value.
 The value that macros evaluate to when passed as a procedure argument.
 The only value that yields true with <syntax?>, and can be applied to
 a list of quoted macros arguments via <apply> like any other procedure.
+```
+
+-------------------------------------------------------------------------------
+## `thread`
+
+### Description:
+```
+The value created by the <thread> function, using a true JVM thread under 
+the hood. See the <thread> function for creation details, and <concurrency>
+in <Topics> for more details on leveraging parallelism in EScheme.
+```
+
+-------------------------------------------------------------------------------
+## `type-alias`
+
+### Description:
+```
+The value created by the <type-alias> function, or <define-type> macro.
+
+Used to reference a pre-existing keyword type, <type-alias>s allow us
+to hide complicated union/parameterized types behind simple names. 
+
+See <type-system> in <Topics> for more details on EScheme's types.
+See the the <type-alias> function and <define-type> syntax descriptions
+for more details on how to create and use type aliases.
 ```
 
 -------------------------------------------------------------------------------
@@ -7354,7 +7449,9 @@ Returns a list after applying <callable> to "<arg> ...":
 
 #### Description:
 ```
-Returns <obj>'s type name as a symbol.
+Returns <obj>'s intrinsic type name as a symbol. Note that it does not 
+return a keyword type as described in <type-system> from <Topics>: for 
+example, (typeof 42) yields 'number despite also matching :int
 ```
 
 -------------------------------------------------------------------------------
@@ -10251,8 +10348,8 @@ as a macro!
 ### Description:
 ```
 EScheme has a totally optional object system. See the <class> 'help' entry
-for more nitty-gritty usage details, and <meta-object> in <Intrinsic-Types> for
-type details.
+for more nitty-gritty usage details, and <meta-object> in <Intrinsic-Types>
+for type details.
 
 At a high-level, EScheme supports classes and interfaces. Like Java, there's
 single inheritance for classes and multiple inheritance for interfaces.
@@ -10262,7 +10359,7 @@ Reflection is done via OO primitives, often prefixed with 'oo-'.
 Dot-notation for property access is supported even at the bytecode level,
 hence (define obj.property) is a valid instruction!
 
-Again, check out <class>'s 'help' entry for more usage details :)
+Again, check out the <class> syntax's 'help' entry for more usage details :)
 ```
 
 -------------------------------------------------------------------------------

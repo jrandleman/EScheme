@@ -38,7 +38,7 @@ public class UtilityPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Utilities\nReturns <obj>'s type name as a symbol.";
+      return "@help:Procedures:Utilities\nReturns <obj>'s intrinsic type name as a symbol. Note that it does not \nreturn a keyword type as described in <type-system> from <Topics>: for \nexample, (typeof 42) yields 'number despite also matching :int";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
