@@ -59,16 +59,17 @@ EScheme's primitive types include:
 :procedure
 :syntax
 
-:metaobj ; includes objects, classes, interfaces, and modules
+:metaobj ; includes objects, classes, and interfaces
 :object
 :class
 :interface
 
+:dottable ; includes objects, classes, interfaces, and modules
+:module
+
 :port
 :inport
 :outport
-
-:module
 
 :type-alias
 ```

@@ -103,7 +103,7 @@
 (ut ((fn ((:metaobj x) #t) ((:any x) #f)) (class)) #t)
 (ut ((fn ((:metaobj x) #t) ((:any x) #f)) ((class))) #t)
 (ut ((fn ((:metaobj x) #t) ((:any x) #f)) (interface)) #t)
-(ut ((fn ((:metaobj x) #t) ((:any x) #f)) module1) #t)
+(ut ((fn ((:metaobj x) #t) ((:any x) #f)) module1) #f)
 (ut ((fn ((:metaobj x) #t) ((:any x) #f)) 42) #f)
 (ut ((fn ((:object x) #t) ((:any x) #f)) (class)) #f)
 (ut ((fn ((:object x) #t) ((:any x) #f)) ((class))) #t)
@@ -121,8 +121,20 @@
 (ut ((fn ((:interface x) #t) ((:any x) #f)) module1) #f)
 (ut ((fn ((:interface x) #t) ((:any x) #f)) 42) #f)
 
-; I/O
+; Dottables
+(ut ((fn ((:dottable x) #t) ((:any x) #f)) (class)) #t)
+(ut ((fn ((:dottable x) #t) ((:any x) #f)) ((class))) #t)
+(ut ((fn ((:dottable x) #t) ((:any x) #f)) (interface)) #t)
+(ut ((fn ((:dottable x) #t) ((:any x) #f)) module1) #t)
+(ut ((fn ((:dottable x) #t) ((:any x) #f)) 42) #f)
+
+; Modules
 (define file-name (module-path module1))
+(ut ((fn ((:module x) #t) ((:any x) #f)) module1) #t)
+(ut ((fn ((:module x) #t) ((:any x) #f)) file-name) #f)
+(ut ((fn ((:module x) #t) ((:any x) #f)) 42) #f)
+
+; I/O
 (ut ((fn ((:port x) #t) ((:any x) #f)) (open-output-file+ file-name)) #t)
 (ut ((fn ((:port x) #t) ((:any x) #f)) (open-input-file file-name)) #t)
 (ut ((fn ((:port x) #t) ((:any x) #f)) 42) #f)
@@ -132,11 +144,6 @@
 (ut ((fn ((:outport x) #t) ((:any x) #f)) (open-output-file+ file-name)) #t)
 (ut ((fn ((:outport x) #t) ((:any x) #f)) (open-input-file file-name)) #f)
 (ut ((fn ((:outport x) #t) ((:any x) #f)) 42) #f)
-
-; Modules
-(ut ((fn ((:module x) #t) ((:any x) #f)) module1) #t)
-(ut ((fn ((:module x) #t) ((:any x) #f)) file-name) #f)
-(ut ((fn ((:module x) #t) ((:any x) #f)) 42) #f)
 
 ; Type Aliases
 (ut ((fn ((:type-alias x) #t) ((:any x) #f)) (type-alias :int|char)) #t)

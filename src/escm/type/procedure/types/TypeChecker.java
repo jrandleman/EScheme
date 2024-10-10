@@ -108,7 +108,7 @@ public class TypeChecker {
 
       // Object-oriented types
       case "metaobj": return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.oo.Dottable;
+        return value instanceof escm.type.oo.MetaObject;
       },next);
       case "object": return new Pair<Predicate,Integer>((env, value) -> { 
         return value instanceof EscmObject;
@@ -120,6 +120,16 @@ public class TypeChecker {
         return value instanceof EscmInterface;
       },next);
 
+      // Dottable types
+      case "dottable": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.oo.Dottable;
+      },next);
+
+      // Module types
+      case "module": return new Pair<Predicate,Integer>((env, value) -> { 
+        return value instanceof escm.type.oo.EscmModule;
+      },next);
+
       // I/O types
       case "port": return new Pair<Predicate,Integer>((env, value) -> { 
         return value instanceof escm.type.port.Port;
@@ -129,11 +139,6 @@ public class TypeChecker {
       },next);
       case "outport": return new Pair<Predicate,Integer>((env, value) -> { 
         return value instanceof escm.type.port.OutputPort;
-      },next);
-
-      // Module types
-      case "module": return new Pair<Predicate,Integer>((env, value) -> { 
-        return value instanceof escm.type.oo.EscmModule;
       },next);
 
       // Type Alias types
