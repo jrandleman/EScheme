@@ -152,7 +152,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CONTAINER TESTS
+;; COLLECTION TESTS
 ; Lists
 (ut ((fn ((:pair x) #t) ((:any x) #f)) (cons 1 2)) #t)
 (ut ((fn ((:pair<int> x) #t) ((:any x) #f)) (cons 1 '())) #t) ; "<type>" checks pair contents as a list

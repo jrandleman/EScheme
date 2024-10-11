@@ -153,12 +153,12 @@ public class TypeChecker {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Parse Container Types
+  // Parse Collection Types
   private static boolean parsedAnyParameter(String type, int startIndex, int endIndex) {
     return startIndex+3 == endIndex && type.startsWith("any",startIndex);
   }
 
-  private static Pair<Predicate,Integer> parseContainer(String type, int typeLength, String name, int next) throws Exception{
+  private static Pair<Predicate,Integer> parseCollection(String type, int typeLength, String name, int next) throws Exception{
     switch(name) {
       // Common collection types
       // - Vector
@@ -406,7 +406,7 @@ public class TypeChecker {
         }
       }
 
-      // Non-container types
+      // Non-collection types
       default: {
         return null;
       }
@@ -500,8 +500,9 @@ public class TypeChecker {
   // Type Parsing Handle
   // TYPE ::=
   //   | primitiveREST
-  //   | container<TYPE>REST
-  //   | container<TYPE,TYPE>REST
+  //   | collection<TYPE>REST
+  //   | collection<TYPE,TYPE>REST
+  //   | collectionREST
   //   | classREST
   //   | interfaceREST
   //   | typealiasREST
@@ -525,7 +526,7 @@ public class TypeChecker {
     String name = type.substring(index,next);
     Pair<Predicate,Integer> p = parsePrimitive(type,name,next);
     if(p == null) {
-      p = parseContainer(type,typeLength,name,next);
+      p = parseCollection(type,typeLength,name,next);
       if(p == null) {
         p = parseClassOrInterfaceOrAlias(type,typeLength,name,index,next);
       }

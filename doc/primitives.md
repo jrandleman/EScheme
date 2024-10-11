@@ -10437,8 +10437,8 @@ EScheme denotes types with keywords, and "union types" via `|` syntax.
 
 - EX: `:str|num` represents either a string or a number.
 
-EScheme types are typically either a "primitive" or "container" type.
-If a type is neither a primitive nor a container, it is presumed to
+EScheme types are typically either a "primitive" or "collection" type.
+If a type is neither a primitive nor a collection, it is presumed to
 represent some class, interface, or type-alias: if the type doesn't
 resolve to a valid class, interface, or type-alias during a runtime
 type-check, an error is thrown.
@@ -10501,12 +10501,12 @@ EScheme's primitive types include:
 :type-alias
 ```
 
-### EScheme Container Types
+### EScheme Collection Types
 
-Container types represent an intrinsic EScheme collection type. By
+Collection types represent an intrinsic EScheme collection type. By
 default, collections are just checked to match whatever type of
 collection the keyword stands for (without regard for the types of
-its contents). However, containers may be parameterized by adding
+its contents). However, collections may be parameterized by adding
 the `<type>` suffix in order to type-check its contents as well.
 
 For example, `:list<str|sym>` is a list where each element is either
