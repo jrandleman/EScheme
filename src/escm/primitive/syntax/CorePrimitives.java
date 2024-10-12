@@ -2466,7 +2466,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Core\nExecutes \"<body> ...\" while guarding against a <raise>d exception.\nThe <raise>d exception value is bound to <raised-var>, and\n<raised-var> is then passed to the <cond>-style\n\"(<condition> <expression> ...)\" clauses. If a condition is satisfied, then\n\"<expression> ...\" is executed. <else> matches against all exception types.\n\nFor example:\n  (guard (condition\n           (else\n            (display \"condition: \")\n            (write condition)\n            (newline)\n            'exception))\n    (+ 1 (raise 'an-error)))";
+      return "@help:Syntax:Core\nExecutes \"<body> ...\" while guarding against a <raise>d exception. The\n<raise>d exception value is bound to <raised-var>, and <raised-var> is\nthen passed to the <cond>-style \"(<condition> <expression> ...)\" clauses.\nIf a condition is satisfied, then \"<expression> ...\" is executed. <else>\nmatches against all exception types.\n\nFor example:\n  (guard (condition\n           (else\n            (display \"condition: \")\n            (write condition)\n            (newline)\n            'exception))\n    (+ 1 (raise 'an-error)))";
     }
 
     private static Symbol parseRaisedVar(Datum raisedVarAndClauses, ArrayList<Datum> parameters) throws Exception {

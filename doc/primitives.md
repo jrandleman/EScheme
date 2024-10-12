@@ -8519,11 +8519,11 @@ Note that *dosync-lock* is a parameter variable!
 
 #### Description:
 ```
-Executes "<body> ..." while guarding against a <raise>d exception.
-The <raise>d exception value is bound to <raised-var>, and
-<raised-var> is then passed to the <cond>-style
-"(<condition> <expression> ...)" clauses. If a condition is satisfied, then
-"<expression> ..." is executed. <else> matches against all exception types.
+Executes "<body> ..." while guarding against a <raise>d exception. The
+<raise>d exception value is bound to <raised-var>, and <raised-var> is
+then passed to the <cond>-style "(<condition> <expression> ...)" clauses.
+If a condition is satisfied, then "<expression> ..." is executed. <else>
+matches against all exception types.
 
 For example:
   (guard (condition
