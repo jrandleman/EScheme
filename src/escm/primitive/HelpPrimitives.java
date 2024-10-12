@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import escm.type.Datum;
+import escm.type.Keyword;
 import escm.type.Symbol;
 import escm.type.Void;
 import escm.type.Pair;
@@ -245,8 +246,16 @@ public class HelpPrimitives {
     }
 
 
-    private static boolean hasMultipleSignatures(Datum sigs) {
-      return Pair.isListPair(sigs) && ((Pair)sigs).car() instanceof Pair;
+    private static boolean hasMultipleOrTypedSignatures(Datum sigsDatum) {
+      if(!Pair.isListPair(sigsDatum)) return false;
+      Pair signatures = (Pair)sigsDatum;
+      Datum fst = signatures.car();
+      if(fst instanceof Pair) return true;
+      if(fst instanceof Keyword) {
+        Datum rest = signatures.cdr();
+        return rest instanceof Pair && ((Pair)rest).car() instanceof Pair;
+      }
+      return false;
     }
 
 
@@ -256,30 +265,39 @@ public class HelpPrimitives {
 
 
     // Might return <null> on fail
-    public static String getObjectName(Datum obj) {
-      Datum name = MetaPrimitives.CallableName.logic(obj);
-      if(name instanceof Symbol) return ((Symbol)name).value();
-      return null;
-    }
-
-
-    // Might return <null> on fail
     public static String getObjectSignatures(Datum obj, int tabSpaceWidth) {
       String tab = getTab(tabSpaceWidth);
       Datum sigs = MetaPrimitives.CallableSignature.logic(obj);
       if(sigs instanceof Boolean) return null;
-      if(hasMultipleSignatures(sigs)) {
+      if(hasMultipleOrTypedSignatures(sigs)) {
         StringBuilder sb = new StringBuilder();
         while(sigs instanceof Pair) {
           Pair p = (Pair)sigs;
-          sb.append(padNewlinesWithTabs(p.car().pprint(),tab));
-          sigs = p.cdr();
+          Datum fst = p.car();
+          Datum rest = p.cdr();
+          sb.append(padNewlinesWithTabs(fst.pprint(),tab));
+          if(fst instanceof Keyword && rest instanceof Pair) {
+            p = (Pair)rest;
+            fst = p.car();
+            rest = p.cdr();
+            sb.append(' ');
+            sb.append(fst.write());
+          }
+          sigs = rest;
           if(sigs instanceof Pair) sb.append("\n");
         }
         return sb.toString();
       } else {
         return padNewlinesWithTabs(sigs.pprint(),tab);
       }
+    }
+
+
+    // Might return <null> on fail
+    public static String getObjectName(Datum obj) {
+      Datum name = MetaPrimitives.CallableName.logic(obj);
+      if(name instanceof Symbol) return ((Symbol)name).value();
+      return null;
     }
 
 
