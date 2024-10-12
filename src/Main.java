@@ -11,6 +11,7 @@
 
 import java.util.ArrayList;
 import java.io.File;
+import java.io.FileWriter;
 import java.nio.file.Path;
 import escm.type.Datum;
 import escm.type.Symbol;
@@ -41,10 +42,11 @@ public class Main {
     "  1. -v, --version                    | Print EScheme version information\n"+
     "  2. -h, --help                       | Print this information\n"+
     "  3. -q, --quiet                      | Launch the REPL without ASCII art\n"+
-    "  4. -l, --load <script> <arg1> ...   | Load <script> with <arg> ... as *argv* into the REPL\n"+
-    "  5. -i, --import <module> <arg1> ... | Import <module> with <arg> ... as *argv* into the REPL\n"+
-    "  6. <script> <arg1> ...              | Interpret <script> with <arg> ... as *argv*\n"+
-    "  7. [no arguments]                   | Launch the REPL\n";
+    "  4. -e, --eval <escheme code>        | Evaluate <escheme code> in a temporary file\n"+
+    "  5. -l, --load <script> <arg1> ...   | Load <script> with <arg> ... as *argv* into the REPL\n"+
+    "  6. -i, --import <module> <arg1> ... | Import <module> with <arg> ... as *argv* into the REPL\n"+
+    "  7. <script> <arg1> ...              | Interpret <script> with <arg> ... as *argv*\n"+
+    "  8. [no arguments]                   | Launch the REPL\n";
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -129,6 +131,18 @@ public class Main {
 
 
   ////////////////////////////////////////////////////////////////////////////
+  // Implementing our Code Evaluator
+  private static String writeCodeToTemporaryFile(ParsedCommandLine parsedCmdLine) throws Exception {
+    File tempFile = File.createTempFile("escheme_eval",".scm");
+    tempFile.deleteOnExit();
+    FileWriter writer = new FileWriter(tempFile);
+    writer.append(parsedCmdLine.eschemeCode);
+    writer.close();
+    return tempFile.getAbsolutePath();
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
   // Implementing our File Interpreter
   private static void loadScript(ParsedCommandLine parsedCmdLine) throws Exception {
     if(FilePrimitives.IsFileP.logic(Path.of(parsedCmdLine.scriptName)) == false)
@@ -161,8 +175,21 @@ public class Main {
   }
 
 
+  private static void evaluateCode(ParsedCommandLine parsedCmdLine) throws Exception {
+    String fileName = writeCodeToTemporaryFile(parsedCmdLine);
+    if(FilePrimitives.IsFileP.logic(Path.of(fileName)) == false)
+      throw new Exceptionf("\"--eval\": \"%s\" couldn't be evaluated in temp file \"%s\"!\n  %s", parsedCmdLine.eschemeCode, fileName, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
+    Environment globalEnvironment = GlobalState.getDefaultEnvironment();
+    Trampoline.resolve(SystemPrimitives.Load.logic("load",fileName,globalEnvironment,(value) -> () -> {
+      return Trampoline.LAST_BOUNCE_SIGNAL;
+    }));
+  }
+
+
   private static void launchScript(ParsedCommandLine parsedCmdLine) throws Exception {
-    if(parsedCmdLine.importingIntoREPL) {
+    if(parsedCmdLine.evaluatingCode) {
+      evaluateCode(parsedCmdLine);
+    } else if(parsedCmdLine.importingIntoREPL) {
       importScript(parsedCmdLine);
     } else {
       loadScript(parsedCmdLine);
@@ -192,8 +219,10 @@ public class Main {
     public boolean executeUnitTests          = false; // --unit-tests
     public boolean generateJavaStdLibLoader  = false; // --generate-java-stdlib-loader
     public boolean launchingQuiet            = false; // -q --quiet
+    public boolean evaluatingCode            = false; // -e --eval
     public boolean loadingIntoREPL           = false; // -l --load
     public boolean importingIntoREPL         = false; // -i --import
+    public String eschemeCode                = null;  // <null> denotes no code
     public String scriptName                 = null;  // <null> denotes no script
   }
 
@@ -229,6 +258,21 @@ public class Main {
         case "-q": case "--quiet": {
           parsed.launchingQuiet = true;
           break;
+        }
+        case "-e": case "--eval": {
+          parsed.evaluatingCode = true;
+          if(i+1 == args.length) {
+            System.err.printf("ESCM ERROR: No EScheme code given to evaluate with \"%s\"!\n", args[i]);
+            System.err.print(COMMAND_LINE_FLAGS);
+            System.exit(1);
+          }
+          StringBuilder sb = new StringBuilder();
+          for(i = i+1; i < args.length; ++i) {
+            sb.append(args[i]);
+            if(i+1 < args.length) sb.append(' ');
+          }
+          parsed.eschemeCode = sb.toString();
+          return parsed;
         }
         case "-l": case "--load": {
           parsed.loadingIntoREPL = true;
@@ -282,7 +326,7 @@ public class Main {
               generateJavaStdLibLoader();
             } else if(parsedCmdLine.executeUnitTests == true) {
               executeUnitTests();
-            } else if(parsedCmdLine.scriptName == null) {
+            } else if(parsedCmdLine.scriptName == null && parsedCmdLine.eschemeCode == null) {
               GlobalState.inREPL = true; // trigger exit message to be printed
               launchRepl(parsedCmdLine.launchingQuiet,GlobalState.getDefaultEnvironment());
             } else {

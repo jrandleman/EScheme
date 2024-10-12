@@ -10221,13 +10221,14 @@ Note that the "meta-thread" is a pseudo-thread accessable by all threads:
 ### Description:
 ```
 Command-line flags may be used to modify EScheme's behavior:
-  1. -v, --version                  | Print EScheme version information
-  2. -h, --help                     | Print this information
-  3. -q, --quiet                    | Launch the REPL without ASCII art
-  4. -l, --load <script> <arg1> ... | Load <script> with <arg> ... as *argv* into the REPL
-  5. -i, --import <module> <arg1> ... | Import <module> with <arg> ... as *argv* into the REPL
-  6. <script> <arg1> ...            | Interpret <script> with <arg> ... as *argv*
-  7. [no arguments]                 | Launch the REPL
+  1. -v, --version                    | Print EScheme version information
+  2. -h, --help                       | Print this information
+  3. -q, --quiet                      | Launch the REPL without ASCII art
+  4. -e, --eval <escheme code>        | Evaluate <escheme code> in a temporary file
+  5. -l, --load <script> <arg1> ...   | Load <script> with <arg> ... as *argv* into the REPL
+  6. -i, --import <module> <arg1> ... | Import <module> with <arg> ... as *argv* into the REPL
+  7. <script> <arg1> ...              | Interpret <script> with <arg> ... as *argv*
+  8. [no arguments]                   | Launch the REPL
 ```
 
 -------------------------------------------------------------------------------

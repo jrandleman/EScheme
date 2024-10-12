@@ -47,13 +47,15 @@
    - Print this information
 3. `-q`, `--quiet`
    - Launch the REPL without ASCII art
-4. `-l <script> <arg1> ...`, `--load <script> <arg1> ...`
+4. `-e <escheme code>`, `--eval <escheme code>`
+   - Evaluate `<escheme code>` in a temporary file
+5. `-l <script> <arg1> ...`, `--load <script> <arg1> ...`
    - Load `<script>` with `<arg> ...` as `*argv*` into the REPL
-5. `-i <module> <arg1> ...`, `--import <module> <arg1> ...`
+6. `-i <module> <arg1> ...`, `--import <module> <arg1> ...`
    - Import `<module>` with `<arg> ...` as `*argv*` into the REPL
-6. `<script> <arg1> ...`
+7. `<script> <arg1> ...`
    - Interpret `<script>` with `<arg> ...` as `*argv*`
-7. \[no arguments\]
+8. \[no arguments\]
    - Launch the REPL
 
 ---
