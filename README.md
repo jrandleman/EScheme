@@ -119,9 +119,9 @@ Anything with the `escm-` prefix is considered reserved for use by the runtime.
 
 ## EScheme-Specific Concepts (Scheme Extensions/Deviations):
 
-1. Type System (optional procedural runtime types, union and parameterized types)
+1. Type System (optional runtime types, union and parameterized types)
 2. Object System (classes, interfaces, and objects)
-3. Module System (file-specific variables & macros)
+3. Module System (file-specific variables and macros)
 4. Multithreading Support (promises, threads, and mutexes)
 5. Compile-time procedural macros
 6. Multiple dispatch procedures via `fn` with optional parameter support
@@ -150,7 +150,7 @@ Anything with the `escm-` prefix is considered reserved for use by the runtime.
 13. Immutable pairs and strings
     - Mutable pairs may be implemented by users via the object system
 14. Keyword primitive types
-    - Like symbols, but prefixed with `:`, & they always evaluate to themselves
+    - Like symbols, but prefixed with `:`, and they always evaluate to themselves
 15. Reader extensions:
     - `(. <obj>)` is equivalent to `<obj>` for the reader
     - `#eof`, `#void`, `#nil` reader literals yield their respective values
