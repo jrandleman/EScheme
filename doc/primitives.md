@@ -10301,7 +10301,7 @@ Scheme into continuation passing style, or you could write the VM itself in
 CPS such that the continuation management is entirely handled internally.
 
 EScheme opts for the second approach. Note that it required a custom
-trampolining library for this to work, since Java11 still doesn't implement
+trampolining library for this to work, since Java 21 still doesn't implement
 tail-call optimizations, but oh well.
 
 Our baked-in VM-level continuations give us some serious advantages:
@@ -10332,7 +10332,7 @@ multiple arities, support optional arguments, and have variadic arguments
 just like any other EScheme procedure!
 
 Macros are so important in fact, their expansion is one of the only 4 jobs
-that EScheme's Java11 compiler performs:
+that EScheme's Java compiler performs:
 
   1. Reflect inlined bytecode from 'bytecode'
   2. Compile vector/hashmap literals

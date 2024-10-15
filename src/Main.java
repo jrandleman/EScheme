@@ -267,9 +267,9 @@ public class Main {
             System.exit(1);
           }
           StringBuilder sb = new StringBuilder();
-          for(i = i+1; i < args.length; ++i) {
-            sb.append(args[i]);
-            if(i+1 < args.length) sb.append(' ');
+          for(i = i+1; i < args.length;) {
+            sb.append(args[i++]);
+            if(i < args.length) sb.append(' ');
           }
           parsed.eschemeCode = sb.toString();
           return parsed;
