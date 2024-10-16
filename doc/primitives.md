@@ -9213,8 +9213,6 @@ to the class, rather than one of its instances.
   C.VALUE ; 10
 
 
-Class reflection is provided by primtive functions prefixed with "oo-".
-
 Initialization of the super object's non-nullary constructor is achieved
 via the "(super! <arg> ...)" macro. Alternatively use the "apply-super!"
 macro to initialize the super object with a list of values.
@@ -9231,9 +9229,6 @@ macro to initialize the super object with a list of values.
   ((new)
     (define self.value 314)
     (super! 42)) ; undefined behavior
-
-
-See <meta-object> in <Intrinsic-Types> for more type details.
 
 
 For example:
@@ -9257,6 +9252,12 @@ For example:
   (define s (Square 5))
 
   (display (s.area)) ; Square "inherited" <area> method. Prints 25
+
+
+
+Class reflection is provided by primtive functions prefixed with "oo-".
+
+See <meta-object> in <Intrinsic-Types> for more type details.
 ```
 
 -------------------------------------------------------------------------------
@@ -10345,23 +10346,326 @@ as a macro!
 ```
 
 -------------------------------------------------------------------------------
+## `module-system`
+
+### Description:
+```
+# Modules in EScheme
+
+### Describes EScheme's optional module system!
+
+## Motivation and Overview
+
+The value created by an `import` expression.
+
+Modules present an alternative to Scheme's usual inter-file semantics.
+
+The `load` function has always served as a means by which to execute the code
+of another Scheme file in the calling file's global environment. This simplicity
+is a double edged sword though: while making `load` easy to implement, it leaves
+much to be desired with respect to enabling encapsulation of code across
+coordinated Scheme files.
+
+As such, in addition to `load`, EScheme offers a minimalistic module system
+that strives to enable file-specific encapsulation of EScheme code. Files
+processed via the `import` macro are defined as `module` objects within the
+enclosing enivironment. See the `import` details below for more information on
+how EScheme evaluates modules.
+
+Each module has its own isolated global environment, and has automatic access
+to EScheme's standard library. Note that this means that operations that depend
+on global variables (e.g. `load-once`) are hence only able to operate on
+a module-relative basis.
+
+- Note that `dosync` notably works across modules, since its internal lock was
+  created via `define-parameter`. Use `dosync-module` for module-relative locking
+  behavior.
+
+Both variables and macros can be accessed from a module by using EScheme's
+dot-notation: for example, to access variable `PersonClass` from module `Mod`,
+we write `Mod.PersonClass`.
+
+Further note that imported modules are cached! Importing the same module
+multiple times does not cause multiple evaluations of that module. Use the
+`reload` macro if you'd like to forcefully re-evaluate the module in question.
+
+Additionally, the `from` macro may be used to load specific variables within
+a given module, without defining that module itself as a local variable.
+
+Modules may be introspected upon by 2 primitives:
+
+1. `module-path`: yield the absolute file path to the module (this is what
+   distinguishes one module from another under the hood).
+2. `module-bindings`: yield a list of the symbols defined in a module (beware:
+   every module redefines the entire EScheme standard library!).
+
+Note that the 'meta-thread's environment (see `thread-define`) is module
+independant!
+
+Use the `*import*` variable to determine if the current file was `import`ed.
+Can combine with `unless` to mimic Python's `if __name__=='__main__':` pattern:
+
+```scheme
+  (unless *import*
+    <execute-main-escheme-code-here> ...)
+```
+
+Lastly, note that the concept of 'parameter' variables exist in order to
+have global state shared across modules. See the `define-parameter` and
+`parameter?` 'help' entries for more details.
+
+---
+
+## Accessing variable `<var>` from module `<module>`
+
+```scheme
+<module>.<var>
+```
+
+---
+
+## Regular Imports
+
+```scheme
+(import <module-path-symbol>)
+(import <module-path-symbol> :as <module-alias-symbol>)
+(import <filepath-string> <module-path-symbol>)
+(import <filepath-string> <module-path-symbol> :as <module-alias-symbol>)
+```
+
+Import `<module-path-symbol>` as a module variable in the current environment,
+where `<module-path-symbol>` represents an Escheme (or `serialize`d!) file.
+Seeks the module from `<filepath-string>`, if provided.
+
+Module variables are named `<module-path-symbol>` by default, though there are
+2 caveats:
+
+1.  `<module-alias-symbol>` is provided: this overrides the default name and
+    will be what the module is loaded into the environment as.
+
+2.  `<module-path-symbol>` is a dotted list of symbols: this is how we denote
+    access to a module that is in a different folder than the current
+    directory. For example, suppose we have the following directory layout:
+
+    ```
+    Root
+    |____ Folder1
+    |     |_______ Module.scm
+    |
+    |____ Folder2
+          |_______ Main.scm
+    ```
+
+    For `Main.scm` to import `Module.scm`, it would contain:
+
+    ```scheme
+    (import Folder1.Module) ; within 'Main.scm'. '(import Root.Folder1.Module)' also works
+    ```
+
+    In this example, the module variable would be named `Module`. Note that
+    the file extension of the target module file is left out from the `import`
+    expression.
+
+With regards to locating the file pointed to by `<module-path-symbol>`, EScheme
+will first attempt to find it along the file path tree from the location that
+invoked the `import` expression. Note that this makes executing `(import #path Module)`
+redundant, in contrast to the `load` function.
+
+Imported modules are also cached across modules, so every instance of `(import Module)`
+will reference the same `Module` module object. Note that you can force a module
+to be reloaded via the `reload` special form.
+
+See the `from` details below for an alternative to `import` that extracts specific
+fields from the `<module-path-symbol>` module, without adding the module itself to
+your current environment's namespace.
+
+---
+
+## Reloading Modules
+
+```scheme
+(reload <module-alias-symbol>)
+```
+
+Forcefully re-evaluate `<module-alias-symbol>` (note that `import` caches
+modules by default).
+
+---
+
+## Loading Module Variables
+
+```scheme
+(from <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ...)
+(from <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ... :as <alias1-symbol> <alias2-symbol> ...)
+(from <filepath-string> <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ...)
+(from <filepath-string> <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ... :as <alias1-symbol> <alias2-symbol> ...)
+```
+
+Import `<obj1-symbol> <obj2-symbol> ...` from `<module-path-symbol>`, without
+exposing the module itself as a variable within the current environment.
+
+Equivalent to:
+
+```scheme
+(begin
+  (import <module-path-symbol> :as <hidden-name>)
+  (define <obj1-symbol> <hidden-name>.<obj1-symbol>)
+  (define <obj2-symbol> <hidden-name>.<obj2-symbol>)
+  ...)
+```
+
+Or, if `<alias1-symbol> ...` is provided:
+
+```scheme
+(begin
+  (import <module-path-symbol> :as <hidden-name>)
+  (define <alias1-symbol> <hidden-name>.<obj1-symbol>)
+  (define <alias2-symbol> <hidden-name>.<obj2-symbol>)
+  ...)
+```
+
+If given `<filepath-string>`, `from` simply adds it to the above `import`
+statement.
+
+---
+
+## Module Introspection Primitives
+
+### Module Predicate
+
+```scheme
+(module? <obj>)
+```
+
+### Module Absolute Path Source Location
+
+```scheme
+(module-path <module>)
+```
+
+The absolute file path string of the module file's location, what
+distinguishes one module from another under the hood.
+
+### Module Variable Name Bindings List
+
+```scheme
+(module-bindings <module>)
+```
+
+A list of variable symbols defined in `<module>`. Beware that all modules load
+all of EScheme's standard library by default!
+```
+
+-------------------------------------------------------------------------------
 ## `object-system`
 
 ### Description:
 ```
-EScheme has a totally optional object system. See the <class> 'help' entry
-for more nitty-gritty usage details, and <meta-object> in <Intrinsic-Types>
-for type details.
+# Objects in EScheme
 
-At a high-level, EScheme supports classes and interfaces. Like Java, there's
-single inheritance for classes and multiple inheritance for interfaces.
+### Describes EScheme's optional object system!
 
-Reflection is done via OO primitives, often prefixed with 'oo-'.
+## Object System Overview
 
-Dot-notation for property access is supported even at the bytecode level,
-hence (define obj.property) is a valid instruction!
+EScheme has a totally optional object system, including support for:
 
-Again, check out the <class> syntax's 'help' entry for more usage details :)
+- Single inheritance for classes, multiple inheritance for interfaces
+- Static support:
+  - `:static` fields & methods for class/interface-local properties
+    - implied when `define`ing a new class/interface property!
+- `self` semantics:
+  - instance methods have `self` dynamically bound to the calling object
+  - static methods have `self` bound to the class datum they belong to
+- `super` semantics:
+  - instance methods have `super` statically bound to the super object
+  - static methods have `super` bound to the super class
+- Referring to static props in instance methods:
+  - `<classname>.<static-prop>`
+  - `self.class.<static-prop>`
+- Special object properties:
+  - `new` pseudo-method constructor syntax
+    - Doesn't correlate to an actual method named `new`
+  - `class` field to access the class of the current object
+  - `->procedure` method to overload application for objects
+    - Applicable objects with this method are called "functor"s
+- Special class and interface property:
+  - `name`: the symbolic name of the class/interface
+    - Only present if the class/interface is NOT anonymous!
+- All methods have the following variables automatically defined:
+  - `self` ; the polymorphic calling object
+  - `super` ; the super object if exists, else #f
+- Bytecode-level support for `(define obj.prop)` `(set! obj.prop)` syntax
+
+---
+
+## Named Class Syntax:
+
+### Also generates a `(<class-name>? <obj>)` predicate procedure!
+
+### May use `defclass` to alias `define-class`!
+
+```scheme
+(define-class <class-name>
+  (:extends <class>) (:implements <interface> ...) ; both are optional
+  <optional-docstring>
+  (:static <name> <value>)
+  (:static (<method-name> <param> ...) <body> ...)
+  (<name> <value>)
+  ((<method-name> <param> ...) <body> ...))
+```
+
+---
+
+## Anonymous Class Syntax:
+
+```scheme
+(class (:extends <class>) (:implements <interface> ...) ; both are optional
+  <optional-docstring>
+  (:static <name> <value>)
+  (:static (<method-name> <param> ...) <body> ...)
+  (<name> <value>)
+  ((<method-name> <param> ...) <body> ...))
+```
+
+---
+
+## Named Interface Syntax:
+
+### Also generates an `(<interface-name>? <obj>)` predicate procedure!
+
+### May use `definterface` to alias `define-interface`!
+
+```scheme
+(define-interface <interface-name>
+  (:extends <interface> ...) ; ":extends" is optional
+  <optional-docstring>
+  (:static <name> <value>)
+  (:static (<method-name> <param> ...) <body> ...)
+  <name>) ; required property name(s) for a class to have
+```
+
+---
+
+## Anonymous Interface Syntax:
+
+```scheme
+(interface (:extends <interface> ...) ; ":extends" is optional
+  <optional-docstring>
+  (:static <name> <value>)
+  (:static (<method-name> <param> ...) <body> ...)
+  <name>) ; required property name(s) for a class to have
+```
+
+---
+
+## Initializing Super Object Constructors
+
+The `(super! <param> ...)` macro may be used within object constructors to
+initialize an object's super class with a set of parameters.
+
+- Super objects with a "nullary" constructor are automatically constructed.
+- `super!` must be used immediately in constructors to avoid undefined behavior!
+- Use `(apply-super! <param-list>)` to initialize the super object with a list.
 ```
 
 -------------------------------------------------------------------------------
@@ -10461,7 +10765,7 @@ with a few exceptions like `:int` requiring slightly more work.
 
 EScheme's primitive types include:
 
-```
+```scheme
 :any
 
 :num ; aliased by ":complex"
@@ -10521,7 +10825,7 @@ a string or symbol.
 
 EScheme's collection types include:
 
-```
+```scheme
 :vec ; vector
 :map ; hashmap
 
@@ -10546,7 +10850,7 @@ Notes on optional and variadic parameters:
 
 - `defn` uses the same type syntax as `fn`
 
-```
+```scheme
 (fn
   ; Typed <:int> return and <:list>/<:char> parameters
   (:int (:list a :char b . rest-args)
@@ -10569,7 +10873,7 @@ Notes on optional and variadic parameters:
 
 ### `lambda`
 
-```
+```scheme
 ; Typed <:int> return and <:list>/<:char> parameters
 (lambda :int (:list a :char b . rest-args)
   (length (cons b (cons a rest-args))))
@@ -10581,7 +10885,7 @@ Notes on optional and variadic parameters:
 
 ### `define`
 
-```
+```scheme
 ; Typed <:int> return and <:list>/<:char> parameters
 (define :int (function-name :list a :char b . rest-args)
   (length (cons b (cons a rest-args))))
@@ -10596,7 +10900,7 @@ Notes on optional and variadic parameters:
 - Only supports typed parameters, not typed returns, to account for
   `*generator-complete*` being returned from finite generators.
 
-```
+```scheme
 ; Required <:flo> and optional <:int> parameters
 (define-generator (generator-factory-name :flo a (:int b 42))
   (let loop ((i b))
@@ -10608,7 +10912,7 @@ Notes on optional and variadic parameters:
 
 - Only type-checks the return value once all parameters have been applied.
 
-```
+```scheme
 ; Typed <:int> return and <:list>/<:char> parameters
 (curry :int (:list a :char b)
   (length (cons b a)))
@@ -10621,7 +10925,7 @@ Notes on optional and variadic parameters:
 - `define-class` uses the same type syntax as `class`
   - as `define-interface` does with `interface`
 
-```
+```scheme
 (define-class ClassName
   ; Instance: typed <:int> return and <:list>/<:char> parameters
   (:int (method-name-1 :list a :char b . rest-args)
@@ -10674,7 +10978,7 @@ which is simply a convenience wrapper around `define` and `type-alias`.
 
 ### Example
 
-```
+```scheme
 ; Create a type-alias and dispatch on it
 (define-type phone-number :str|list<int>)
 

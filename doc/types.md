@@ -32,7 +32,7 @@ with a few exceptions like `:int` requiring slightly more work.
 
 EScheme's primitive types include:
 
-```
+```scheme
 :any
 
 :num ; aliased by ":complex"
@@ -92,7 +92,7 @@ a string or symbol.
 
 EScheme's collection types include:
 
-```
+```scheme
 :vec ; vector
 :map ; hashmap
 
@@ -117,7 +117,7 @@ Notes on optional and variadic parameters:
 
 - `defn` uses the same type syntax as `fn`
 
-```
+```scheme
 (fn
   ; Typed <:int> return and <:list>/<:char> parameters
   (:int (:list a :char b . rest-args)
@@ -140,7 +140,7 @@ Notes on optional and variadic parameters:
 
 ### `lambda`
 
-```
+```scheme
 ; Typed <:int> return and <:list>/<:char> parameters
 (lambda :int (:list a :char b . rest-args)
   (length (cons b (cons a rest-args))))
@@ -152,7 +152,7 @@ Notes on optional and variadic parameters:
 
 ### `define`
 
-```
+```scheme
 ; Typed <:int> return and <:list>/<:char> parameters
 (define :int (function-name :list a :char b . rest-args)
   (length (cons b (cons a rest-args))))
@@ -167,7 +167,7 @@ Notes on optional and variadic parameters:
 - Only supports typed parameters, not typed returns, to account for
   `*generator-complete*` being returned from finite generators.
 
-```
+```scheme
 ; Required <:flo> and optional <:int> parameters
 (define-generator (generator-factory-name :flo a (:int b 42))
   (let loop ((i b))
@@ -179,7 +179,7 @@ Notes on optional and variadic parameters:
 
 - Only type-checks the return value once all parameters have been applied.
 
-```
+```scheme
 ; Typed <:int> return and <:list>/<:char> parameters
 (curry :int (:list a :char b)
   (length (cons b a)))
@@ -192,7 +192,7 @@ Notes on optional and variadic parameters:
 - `define-class` uses the same type syntax as `class`
   - as `define-interface` does with `interface`
 
-```
+```scheme
 (define-class ClassName
   ; Instance: typed <:int> return and <:list>/<:char> parameters
   (:int (method-name-1 :list a :char b . rest-args)
@@ -245,7 +245,7 @@ which is simply a convenience wrapper around `define` and `type-alias`.
 
 ### Example
 
-```
+```scheme
 ; Create a type-alias and dispatch on it
 (define-type phone-number :str|list<int>)
 

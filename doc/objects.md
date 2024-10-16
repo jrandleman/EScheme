@@ -6,6 +6,8 @@
 
 ## Object System Overview
 
+EScheme has a totally optional object system, including support for:
+
 - Single inheritance for classes, multiple inheritance for interfaces
 - Static support:
   - `:static` fields & methods for class/interface-local properties
@@ -28,10 +30,10 @@
 - Special class and interface property:
   - `name`: the symbolic name of the class/interface
     - Only present if the class/interface is NOT anonymous!
-- All instance & static methods have the following variables automatically defined:
+- All methods have the following variables automatically defined:
   - `self` ; the polymorphic calling object
   - `super` ; the super object if exists, else #f
-- Bytecode-level instruction support for `(define obj.prop)` `(set! obj.prop)` syntax
+- Bytecode-level support for `(define obj.prop)` `(set! obj.prop)` syntax
 
 ---
 
@@ -43,7 +45,7 @@
 
 ```scheme
 (define-class <class-name>
-  (:extends <class>) (:implements <interface> ...) ; both ":extends" and ":implements" are optional
+  (:extends <class>) (:implements <interface> ...) ; both are optional
   <optional-docstring>
   (:static <name> <value>)
   (:static (<method-name> <param> ...) <body> ...)
@@ -56,7 +58,7 @@
 ## Anonymous Class Syntax:
 
 ```scheme
-(class (:extends <class>) (:implements <interface> ...) ; both ":extends" and ":implements" are optional
+(class (:extends <class>) (:implements <interface> ...) ; both are optional
   <optional-docstring>
   (:static <name> <value>)
   (:static (<method-name> <param> ...) <body> ...)
@@ -101,5 +103,5 @@ The `(super! <param> ...)` macro may be used within object constructors to
 initialize an object's super class with a set of parameters.
 
 - Super objects with a "nullary" constructor are automatically constructed.
-- `super!` **_must_** be used **_immediately_** in constructors to avoid undefined behavior!
-- Use `(apply-super! <param-list>)` instead to initialize the super object with a list of values.
+- `super!` must be used immediately in constructors to avoid undefined behavior!
+- Use `(apply-super! <param-list>)` to initialize the super object with a list.
