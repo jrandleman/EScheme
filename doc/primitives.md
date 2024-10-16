@@ -234,7 +234,7 @@ a module-relative basis.
     was created via <define-parameter>. Use <dosync-module> for module-relative
     locking behavior.
 
-Both variables and macros can be access from a module by using EScheme's
+Both variables and macros can be accessed from a module by using EScheme's
 dot-notation: for example, to access variable 'PersonClass' from module 'Mod',
 we write 'Mod.PersonClass'.
 
@@ -9039,7 +9039,8 @@ statement. See the <import> <help> entry for more details on how EScheme
 loads modules, and see the <module> <help> entry for general details of
 the overall module system itself.
 
-Like <import>, also automatically sets the '*import*' global variable to #t.
+Like <import>, also automatically sets the module's '*import*' global
+variable to #t.
 ```
 
 -------------------------------------------------------------------------------
@@ -9090,9 +9091,9 @@ redundant, in contrast to the 'load' function.
 
 Imported modules are also cached across modules, so every instance of '(import Module)
 will reference the same 'Module' module object. Note that you can force a module
-to be reloaded via the <reload> special form.
+to be reloaded via the <reload> macro.
 
-Automatically sets the '*import*' global variable to #t.
+Automatically sets the module's '*import*' global variable to #t.
 
 Lastly, note that the concept of 'parameter' variables exist in order to
 have global state shared across modules. See the <define-parameter> and

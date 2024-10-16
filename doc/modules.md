@@ -31,7 +31,7 @@ a module-relative basis.
   created via `define-parameter`. Use `dosync-module` for module-relative locking
   behavior.
 
-Both variables and macros can be access from a module by using EScheme's
+Both variables and macros can be accessed from a module by using EScheme's
 dot-notation: for example, to access variable `PersonClass` from module `Mod`,
 we write `Mod.PersonClass`.
 
