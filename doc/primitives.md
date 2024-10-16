@@ -415,33 +415,8 @@ alternative clears it out first.
 ### Description:
 ```
 A lazy alternative to lists, where each item is only evaluated once accessed.
-Use <scar> and <scdr> respectively to access to the 1st and 2nd items.
-
-Example:
-  (define (sieve int-stream)
-    (scons
-      (scar int-stream)
-      (sieve
-        (stream-filter
-          (lambda (n) (positive? (remainder n (scar int-stream))))
-          (scdr int-stream)))))
-
-  (define (ints-from n)
-    (scons n (ints-from (+ n 1))))
-
-  (define primes (sieve (ints-from 2))) ; infinite stream of prime numbers!
-
-  (display (stream->list primes 13))
-  (newline)
-```
-
--------------------------------------------------------------------------------
-## `stream-pair`
-
-### Description:
-```
-A lazy alternative to pairs. Each item is only evaluated once accessed.
-Nest them with #nil as the last <scdr> to create a stream.
+Use <scons> to create a <stream-pair>, as <cons> does for regular pairs.
+Use <scar>/<scdr> to access to the 1st/2nd items in a <stream-pair>.
 
 Example:
   (define (sieve int-stream)
