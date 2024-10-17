@@ -178,7 +178,7 @@ public class CorePrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Core\nDefines <macro-name> to be a macro that uses to <callable>\nto perform its code expansion.\n\nFor example:\n  (define-syntax and\n    (lambda (. conditions)\n      (fold (lambda (acc item) (list (quote if) acc item #f))\n            #t\n            conditions)))";
+      return "@help:Syntax:Core\nDefines <macro-name> to be a macro that uses to <callable> to perform its\ncode expansion at compile time.\n  => See <help>'s <macros> in <Topics> for more details!\n\nFor example:\n  (define-syntax and\n    (lambda (. conditions)\n      (fold (lambda (acc item) (list (quote if) acc item #f))\n            #t\n            conditions)))";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

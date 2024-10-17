@@ -8236,8 +8236,9 @@ Note that *dosync-lock* is a parameter variable!
 
 #### Description:
 ```
-Defines <macro-name> to be a macro that uses to <callable>
-to perform its code expansion.
+Defines <macro-name> to be a macro that uses to <callable> to perform its
+code expansion at compile time.
+  => See <help>'s <macros> in <Topics> for more details!
 
 For example:
   (define-syntax and
