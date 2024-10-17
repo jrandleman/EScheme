@@ -1732,7 +1732,7 @@ See <promise>'s <help> entry for an example use!
 
 ##### Description:
 ```
-Get a new promise that either resolves to a list of <promises>'s resolved
+Get a new promise that either resolves to a list of the <promise>s resolved
 results, or rejects with the first error encountered. Akin to JavaScript's
 <Promise.all()>.
 

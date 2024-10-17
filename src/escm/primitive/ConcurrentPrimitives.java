@@ -1293,7 +1293,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency:Promises\nGet a new promise that either resolves to a list of <promises>'s resolved\nresults, or rejects with the first error encountered. Akin to JavaScript's\n<Promise.all()>.\n\n<await-all> can be called in two ways:\n  1. (await-all <promises-ordered-collection>)\n  2. (await-all <promise> ...)\n\nNote that it's safe to pass non-promises to <await-all>: they're treated as \nvalues of immediately resolved promises.\n\nSee <promise>'s <help> entry for an example use!";
+      return "@help:Procedures:Concurrency:Promises\nGet a new promise that either resolves to a list of the <promise>s resolved\nresults, or rejects with the first error encountered. Akin to JavaScript's\n<Promise.all()>.\n\n<await-all> can be called in two ways:\n  1. (await-all <promises-ordered-collection>)\n  2. (await-all <promise> ...)\n\nNote that it's safe to pass non-promises to <await-all>: they're treated as \nvalues of immediately resolved promises.\n\nSee <promise>'s <help> entry for an example use!";
     }
 
     private ArrayList<Datum> parsePromises(ArrayList<Datum> parameters) throws Exception {
