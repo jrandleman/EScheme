@@ -25,6 +25,7 @@
   (lambda (a b)
     (list (quote +) a b)))
 (ut (macro-test 1 2) 3)
+(ut defsyntax define-syntax)
 
 
 ; arity dispatch 

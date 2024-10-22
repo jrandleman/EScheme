@@ -138,6 +138,9 @@ public class GlobalState {
   private static final Symbol DEFP = new Symbol("def?");
   private static final Symbol DEFINEDP = new Symbol("defined?");
 
+  private static final Symbol DEFSYNTAX = new Symbol("defsyntax");
+  private static final Symbol DEFINE_SYNTAX = new Symbol("define-syntax");
+
   private static final Symbol DEFGEN = new Symbol("defgen");
   private static final Symbol DEFINE_GENERATOR = new Symbol("define-generator");
 
@@ -214,6 +217,7 @@ public class GlobalState {
     JavaStdLibLoader.load(definitionEnvironment);
     definitionEnvironment.define(DEF,definitionEnvironment.get(DEFINE));
     definitionEnvironment.define(DEFP,definitionEnvironment.get(DEFINEDP));
+    definitionEnvironment.define(DEFSYNTAX,definitionEnvironment.get(DEFINE_SYNTAX));
     definitionEnvironment.define(DEFGEN,definitionEnvironment.get(DEFINE_GENERATOR));
     definitionEnvironment.define(DEFCLASS,definitionEnvironment.get(DEFINE_CLASS));
     definitionEnvironment.define(DEFINTERFACE,definitionEnvironment.get(DEFINE_INTERFACE));
