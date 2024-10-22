@@ -99,7 +99,7 @@ information on EScheme's broader extensions in the `doc` directory:
 - [`concurrency.md`](https://github.com/jrandleman/EScheme/tree/main/doc/concurrency.md): Threading semantics and dynamic environments.
 - [`modules.md`](https://github.com/jrandleman/EScheme/blob/main/doc/modules.md): Module system, as well as its reflection.
 - [`objects.md`](https://github.com/jrandleman/EScheme/blob/main/doc/objects.md): Single-inheritance multiple-interfaces object system.
-- [`instructions.md`](https://github.com/jrandleman/EScheme/blob/main/doc/instructions.md): Inline bytecode, and learn EScheme's instruction set.
+- [`bytecode.md`](https://github.com/jrandleman/EScheme/blob/main/doc/bytecode.md): Inline bytecode, and learn EScheme's instruction set.
 - [`examples`](https://github.com/jrandleman/EScheme/tree/main/doc/examples): Directory with sample EScheme files.
 
 Having learned R4RS Scheme and EScheme's deviations, you're set to code now! 🙌
