@@ -10810,10 +10810,10 @@ EScheme's primitive types include:
 ### EScheme Collection Types
 
 Collection types represent an intrinsic EScheme collection type. By
-default, collections are just checked to match whatever type of
-collection the keyword stands for (without regard for the types of
-its contents). However, collections may be parameterized by adding
-the `<type>` suffix in order to type-check its contents as well.
+default, collections are just type-checked to match whatever type
+of collection the keyword stands for. However, collections may be
+parameterized by adding the `<type>` suffix in order to type-check
+their contents as well.
 
 For example, `:list<str|sym>` is a list where each element is either
 a string or symbol.
@@ -10832,8 +10832,8 @@ EScheme's collection types include:
 :pair
 :list
 
-:ac ; associative-collection
-:oc ; ordered-collection
+:ac ; associative-collection (hashmaps, vectors, lists, strings)
+:oc ; ordered-collection (vectors, lists, strings)
 ```
 
 ---
