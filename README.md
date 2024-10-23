@@ -74,7 +74,7 @@ R4RS and R5RS Scheme. Scheme resources include:
 2. [The R4RS Scheme standard here!](https://people.csail.mit.edu/jaffer/r4rs_toc.html)
 3. [The R5RS Scheme standard here!](https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r5rs-html/r5rs_toc.html)
 
-[While EScheme deviates from R(4/5)RS in some key ways](#escheme-specific-concepts-scheme-extensionsdeviations), having read the tutorials
+[While EScheme deviates from R(4/5)RS in some key ways](#escheme-specific-concepts-scheme-extensionsdeviations), having read the resources
 above, you'll be broadly ready to jump directly into learning EScheme! However,
 if you'd like a bit more practice first, you can first check out this textbook:
 "The Structure and Interpretation of Computer Programs" (or _SICP_ for short).
@@ -96,15 +96,13 @@ Click on the links below for:
 [Beyond README.md's information on EScheme's R4RS extensions](#escheme-specific-concepts-scheme-extensionsdeviations), you can find more
 information on EScheme's broader extensions in the `doc` directory:
 
-- [`primitives.md`](https://github.com/jrandleman/EScheme/tree/main/doc/primitives.md): Broad overview of EScheme's primitive functions.
-- [`types.md`](https://github.com/jrandleman/EScheme/tree/main/doc/types.md): Optional runtime type system.
+- [`primitives.md`](https://github.com/jrandleman/EScheme/tree/main/doc/primitives.md): Primitive functions, macros, and intrinsic types.
+- [`types.md`](https://github.com/jrandleman/EScheme/tree/main/doc/types.md): Optional runtime type system for procedures.
 - [`concurrency.md`](https://github.com/jrandleman/EScheme/tree/main/doc/concurrency.md): Threading semantics and dynamic environments.
 - [`modules.md`](https://github.com/jrandleman/EScheme/blob/main/doc/modules.md): Module system, as well as its reflection.
-- [`objects.md`](https://github.com/jrandleman/EScheme/blob/main/doc/objects.md): Single-inheritance multiple-interfaces object system.
+- [`objects.md`](https://github.com/jrandleman/EScheme/blob/main/doc/objects.md): Single-inheritance, multiple-interfaces object system.
 - [`bytecode.md`](https://github.com/jrandleman/EScheme/blob/main/doc/bytecode.md): Inline bytecode, and learn EScheme's instruction set.
 - [`examples`](https://github.com/jrandleman/EScheme/tree/main/doc/examples): Directory with sample EScheme files.
-
-Note that EScheme draws from Python with [a `help` function]
 
 EScheme also draws from Python with an extensible [`help` function](https://github.com/jrandleman/EScheme/tree/main/doc/primitives.md#help), allowing
 documentation to be dynamically explored and expanded upon via docstrings.
