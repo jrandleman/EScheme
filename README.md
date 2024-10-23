@@ -62,16 +62,17 @@
 
 ## Learning EScheme:
 
-EScheme builds on R4RS Scheme: designed to be the C++ to it's C, EScheme adapts
+EScheme builds on R4RS Scheme: designed to be the C++ to its C, EScheme adapts
 the LISP for contemporary use by supporting many paradigms programmers have come
 to expect from modern tools.
 
 Despite being inspired by a broad variety of languages (including Clojure, Scala,
-Smalltalk, Python, JavaScript, Java, & C++), EScheme's base draws most heavily on
-R4RS and R5RS Scheme. You can find tutorials for:
+Smalltalk, Python, TypeScript, Java, & C++), EScheme's base draws most heavily on
+R4RS and R5RS Scheme. Scheme resources include:
 
-1. [R4RS here!](https://people.csail.mit.edu/jaffer/r4rs_toc.html)
-2. [R5RS here!](https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r5rs-html/r5rs_toc.html)
+1. [This wonderful Scheme tutorial (thanks to LIPS Scheme)!](https://lips.js.org/docs/category/introduction-to-scheme)
+2. [The R4RS Scheme standard here!](https://people.csail.mit.edu/jaffer/r4rs_toc.html)
+3. [The R5RS Scheme standard here!](https://groups.csail.mit.edu/mac/ftpdir/scheme-reports/r5rs-html/r5rs_toc.html)
 
 [While EScheme deviates from R(4/5)RS in some key ways](#escheme-specific-concepts-scheme-extensionsdeviations), having read the tutorials
 above, you'll be broadly ready to jump directly into learning EScheme! However,
@@ -96,20 +97,23 @@ Click on the links below for:
 information on EScheme's broader extensions in the `doc` directory:
 
 - [`primitives.md`](https://github.com/jrandleman/EScheme/tree/main/doc/primitives.md): Broad overview of EScheme's primitive functions.
+- [`types.md`](https://github.com/jrandleman/EScheme/tree/main/doc/types.md): Optional runtime type system.
 - [`concurrency.md`](https://github.com/jrandleman/EScheme/tree/main/doc/concurrency.md): Threading semantics and dynamic environments.
 - [`modules.md`](https://github.com/jrandleman/EScheme/blob/main/doc/modules.md): Module system, as well as its reflection.
 - [`objects.md`](https://github.com/jrandleman/EScheme/blob/main/doc/objects.md): Single-inheritance multiple-interfaces object system.
 - [`bytecode.md`](https://github.com/jrandleman/EScheme/blob/main/doc/bytecode.md): Inline bytecode, and learn EScheme's instruction set.
 - [`examples`](https://github.com/jrandleman/EScheme/tree/main/doc/examples): Directory with sample EScheme files.
 
-Having learned R4RS Scheme and EScheme's deviations, you're set to code now! 🙌
+Note that EScheme draws from Python with [a `help` function]
 
-Keep reading this README for a table of contents on EScheme's language features!
-For an interactive solution, EScheme draws from Python with [a `help` function](https://github.com/jrandleman/EScheme/tree/main/doc/primitives.md#help):
+EScheme also draws from Python with an extensible [`help` function](https://github.com/jrandleman/EScheme/tree/main/doc/primitives.md#help), allowing
+documentation to be dynamically explored and expanded upon via docstrings.
 
 1. `(help)`: Launch EScheme's interactive "help" menu to explore the language
 2. `(help <obj>)`: Get introspected information on the `<obj>` EScheme datum
    - **_Tip: Always pass functions and macros to `help` the first time you use them!_**
+
+Having learned R4RS Scheme and EScheme's deviations, you're set to code now! 🙌
 
 ---
 
