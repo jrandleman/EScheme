@@ -399,32 +399,6 @@ public class MetaPrimitives {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // type-alias
-  public static class TypeAlias extends Primitive {
-    public java.lang.String escmName() {
-      return "type-alias";
-    }
-
-    public Datum signature() {
-      return Pair.List(new Symbol("type-alias"),new Symbol("<type-keyword>"));
-    }
-
-    public String docstring() {
-      return "@help:Procedures:Meta\nCreates a type alias value for <type-keyword>. When bound via <define> to a\nsymbolic alias, that alias may be used as a keyword to reference <type-keyword>\nin procedural type dispatch.\n  => See <type-system> in <Topics> for more details on EScheme's types!\n\nSee <type-alias?> to determine if a value is a type alias, as well as\n<type-alias-source> to get the keyword type that an alias references.\n\nSee <define-type> for a convenience macro wrapping <define> and <type-alias>.\n\nFor example:\n  ; Have :my-type alias :int|char\n  (define my-type (type-alias :int|char))\n\n  ; Use :my-type as a keyword type\n  (define :my-type (f :bool choice)\n    (if choice 1 #\1))";
-    }
-
-    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 1)
-        throw new Exceptionf("'(type-alias <type-keyword>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
-      Datum typeKeyword = parameters.get(0);
-      if(!(typeKeyword instanceof Keyword))
-        throw new Exceptionf("'(type-alias <type-keyword>) arg %s isn't a keyword: %s", typeKeyword.profile(), Exceptionf.profileArgs(parameters));
-      return new escm.type.procedure.types.TypeAlias(this.definitionEnvironment,(Keyword)typeKeyword);
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////
   // type-alias?
   public static class IsTypeAliasP extends Primitive {
     public java.lang.String escmName() {
@@ -436,7 +410,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Meta\nReturns whether <obj> is a type-alias. See <type-alias> for more details.";
+      return "@help:Procedures:Meta\nReturns whether <obj> is a type-alias. See <define-type> for more details.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -459,7 +433,7 @@ public class MetaPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Meta\nReturns the keyword type that <type-alias> references. See <type-alias>\nfor more details.";
+      return "@help:Procedures:Meta\nReturns the keyword type that <type-alias> references. See <define-type>\nfor more details.";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

@@ -3875,35 +3875,6 @@ macros are evaluated as a procedure argument.
 ```
 
 -------------------------------------------------------------------------------
-### `type-alias`
-
-#### Signatures:
-```scheme
-(type-alias <type-keyword>)
-```
-
-#### Description:
-```
-Creates a type alias value for <type-keyword>. When bound via <define> to a
-symbolic alias, that alias may be used as a keyword to reference <type-keyword>
-in procedural type dispatch.
-  => See <type-system> in <Topics> for more details on EScheme's types!
-
-See <type-alias?> to determine if a value is a type alias, as well as
-<type-alias-source> to get the keyword type that an alias references.
-
-See <define-type> for a convenience macro wrapping <define> and <type-alias>.
-
-For example:
-  ; Have :my-type alias :int|char
-  (define my-type (type-alias :int|char))
-
-  ; Use :my-type as a keyword type
-  (define :my-type (f :bool choice)
-    (if choice 1 #))
-```
-
--------------------------------------------------------------------------------
 ### `type-alias-source`
 
 #### Signatures:
@@ -3913,7 +3884,7 @@ For example:
 
 #### Description:
 ```
-Returns the keyword type that <type-alias> references. See <type-alias>
+Returns the keyword type that <type-alias> references. See <define-type>
 for more details.
 ```
 
@@ -3927,7 +3898,7 @@ for more details.
 
 #### Description:
 ```
-Returns whether <obj> is a type-alias. See <type-alias> for more details.
+Returns whether <obj> is a type-alias. See <define-type> for more details.
 ```
 
 -------------------------------------------------------------------------------
@@ -7936,6 +7907,8 @@ syntax. These include: `define`, `set!`, `load`, `call`, `push`, & `return`.
 
 (defined? <symbol>) ; determine if <symbol> is defined as a variable [sets CVR to the boolean result]
 
+(define-type <symbol>) ; define <symbol> as a type alias for the keyword in CVR [sets CVR to <void>]
+
 (ifn <integer>) ; if CVR is NOT truthy, jump <integer> instructions [sets CVR to <void>]
 
 (jump <integer>) ; jump <integer> instructions
@@ -8258,10 +8231,22 @@ For example:
 
 #### Description:
 ```
-Convenience macro wrapping <define> and <type-alias>. See <type-alias>
-for more details.
+Defines <alias-symbol> to be a type alias for <type-keyword>. The alias may 
+be used as a keyword to reference <type-keyword> in procedural type dispatch.
+  => See <type-system> in <Topics> for more details on EScheme's types!
+
+See <type-alias?> to determine if a value is a type alias, as well as
+<type-alias-source> to get the keyword type that an alias references.
 
 Aliased by <deftype>.
+
+For example:
+  ; Have :my-type alias :int|char
+  (define-type my-type :int|char)
+
+  ; Use :my-type as a keyword type
+  (define :my-type (f :bool choice)
+    (if choice 1 #\1))
 ```
 
 -------------------------------------------------------------------------------
@@ -10968,10 +10953,9 @@ mask type complexity. For example, when implementing a `UserProfile`
 class, it might be nicer to define a `:phone-number` type instead of
 always using `:str|list<int>`.
 
-Type aliases can be created by using `define-type` (aliased by `deftype`)
-which is simply a convenience wrapper around `define` and `type-alias`.
+Type aliases can be created by using `define-type` (aliased by `deftype`).
+Type alias primitive helper functions include:
 
-- `(type-alias <type-keyword>)` creates a type alias value
 - `(type-alias? <obj>)` returns whether `<obj>` is a type alias
 - `(type-alias-source <type-alias>)` returns the original keyword type
   that `<type-alias>` references

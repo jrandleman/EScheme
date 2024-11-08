@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import escm.type.Datum;
+import escm.type.Keyword;
 import escm.type.Character;
 import escm.type.number.Real;
+import escm.type.procedure.types.TypeAlias;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.vm.type.callable.Callable;
@@ -22,7 +24,7 @@ public class Interpreter {
   // Application helper
   private static Trampoline.Bounce executeApplication(ArrayDeque<Datum> stack, int applicationItemCount, Trampoline.Continuation continuation) throws Exception {
     if(applicationItemCount == 0)
-      throw new Exception("VM ERROR: Invalid application count 0 in \"call\" instruction!");
+      throw new Exception("VM ERROR: Invalid \"call\" instruction, application count is 0");
     // Extract application items
     int absCount = Math.abs(applicationItemCount);
     Datum procedure = null;
@@ -44,7 +46,7 @@ public class Interpreter {
     
     // Validate procedure as such
     if(!(procedure instanceof Callable))
-      throw new Exceptionf("VM ERROR: Can't apply non-callable %s", procedure.profile());
+      throw new Exceptionf("VM ERROR: Invalid \"call\" instruction, applying non-callable %s", procedure.profile());
 
     // Return the application's result
     return ((Callable)procedure).callWith(args,continuation);
@@ -101,6 +103,21 @@ public class Interpreter {
         }
 
         //////////////////////////////////////////////////////////////////////
+        // (define-type <symbol>)
+        case Instruction.DEFINE_TYPE: {
+          if(!(state.cvr instanceof Keyword))
+            throw new Exceptionf("VM ERROR: Invalid \"define-type\" instruction, non-keyword CVR %s", state.cvr.profile());
+          if(instruction.argument instanceof escm.type.Symbol) {
+            state.env.define((escm.type.Symbol)instruction.argument,new TypeAlias(state.env,(Keyword)state.cvr));
+          } else { // instruction.argument instanceof ObjectAccessChain
+            ((ObjectAccessChain)instruction.argument).define(state,new TypeAlias(state.env,(Keyword)state.cvr));
+          }
+          state.cvr = escm.type.Void.VALUE;
+          ++state.cii;
+          break;
+        }
+
+        //////////////////////////////////////////////////////////////////////
         // (ifn <integer>)
         case Instruction.IFN: {
           if(state.cvr.isTruthy()) {
@@ -140,7 +157,7 @@ public class Interpreter {
           state.cvr = instruction.argument.loadWithState(state);
           ++state.cii;
           if(!(state.cvr instanceof Real) || !((Real)state.cvr).isInteger())
-            throw new Exceptionf("VM ERROR: Invalid application non-integer count %s in \"call\" instruction!", state.cvr.profile());
+            throw new Exceptionf("VM ERROR: Invalid \"call\" instruction, non-integer count %s", state.cvr.profile());
           return executeApplication(
             state.stack,
             ((Real)state.cvr).intValue(),

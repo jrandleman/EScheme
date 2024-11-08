@@ -45,18 +45,20 @@
 (ut (pair? (callable-signature callable-signature)) #t) 
 (ut (string? (docstring docstring)) #t)
 
-(ut (begin (define mytype (type-alias :int|char)) ((fn ((:mytype x) #t) ((x) #f)) 42)) #t)
-(ut (begin (define mytype (type-alias :int|char)) ((fn ((:mytype x) #t) ((x) #f)) #\a)) #t)
-(ut (begin (define mytype (type-alias :int|char)) ((fn ((:mytype x) #t) ((x) #f)) "a")) #f)
+(define-type int-or-char :int|char)
+
+(ut ((fn ((:int-or-char x) #t) ((x) #f)) 42) #t)
+(ut ((fn ((:int-or-char x) #t) ((x) #f)) #\a) #t)
+(ut ((fn ((:int-or-char x) #t) ((x) #f)) "a") #f)
 
 (ut (type-alias? 42) #f)
-(ut (type-alias? (type-alias :int|char)) #t)
+(ut (type-alias? int-or-char) #t)
 
-(ut (type-alias-source (type-alias :int|char)) :int|char)
+(ut (type-alias-source int-or-char) :int|char)
 
 (ut (type-is? 42 :int) #t)
 (ut (type-is? 42 :str) #f)
-(ut (type-is? 42 (type-alias :int|char)) #t) ; support for passing alias objects too
-(ut (type-is? #\a (type-alias :int|char)) #t)
-(ut (type-is? "a" (type-alias :int|char)) #f)
+(ut (type-is? 42 :int-or-char) #t) ; support for passing alias objects too
+(ut (type-is? #\a :int-or-char) #t)
+(ut (type-is? "a" :int-or-char) #f)
 (ut (type-is? 42 :ClassNameThatDoesNotExist) #f) ; doesn't throw for non-existent types

@@ -139,11 +139,13 @@ syntax. These include: `define`, `set!`, `load`, `call`, `push`, & `return`.
 
 (defined? <symbol>) ; determine if <symbol> is defined as a variable [sets CVR to the boolean result]
 
+(define-type <symbol>) ; define <symbol> as a type alias for the keyword in CVR [sets CVR to <void>]
+
 (ifn <integer>) ; if CVR is NOT truthy, jump <integer> instructions [sets CVR to <void>]
 
 (jump <integer>) ; jump <integer> instructions
 
-(quote <datum>) ; quote <datum> and load it into CVR. may recurse infinitely for cyclic vectors/hashmaps.
+(quote <datum>) ; quote <datum> and load it into CVR. may recurse infinitely for cyclic vectors/hashmaps
 
 (load <datum>) ; evaluate <datum> and load it into CVR
 

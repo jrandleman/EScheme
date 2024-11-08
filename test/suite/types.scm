@@ -146,7 +146,7 @@
 (ut ((fn ((:outport x) #t) ((:any x) #f)) 42) #f)
 
 ; Type Aliases
-(ut ((fn ((:type-alias x) #t) ((:any x) #f)) (type-alias :int|char)) #t)
+(ut ((fn ((:type-alias x) #t) ((:any x) #f)) (let () (define-type x :int|char) x)) #t)
 (ut ((fn ((:type-alias x) #t) ((:any x) #f)) 42) #f)
 (ut ((fn ((:type-alias x) #t) ((:any x) #f)) "42") #f)
 
@@ -668,3 +668,14 @@
 ; Module alias dispatch
 (ut ((fn ((:objects.personalias p) #t) ((x) #f)) 42) #f)
 (ut ((fn ((:objects.personalias p) #t) ((x) #f)) (objects.Person "John" 42)) #t)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ALIASING LOCAL TYPES
+(let () 
+  (def (local-type-alias-test)
+    (defclass LocalClassName)
+    (deftype local-type-alias :LocalClassName)
+    (ut ((fn ((:local-type-alias x) #t) ((:any x) #f)) (LocalClassName)) #t)
+    (ut ((fn ((:local-type-alias x) #t) ((:any x) #f)) 42) #f))
+  (local-type-alias-test))

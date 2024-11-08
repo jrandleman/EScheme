@@ -34,6 +34,7 @@ public class Assembler {
       case "define":       return Instruction.DEFINE;
       case "set!":         return Instruction.SET;
       case "defined?":     return Instruction.DEFINEDP;
+      case "define-type":  return Instruction.DEFINE_TYPE;
       case "ifn":          return Instruction.IFN;
       case "jump":         return Instruction.JUMP;
       case "quote":        return Instruction.QUOTE;
@@ -288,6 +289,19 @@ public class Assembler {
           return new Instruction(Instruction.DEFINEDP,new ObjectAccessChain(argSymbol));
         }
         return new Instruction(Instruction.DEFINEDP,arg);
+      }
+
+      ////////////////////////////////////////////////////////////////////////
+      // (define-type <symbol>)
+      case Instruction.DEFINE_TYPE: {
+        Datum arg = getInstructionArgument(instructionPair);
+        if(!(arg instanceof Symbol))
+          throw new Exceptionf("ASM ERROR: \"define-type\" instruction %s must have a symbolic arg!", instruction.profile());
+        Symbol argSymbol = (Symbol)arg;
+        if(ObjectAccessChain.is(argSymbol)) {
+          return new Instruction(Instruction.DEFINE_TYPE,new ObjectAccessChain(argSymbol));
+        }
+        return new Instruction(Instruction.DEFINE_TYPE,arg);
       }
 
       ////////////////////////////////////////////////////////////////////////

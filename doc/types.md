@@ -235,10 +235,9 @@ mask type complexity. For example, when implementing a `UserProfile`
 class, it might be nicer to define a `:phone-number` type instead of
 always using `:str|list<int>`.
 
-Type aliases can be created by using `define-type` (aliased by `deftype`)
-which is simply a convenience wrapper around `define` and `type-alias`.
+Type aliases can be created by using `define-type` (aliased by `deftype`).
+Type alias primitive helper functions include:
 
-- `(type-alias <type-keyword>)` creates a type alias value
 - `(type-alias? <obj>)` returns whether `<obj>` is a type alias
 - `(type-alias-source <type-alias>)` returns the original keyword type
   that `<type-alias>` references
