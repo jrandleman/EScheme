@@ -14,11 +14,15 @@ public class TypeAlias extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Private Value Fields
   private final Environment definitionEnvironment;
-  private final String typeName;
+  private final Keyword type;
   private final TypeChecker.Predicate predicate;
 
-  public String typeName() {
-    return typeName;
+  public Environment definitionEnvironment() {
+    return definitionEnvironment;
+  }
+
+  public Keyword typeKeyword() {
+    return type;
   }
 
   public boolean check(Datum value) throws Exception {
@@ -28,9 +32,20 @@ public class TypeAlias extends Datum {
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
+  public static boolean isCyclic(Environment definitionEnvironment, Keyword type) throws Exception {
+    try {
+      TypeEquality.TypeEqualityNode typeEqualityNode = TypeEquality.tree(type,definitionEnvironment);
+      typeEqualityNode.equals(typeEqualityNode); // overflows if alias is cyclic
+      return false;
+    } catch(StackOverflowError e) {
+      return true;
+    }
+  }
+
+
   public TypeAlias(Environment definitionEnvironment, Keyword type) throws Exception {
     this.definitionEnvironment = definitionEnvironment;
-    this.typeName = type.value();
+    this.type = type;
     this.predicate = TypeChecker.getPredicate(type);
   }
 
@@ -63,7 +78,7 @@ public class TypeAlias extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Documentation String
   public java.lang.String docstring() {
-    return "Type alias for \""+typeName+"\". Created by <define-type>.";
+    return "Type alias for \""+type.value()+"\". Created by <define-type>.";
   }
 
 
@@ -77,7 +92,7 @@ public class TypeAlias extends Datum {
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public java.lang.String display() {
-    return "#<type-alias "+typeName+">";
+    return "#<type-alias "+type.value()+">";
   }
 
   public java.lang.String write() {

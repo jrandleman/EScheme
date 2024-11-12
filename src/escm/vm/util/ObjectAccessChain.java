@@ -80,6 +80,15 @@ public class ObjectAccessChain extends Datum {
     return value;
   }
 
+  public String toChainString() {
+    StringBuilder sb = new StringBuilder();
+    for(int i = 0; i < value.length; ++i) {
+      sb.append(value[i].value());
+      if(i+1<value.length) sb.append('.');
+    }
+    return sb.toString();
+  }
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor

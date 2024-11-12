@@ -3861,6 +3861,34 @@ Use <help> to explore this markdown interactively via the command line.
 ```
 
 -------------------------------------------------------------------------------
+### `is-type?`
+
+#### Signatures:
+```scheme
+(is-type? <obj> <type-keyword>)
+```
+
+#### Description:
+```
+Returns whether <obj> is a <type-keyword>.
+  => See <type-system> in <Topics> for more details on EScheme's types!
+```
+
+-------------------------------------------------------------------------------
+### `same-type?`
+
+#### Signatures:
+```scheme
+(same-type? <type-keyword> <type-keyword>)
+```
+
+#### Description:
+```
+Returns whether <type-keyword>s are equivalent types.
+  => See <type-system> in <Topics> for more details on EScheme's types!
+```
+
+-------------------------------------------------------------------------------
 ### `syntax?`
 
 #### Signatures:
@@ -3902,16 +3930,16 @@ Returns whether <obj> is a type-alias. See <define-type> for more details.
 ```
 
 -------------------------------------------------------------------------------
-### `type-is?`
+### `type?`
 
 #### Signatures:
 ```scheme
-(type-is? <obj> <type-keyword>)
+(type? <type-keyword>)
 ```
 
 #### Description:
 ```
-Returns whether <obj> is a <type-keyword>.
+Returns whether <type-keyword> is a valid type.
   => See <type-system> in <Topics> for more details on EScheme's types!
 ```
 
@@ -10979,7 +11007,9 @@ Type alias primitive helper functions include:
 
 ## Type Primitive
 
-Use `(type-is? <obj> <type-keyword>)` to determine if `<obj>` is a `<type-keyword>`.
+- `(type? <type-keyword>)` returns if `<type-keyword>` is a valid type
+- `(is-type? <obj> <type-keyword>)` returns if `<obj>` is a `<type-keyword>`
+- `(same-type? <type-keyword> <type-keyword>)` returns if `<type-keyword>`s are equivalent
 ```
 
 -------------------------------------------------------------------------------

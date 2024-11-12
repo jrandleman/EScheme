@@ -24,7 +24,7 @@ public class Interpreter {
   // Application helper
   private static Trampoline.Bounce executeApplication(ArrayDeque<Datum> stack, int applicationItemCount, Trampoline.Continuation continuation) throws Exception {
     if(applicationItemCount == 0)
-      throw new Exception("VM ERROR: Invalid \"call\" instruction, application count is 0");
+      throw new Exception("VM: Invalid \"call\" instruction, application count is 0");
     // Extract application items
     int absCount = Math.abs(applicationItemCount);
     Datum procedure = null;
@@ -41,12 +41,12 @@ public class Interpreter {
         procedure = stack.pop();
       }
     } catch(java.util.EmptyStackException e) {
-      throw new Exceptionf("VM ERROR: Insufficient args for \"call\" instruction (need %d have %d)!", absCount, ((procedure == null) ? 0 : 1) + args.size());
+      throw new Exceptionf("VM: Insufficient args for \"call\" instruction (need %d have %d)!", absCount, ((procedure == null) ? 0 : 1) + args.size());
     }
     
     // Validate procedure as such
     if(!(procedure instanceof Callable))
-      throw new Exceptionf("VM ERROR: Invalid \"call\" instruction, applying non-callable %s", procedure.profile());
+      throw new Exceptionf("VM: Invalid \"call\" instruction, applying non-callable %s", procedure.profile());
 
     // Return the application's result
     return ((Callable)procedure).callWith(args,continuation);
@@ -106,12 +106,19 @@ public class Interpreter {
         // (define-type <symbol>)
         case Instruction.DEFINE_TYPE: {
           if(!(state.cvr instanceof Keyword))
-            throw new Exceptionf("VM ERROR: Invalid \"define-type\" instruction, non-keyword CVR %s", state.cvr.profile());
+            throw new Exceptionf("VM: Invalid \"define-type\" instruction, non-keyword CVR %s", state.cvr.profile());
+          String aliasName;
           if(instruction.argument instanceof escm.type.Symbol) {
-            state.env.define((escm.type.Symbol)instruction.argument,new TypeAlias(state.env,(Keyword)state.cvr));
+            escm.type.Symbol argSym = (escm.type.Symbol)instruction.argument;
+            state.env.define(argSym,new TypeAlias(state.env,(Keyword)state.cvr));
+            aliasName = argSym.value();
           } else { // instruction.argument instanceof ObjectAccessChain
-            ((ObjectAccessChain)instruction.argument).define(state,new TypeAlias(state.env,(Keyword)state.cvr));
+            ObjectAccessChain argObj = (ObjectAccessChain)instruction.argument;
+            argObj.define(state,new TypeAlias(state.env,(Keyword)state.cvr));
+            aliasName = argObj.toChainString();
           }
+          if(TypeAlias.isCyclic(state.env,new Keyword(aliasName)))
+            throw new Exceptionf("VM: Invalid \"define-type\" cyclic instruction: (define-type %s %s)", aliasName, state.cvr.write());
           state.cvr = escm.type.Void.VALUE;
           ++state.cii;
           break;
@@ -157,7 +164,7 @@ public class Interpreter {
           state.cvr = instruction.argument.loadWithState(state);
           ++state.cii;
           if(!(state.cvr instanceof Real) || !((Real)state.cvr).isInteger())
-            throw new Exceptionf("VM ERROR: Invalid \"call\" instruction, non-integer count %s", state.cvr.profile());
+            throw new Exceptionf("VM: Invalid \"call\" instruction, non-integer count %s", state.cvr.profile());
           return executeApplication(
             state.stack,
             ((Real)state.cvr).intValue(),
@@ -181,7 +188,7 @@ public class Interpreter {
         // (pop)
         case Instruction.POP: {
           if(state.stack.size() == 0)
-            throw new Exception("VM ERROR: Invalid \"pop\" instruction, stack is empty!");
+            throw new Exception("VM: Invalid \"pop\" instruction, stack is empty!");
           state.cvr = state.stack.pop();
           ++state.cii;
           break;
@@ -200,7 +207,7 @@ public class Interpreter {
         //////////////////////////////////////////////////////////////////////
         // Invalid instruction!
         default: {
-          throw new Exceptionf("VM ERROR: Invalid instruction index %d!", state.cii);
+          throw new Exceptionf("VM: Invalid instruction index %d!", state.cii);
         }
       }
     }

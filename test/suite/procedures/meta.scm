@@ -56,9 +56,25 @@
 
 (ut (type-alias-source int-or-char) :int|char)
 
-(ut (type-is? 42 :int) #t)
-(ut (type-is? 42 :str) #f)
-(ut (type-is? 42 :int-or-char) #t) ; support for passing alias objects too
-(ut (type-is? #\a :int-or-char) #t)
-(ut (type-is? "a" :int-or-char) #f)
-(ut (type-is? 42 :ClassNameThatDoesNotExist) #f) ; doesn't throw for non-existent types
+(ut (type? :int-or-char) #t)
+(ut (type? :char-or-int) #f)
+(ut (type? :int|char) #t)
+(ut (type? :false-primitive) #f)
+(ut (type? :vec<int|char>) #t)
+(ut (type? :vec<false-primitive>) #f)
+
+(ut (is-type? 42 :int) #t)
+(ut (is-type? 42 :str) #f)
+(ut (is-type? 42 :int-or-char) #t) ; support for passing alias objects too
+(ut (is-type? #\a :int-or-char) #t)
+(ut (is-type? "a" :int-or-char) #f)
+(ut (is-type? 42 :ClassNameThatDoesNotExist) #f) ; doesn't throw for non-existent types
+
+(ut (same-type? :int :str) #f)
+(ut (same-type? :int|str :str|int) #t)
+(ut (same-type? :int|str|char :str|int) #f)
+(ut (same-type? :int|str :str|int|char) #f)
+(ut (same-type? :vec<int|str>|char :char|vec<str|int>) #t)
+(ut (same-type? :vec<int|str>|char :char|vec<key|int>) #f)
+(ut (same-type? :int-or-char|str :str|int|char) #t) ; supports deconstructing aliases
+(ut (same-type? :int-or-char|str :str|key|char) #f)

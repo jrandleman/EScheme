@@ -12,6 +12,7 @@ import escm.type.Pair;
 import escm.type.Symbol;
 import escm.type.procedure.SyntaxProcedure;
 import escm.type.procedure.types.TypeChecker;
+import escm.type.procedure.types.TypeEquality;
 import escm.type.procedure.Procedure;
 import escm.type.bool.Boolean;
 import escm.util.error.Exceptionf;
@@ -442,20 +443,53 @@ public class MetaPrimitives {
       Datum alias = parameters.get(0);
       if(!(alias instanceof escm.type.procedure.types.TypeAlias))
         throw new Exceptionf("'(type-alias-source <type-alias>) arg %s isn't a type-alias: %s", alias.profile(), Exceptionf.profileArgs(parameters));
-      return new Keyword(((escm.type.procedure.types.TypeAlias)alias).typeName().substring(1));
+      return ((escm.type.procedure.types.TypeAlias)alias).typeKeyword();
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // type-is?
-  public static class IsTypeIsP extends Primitive {
+  // type?
+  public static class TypeP extends Primitive {
     public java.lang.String escmName() {
-      return "type-is?";
+      return "type?";
     }
 
     public Datum signature() {
-      return Pair.List(new Symbol("type-is?"),new Symbol("<obj>"),new Symbol("<type-keyword>"));
+      return Pair.List(new Symbol("type?"),new Symbol("<type-keyword>"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Meta\nReturns whether <type-keyword> is a valid type.\n  => See <type-system> in <Topics> for more details on EScheme's types!";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 1)
+        throw new Exceptionf("'(type? <type-keyword>) didn't receive exactly 1 arg: %s", Exceptionf.profileArgs(parameters));
+      Datum type = parameters.get(0);
+      if(!(type instanceof Keyword))
+        throw new Exceptionf("'(type? <type-keyword>) arg %s isn't a keyword: %s", type.profile(), Exceptionf.profileArgs(parameters));
+      try {
+        TypeEquality.TypeEqualityNode typeKey = TypeEquality.tree((Keyword)type,this.definitionEnvironment);
+        return Boolean.valueOf(typeKey.equals(typeKey));
+      } catch(Exception e) {
+        return Boolean.FALSE;
+      } catch(StackOverflowError e) {
+        return Boolean.FALSE;
+      }
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // is-type?
+  public static class IsTypeP extends Primitive {
+    public java.lang.String escmName() {
+      return "is-type?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("is-type?"),new Symbol("<obj>"),new Symbol("<type-keyword>"));
     }
 
     public String docstring() {
@@ -464,7 +498,7 @@ public class MetaPrimitives {
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
       if(parameters.size() != 2)
-        throw new Exceptionf("'(type-is? <obj> <type-keyword>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(is-type? <obj> <type-keyword>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
       Datum type = parameters.get(1);
       if(type instanceof Keyword) {
         try {
@@ -481,8 +515,39 @@ public class MetaPrimitives {
           return Boolean.FALSE;
         }
       } else {
-        throw new Exceptionf("'(type-is? <obj> <type-keyword>) 2nd arg %s isn't a keyword: %s", type.profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'(is-type? <obj> <type-keyword>) 2nd arg %s isn't a keyword: %s", type.profile(), Exceptionf.profileArgs(parameters));
       }
+    }
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // same-type?
+  public static class SameTypeP extends Primitive {
+    public java.lang.String escmName() {
+      return "same-type?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("same-type?"),new Symbol("<type-keyword>"),new Symbol("<type-keyword>"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Meta\nReturns whether <type-keyword>s are equivalent types.\n  => See <type-system> in <Topics> for more details on EScheme's types!";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if(parameters.size() != 2)
+        throw new Exceptionf("'(same-type? <type-keyword> <type-keyword>) didn't receive exactly 2 args: %s", Exceptionf.profileArgs(parameters));
+      Datum left = parameters.get(0);
+      Datum right = parameters.get(1);
+      if(!(left instanceof Keyword))
+        throw new Exceptionf("'(same-type? <type-keyword> <type-keyword>) 1st arg %s isn't a keyword: %s", left.profile(), Exceptionf.profileArgs(parameters));
+      if(!(right instanceof Keyword))
+        throw new Exceptionf("'(same-type? <type-keyword> <type-keyword>) 2nd arg %s isn't a keyword: %s", right.profile(), Exceptionf.profileArgs(parameters));
+      Keyword leftType = (Keyword)left;
+      Keyword rightType = (Keyword)right;
+      return Boolean.valueOf(TypeEquality.sameType(leftType,this.definitionEnvironment,rightType,this.definitionEnvironment));
     }
   }
 }
