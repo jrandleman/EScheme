@@ -3,7 +3,9 @@
 //    EScheme <callable> type annotation comparison utility functions.
 //    See doc/types.md for more information on using EScheme's types.
 //    Provides:
-//      1. <sameType(key1,env1,key2,env2)>: Determine if types match.
+//      1. <Node>: Type tree node class (supports ".equals()").
+//      2. <tree(key,env)>: Keyword type tree node generator.
+//      3. <sameType(key1,env1,key2,env2)>: Determine if types match.
 
 package escm.type.procedure.types;
 import java.util.ArrayList;
@@ -20,20 +22,20 @@ import escm.vm.util.ObjectAccessChain;
 public class TypeEquality {
   ////////////////////////////////////////////////////////////////////////////
   // Type Equality Syntax Tree
-  public static abstract class TypeEqualityNode {} // only supports ".equals()"
+  public static abstract class Node {} // only supports ".equals()"
 
 
-  private static class TypeEqualityCompound extends TypeEqualityNode {
-    ArrayList<TypeEqualityNode> orTypes;
+  private static class CompoundNode extends Node {
+    ArrayList<Node> orTypes;
 
-    public TypeEqualityCompound(ArrayList<TypeEqualityNode> orTypes) {
+    public CompoundNode(ArrayList<Node> orTypes) {
       this.orTypes = orTypes;
     }
 
     public boolean equals(Object o) {
-      if(o instanceof TypeEqualityCompound) {
+      if(o instanceof CompoundNode) {
         HashSet<Integer> seen = new HashSet<Integer>();
-        ArrayList<TypeEqualityNode> ts = ((TypeEqualityCompound)o).orTypes;
+        ArrayList<Node> ts = ((CompoundNode)o).orTypes;
         if(ts.size() != orTypes.size()) return false;
         for(int i = 0, n = orTypes.size(); i < n; ++i) {
           int j = 0;
@@ -52,22 +54,22 @@ public class TypeEquality {
   }
 
 
-  private static class TypeEqualityContainer extends TypeEqualityNode {
+  private static class ContainerNode extends Node {
     String name;
-    TypeEqualityNode keyType;
-    TypeEqualityNode valueType;
+    Node keyType;
+    Node valueType;
 
-    public TypeEqualityContainer(String name, TypeEqualityNode keyType, TypeEqualityNode valueType) {
+    public ContainerNode(String name, Node keyType, Node valueType) {
       this.name = name;
       this.keyType = keyType;
       this.valueType = valueType;
     }
 
     public boolean equals(Object o) {
-      if(o instanceof TypeEqualityContainer) {
-        TypeEqualityContainer oc = (TypeEqualityContainer)o;
-        TypeEqualityNode kt = oc.keyType;
-        TypeEqualityNode vt = oc.valueType;
+      if(o instanceof ContainerNode) {
+        ContainerNode oc = (ContainerNode)o;
+        Node kt = oc.keyType;
+        Node vt = oc.valueType;
         if(!name.equals(oc.name)) return false;
         if((kt == null || keyType == null) && kt != keyType) return false;
         if(kt != null && keyType != null && !kt.equals(keyType)) return false;
@@ -80,208 +82,208 @@ public class TypeEquality {
   }
 
 
-  private static class TypeEqualityPrimitive extends TypeEqualityNode {
+  private static class PrimitiveNode extends Node {
     String name;
 
-    public TypeEqualityPrimitive(String name) {
+    public PrimitiveNode(String name) {
       this.name = name;
     }
 
     public boolean equals(Object o) {
-      return o instanceof TypeEqualityPrimitive && name.equals(((TypeEqualityPrimitive)o).name);
+      return o instanceof PrimitiveNode && name.equals(((PrimitiveNode)o).name);
     }
   }
 
 
-  private static class TypeEqualityClass extends TypeEqualityNode {
+  private static class ClassNode extends Node {
     EscmClass eclass;
 
-    public TypeEqualityClass(EscmClass eclass) {
+    public ClassNode(EscmClass eclass) {
       this.eclass = eclass;
     }
 
     public boolean equals(Object o) {
-      return o instanceof TypeEqualityClass && eclass.eq(((TypeEqualityClass)o).eclass);
+      return o instanceof ClassNode && eclass.eq(((ClassNode)o).eclass);
     }
   }
 
 
-  private static class TypeEqualityInterface extends TypeEqualityNode {
+  private static class InterfaceNode extends Node {
     EscmInterface eface;
 
-    public TypeEqualityInterface(EscmInterface eface) {
+    public InterfaceNode(EscmInterface eface) {
       this.eface = eface;
     }
 
     public boolean equals(Object o) {
-      return o instanceof TypeEqualityInterface && eface.eq(((TypeEqualityInterface)o).eface);
+      return o instanceof InterfaceNode && eface.eq(((InterfaceNode)o).eface);
     }
   }
 
   
   ////////////////////////////////////////////////////////////////////////////
-  // Parser TypeEqualityNode Value Generator
-  private static class TypeEqualityNodeGenerator implements ValueGenerator<TypeEqualityNode> {
+  // Parser Node Value Generator
+  private static class NodeGenerator implements ValueGenerator<Node> {
     /////////////////////////////////////
-    // Primitive TypeEqualityNodes
-    public TypeEqualityNode primitiveAny() {
-      return new TypeEqualityPrimitive("any");
+    // Primitive Nodes
+    public Node primitiveAny() {
+      return new PrimitiveNode("any");
     }
 
-    public TypeEqualityNode primitiveNum() {
-      return new TypeEqualityPrimitive("num");
+    public Node primitiveNum() {
+      return new PrimitiveNode("num");
     }
-    public TypeEqualityNode primitiveInt() {
-      return new TypeEqualityPrimitive("int");
+    public Node primitiveInt() {
+      return new PrimitiveNode("int");
     }
-    public TypeEqualityNode primitiveFlo() {
-      return new TypeEqualityPrimitive("flo");
+    public Node primitiveFlo() {
+      return new PrimitiveNode("flo");
     }
-    public TypeEqualityNode primitiveReal() {
-      return new TypeEqualityPrimitive("real");
+    public Node primitiveReal() {
+      return new PrimitiveNode("real");
     }
-    public TypeEqualityNode primitiveExact() {
-      return new TypeEqualityPrimitive("exact");
+    public Node primitiveExact() {
+      return new PrimitiveNode("exact");
     }
-    public TypeEqualityNode primitiveInexact() {
-      return new TypeEqualityPrimitive("inexact");
-    }
-
-    public TypeEqualityNode primitiveStr() {
-      return new TypeEqualityPrimitive("str");
-    }
-    public TypeEqualityNode primitiveChar() {
-      return new TypeEqualityPrimitive("char");
-    }
-    public TypeEqualityNode primitiveKey() {
-      return new TypeEqualityPrimitive("key");
-    }
-    public TypeEqualityNode primitiveBool() {
-      return new TypeEqualityPrimitive("bool");
-    }
-    public TypeEqualityNode primitiveSym() {
-      return new TypeEqualityPrimitive("sym");
-    }
-    public TypeEqualityNode primitiveVoid() {
-      return new TypeEqualityPrimitive("void");
+    public Node primitiveInexact() {
+      return new PrimitiveNode("inexact");
     }
 
-    public TypeEqualityNode primitiveNil() {
-      return new TypeEqualityPrimitive("nil");
+    public Node primitiveStr() {
+      return new PrimitiveNode("str");
     }
-    public TypeEqualityNode primitiveAtom() {
-      return new TypeEqualityPrimitive("atom");
+    public Node primitiveChar() {
+      return new PrimitiveNode("char");
     }
-
-    public TypeEqualityNode primitiveThread() {
-      return new TypeEqualityPrimitive("thread");
+    public Node primitiveKey() {
+      return new PrimitiveNode("key");
     }
-    public TypeEqualityNode primitiveMutex() {
-      return new TypeEqualityPrimitive("mutex");
+    public Node primitiveBool() {
+      return new PrimitiveNode("bool");
     }
-
-    public TypeEqualityNode primitiveFn() {
-      return new TypeEqualityPrimitive("fn");
+    public Node primitiveSym() {
+      return new PrimitiveNode("sym");
     }
-    public TypeEqualityNode primitiveProcedure() {
-      return new TypeEqualityPrimitive("procedure");
-    }
-    public TypeEqualityNode primitiveSyntax() {
-      return new TypeEqualityPrimitive("syntax");
+    public Node primitiveVoid() {
+      return new PrimitiveNode("void");
     }
 
-    public TypeEqualityNode primitiveMetaobj() {
-      return new TypeEqualityPrimitive("metaobj");
+    public Node primitiveNil() {
+      return new PrimitiveNode("nil");
     }
-    public TypeEqualityNode primitiveObject() {
-      return new TypeEqualityPrimitive("object");
-    }
-    public TypeEqualityNode primitiveClass() {
-      return new TypeEqualityPrimitive("class");
-    }
-    public TypeEqualityNode primitiveInterface() {
-      return new TypeEqualityPrimitive("interface");
+    public Node primitiveAtom() {
+      return new PrimitiveNode("atom");
     }
 
-    public TypeEqualityNode primitiveDottable() {
-      return new TypeEqualityPrimitive("dottable");
+    public Node primitiveThread() {
+      return new PrimitiveNode("thread");
     }
-    public TypeEqualityNode primitiveModule() {
-      return new TypeEqualityPrimitive("module");
-    }
-
-    public TypeEqualityNode primitivePort() {
-      return new TypeEqualityPrimitive("port");
-    }
-    public TypeEqualityNode primitiveIport() {
-      return new TypeEqualityPrimitive("iport");
-    }
-    public TypeEqualityNode primitiveOport() {
-      return new TypeEqualityPrimitive("oport");
+    public Node primitiveMutex() {
+      return new PrimitiveNode("mutex");
     }
 
-    public TypeEqualityNode primitiveTypeAlias() {
-      return new TypeEqualityPrimitive("type-alias");
+    public Node primitiveFn() {
+      return new PrimitiveNode("fn");
+    }
+    public Node primitiveProcedure() {
+      return new PrimitiveNode("procedure");
+    }
+    public Node primitiveSyntax() {
+      return new PrimitiveNode("syntax");
     }
 
-    /////////////////////////////////////
-    // Container TypeEqualityNodes
-    public TypeEqualityNode containerVec(TypeEqualityNode valType) {
-      return new TypeEqualityContainer("vec", null, valType);
+    public Node primitiveMetaobj() {
+      return new PrimitiveNode("metaobj");
     }
-    public TypeEqualityNode containerMap(TypeEqualityNode keyType, TypeEqualityNode valType) {
-      return new TypeEqualityContainer("map", keyType, valType);
+    public Node primitiveObject() {
+      return new PrimitiveNode("object");
     }
-    public TypeEqualityNode containerMap(TypeEqualityNode valType) {
-      return new TypeEqualityContainer("map", null, valType);
+    public Node primitiveClass() {
+      return new PrimitiveNode("class");
     }
-    public TypeEqualityNode containerPair(TypeEqualityNode keyType, TypeEqualityNode valType) {
-      return new TypeEqualityContainer("pair", keyType, valType);
-    }
-    public TypeEqualityNode containerPair(TypeEqualityNode valType) {
-      return new TypeEqualityContainer("pair", null, valType);
-    }
-    public TypeEqualityNode containerList(TypeEqualityNode valType) {
-      return new TypeEqualityContainer("list", null, valType);
-    }
-    public TypeEqualityNode containerAC(TypeEqualityNode valType) {
-      return new TypeEqualityContainer("ac", null, valType);
-    }
-    public TypeEqualityNode containerOC(TypeEqualityNode valType) {
-      return new TypeEqualityContainer("oc", null, valType);
+    public Node primitiveInterface() {
+      return new PrimitiveNode("interface");
     }
 
+    public Node primitiveDottable() {
+      return new PrimitiveNode("dottable");
+    }
+    public Node primitiveModule() {
+      return new PrimitiveNode("module");
+    }
+
+    public Node primitivePort() {
+      return new PrimitiveNode("port");
+    }
+    public Node primitiveIport() {
+      return new PrimitiveNode("iport");
+    }
+    public Node primitiveOport() {
+      return new PrimitiveNode("oport");
+    }
+
+    public Node primitiveTypeAlias() {
+      return new PrimitiveNode("type-alias");
+    }
 
     /////////////////////////////////////
-    // User Type (Class, Interface, Alias) TypeEqualityNodes
-    public TypeEqualityNode userType(String type, String name, Environment env) throws Exception {
+    // Container Nodes
+    public Node containerVec(Node valType) {
+      return new ContainerNode("vec", null, valType);
+    }
+    public Node containerMap(Node keyType, Node valType) {
+      return new ContainerNode("map", keyType, valType);
+    }
+    public Node containerMap(Node valType) {
+      return new ContainerNode("map", null, valType);
+    }
+    public Node containerPair(Node keyType, Node valType) {
+      return new ContainerNode("pair", keyType, valType);
+    }
+    public Node containerPair(Node valType) {
+      return new ContainerNode("pair", null, valType);
+    }
+    public Node containerList(Node valType) {
+      return new ContainerNode("list", null, valType);
+    }
+    public Node containerAC(Node valType) {
+      return new ContainerNode("ac", null, valType);
+    }
+    public Node containerOC(Node valType) {
+      return new ContainerNode("oc", null, valType);
+    }
+
+
+    /////////////////////////////////////
+    // User Type (Class, Interface, Alias) Nodes
+    public Node userType(String type, String name, Environment env) throws Exception {
       Datum classOrInterfaceOrAlias = env.nullableGet(name);
       if(classOrInterfaceOrAlias == null) {
         throw new Exceptionf("Invalid Class/Interface/Alias Type \"%s\": %s",name,type);
       }
       if(classOrInterfaceOrAlias instanceof TypeAlias) {
         TypeAlias alias = (TypeAlias)classOrInterfaceOrAlias;
-        return TypeTree.walk(alias.typeKeyword(),alias.definitionEnvironment(),TYPE_EQUALITY_NODE_GENERATOR);
+        return TypeTree.walk(alias.typeKeyword(),alias.definitionEnvironment(),NODE_GENERATOR);
       } else if(classOrInterfaceOrAlias instanceof EscmClass) {
-        return new TypeEqualityClass((EscmClass)classOrInterfaceOrAlias);
+        return new ClassNode((EscmClass)classOrInterfaceOrAlias);
       } else if(classOrInterfaceOrAlias instanceof EscmInterface) {
-        return new TypeEqualityInterface((EscmInterface)classOrInterfaceOrAlias);
+        return new InterfaceNode((EscmInterface)classOrInterfaceOrAlias);
       } else {
         throw new Exceptionf("Invalid Class/Interface/Alias Type \"%s\": %s",name,type);
       }
     }
-    public TypeEqualityNode moduleUserType(String type, String name, ObjectAccessChain chain, Environment env) throws Exception {
+    public Node moduleUserType(String type, String name, ObjectAccessChain chain, Environment env) throws Exception {
       Datum classOrInterfaceOrAlias = chain.nullableLoadWithState(env);
       if(classOrInterfaceOrAlias == null) {
         throw new Exceptionf("Invalid Module Class/Interface/Alias Type \"%s\": %s",name,type);
       }
       if(classOrInterfaceOrAlias instanceof TypeAlias) {
         TypeAlias alias = (TypeAlias)classOrInterfaceOrAlias;
-        return TypeTree.walk(alias.typeKeyword(),alias.definitionEnvironment(),TYPE_EQUALITY_NODE_GENERATOR);
+        return TypeTree.walk(alias.typeKeyword(),alias.definitionEnvironment(),NODE_GENERATOR);
       } else if(classOrInterfaceOrAlias instanceof EscmClass) {
-        return new TypeEqualityClass((EscmClass)classOrInterfaceOrAlias);
+        return new ClassNode((EscmClass)classOrInterfaceOrAlias);
       } else if(classOrInterfaceOrAlias instanceof EscmInterface) {
-        return new TypeEqualityInterface((EscmInterface)classOrInterfaceOrAlias);
+        return new InterfaceNode((EscmInterface)classOrInterfaceOrAlias);
       } else {
         throw new Exceptionf("Invalid Module Class/Interface/Alias Type \"%s\": %s",name,type);
       }
@@ -290,19 +292,19 @@ public class TypeEquality {
 
     /////////////////////////////////////
     // Compound Type
-    public TypeEqualityNode compound(ArrayList<TypeEqualityNode> orTypes) {
-      return new TypeEqualityCompound(orTypes);
+    public Node compound(ArrayList<Node> orTypes) {
+      return new CompoundNode(orTypes);
     }
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Type Comparison
-  private static TypeEqualityNodeGenerator TYPE_EQUALITY_NODE_GENERATOR = new TypeEqualityNodeGenerator();
+  private static NodeGenerator NODE_GENERATOR = new NodeGenerator();
 
 
-  public static TypeEqualityNode tree(Keyword key, Environment env) throws Exception {
-    return TypeTree.walk(key,env,TYPE_EQUALITY_NODE_GENERATOR);
+  public static Node tree(Keyword key, Environment env) throws Exception {
+    return TypeTree.walk(key,env,NODE_GENERATOR);
   }
 
 

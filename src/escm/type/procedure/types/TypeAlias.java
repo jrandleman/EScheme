@@ -34,7 +34,7 @@ public class TypeAlias extends Datum {
   // Constructor
   public static boolean isCyclic(Environment definitionEnvironment, Keyword type) throws Exception {
     try {
-      TypeEquality.TypeEqualityNode typeEqualityNode = TypeEquality.tree(type,definitionEnvironment);
+      TypeEquality.Node typeEqualityNode = TypeEquality.tree(type,definitionEnvironment);
       typeEqualityNode.equals(typeEqualityNode); // overflows if alias is cyclic
       return false;
     } catch(StackOverflowError e) {

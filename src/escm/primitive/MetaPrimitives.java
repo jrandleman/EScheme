@@ -470,7 +470,7 @@ public class MetaPrimitives {
       if(!(type instanceof Keyword))
         throw new Exceptionf("'(type? <type-keyword>) arg %s isn't a keyword: %s", type.profile(), Exceptionf.profileArgs(parameters));
       try {
-        TypeEquality.TypeEqualityNode typeKey = TypeEquality.tree((Keyword)type,this.definitionEnvironment);
+        TypeEquality.Node typeKey = TypeEquality.tree((Keyword)type,this.definitionEnvironment);
         return Boolean.valueOf(typeKey.equals(typeKey));
       } catch(Exception e) {
         return Boolean.FALSE;
