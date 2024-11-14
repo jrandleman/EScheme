@@ -524,11 +524,11 @@ public class MetaPrimitives {
       Datum left = parameters.get(0);
       if(!(left instanceof Keyword))
         throw new Exceptionf("'(type=? <type-keyword> ...) arg %s isn't a keyword: %s", left.profile(), Exceptionf.profileArgs(parameters));
+      Keyword leftType = (Keyword)left;
       for(int i = 1; i < n; ++i) {
         Datum right = parameters.get(i);
         if(!(right instanceof Keyword))
           throw new Exceptionf("'(type=? <type-keyword> ...) arg %s isn't a keyword: %s", right.profile(), Exceptionf.profileArgs(parameters));
-        Keyword leftType = (Keyword)left;
         Keyword rightType = (Keyword)right;
         if(logic(leftType,this.definitionEnvironment,rightType,this.definitionEnvironment) == false) {
           return Boolean.FALSE;
