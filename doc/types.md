@@ -262,5 +262,5 @@ Type alias primitive helper functions include:
 ## Type Primitives
 
 - `(type? <type-keyword>)` returns if `<type-keyword>` is a valid type
-- `(is-type? <obj> <type-keyword>)` returns if `<obj>` is a `<type-keyword>`
-- `(same-type? <type-keyword> <type-keyword>)` returns if `<type-keyword>`s are equivalent
+- `(type? <obj> <type-keyword>)` returns if `<obj>` is a `<type-keyword>`
+- `(type=? <type-keyword> ...)` returns if `<type-keyword>`s are equivalent

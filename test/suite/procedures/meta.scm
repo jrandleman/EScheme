@@ -63,26 +63,28 @@
 (ut (type? :vec<int|char>) #t)
 (ut (type? :vec<false-primitive>) #f)
 
-(ut (is-type? 42 :int) #t)
-(ut (is-type? 42 :str) #f)
-(ut (is-type? 42 :int-or-char) #t) ; support for passing alias objects too
-(ut (is-type? #\a :int-or-char) #t)
-(ut (is-type? "a" :int-or-char) #f)
-(ut (is-type? 42 :ClassNameThatDoesNotExist) #f) ; doesn't throw for non-existent types
+(ut (type? 42 :int) #t)
+(ut (type? 42 :str) #f)
+(ut (type? 42 :int-or-char) #t) ; support for passing alias objects too
+(ut (type? #\a :int-or-char) #t)
+(ut (type? "a" :int-or-char) #f)
+(ut (type? 42 :ClassNameThatDoesNotExist) #f) ; doesn't throw for non-existent types
 
-(ut (same-type? :int :str) #f)
-(ut (same-type? :int|str :str|int) #t)
-(ut (same-type? :int|str|char :str|int) #f)
-(ut (same-type? :int|str :str|int|char) #f)
-(ut (same-type? :map<any,any> :map<any,any>) #t)
-(ut (same-type? :map<any,int> :map<any,int>) #t)
-(ut (same-type? :map<int,any> :map<int,any>) #t)
-(ut (same-type? :map<int,any> :map<any,int>) #f)
-(ut (same-type? :map<any,int> :map<int,any>) #f)
-(ut (same-type? :vec<any> :vec<any>) #t)
-(ut (same-type? :vec<any> :vec<int>) #f)
-(ut (same-type? :vec<int> :vec<any>) #f)
-(ut (same-type? :vec<int|str>|char :char|vec<str|int>) #t)
-(ut (same-type? :vec<int|str>|char :char|vec<key|int>) #f)
-(ut (same-type? :int-or-char|str :str|int|char) #t) ; supports deconstructing aliases
-(ut (same-type? :int-or-char|str :str|key|char) #f)
+(ut (type=? :int :str) #f)
+(ut (type=? :int|str :str|int) #t)
+(ut (type=? :int :int :int :str :int) #f) ; more than 2 arguments
+(ut (type=? :int|str :str|int :str|int :str|int) #t) ; more than 2 arguments
+(ut (type=? :int|str|char :str|int) #f)
+(ut (type=? :int|str :str|int|char) #f)
+(ut (type=? :map<any,any> :map<any,any>) #t)
+(ut (type=? :map<any,int> :map<any,int>) #t)
+(ut (type=? :map<int,any> :map<int,any>) #t)
+(ut (type=? :map<int,any> :map<any,int>) #f)
+(ut (type=? :map<any,int> :map<int,any>) #f)
+(ut (type=? :vec<any> :vec<any>) #t)
+(ut (type=? :vec<any> :vec<int>) #f)
+(ut (type=? :vec<int> :vec<any>) #f)
+(ut (type=? :vec<int|str>|char :char|vec<str|int>) #t)
+(ut (type=? :vec<int|str>|char :char|vec<key|int>) #f)
+(ut (type=? :int-or-char|str :str|int|char) #t) ; supports deconstructing aliases
+(ut (type=? :int-or-char|str :str|key|char) #f)
