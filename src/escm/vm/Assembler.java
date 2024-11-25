@@ -138,7 +138,7 @@ public class Assembler {
           types.add(null);
         } else {
           try {
-            typeNames.add(type.display());
+            typeNames.add(type.display().substring(1));
             types.add(TypeChecker.getPredicate(type));
           } catch(Exception e) {
             throw new Exceptionf("ASM ERROR: %s isn't valid bytecode syntax: %s", instruction.profile(), e.getMessage());
@@ -201,7 +201,7 @@ public class Assembler {
         returnTypeNameList.add(null);
         returnTypeList.add(null);
       } else {
-        returnTypeNameList.add(returnType.display());
+        returnTypeNameList.add(returnType.display().substring(1));
         returnTypeList.add(TypeChecker.getPredicate(returnType));
       }
       noReturnTypes = noReturnTypes && returnType == null;

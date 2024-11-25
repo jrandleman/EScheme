@@ -147,6 +147,8 @@ public class OOPrimitives {
                        new Symbol("<interface-list>"),
                        new Symbol("<static-property-name-list>"),
                        new Symbol("<static-property-value-list>"),
+                       new Symbol("<instance-type-signature-name-list>"),
+                       new Symbol("<instance-type-signature-value-list>"),
                        new Symbol("<instance-property-name-list>"));
     }
 
@@ -169,7 +171,7 @@ public class OOPrimitives {
       return interfaces;
     }
 
-    private static ConcurrentHashMap<String,Datum> parsePropertyNamesAndValues(ArrayList<Datum> parameters) throws Exception {
+    private static ConcurrentHashMap<String,Datum> parseStaticPropertyNamesAndValues(ArrayList<Datum> parameters) throws Exception {
       Datum nameList = parameters.get(3);
       Datum valueList = parameters.get(4);
       ConcurrentHashMap<String,Datum> namesAndValues = new ConcurrentHashMap<String,Datum>();
@@ -188,8 +190,33 @@ public class OOPrimitives {
       return namesAndValues;
     }
 
-    private static ArrayList<String> parseInstancePropertyNames(ArrayList<Datum> parameters) throws Exception {
+    private static ConcurrentHashMap<String,CompoundProcedure> parseTypeSignatureNamesAndValues(ArrayList<Datum> parameters) throws Exception {
       Datum nameList = parameters.get(5);
+      Datum valueList = parameters.get(6);
+      ConcurrentHashMap<String,CompoundProcedure> namesAndValues = new ConcurrentHashMap<String,CompoundProcedure>();
+      while(nameList instanceof escm.type.Pair && valueList instanceof escm.type.Pair) {
+        escm.type.Pair np = (escm.type.Pair)nameList;
+        escm.type.Pair vp = (escm.type.Pair)valueList;
+        Datum name = np.car();
+        Datum typeSignature = vp.car();
+        if(!(name instanceof Symbol))
+          throw new Exceptionf("'interface method type-signature name %s isn't a symbol: %s", name.profile(), Exceptionf.profileArgs(parameters));
+        if(!(typeSignature instanceof CompoundProcedure))
+          throw new Exceptionf("'interface invalid instance property %s (only supports symbol fields and method type-signatures) %s: %s", typeSignature.profile(), name.profile(), Exceptionf.profileArgs(parameters));
+        CompoundProcedure typeSignatureFn = (CompoundProcedure)typeSignature;
+        if(!typeSignatureFn.isTypeSignature())
+          throw new Exceptionf("'interface method type-signature named %s isn't a valid type-signature: %s", name.profile(), Exceptionf.profileArgs(parameters));
+        namesAndValues.put(((Symbol)name).value(),typeSignatureFn);
+        nameList = np.cdr();
+        valueList = vp.cdr();
+      }
+      if(nameList instanceof escm.type.Pair || valueList instanceof escm.type.Pair)
+        throw new Exceptionf("'interface given different number of type-signature names and values: %s", Exceptionf.profileArgs(parameters));
+      return namesAndValues;
+    }
+
+    private static ArrayList<String> parseInstancePropertyNames(ArrayList<Datum> parameters) throws Exception {
+      Datum nameList = parameters.get(7);
       ArrayList<String> names = new ArrayList<String>();
       while(nameList instanceof escm.type.Pair) {
         escm.type.Pair par = (escm.type.Pair)nameList;
@@ -203,16 +230,17 @@ public class OOPrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      if(parameters.size() != 6) 
-        throw new Exceptionf("'(escm-oo-interface <name-keyword> <docstring> <interface-list> <static-prop-name-list> <static-prop-value-list> <instance-prop-name-list>) expects exactly 6 args: %s", Exceptionf.profileArgs(parameters));
+      if(parameters.size() != 8)
+        throw new Exceptionf("'(escm-oo-interface <name-keyword> <docstring> <interface-list> <static-prop-name-list> <static-prop-value-list> <instance-type-signature-name-list> <instance-type-signature-value-list> <instance-prop-name-list>) expects exactly 8 args: %s", Exceptionf.profileArgs(parameters));
       // Parse components
       String interfaceName = EscmOoClass.parseOptionalClassOrInterfaceName(parameters);
       String docstring = EscmOoClass.parseOptionalDocstring(parameters);
       ArrayList<EscmInterface> interfaces = parseInterfaces(parameters);
-      ConcurrentHashMap<String,Datum> staticProps = parsePropertyNamesAndValues(parameters);
+      ConcurrentHashMap<String,Datum> staticProps = parseStaticPropertyNamesAndValues(parameters);
+      ConcurrentHashMap<String,CompoundProcedure> typeSigProps = parseTypeSignatureNamesAndValues(parameters);
       ArrayList<String> instanceNames = parseInstancePropertyNames(parameters);
       // Create the interface!
-      return new EscmInterface(interfaceName,docstring,interfaces,staticProps,instanceNames);
+      return new EscmInterface(interfaceName,docstring,interfaces,staticProps,instanceNames,typeSigProps);
     }
   }
 

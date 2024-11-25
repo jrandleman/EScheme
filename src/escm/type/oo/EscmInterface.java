@@ -14,11 +14,14 @@
 
 package escm.type.oo;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.Pair;
 import escm.type.procedure.CompoundProcedure;
+import escm.util.error.Exceptionf;
 import escm.vm.type.callable.DocString;
 
 public class EscmInterface extends MetaObject {
@@ -63,6 +66,7 @@ public class EscmInterface extends MetaObject {
   ////////////////////////////////////////////////////////////////////////////
   // Object-Construction Template
   private ArrayList<String> requiredProps = null;
+  private ConcurrentHashMap<String,CompoundProcedure> methodsTypeSignatures = null;
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -113,8 +117,24 @@ public class EscmInterface extends MetaObject {
     EscmClass.accumulateMethodSignatureAndDocstring(sb,signatures,val.docstring());
   }
 
+  // Print required type signatures
+  private boolean accumulateTypeSignatures(boolean printed, StringBuilder sb) {
+    if(props.size() == 0) return false;
+    if(methodsTypeSignatures.size() > 0) {
+      if(printed) sb.append("  ----------------------------------------------------------------------\n");
+      sb.append("  Required Instance Methods:");
+      TreeMap<String,CompoundProcedure> sortedSigs = new TreeMap<String,CompoundProcedure>(methodsTypeSignatures);
+      for(Map.Entry<String,CompoundProcedure> sig : sortedSigs.entrySet()) {
+        accumulateMethod(sb,sig.getKey(),sig.getValue());
+      }
+      sb.append("\n");
+      printed = true;
+    }
+    return printed;
+  }
+
   // Print static fields & methods
-  private boolean accumulateProperties(boolean printed, StringBuilder sb) {
+  private boolean accumulateStaticProperties(boolean printed, StringBuilder sb) {
     if(props.size() == 0) return false;
     ConcurrentHashMap<String,Datum> fields = new ConcurrentHashMap<String,Datum>();
     ConcurrentHashMap<String,CompoundProcedure> methods = new ConcurrentHashMap<String,CompoundProcedure>();
@@ -139,7 +159,8 @@ public class EscmInterface extends MetaObject {
     if(methods.size() > 0) {
       if(printed) sb.append("  ----------------------------------------------------------------------\n");
       sb.append("  Static Methods:");
-      for(ConcurrentHashMap.Entry<String,CompoundProcedure> method : methods.entrySet()) {
+      TreeMap<String,CompoundProcedure> sortedMethods = new TreeMap<String,CompoundProcedure>(methods);
+      for(Map.Entry<String,CompoundProcedure> method : sortedMethods.entrySet()) {
         accumulateMethod(sb,method.getKey(),method.getValue());
       }
       sb.append("\n");
@@ -156,19 +177,22 @@ public class EscmInterface extends MetaObject {
     boolean printed = accumulateUserDocstring(sb);
     // Print instance properties
     printed = accumulateRequiredProperties(printed,sb);
+    // Print type signatures
+    printed = accumulateTypeSignatures(printed,sb);
     // Print static properties
-    printed = accumulateProperties(printed,sb);
+    printed = accumulateStaticProperties(printed,sb);
     return sb.toString();
   }
 
 
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  public EscmInterface(String name, String docstring, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) throws Exception {
+  public EscmInterface(String name, String docstring, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps, ConcurrentHashMap<String,CompoundProcedure> methodsTypeSignatures) throws Exception {
     this.docstring = DocString.format(docstring);
     this.interfaces = interfaces;
     this.props = props;
     this.requiredProps = requiredProps;
+    this.methodsTypeSignatures = methodsTypeSignatures;
     if(name == null) {
       this.convertProceduresToMethods();
     } else {
@@ -209,59 +233,56 @@ public class EscmInterface extends MetaObject {
 
   ////////////////////////////////////////////////////////////////////////////
   // Class Satisfaction Verification
-  private static class StringArrayListBox {
-    public ArrayList<String> value = new ArrayList<String>();
-  }
-
-
-  private String stringifyArrayListString(ArrayList<String> al) {
-    StringBuilder sb = new StringBuilder("{");
-    for(int i = 0, n = al.size(); i < n; ++i) {
-      sb.append(al.get(i));
-      if(i+1 < n) sb.append(", ");
-    }
-    return sb.toString() + '}';
-  }
-
-
-  private ArrayList<String> getClassInstanceProperties(EscmClass topmostClass) {
-    StringArrayListBox sb = new StringArrayListBox();
-    topmostClass.forEachInstanceProperty((prop) -> {
-      sb.value.add(prop);
-      return true;
-    });
-    return sb.value;
-  }
-
-
-  private String generateSatisfactionError(EscmClass topmostClass, ArrayList<String> inheritanceChain, String missedReqProp) {
-    if(inheritanceChain.size() > 0) inheritanceChain.remove(0);
-    return String.format("Class with instance props %s inheriting %s doesn't have required prop \"%s\" for interface \"%s\"", 
-                                   stringifyArrayListString(getClassInstanceProperties(topmostClass)), 
-                                   stringifyArrayListString(inheritanceChain), 
-                                   missedReqProp, 
-                                   readableName());
-  }
-
-
-  private void confirmSatisfiedBy(EscmClass cls, ArrayList<String> inheritanceChain, EscmClass topmostClass, String missedReqProp) throws Exception {
+  private void confirmHasProp(EscmClass cls, EscmClass topmostClass, String targetProp) throws Exception {
     if(cls == null) {
-      if(missedReqProp != null) {
-        throw new Exception(generateSatisfactionError(topmostClass,inheritanceChain,missedReqProp));
-      }
-      return;
+      throw new Exceptionf(
+        "Class %s missing required property \"%s\" for interface \"%s\"",
+        topmostClass.readableName(),
+        targetProp,
+        readableName()
+      );
     }
-    inheritanceChain.add(cls.readableName());
+    if(!cls.hasInstanceProp(targetProp)) {
+      confirmHasProp(cls.getSuper(),topmostClass,targetProp);
+    }
+  }
+
+
+  private void confirmHasMethod(EscmClass cls, EscmClass topmostClass, String methodName, CompoundProcedure method) throws Exception {
+    if(cls == null) {
+      throw new Exceptionf(
+        "Class %s missing required method \"%s\" %s for interface %s", 
+        topmostClass.readableName(),
+        methodName, 
+        method.signature(),
+        readableName()
+      );
+    }
+    if(!cls.hasInstanceMethod(methodName,method)) {
+      confirmHasMethod(cls.getSuper(),topmostClass,methodName,method);
+    }
+  }
+
+
+  private void confirmSatisfiedBy(EscmClass cls, EscmClass topmostClass) throws Exception {
+    EscmClass superClass = cls.getSuper();
     for(String prop : requiredProps) {
       if(!cls.hasInstanceProp(prop)) {
-        confirmSatisfiedBy(cls.getSuper(),inheritanceChain,topmostClass,prop);
+        confirmHasProp(superClass,topmostClass,prop);
+      }
+    }
+    for(ConcurrentHashMap.Entry<String,CompoundProcedure> typeSig : methodsTypeSignatures.entrySet()) {
+      String name = typeSig.getKey();
+      CompoundProcedure method = typeSig.getValue();
+      if(!cls.hasInstanceMethod(name,method)) {
+        confirmHasMethod(superClass,topmostClass,name,method);
       }
     }
   }
 
 
   public void confirmSatisfiedBy(EscmClass cls) throws Exception {
-    confirmSatisfiedBy(cls,new ArrayList<String>(),cls,null);
+    confirmSatisfiedBy(cls,cls);
     for(EscmInterface superIface : interfaces) {
       superIface.confirmSatisfiedBy(cls);
     }

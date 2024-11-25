@@ -23,16 +23,18 @@
 //
 //    Further note that the definition environment is bound at runtime by the interpreter.
 //
-//    Lastly, observe that ALL escm procedures are multi-arity, supporting several parameter
-//    signatures and associated function bodies.
+//    Lastly, observe that ALL escm procedures use multiple dispatch, supporting multiple
+//    parameter signature arities and keyword types, with associated function bodies.
 
 package escm.type.procedure;
 import java.util.Objects;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.io.Serializable;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
 import escm.type.procedure.types.TypeChecker;
+import escm.type.procedure.types.TypeEquality;
 import escm.type.Datum;
 import escm.type.Keyword;
 import escm.type.Symbol;
@@ -66,7 +68,7 @@ public class CompoundProcedure extends Procedure {
     public ArrayList<Symbol> variadicParameterList; // <null> indicates non-variadic
     public ArrayList<ArrayList<Instruction>> bodyList;
 
-    public ArrayList<String> getParameterTypeName(int index) {
+    public ArrayList<String> getParameterTypeNames(int index) {
       if(parameterTypeNamesLists == null) return null;
       return parameterTypeNamesLists.get(index);
     }
@@ -133,6 +135,98 @@ public class CompoundProcedure extends Procedure {
       variadicParameterList,
       bodyList
     );
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Type Signature Operations
+  // Whether procedure only has, at most, `(load #void)` as its bodies
+  public boolean isTypeSignature() {
+    for(ArrayList<Instruction> body : compileTime.bodyList) {
+      int n = body.size();
+      if(n != 0) {
+        if(n != 1) return false;
+        Instruction inst = body.get(0);
+        if(inst.operation != Instruction.LOAD) return false;
+        if(!(inst.argument instanceof escm.type.Void)) return false;
+      }
+    }
+    return true;
+  }
+
+  private static boolean mismatchedNulls(Object o1, Object o2) {
+    return (o1 == null || o2 == null) && o1 != o2;
+  }
+
+  private static boolean differentTypes(String type1, Environment env1, String type2, Environment env2) throws Exception {
+    if(mismatchedNulls(type1,type2)) return true;
+    return type1 != null && TypeEquality.sameType(type1,env1,type2,env2) == false;
+  }
+
+  private static boolean sameSignature(
+    Environment thisEnv, Environment thatEnv,
+    ArrayList<Symbol> thisSig, Symbol thisVar, 
+    ArrayList<String> thisTypeSig, String thisRetType, 
+    ArrayList<Symbol> thatSig, Symbol thatVar,
+    ArrayList<String> thatTypeSig, String thatRetType
+  ) throws Exception {
+    // Same variadic status?
+    if(mismatchedNulls(thisVar,thatVar)) return false;
+    // Same return type?
+    if(differentTypes(thisRetType,thisEnv,thatRetType,thatEnv)) return false;
+    // Same parameter counts/types?
+    int n = thisSig.size();
+    if(n != thatSig.size()) return false;
+    if(mismatchedNulls(thisTypeSig,thatTypeSig)) return false;
+    if(thisTypeSig != null) {
+      for(int i = 0; i < n; ++i) {
+        if(differentTypes(thisTypeSig.get(i),thisEnv,thatTypeSig.get(i),thatEnv)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  // Whether procedures share same parameter counts/types, and return types 
+  // Assumes: this.isTypeSignature() && that.isTypeSignature()
+  public boolean sameSignatures(CompoundProcedure that) throws Exception {
+    HashSet<Integer> seen = new HashSet<Integer>();
+    Environment thisEnv = this.definitionEnvironment;
+    Environment thatEnv = that.definitionEnvironment;
+    ArrayList<ArrayList<Symbol>> theseParams = this.compileTime.parametersList;
+    ArrayList<ArrayList<Symbol>> thoseParams = that.compileTime.parametersList;
+    ArrayList<Symbol> theseVars = this.compileTime.variadicParameterList;
+    ArrayList<Symbol> thoseVars = that.compileTime.variadicParameterList;
+    int n = theseParams.size();
+    if(n != thoseParams.size()) return false;
+    for(int i = 0; i < n; ++i) {
+      ArrayList<Symbol> thisParams = theseParams.get(i);
+      Symbol thisVar = theseVars.get(i);
+      ArrayList<String> thisParamTypes = this.compileTime.getParameterTypeNames(i);
+      String thisRetType = this.compileTime.getReturnTypeName(i);
+      int j = 0;
+      for(; j < n; ++j) {
+        if(!seen.contains(j) && sameSignature(
+              thisEnv,
+              thatEnv,
+              thisParams, 
+              thisVar, 
+              thisParamTypes, 
+              thisRetType,
+              thoseParams.get(j), 
+              thoseVars.get(j), 
+              that.compileTime.getParameterTypeNames(j), 
+              that.compileTime.getReturnTypeName(j)
+            )
+          ) {
+          seen.add(j);
+          break;
+        }
+      }
+      if(j == n) return false;
+    }
+    return true;
   }
 
 
@@ -210,7 +304,7 @@ public class CompoundProcedure extends Procedure {
       if(parameterTypeNames != null) {
         String name = parameterTypeNames.get(i);
         if(name != null) {
-          sig = new Pair(new Keyword(name.substring(1)),sig);
+          sig = new Pair(new Keyword(name),sig);
         }
       }
     }
@@ -221,21 +315,21 @@ public class CompoundProcedure extends Procedure {
     int n = compileTime.parametersList.size();
     if(n == 1) {
       String returnTypeName = compileTime.getReturnTypeName(0);
-      Datum parameterClause = clauseSignature(compileTime.getParameterTypeName(0),compileTime.parametersList.get(0),compileTime.variadicParameterList.get(0));
+      Datum parameterClause = clauseSignature(compileTime.getParameterTypeNames(0),compileTime.parametersList.get(0),compileTime.variadicParameterList.get(0));
       if(returnTypeName == null) {
         return parameterClause;
       } else {
-        return Pair.List(new Keyword(returnTypeName.substring(1)),parameterClause);
+        return Pair.List(new Keyword(returnTypeName),parameterClause);
       }
     }
     Datum sigs = Nil.VALUE;
     for(int i = n-1; i >= 0; --i) {
       String returnTypeName = compileTime.getReturnTypeName(i);
-      Datum parameterClause = clauseSignature(compileTime.getParameterTypeName(i),compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i));
+      Datum parameterClause = clauseSignature(compileTime.getParameterTypeNames(i),compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i));
       if(returnTypeName == null) {
         sigs = new Pair(parameterClause,sigs);
       } else {
-        sigs = new Pair(new Keyword(returnTypeName.substring(1)),new Pair(parameterClause,sigs));
+        sigs = new Pair(new Keyword(returnTypeName),new Pair(parameterClause,sigs));
       }
     }
     return sigs;
@@ -277,7 +371,7 @@ public class CompoundProcedure extends Procedure {
     for(int i = 0, n = compileTime.parametersList.size(); i < n; ++i) {
       sb.append(String.format("\n   %2d) ", i+1));
       sb.append(stringifyReturnType(compileTime.getReturnTypeName(i)));
-      sb.append(stringifyParameters(compileTime.getParameterTypeName(i),compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i)));
+      sb.append(stringifyParameters(compileTime.getParameterTypeNames(i),compileTime.parametersList.get(i),compileTime.variadicParameterList.get(i)));
     }
     return sb.toString();
   }

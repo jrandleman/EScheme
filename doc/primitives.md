@@ -9118,8 +9118,8 @@ ONLY valid as the FIRST expression in a class constructor:
 any other use risks undefined behavior!
 
 See <object-system> in <Topics> for more high-level object orientation details.
-See <class> for more detailed object orientation
-details. See <meta-object> in <Intrinsic-Types> for more type details.
+See <class> for more detailed object orientation details. See <meta-object> in
+<Intrinsic-Types> for more type details.
 ```
 
 -------------------------------------------------------------------------------
@@ -9264,8 +9264,8 @@ Methods support keyword runtime types exactly like <lambda>.
 Aliased by <defclass>.
 
 See <object-system> in <Topics> for more high-level object orientation details.
-See <class> for more detailed object orientation
-details. See <meta-object> in <Intrinsic-Types> for more type details.
+See <class> for more detailed object orientation details. See <meta-object> in
+<Intrinsic-Types> for more type details.
 ```
 
 -------------------------------------------------------------------------------
@@ -9277,6 +9277,7 @@ details. See <meta-object> in <Intrinsic-Types> for more type details.
   (:extends <interface> ...)
   <optional-docstring>
   <field-name>
+  ((<method-name> <parameter> ...))
   (:static <field-name> <default-value>)
   (:static (<method-name> <parameter> ...) <body> ...)
   ...)
@@ -9288,13 +9289,13 @@ Simple wrapper macro combining <define> and <interface> to bind <interface-name>
 Also generates a (<interface-name>? <obj>) predicate procedure!
 
 Optionally include <docstring> to detail information on the interface in <help>.
-Static methods support keyword runtime types exactly like <lambda>.
+Static and required methods support keyword runtime types exactly like <lambda>.
 
 Aliased by <definterface>.
 
 See <object-system> in <Topics> for more high-level object orientation details.
-See <class> for more detailed object orientation
-details. See <meta-object> in <Intrinsic-Types> for more type details.
+See <class> for more detailed object orientation details. See <meta-object> in
+<Intrinsic-Types> for more type details.
 ```
 
 -------------------------------------------------------------------------------
@@ -9305,6 +9306,7 @@ details. See <meta-object> in <Intrinsic-Types> for more type details.
 (interface (:extends <interface> ...)
   <optional-docstring>
   <field-name>
+  ((<method-name> <parameter> ...))
   (:static <field-name> <default-value>)
   (:static (<method-name> <parameter> ...) <body> ...)
   ...)
@@ -9313,17 +9315,19 @@ details. See <meta-object> in <Intrinsic-Types> for more type details.
 #### Description:
 ```
 Creates an anonymous interface. Similar to classes, BUT cannot be instantiated
-via a constructor. Required property names are denoted by a symbolic property,
-(<field-name> above).
+via a constructor.
+  * Required property names are denoted by symbols (see <field-name>).
+  * Required method signatures are denoted by procedures without bodies
+    (see <method-name>).
 
 Use :extends to optionally inherit required fields from other interface objects.
 
 Optionally include <docstring> to detail information on the interface in <help>.
-Static methods support keyword runtime types exactly like <lambda>.
+Static and required methods support keyword runtime types exactly like <lambda>.
 
 See <object-system> in <Topics> for more high-level object orientation details.
-See <class> for more detailed object orientation
-details. See <meta-object> in <Intrinsic-Types> for more type details.
+See <class> for more detailed object orientation details. See <meta-object> in
+<Intrinsic-Types> for more type details.
 
 For example:
   (define-interface IHasName
@@ -9331,13 +9335,19 @@ For example:
     name)
 
   (define-interface IHasAge
-    age)
+    age
+    (:num (get-age))
+    (:void (set-age! :num age)))
 
   (define-interface IPerson (:extends IHasName IHasAge))
 
   (define-class Person (:implements IPerson)
     (name "")
-    (age 0))
+    (age 0)
+    (:num (get-age)
+      self.age)
+    (:void (set-age! :num age)
+      (set! self.age age)))
 ```
 
 -------------------------------------------------------------------------------
@@ -9356,8 +9366,8 @@ ONLY valid as the FIRST expression in a class constructor:
 any other use risks undefined behavior!
 
 See <object-system> in <Topics> for more high-level object orientation details.
-See <class> for more detailed object orientation
-details. See <meta-object> in <Intrinsic-Types> for more type details.
+See <class> for more detailed object orientation details. See <meta-object> in
+<Intrinsic-Types> for more type details.
 ```
 
 -------------------------------------------------------------------------------
@@ -10642,7 +10652,8 @@ EScheme has a totally optional object system, including support for:
   <optional-docstring>
   (:static <name> <value>)
   (:static (<method-name> <param> ...) <body> ...)
-  <name>) ; required property name(s) for a class to have
+  <name> ; required property name(s) for a class to have
+  ((<method-name> <param> ...))) ; required method signature(s) for a class to have
 ```
 
 ---
@@ -10654,7 +10665,8 @@ EScheme has a totally optional object system, including support for:
   <optional-docstring>
   (:static <name> <value>)
   (:static (<method-name> <param> ...) <body> ...)
-  <name>) ; required property name(s) for a class to have
+  <name> ; required property name(s) for a class to have
+  ((<method-name> <param> ...))) ; required method signature(s) for a class to have
 ```
 
 ---

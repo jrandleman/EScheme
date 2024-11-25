@@ -80,7 +80,8 @@ EScheme has a totally optional object system, including support for:
   <optional-docstring>
   (:static <name> <value>)
   (:static (<method-name> <param> ...) <body> ...)
-  <name>) ; required property name(s) for a class to have
+  <name> ; required property name(s) for a class to have
+  ((<method-name> <param> ...))) ; required method signature(s) for a class to have
 ```
 
 ---
@@ -92,7 +93,8 @@ EScheme has a totally optional object system, including support for:
   <optional-docstring>
   (:static <name> <value>)
   (:static (<method-name> <param> ...) <body> ...)
-  <name>) ; required property name(s) for a class to have
+  <name> ; required property name(s) for a class to have
+  ((<method-name> <param> ...))) ; required method signature(s) for a class to have
 ```
 
 ---

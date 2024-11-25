@@ -192,6 +192,8 @@ public class ObjectPrimitives {
       return "@help:Syntax:Objects\nCreates an anonymous class. See <define-class> to bind a name to a class\nin one expression. See <object-system> in <Topics> for more high-level object\norientation details.\n\nRegarding inter-class/interface relations: \n  1. <super> MUST be an expression that evals to a class type.\n  2. <interface> MUST be an expression that evals to an interface type.\n  3. Both :extends and :implements are optional.\n\nOptionally include <docstring> to detail information on the class in <help>.\nMethods support keyword runtime types exactly like <lambda>.\n\n\nSimilar to Java, we support single inheritance for classes and multiple\ninheritance for interfaces.\n\nThe \"new\" pseudo-method acts as the class constructor (doesn't correlate \nto a real method). Invoke the class constructor by calling the class \nobject as if it were a procedure.\n\nThe \"->procedure\" method overloads applications for objects, making them\na \"functor\" (function object).\n\nThe \"name\" field is automatically defined for classes and interfaces.\nThe \"class\" field is automatically defined for objects.\n\nUse \"self\" and \"super\" in methods to refer to the calling object and the\nclass's super object respectively. Qualification of \"self.\" is required\nwhen referring to class fields in a method.\n  (define n 0) ; the \"global n\"\n  (define-class C\n    (n 1)      ; the \"local n\"\n    ((method)\n      n        ; refers to the \"global n\"\n      self.n)) ; refers to the \"local n\"\n\n\nRefer to a field via: object.property1.property2\nRefer to a method as: (object.inner-obj.method <arg> ...)\n\nObjects (classes and interfaces for static methods) support the following:\n  (define object.property <value>) ; define <property> as a new field\n  (set! object.property <value>)   ; set the existing <property> field\n\n\nUse the \":static\" keyword qualifier to indicate that the field/method belongs\nto the class, rather than one of its instances.\n  (define-class C (:static VALUE 10))\n  C.VALUE ; 10\n\n\nInitialization of the super object's non-nullary constructor is achieved\nvia the \"(super! <arg> ...)\" macro. Alternatively use the \"apply-super!\"\nmacro to initialize the super object with a list of values.\n\n  =================================================================\n  * NOTE THAT \"super!\", IF USED, MUST BE THE FIRST EXPRESSION IN A \n    CONSTRUCTOR IN ORDER TO AVOID INVOKING UNDEFINED BEHAVIOR !!!!\n  =================================================================\n\n  ((new)\n    (super! 42) ; valid\n    (define self.value 314)) \n\n  ((new)\n    (define self.value 314)\n    (super! 42)) ; undefined behavior\n\n\nFor example:\n  (define-class Rectangle\n    (length 0)\n    (width 0)\n    ((new l w)\n      (set! self.length l)\n      (set! self.width w))\n    ((area)\n      (* self.length self.width))\n    ((perimeter)\n      (* 2 (+ self.length self.width))))\n\n\n  (define-class Square (:extends Rectangle)\n    ((new l)\n      (super! l l))) ; init the super object\n\n\n  (define s (Square 5))\n\n  (display (s.area)) ; Square \"inherited\" <area> method. Prints 25\n\n\n\nClass reflection is provided by primtive functions prefixed with \"oo-\".\n\nSee <meta-object> in <Intrinsic-Types> for more type details.";
     }
 
+    static private String CLASS_MACRO_SIGNATURE = "(class <super-expr> <interfaces-expr> <prop> ...)";
+
     // Helper triplet class
     public static class Triple<T,U,V> {
       public T first;
@@ -338,10 +340,10 @@ public class ObjectPrimitives {
 
     // Returns a pair of lists of static & non-static properties stripped of :static, else NIL
     //   => Also converts inlined methods to lambdas!
-    public static escm.util.Pair<Datum,Datum> getStaticAndNonStaticProperties(Datum properties) {
+    public static escm.util.Pair<Datum,Datum> getInterfaceProperties(Datum properties) {
       if(!(properties instanceof Pair)) return new escm.util.Pair<Datum,Datum>(Nil.VALUE,Nil.VALUE);
       Pair p = (Pair)properties;
-      escm.util.Pair<Datum,Datum> tails = getStaticAndNonStaticProperties(p.cdr());
+      escm.util.Pair<Datum,Datum> tails = getInterfaceProperties(p.cdr());
       if(isStaticProperty(p.car())) {
         Datum property = ((Pair)p.car()).cdr();
         if(isInlinedMethod(property)) {
@@ -384,13 +386,13 @@ public class ObjectPrimitives {
     }
 
     // Returns pair of property names as a list of quoted symbols & property values
-    public static escm.util.Pair<Datum,Datum> parsePropertyNamesAndValues(ArrayList<Datum> parameters, Datum properties) throws Exception {
+    public static escm.util.Pair<Datum,Datum> parsePropertyNamesAndValues(ArrayList<Datum> parameters, Datum properties, String macroSignature) throws Exception {
       if(!(properties instanceof Pair)) return new escm.util.Pair<Datum,Datum>(Nil.VALUE,Nil.VALUE);
       Pair p = (Pair)properties;
       if(!isValidProperty(p.car()))
-        throw new Exceptionf("'(class <super-expr> <interfaces-expr> <prop> ...) invalid <prop> %s: %s", p.car().profile(), Exceptionf.profileArgs(parameters));
+        throw new Exceptionf("'%s invalid <prop> %s: %s", macroSignature, p.car().profile(), Exceptionf.profileArgs(parameters));
       Pair prop = (Pair)p.car();
-      escm.util.Pair<Datum,Datum> tails = parsePropertyNamesAndValues(parameters,p.cdr());
+      escm.util.Pair<Datum,Datum> tails = parsePropertyNamesAndValues(parameters,p.cdr(),macroSignature);
       return new escm.util.Pair<Datum,Datum>(
         new Pair(Pair.List(CorePrimitives.QUOTE,prop.car()),tails.first),
         new Pair(((Pair)prop.cdr()).car(),tails.second));
@@ -404,10 +406,10 @@ public class ObjectPrimitives {
       Triple<Datum,Datum,Datum> superAndInterfacesAndDocstring = getSuperAndInterfacesAndDocstring(x);
       // Extract "has-a"'s
       Datum properties = getProperties(superAndInterfacesAndDocstring,x);
-      escm.util.Pair<Datum,Datum> staticAndNonStaticProps = getStaticAndNonStaticProperties(properties);
+      escm.util.Pair<Datum,Datum> staticAndNonStaticProps = getInterfaceProperties(properties);
       escm.util.Pair<Datum,Datum> ctorAndInstanceProps = parseConstructorProcedureAndInstanceProperties(staticAndNonStaticProps.second);
-      escm.util.Pair<Datum,Datum> staticPropNamesAndVals = parsePropertyNamesAndValues(parameters,staticAndNonStaticProps.first);
-      escm.util.Pair<Datum,Datum> instancePropNamesAndVals = parsePropertyNamesAndValues(parameters,ctorAndInstanceProps.second);
+      escm.util.Pair<Datum,Datum> staticPropNamesAndVals = parsePropertyNamesAndValues(parameters,staticAndNonStaticProps.first,CLASS_MACRO_SIGNATURE);
+      escm.util.Pair<Datum,Datum> instancePropNamesAndVals = parsePropertyNamesAndValues(parameters,ctorAndInstanceProps.second,CLASS_MACRO_SIGNATURE);
       // Generate the call to an internal primitive that makes our class!
       return Pair.List(ESCM_OO_CLASS,className,superAndInterfacesAndDocstring.third,
         superAndInterfacesAndDocstring.first,new Pair(CorePrimitives.LIST,superAndInterfacesAndDocstring.second),
@@ -452,7 +454,7 @@ public class ObjectPrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Objects\nSimple wrapper macro combining <define> and <class> to bind <class-name>.\nAlso generates a (<class-name>? <obj>) predicate procedure!\n\nOptionally include <docstring> to detail information on the class in <help>.\nMethods support keyword runtime types exactly like <lambda>.\n\nAliased by <defclass>.\n\nSee <object-system> in <Topics> for more high-level object orientation details.\nSee <class> for more detailed object orientation\ndetails. See <meta-object> in <Intrinsic-Types> for more type details.";
+      return "@help:Syntax:Objects\nSimple wrapper macro combining <define> and <class> to bind <class-name>.\nAlso generates a (<class-name>? <obj>) predicate procedure!\n\nOptionally include <docstring> to detail information on the class in <help>.\nMethods support keyword runtime types exactly like <lambda>.\n\nAliased by <defclass>.\n\nSee <object-system> in <Topics> for more high-level object orientation details.\nSee <class> for more detailed object orientation details. See <meta-object> in\n<Intrinsic-Types> for more type details.";
     }
 
     public Datum signature() {
@@ -489,6 +491,8 @@ public class ObjectPrimitives {
   // (interface <optional-name-keyword> (:extends <interface> ...) <optional-docstring> <prop> ...)
   //
   // <prop> ::= <name>
+  //          | (<method-name> <param> ...) ; typed method signature
+  //          | (<method-name> (<param> ...) ...) ; multiple typed method signatures
   //          | (:static <name> <value>)
   //          | (:static (<method-name> <param> ...) <body> ...)
   //
@@ -500,7 +504,7 @@ public class ObjectPrimitives {
   //       than only later when we bind a symbol to the interface object in the 
   //       environment. 
   //       * This allows us to reduce the number of method allocations by half!
-  //       It also doesn't parse <optional-docstring>.
+  //       It also doesn't parse <optional-docstring>, nor typed method signatures.
   //
   //
   // ; Returns the list of implemented interfaces if exists, else NIL
@@ -546,6 +550,7 @@ public class ObjectPrimitives {
           Pair.List(EXTENDS,new Symbol("<interface>"),Signature.VARIADIC),
           new Symbol("<optional-docstring>"),
           new Symbol("<field-name>"),
+          Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC)),
           Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
           Signature.VARIADIC
@@ -553,7 +558,21 @@ public class ObjectPrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Objects\nCreates an anonymous interface. Similar to classes, BUT cannot be instantiated\nvia a constructor. Required property names are denoted by a symbolic property,\n(<field-name> above).\n\nUse :extends to optionally inherit required fields from other interface objects.\n\nOptionally include <docstring> to detail information on the interface in <help>.\nStatic methods support keyword runtime types exactly like <lambda>.\n\nSee <object-system> in <Topics> for more high-level object orientation details.\nSee <class> for more detailed object orientation\ndetails. See <meta-object> in <Intrinsic-Types> for more type details.\n\nFor example:\n  (define-interface IHasName\n    (:static VALUE 10)\n    name)\n\n  (define-interface IHasAge\n    age)\n\n  (define-interface IPerson (:extends IHasName IHasAge))\n\n  (define-class Person (:implements IPerson)\n    (name \"\")\n    (age 0))";
+      return "@help:Syntax:Objects\nCreates an anonymous interface. Similar to classes, BUT cannot be instantiated\nvia a constructor.\n  * Required property names are denoted by symbols (see <field-name>).\n  * Required method signatures are denoted by procedures without bodies\n    (see <method-name>).\n\nUse :extends to optionally inherit required fields from other interface objects.\n\nOptionally include <docstring> to detail information on the interface in <help>.\nStatic and required methods support keyword runtime types exactly like <lambda>.\n\nSee <object-system> in <Topics> for more high-level object orientation details.\nSee <class> for more detailed object orientation details. See <meta-object> in\n<Intrinsic-Types> for more type details.\n\nFor example:\n  (define-interface IHasName\n    (:static VALUE 10)\n    name)\n\n  (define-interface IHasAge\n    age\n    (:num (get-age))\n    (:void (set-age! :num age)))\n\n  (define-interface IPerson (:extends IHasName IHasAge))\n\n  (define-class Person (:implements IPerson)\n    (name \"\")\n    (age 0)\n    (:num (get-age)\n      self.age)\n    (:void (set-age! :num age)\n      (set! self.age age)))";
+    }
+
+    static private String INTERFACE_MACRO_SIGNATURE = "(interface <interfaces-expr> <prop> ...)";
+
+    // Class to store parsed interface properties
+    private static class InterfaceProperties {
+      public Datum staticProps;
+      public Datum instanceSymbols;
+      public Datum instanceMethodSignatures;
+      public InterfaceProperties(Datum staticProps, Datum instanceSymbols, Datum instanceMethodSignatures) {
+        this.staticProps = staticProps;
+        this.instanceSymbols = instanceSymbols;
+        this.instanceMethodSignatures = instanceMethodSignatures;
+      }
     }
 
     // Returns the list of implemented interfaces if exists, else NIL
@@ -593,24 +612,51 @@ public class ObjectPrimitives {
     }
 
     // Returns a pair of lists of static & non-static properties stripped of :static, else NIL
-    //   => Also converts static inlined methods to lambdas!
+    //   => Also converts static/type-signature inlined methods to lambdas!
     //   => Also yields instance properties as quoted values!
-    public static escm.util.Pair<Datum,Datum> getStaticAndNonStaticProperties(ArrayList<Datum> parameters, Datum properties) throws Exception {
-      if(!(properties instanceof Pair)) return new escm.util.Pair<Datum,Datum>(Nil.VALUE,Nil.VALUE);
+    //   => Also yields type-signatures for required instance methods!
+    public static InterfaceProperties parseInterfaceProperties(ArrayList<Datum> parameters, Datum properties) throws Exception {
+      if(!(properties instanceof Pair)) return new InterfaceProperties(Nil.VALUE,Nil.VALUE,Nil.VALUE);
       Pair p = (Pair)properties;
-      escm.util.Pair<Datum,Datum> tails = getStaticAndNonStaticProperties(parameters,p.cdr());
+      InterfaceProperties tails = parseInterfaceProperties(parameters,p.cdr());
       if(ClassMacro.isStaticProperty(p.car())) {
         Datum property = ((Pair)p.car()).cdr();
         if(ClassMacro.isInlinedMethod(property)) {
-          return new escm.util.Pair<Datum,Datum>(new Pair(ClassMacro.expandInlinedMethod((Pair)property),tails.first),tails.second);
+          return new InterfaceProperties(
+            new Pair(ClassMacro.expandInlinedMethod((Pair)property),tails.staticProps),
+            tails.instanceSymbols,
+            tails.instanceMethodSignatures
+          );
         } else {
-          return new escm.util.Pair<Datum,Datum>(new Pair(property,tails.first),tails.second);
+          return new InterfaceProperties(
+            new Pair(property,tails.staticProps),
+            tails.instanceSymbols,
+            tails.instanceMethodSignatures
+          );
         }
       } else {
         Datum property = p.car();
-        if(!(property instanceof Symbol))
-          throw new Exceptionf("'(interface <interfaces-expr> <prop> ...) non-static <prop> %s isn't a symbol: %s", property.profile(), Exceptionf.profileArgs(parameters));
-        return new escm.util.Pair<Datum,Datum>(tails.first,new Pair(Pair.List(CorePrimitives.QUOTE,property),tails.second));
+        if(property instanceof Symbol) {
+          return new InterfaceProperties(
+            tails.staticProps,
+            new Pair(Pair.List(CorePrimitives.QUOTE,property),tails.instanceSymbols),
+            tails.instanceMethodSignatures
+          );
+        } else { // if (is a type-signature method)
+          if(ClassMacro.isInlinedMethod(property)) {
+            return new InterfaceProperties(
+              tails.staticProps,
+              tails.instanceSymbols,
+              new Pair(ClassMacro.expandInlinedMethod((Pair)property),tails.instanceMethodSignatures)
+            );
+          } else {
+            return new InterfaceProperties(
+              tails.staticProps,
+              tails.instanceSymbols,
+              new Pair(property,tails.instanceMethodSignatures)
+            );
+          }
+        }
       }
     }
 
@@ -622,14 +668,17 @@ public class ObjectPrimitives {
       escm.util.Pair<Datum,Datum> interfacesListAndDocstring = getInterfacesAndDocstring(x);
       // Extract "has-a"'s
       Datum properties = getProperties(interfacesListAndDocstring,x);
-      escm.util.Pair<Datum,Datum> staticAndNonStaticProps = getStaticAndNonStaticProperties(parameters,properties);
-      escm.util.Pair<Datum,Datum> staticPropNamesAndVals = ClassMacro.parsePropertyNamesAndValues(parameters,staticAndNonStaticProps.first);
+      InterfaceProperties interfaceProps = parseInterfaceProperties(parameters,properties);
+      escm.util.Pair<Datum,Datum> staticPropNamesAndVals = ClassMacro.parsePropertyNamesAndValues(parameters,interfaceProps.staticProps,INTERFACE_MACRO_SIGNATURE);
+      escm.util.Pair<Datum,Datum> methodSignaturePropNamesAndVals = ClassMacro.parsePropertyNamesAndValues(parameters,interfaceProps.instanceMethodSignatures,INTERFACE_MACRO_SIGNATURE);
       // Generate the call to an internal primitive that makes our interface!
       return Pair.List(ESCM_OO_INTERFACE,interfaceName,interfacesListAndDocstring.second,
         new Pair(CorePrimitives.LIST,interfacesListAndDocstring.first),
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.first),
         new Pair(CorePrimitives.LIST,staticPropNamesAndVals.second),
-        new Pair(CorePrimitives.LIST,staticAndNonStaticProps.second));
+        new Pair(CorePrimitives.LIST,methodSignaturePropNamesAndVals.first),
+        new Pair(CorePrimitives.LIST,methodSignaturePropNamesAndVals.second),
+        new Pair(CorePrimitives.LIST,interfaceProps.instanceSymbols));
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -669,6 +718,7 @@ public class ObjectPrimitives {
           Pair.List(EXTENDS,new Symbol("<interface>"),Signature.VARIADIC),
           new Symbol("<optional-docstring>"),
           new Symbol("<field-name>"),
+          Pair.List(Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC)),
           Pair.List(new Keyword("static"),new Symbol("<field-name>"),new Symbol("<default-value>")),
           Pair.List(new Keyword("static"),Pair.List(new Symbol("<method-name>"),new Symbol("<parameter>"),Signature.VARIADIC),new Symbol("<body>"),Signature.VARIADIC),
           Signature.VARIADIC
@@ -676,7 +726,7 @@ public class ObjectPrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Objects\nSimple wrapper macro combining <define> and <interface> to bind <interface-name>.\nAlso generates a (<interface-name>? <obj>) predicate procedure!\n\nOptionally include <docstring> to detail information on the interface in <help>.\nStatic methods support keyword runtime types exactly like <lambda>.\n\nAliased by <definterface>.\n\nSee <object-system> in <Topics> for more high-level object orientation details.\nSee <class> for more detailed object orientation\ndetails. See <meta-object> in <Intrinsic-Types> for more type details.";
+      return "@help:Syntax:Objects\nSimple wrapper macro combining <define> and <interface> to bind <interface-name>.\nAlso generates a (<interface-name>? <obj>) predicate procedure!\n\nOptionally include <docstring> to detail information on the interface in <help>.\nStatic and required methods support keyword runtime types exactly like <lambda>.\n\nAliased by <definterface>.\n\nSee <object-system> in <Topics> for more high-level object orientation details.\nSee <class> for more detailed object orientation details. See <meta-object> in\n<Intrinsic-Types> for more type details.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -718,7 +768,7 @@ public class ObjectPrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Objects\nInitialize the super object via its non-nullary constructor.\n\nONLY valid as the FIRST expression in a class constructor:\nany other use risks undefined behavior!\n\nSee <object-system> in <Topics> for more high-level object orientation details.\nSee <class> for more detailed object orientation\ndetails. See <meta-object> in <Intrinsic-Types> for more type details.";
+      return "@help:Syntax:Objects\nInitialize the super object via its non-nullary constructor.\n\nONLY valid as the FIRST expression in a class constructor:\nany other use risks undefined behavior!\n\nSee <object-system> in <Topics> for more high-level object orientation details.\nSee <class> for more detailed object orientation details. See <meta-object> in\n<Intrinsic-Types> for more type details.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
@@ -750,7 +800,7 @@ public class ObjectPrimitives {
     }
 
     public String docstring() {
-      return "@help:Syntax:Objects\nAlternative to \"super!\" that initializes the super object by\napplying its <new> constructor to <list-of-args>.\n\nONLY valid as the FIRST expression in a class constructor:\nany other use risks undefined behavior!\n\nSee <object-system> in <Topics> for more high-level object orientation details.\nSee <class> for more detailed object orientation\ndetails. See <meta-object> in <Intrinsic-Types> for more type details.";
+      return "@help:Syntax:Objects\nAlternative to \"super!\" that initializes the super object by\napplying its <new> constructor to <list-of-args>.\n\nONLY valid as the FIRST expression in a class constructor:\nany other use risks undefined behavior!\n\nSee <object-system> in <Topics> for more high-level object orientation details.\nSee <class> for more detailed object orientation details. See <meta-object> in\n<Intrinsic-Types> for more type details.";
     }
     
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

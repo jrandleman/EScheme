@@ -478,4 +478,8 @@ public class TypeTree {
     String name = type.value();
     return parseType(name,env,gen,name.length(),1).first;
   }
+
+  public static <ParseValue> ParseValue walk(String type, Environment env, ValueGenerator<ParseValue> gen) throws Exception {
+    return parseType(type,env,gen,type.length(),0).first;
+  }
 }

@@ -155,3 +155,20 @@
 (ut (number? (string-contains (docstring DocstringInterface) "Interface <docstring> test.")) #t)
 (define-interface DocstringInterface (:extends Interface1) "Interface <docstring> test." field)
 (ut (number? (string-contains (docstring DocstringInterface) "Interface <docstring> test.")) #t)
+
+; verify we support required method signatures in interfaces
+(define-interface InterfaceWithTypeSignatures 
+  ((generic-nullary-method)) ; typeless nullary
+  (:num (unary-method :str x)) ; typed unary
+  (binary-method ; typed n-ary
+    (fn
+      (:num (:int x :char y))
+      (:int (:vec x :int y)))))
+(ut 
+  (class? 
+    (class (:implements InterfaceWithTypeSignatures) 
+      ((generic-nullary-method) #f)
+      (:num (unary-method :str x) (len x))
+      (binary-method 
+        (fn (:num (:int x :char y) x) (:int (:vec x :int y) (len x))))))
+  #t)

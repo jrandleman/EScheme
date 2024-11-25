@@ -117,7 +117,7 @@ public class Interpreter {
             argObj.define(state,new TypeAlias(state.env,(Keyword)state.cvr));
             aliasName = argObj.toChainString();
           }
-          if(TypeAlias.isCyclic(state.env,new Keyword(aliasName)))
+          if(TypeAlias.isCyclic(state.env,aliasName))
             throw new Exceptionf("VM: Invalid \"define-type\" cyclic instruction: (define-type %s %s)", aliasName, state.cvr.write());
           state.cvr = escm.type.Void.VALUE;
           ++state.cii;

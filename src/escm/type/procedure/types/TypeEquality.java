@@ -299,16 +299,25 @@ public class TypeEquality {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // Type Comparison
+  // Type Equality Tree Creation
   private static NodeGenerator NODE_GENERATOR = new NodeGenerator();
-
 
   public static Node tree(Keyword key, Environment env) throws Exception {
     return TypeTree.walk(key,env,NODE_GENERATOR);
   }
 
+  public static Node tree(String key, Environment env) throws Exception {
+    return TypeTree.walk(key,env,NODE_GENERATOR);
+  }
 
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Type Comparison
   public static boolean sameType(Keyword key1, Environment env1, Keyword key2, Environment env2) throws Exception {
+    return tree(key1,env1).equals(tree(key2,env2));
+  }
+
+  public static boolean sameType(String key1, Environment env1, String key2, Environment env2) throws Exception {
     return tree(key1,env1).equals(tree(key2,env2));
   }
 }

@@ -13,6 +13,8 @@
 
 package escm.type.oo;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import escm.util.error.Exceptionf;
 import escm.util.Trampoline;
@@ -229,7 +231,8 @@ public class EscmClass extends MetaObject implements Callable {
     if(methods.size() > 0) {
       if(printed) sb.append("  ----------------------------------------------------------------------\n");
       sb.append("  "+propType+" Methods:");
-      for(ConcurrentHashMap.Entry<String,CompoundProcedure> method : methods.entrySet()) {
+      TreeMap<String,CompoundProcedure> sortedMethods = new TreeMap<String,CompoundProcedure>(methods);
+      for(Map.Entry<String,CompoundProcedure> method : sortedMethods.entrySet()) {
         accumulateMethod(sb,isStaticProps,method.getKey(),method.getValue());
       }
       sb.append("\n");
@@ -262,13 +265,15 @@ public class EscmClass extends MetaObject implements Callable {
     this.interfaces = interfaces;
     this.props = props;
     this.objectProps = objectProps;
+    if(name != null) {
+      this.props.put("name",new Symbol(name));
+    }
     for(EscmInterface iface : interfaces) {
       iface.confirmSatisfiedBy(this);
     }
     if(name == null) {
       this.convertProceduresToMethods();
     } else {
-      this.props.put("name",new Symbol(name));
       this.convertProceduresToNamedMethods();
       this.bindInstanceMethodsWithName();
     }
@@ -313,9 +318,22 @@ public class EscmClass extends MetaObject implements Callable {
   public static interface InstancePropertyIterationProcedure {
     public boolean exec(String prop); // returns whether to continue
   }
+  public static interface InstanceMethodIterationProcedure {
+    public boolean exec(CompoundProcedure typeSig); // returns whether to continue
+  }
 
   public boolean hasInstanceProp(String name) throws Exception {
     return objectProps.containsKey(name);
+  }
+
+  public boolean hasInstanceMethod(String name, CompoundProcedure typeSig) throws Exception {
+    Datum val = objectProps.get(name);
+    if(val == null || !(val instanceof CompoundProcedure)) return false;
+    try {
+      return ((CompoundProcedure)val).sameSignatures(typeSig);
+    } catch(Exception e) {
+      return false;
+    }
   }
 
   public void forEachInstanceProperty(InstancePropertyIterationProcedure ipp) {

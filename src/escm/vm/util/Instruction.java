@@ -41,8 +41,8 @@ public class Instruction implements Serializable {
 
   ////////////////////////////////////////////////////////////////////////////
   // Instruction Designation & Argument
-  public int operation;
-  public Datum argument;
+  public final int operation;
+  public final Datum argument;
 
 
   ////////////////////////////////////////////////////////////////////////////

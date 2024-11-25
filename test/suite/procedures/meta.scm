@@ -59,16 +59,15 @@
 (ut (type? :int-or-char) #t)
 (ut (type? :char-or-int) #f)
 (ut (type? :int|char) #t)
-(ut (type? :false-primitive) #f)
+(ut (type? :ClassNameThatDoesNotExist) #f)
 (ut (type? :vec<int|char>) #t)
-(ut (type? :vec<false-primitive>) #f)
+(ut (type? :vec<ClassNameThatDoesNotExist>) #f)
 
 (ut (type? 42 :int) #t)
 (ut (type? 42 :str) #f)
 (ut (type? 42 :int-or-char) #t) ; support for passing alias objects too
 (ut (type? #\a :int-or-char) #t)
 (ut (type? "a" :int-or-char) #f)
-(ut (type? 42 :ClassNameThatDoesNotExist) #f) ; doesn't throw for non-existent types
 
 (ut (type=? :int :str) #f)
 (ut (type=? :int|str :str|int) #t)
