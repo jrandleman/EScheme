@@ -188,7 +188,7 @@ Notes on optional and variadic parameters:
 ### `class`/`define-class` and `interface`/`define-interface`
 
 - `class` supports types on instance and static methods
-- `interface` only supports types on static methods
+- `interface` supports types on instance method signatures and static methods
 - `define-class` uses the same type syntax as `class`
   - as `define-interface` does with `interface`
 
@@ -212,6 +212,12 @@ Notes on optional and variadic parameters:
 
 
 (define-interface InterfaceName
+  ; Instance signature: typed <:int> return and <:list>/<:char> parameters
+  (:int (method-name-1 :list a :char b . rest-args))
+
+  ; Instance signature: typeless return, required <:flo> and optional <:int> parameters
+  ((method-name-2 :flo a (:int b 42)))
+
   ; Static: typed <:int> return and <:list>/<:char> parameters
   (:static :int (method-name-1 :list a :char b . rest-args)
     (length (cons b (cons a rest-args))))
