@@ -126,7 +126,7 @@ The escm VM has built-in support for interpretting object access chains, hence
 `(define obj.prop1.prop2)` is perfectly valid bytecode syntax.
 
 As such, all instructions that set or evaluate a symbolic datum support this
-syntax. These include: `define`, `set!`, `load`, `call`, `push`, & `return`.
+syntax.
 
 ---
 
