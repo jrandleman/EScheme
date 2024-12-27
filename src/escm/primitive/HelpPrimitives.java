@@ -490,7 +490,10 @@ public class HelpPrimitives {
         FolderNode rootDir = (FolderNode)root;
         if(rootDir.name.equals(HelpNode.UNCATEGORIZED_VARIABLES_FOLDER_NAME)) return "";
         StringBuilder sb = new StringBuilder();
-        String link = rootDir.name.equals("Syntax") ? "Syntax-1" : rootDir.name; // clashes with <syntax?> from <:~:Procedures>
+        String link = rootDir.name;
+        if(link.equals("Syntax")) {
+          link = "Syntax-2"; // clashes with <syntax?> from <:~:Procedures>
+        }
         sb.append(indents+"* ["+rootDir.name+"](#"+link+")\n");
         for(Map.Entry<String,HelpNode> entry : rootDir.getOrderedChildren().entrySet()) {
           sb.append(getTableOfContents(entry.getValue(),indents+"  "));

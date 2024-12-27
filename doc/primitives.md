@@ -30,7 +30,7 @@
   * [Utilities](#Utilities)
   * [Vectors](#Vectors)
   * [Void](#Void)
-* [Syntax](#Syntax-1)
+* [Syntax](#Syntax-2)
   * [Core](#Core)
   * [Generators](#Generators)
   * [Modules](#Modules)
