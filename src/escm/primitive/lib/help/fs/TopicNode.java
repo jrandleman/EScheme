@@ -52,7 +52,7 @@ public class TopicNode extends HelpNode {
     sb.append("\n-------------------------------------------------------------------------------\n");
     sb.append(bolds+" `"+name+"`\n\n");
     sb.append(bolds+"# Description:\n");
-    sb.append("```\n"+description.replaceAll("`", "&#96;")+"\n```\n");
+    sb.append("```\n"+description+"\n```\n");
     return sb.toString();
   }
 

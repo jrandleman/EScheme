@@ -10247,18 +10247,18 @@ generated from classes can be mutated (meaning one could create mutable
 lists via the object system!). Note that vectors and hashmaps are mutable
 too.
 
-In addition to Java threads, EScheme also supports JavaScript's &#96;Promise&#96;
+In addition to Java threads, EScheme also supports JavaScript's `Promise`
 concurrency paradigm. For synchronization, EScheme exposes Java reentrant
-locks via &#96;mutex&#96;, and supports Clojure's &#96;dosync&#96; macro!
+locks via `mutex`, and supports Clojure's `dosync` macro!
 
 ---
 
 ## Using Concurrent Primitives
 
-- Spawn threads via the &#96;thread&#96; procedure.
-- Create promises via the &#96;promise&#96; procedure.
-- Get a reentrant lock via the &#96;mutex&#96; procedure.
-- Check out the &#96;help&#96; function's &#96;Procedures > Concurrency&#96; section for more!
+- Spawn threads via the `thread` procedure.
+- Create promises via the `promise` procedure.
+- Get a reentrant lock via the `mutex` procedure.
+- Check out the `help` function's `Procedures > Concurrency` section for more!
 
 ---
 
@@ -10275,8 +10275,8 @@ locks via &#96;mutex&#96;, and supports Clojure's &#96;dosync&#96; macro!
 
 - Each thread has a so-called 'dynamic environment', wherein a set of variable
   bindings is kept globally within the thread while being hidden from other threads.
-  - Mutate a thread's dynamic environment via the &#96;thread-define&#96;, &#96;thread-set!&#96;,
-    and &#96;thread-get&#96; procedures!
+  - Mutate a thread's dynamic environment via the `thread-define`, `thread-set!`,
+    and `thread-get` procedures!
 - After querying for a variable that doesn't exist in a thread's dynamic environment,
   the 'meta thread''s dynamic environment is checked. If an entry is found in the
   meta thread's dynamic environment, a local copy is cached into the current thread's
@@ -10284,7 +10284,7 @@ locks via &#96;mutex&#96;, and supports Clojure's &#96;dosync&#96; macro!
 - This allows for us to have 'environment-global-thread-local' variables! State can
   be shared & operated upon by many procedures without having to lock, since each
   thread only ever operates on a local copy of the state!
-  - This is used by &#96;dynamic-wind&#96; in order to maintain thread-local winds!
+  - This is used by `dynamic-wind` in order to maintain thread-local winds!
 ```
 
 -------------------------------------------------------------------------------
@@ -10367,175 +10367,157 @@ as a macro!
 
 ## Motivation and Overview
 
-The value created by an &#96;import&#96; expression.
+The value created by an `import` expression.
 
 Modules present an alternative to Scheme's usual inter-file semantics.
 
-The &#96;load&#96; function has always served as a means by which to execute the code
+The `load` function has always served as a means by which to execute the code
 of another Scheme file in the calling file's global environment. This simplicity
-is a double edged sword though: while making &#96;load&#96; easy to implement, it leaves
+is a double edged sword though: while making `load` easy to implement, it leaves
 much to be desired with respect to enabling encapsulation of code across
 coordinated Scheme files.
 
-As such, in addition to &#96;load&#96;, EScheme offers a minimalistic module system
+As such, in addition to `load`, EScheme offers a minimalistic module system
 that strives to enable file-specific encapsulation of EScheme code. Files
-processed via the &#96;import&#96; macro are defined as &#96;module&#96; objects within the
-enclosing enivironment. See the &#96;import&#96; details below for more information on
+processed via the `import` macro are defined as `module` objects within the
+enclosing enivironment. See the `import` details below for more information on
 how EScheme evaluates modules.
 
 Each module has its own isolated global environment, and has automatic access
 to EScheme's standard library. Note that this means that operations that depend
-on global variables (e.g. &#96;load-once&#96;) are hence only able to operate on
+on global variables (e.g. `load-once`) are hence only able to operate on
 a module-relative basis.
 
-- Note that &#96;dosync&#96; notably works across modules, since its internal lock was
-  created via &#96;define-parameter&#96;. Use &#96;dosync-module&#96; for module-relative locking
+- Note that `dosync` notably works across modules, since its internal lock was
+  created via `define-parameter`. Use `dosync-module` for module-relative locking
   behavior.
 
 Both variables and macros can be accessed from a module by using EScheme's
-dot-notation: for example, to access variable &#96;PersonClass&#96; from module &#96;Mod&#96;,
-we write &#96;Mod.PersonClass&#96;.
+dot-notation: for example, to access variable `PersonClass` from module `Mod`,
+we write `Mod.PersonClass`.
 
 Further note that imported modules are cached! Importing the same module
 multiple times does not cause multiple evaluations of that module. Use the
-&#96;reload&#96; macro if you'd like to forcefully re-evaluate the module in question.
+`reload` macro if you'd like to forcefully re-evaluate the module in question.
 
-Additionally, the &#96;from&#96; macro may be used to load specific variables within
+Additionally, the `from` macro may be used to load specific variables within
 a given module, without defining that module itself as a local variable.
 
 Modules may be introspected upon by 2 primitives:
 
-1. &#96;module-path&#96;: yield the absolute file path to the module (this is what
+1. `module-path`: yield the absolute file path to the module (this is what
    distinguishes one module from another under the hood).
-2. &#96;module-bindings&#96;: yield a list of the symbols defined in a module (beware:
+2. `module-bindings`: yield a list of the symbols defined in a module (beware:
    every module redefines the entire EScheme standard library!).
 
-Note that the 'meta-thread's environment (see &#96;thread-define&#96;) is module
+Note that the 'meta-thread's environment (see `thread-define`) is module
 independant!
 
-Use the &#96;*import*&#96; variable to determine if the current file was &#96;import&#96;ed.
-Can combine with &#96;unless&#96; to mimic Python's &#96;if __name__=='__main__':&#96; pattern:
+Use the `*import*` variable to determine if the current file was `import`ed.
+Can combine with `unless` to mimic Python's `if __name__=='__main__':` pattern:
 
-&#96;&#96;&#96;scheme
   (unless *import*
     <execute-main-escheme-code-here> ...)
-&#96;&#96;&#96;
 
 Lastly, note that the concept of 'parameter' variables exist in order to
-have global state shared across modules. See the &#96;define-parameter&#96; and
-&#96;parameter?&#96; 'help' entries for more details.
+have global state shared across modules. See the `define-parameter` and
+`parameter?` 'help' entries for more details.
 
 ---
 
-## Accessing variable &#96;<var>&#96; from module &#96;<module>&#96;
+## Accessing variable `<var>` from module `<module>`
 
-&#96;&#96;&#96;scheme
 <module>.<var>
-&#96;&#96;&#96;
 
 ---
 
 ## Regular Imports
 
-&#96;&#96;&#96;scheme
 (import <module-path-symbol>)
 (import <module-path-symbol> :as <module-alias-symbol>)
 (import <filepath-string> <module-path-symbol>)
 (import <filepath-string> <module-path-symbol> :as <module-alias-symbol>)
-&#96;&#96;&#96;
 
-Import &#96;<module-path-symbol>&#96; as a module variable in the current environment,
-where &#96;<module-path-symbol>&#96; represents an Escheme (or &#96;serialize&#96;d!) file.
-Seeks the module from &#96;<filepath-string>&#96;, if provided.
+Import `<module-path-symbol>` as a module variable in the current environment,
+where `<module-path-symbol>` represents an Escheme (or `serialize`d!) file.
+Seeks the module from `<filepath-string>`, if provided.
 
-Module variables are named &#96;<module-path-symbol>&#96; by default, though there are
+Module variables are named `<module-path-symbol>` by default, though there are
 2 caveats:
 
-1.  &#96;<module-alias-symbol>&#96; is provided: this overrides the default name and
+1.  `<module-alias-symbol>` is provided: this overrides the default name and
     will be what the module is loaded into the environment as.
 
-2.  &#96;<module-path-symbol>&#96; is a dotted list of symbols: this is how we denote
+2.  `<module-path-symbol>` is a dotted list of symbols: this is how we denote
     access to a module that is in a different folder than the current
     directory. For example, suppose we have the following directory layout:
 
-    &#96;&#96;&#96;
     Root
     |____ Folder1
     |     |_______ Module.scm
     |
     |____ Folder2
           |_______ Main.scm
-    &#96;&#96;&#96;
+    
+    For `Main.scm` to import `Module.scm`, it would contain:
 
-    For &#96;Main.scm&#96; to import &#96;Module.scm&#96;, it would contain:
-
-    &#96;&#96;&#96;scheme
     (import Folder1.Module) ; within 'Main.scm'. '(import Root.Folder1.Module)' also works
-    &#96;&#96;&#96;
-
-    In this example, the module variable would be named &#96;Module&#96;. Note that
-    the file extension of the target module file is left out from the &#96;import&#96;
+    
+    In this example, the module variable would be named `Module`. Note that
+    the file extension of the target module file is left out from the `import`
     expression.
 
-With regards to locating the file pointed to by &#96;<module-path-symbol>&#96;, EScheme
+With regards to locating the file pointed to by `<module-path-symbol>`, EScheme
 will first attempt to find it along the file path tree from the location that
-invoked the &#96;import&#96; expression. Note that this makes executing &#96;(import #path Module)&#96;
-redundant, in contrast to the &#96;load&#96; function.
+invoked the `import` expression. Note that this makes executing `(import #path Module)`
+redundant, in contrast to the `load` function.
 
-Imported modules are also cached across modules, so every instance of &#96;(import Module)&#96;
-will reference the same &#96;Module&#96; module object. Note that you can force a module
-to be reloaded via the &#96;reload&#96; special form.
+Imported modules are also cached across modules, so every instance of `(import Module)`
+will reference the same `Module` module object. Note that you can force a module
+to be reloaded via the `reload` special form.
 
-See the &#96;from&#96; details below for an alternative to &#96;import&#96; that extracts specific
-fields from the &#96;<module-path-symbol>&#96; module, without adding the module itself to
+See the `from` details below for an alternative to `import` that extracts specific
+fields from the `<module-path-symbol>` module, without adding the module itself to
 your current environment's namespace.
 
 ---
 
 ## Reloading Modules
 
-&#96;&#96;&#96;scheme
 (reload <module-alias-symbol>)
-&#96;&#96;&#96;
 
-Forcefully re-evaluate &#96;<module-alias-symbol>&#96; (note that &#96;import&#96; caches
+Forcefully re-evaluate `<module-alias-symbol>` (note that `import` caches
 modules by default).
 
 ---
 
 ## Loading Module Variables
 
-&#96;&#96;&#96;scheme
 (from <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ...)
 (from <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ... :as <alias1-symbol> <alias2-symbol> ...)
 (from <filepath-string> <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ...)
 (from <filepath-string> <module-path-symbol> :import <obj1-symbol> <obj2-symbol> ... :as <alias1-symbol> <alias2-symbol> ...)
-&#96;&#96;&#96;
 
-Import &#96;<obj1-symbol> <obj2-symbol> ...&#96; from &#96;<module-path-symbol>&#96;, without
+Import `<obj1-symbol> <obj2-symbol> ...` from `<module-path-symbol>`, without
 exposing the module itself as a variable within the current environment.
 
 Equivalent to:
 
-&#96;&#96;&#96;scheme
 (begin
   (import <module-path-symbol> :as <hidden-name>)
   (define <obj1-symbol> <hidden-name>.<obj1-symbol>)
   (define <obj2-symbol> <hidden-name>.<obj2-symbol>)
   ...)
-&#96;&#96;&#96;
 
-Or, if &#96;<alias1-symbol> ...&#96; is provided:
+Or, if `<alias1-symbol> ...` is provided:
 
-&#96;&#96;&#96;scheme
 (begin
   (import <module-path-symbol> :as <hidden-name>)
   (define <alias1-symbol> <hidden-name>.<obj1-symbol>)
   (define <alias2-symbol> <hidden-name>.<obj2-symbol>)
   ...)
-&#96;&#96;&#96;
 
-If given &#96;<filepath-string>&#96;, &#96;from&#96; simply adds it to the above &#96;import&#96;
+If given `<filepath-string>`, `from` simply adds it to the above `import`
 statement.
 
 ---
@@ -10544,26 +10526,20 @@ statement.
 
 ### Module Predicate
 
-&#96;&#96;&#96;scheme
 (module? <obj>)
-&#96;&#96;&#96;
 
 ### Module Absolute Path Source Location
 
-&#96;&#96;&#96;scheme
 (module-path <module>)
-&#96;&#96;&#96;
 
 The absolute file path string of the module file's location, what
 distinguishes one module from another under the hood.
 
 ### Module Variable Name Bindings List
 
-&#96;&#96;&#96;scheme
 (module-bindings <module>)
-&#96;&#96;&#96;
 
-A list of variable symbols defined in &#96;<module>&#96;. Beware that all modules load
+A list of variable symbols defined in `<module>`. Beware that all modules load
 all of EScheme's standard library by default!
 ```
 
@@ -10582,40 +10558,39 @@ EScheme has a totally optional object system, including support for:
 
 - Single inheritance for classes, multiple inheritance for interfaces
 - Static support:
-  - &#96;:static&#96; fields & methods for class/interface-local properties
-    - implied when &#96;define&#96;ing a new class/interface property!
-- &#96;self&#96; semantics:
-  - instance methods have &#96;self&#96; dynamically bound to the calling object
-  - static methods have &#96;self&#96; bound to the class datum they belong to
-- &#96;super&#96; semantics:
-  - instance methods have &#96;super&#96; statically bound to the super object
-  - static methods have &#96;super&#96; bound to the super class
+  - `:static` fields & methods for class/interface-local properties
+    - implied when `define`ing a new class/interface property!
+- `self` semantics:
+  - instance methods have `self` dynamically bound to the calling object
+  - static methods have `self` bound to the class datum they belong to
+- `super` semantics:
+  - instance methods have `super` statically bound to the super object
+  - static methods have `super` bound to the super class
 - Referring to static props in instance methods:
-  - &#96;<classname>.<static-prop>&#96;
-  - &#96;self.class.<static-prop>&#96;
+  - `<classname>.<static-prop>`
+  - `self.class.<static-prop>`
 - Special object properties:
-  - &#96;new&#96; pseudo-method constructor syntax
-    - Doesn't correlate to an actual method named &#96;new&#96;
-  - &#96;class&#96; field to access the class of the current object
-  - &#96;->procedure&#96; method to overload application for objects
+  - `new` pseudo-method constructor syntax
+    - Doesn't correlate to an actual method named `new`
+  - `class` field to access the class of the current object
+  - `->procedure` method to overload application for objects
     - Applicable objects with this method are called "functor"s
 - Special class and interface property:
-  - &#96;name&#96;: the symbolic name of the class/interface
+  - `name`: the symbolic name of the class/interface
     - Only present if the class/interface is NOT anonymous!
 - All methods have the following variables automatically defined:
-  - &#96;self&#96; ; the polymorphic calling object
-  - &#96;super&#96; ; the super object if exists, else #f
-- Bytecode-level support for &#96;(define obj.prop)&#96; &#96;(set! obj.prop)&#96; syntax
+  - `self` ; the polymorphic calling object
+  - `super` ; the super object if exists, else #f
+- Bytecode-level support for `(define obj.prop)` `(set! obj.prop)` syntax
 
 ---
 
 ## Named Class Syntax:
 
-### Also generates a &#96;(<class-name>? <obj>)&#96; predicate procedure!
+### Also generates a `(<class-name>? <obj>)` predicate procedure!
 
-### May use &#96;defclass&#96; to alias &#96;define-class&#96;!
+### May use `defclass` to alias `define-class`!
 
-&#96;&#96;&#96;scheme
 (define-class <class-name>
   (:extends <class>) (:implements <interface> ...) ; both are optional
   <optional-docstring>
@@ -10623,30 +10598,26 @@ EScheme has a totally optional object system, including support for:
   (:static (<method-name> <param> ...) <body> ...)
   (<name> <value>)
   ((<method-name> <param> ...) <body> ...))
-&#96;&#96;&#96;
 
 ---
 
 ## Anonymous Class Syntax:
 
-&#96;&#96;&#96;scheme
 (class (:extends <class>) (:implements <interface> ...) ; both are optional
   <optional-docstring>
   (:static <name> <value>)
   (:static (<method-name> <param> ...) <body> ...)
   (<name> <value>)
   ((<method-name> <param> ...) <body> ...))
-&#96;&#96;&#96;
 
 ---
 
 ## Named Interface Syntax:
 
-### Also generates an &#96;(<interface-name>? <obj>)&#96; predicate procedure!
+### Also generates an `(<interface-name>? <obj>)` predicate procedure!
 
-### May use &#96;definterface&#96; to alias &#96;define-interface&#96;!
+### May use `definterface` to alias `define-interface`!
 
-&#96;&#96;&#96;scheme
 (define-interface <interface-name>
   (:extends <interface> ...) ; ":extends" is optional
   <optional-docstring>
@@ -10654,31 +10625,28 @@ EScheme has a totally optional object system, including support for:
   (:static (<method-name> <param> ...) <body> ...)
   <name> ; required property name(s) for a class to have
   ((<method-name> <param> ...))) ; required method signature(s) for a class to have
-&#96;&#96;&#96;
 
 ---
 
 ## Anonymous Interface Syntax:
 
-&#96;&#96;&#96;scheme
 (interface (:extends <interface> ...) ; ":extends" is optional
   <optional-docstring>
   (:static <name> <value>)
   (:static (<method-name> <param> ...) <body> ...)
   <name> ; required property name(s) for a class to have
   ((<method-name> <param> ...))) ; required method signature(s) for a class to have
-&#96;&#96;&#96;
 
 ---
 
 ## Initializing Super Object Constructors
 
-The &#96;(super! <param> ...)&#96; macro may be used within object constructors to
+The `(super! <param> ...)` macro may be used within object constructors to
 initialize an object's super class with a set of parameters.
 
 - Super objects with a "nullary" constructor are automatically constructed.
-- &#96;super!&#96; must be used immediately in constructors to avoid undefined behavior!
-- Use &#96;(apply-super! <param-list>)&#96; to initialize the super object with a list.
+- `super!` must be used immediately in constructors to avoid undefined behavior!
+- Use `(apply-super! <param-list>)` to initialize the super object with a list.
 ```
 
 -------------------------------------------------------------------------------
@@ -10752,9 +10720,9 @@ OF NOTE: The semantics of thread/port serialization won't be an issue for 99.999
 
 ## Overview
 
-EScheme denotes types with keywords, and "union types" via &#96;|&#96; syntax.
+EScheme denotes types with keywords, and "union types" via `|` syntax.
 
-- EX: &#96;:str|num&#96; represents either a string or a number.
+- EX: `:str|num` represents either a string or a number.
 
 EScheme types are typically either a "primitive" or "collection" type.
 If a type is neither a primitive nor a collection, it is presumed to
@@ -10763,7 +10731,7 @@ resolve to a valid class, interface, or type-alias during a runtime
 type-check, an error is thrown.
 
 - Note that EScheme supports referencing classes/interfaces/aliases
-  in modules! Hence &#96;:Module.ClassName&#96; is a valid type.
+  in modules! Hence `:Module.ClassName` is a valid type.
 
 EScheme types are parsed and converted to Java functional interface
 predicates internally during compilation, with the predicates being
@@ -10773,12 +10741,11 @@ return values.
 ### EScheme Primitive Types
 
 Primitive types represent an intrinsic atomic EScheme type. Their
-type-checks are typically as fast as a single &#96;instanceof&#96; check,
-with a few exceptions like &#96;:int&#96; requiring slightly more work.
+type-checks are typically as fast as a single `instanceof` check,
+with a few exceptions like `:int` requiring slightly more work.
 
 EScheme's primitive types include:
 
-&#96;&#96;&#96;scheme
 :any
 
 :num ; aliased by ":complex"
@@ -10818,27 +10785,25 @@ EScheme's primitive types include:
 :outport
 
 :type-alias
-&#96;&#96;&#96;
 
 ### EScheme Collection Types
 
 Collection types represent an intrinsic EScheme collection type. By
 default, collections are just type-checked to match whatever type
 of collection the keyword stands for. However, collections may be
-parameterized by adding the &#96;<type>&#96; suffix in order to type-check
+parameterized by adding the `<type>` suffix in order to type-check
 their contents as well.
 
-For example, &#96;:list<str|sym>&#96; is a list where each element is either
+For example, `:list<str|sym>` is a list where each element is either
 a string or symbol.
 
 - For either a list that only has strings OR a list that only has
-  symbols, use &#96;:list<str>|list<sym>&#96;.
-- Furthermore, &#96;:pair&#96; and &#96;:map&#96; may also be parameterized with the
-  &#96;<type,type>&#96; suffix in order to type-check their keys and values.
+  symbols, use `:list<str>|list<sym>`.
+- Furthermore, `:pair` and `:map` may also be parameterized with the
+  `<type,type>` suffix in order to type-check their keys and values.
 
 EScheme's collection types include:
 
-&#96;&#96;&#96;scheme
 :vec ; vector
 :map ; hashmap
 
@@ -10847,7 +10812,6 @@ EScheme's collection types include:
 
 :ac ; associative-collection (hashmaps, vectors, lists, strings)
 :oc ; ordered-collection (vectors, lists, strings)
-&#96;&#96;&#96;
 
 ---
 
@@ -10856,14 +10820,13 @@ EScheme's collection types include:
 Notes on optional and variadic parameters:
 
 - Optional parameters only type-check user args, _not_ their default values
-  - Hence &#96;(:int a "hello")&#96; is a valid optional parameter clause
-- Variadic values cannot be typed (they're implicitly &#96;:list<any>&#96;)
+  - Hence `(:int a "hello")` is a valid optional parameter clause
+- Variadic values cannot be typed (they're implicitly `:list<any>`)
 
-### &#96;fn&#96; and &#96;defn&#96;
+### `fn` and `defn`
 
-- &#96;defn&#96; uses the same type syntax as &#96;fn&#96;
+- `defn` uses the same type syntax as `fn`
 
-&#96;&#96;&#96;scheme
 (fn
   ; Typed <:int> return and <:list>/<:char> parameters
   (:int (:list a :char b . rest-args)
@@ -10882,11 +10845,9 @@ Notes on optional and variadic parameters:
   ; Typeless return, required <:flo> and optional <:int> parameters
   ((:flo a (:int b 42))
     (+ a b)))
-&#96;&#96;&#96;
 
-### &#96;lambda&#96;
+### `lambda`
 
-&#96;&#96;&#96;scheme
 ; Typed <:int> return and <:list>/<:char> parameters
 (lambda :int (:list a :char b . rest-args)
   (length (cons b (cons a rest-args))))
@@ -10894,11 +10855,9 @@ Notes on optional and variadic parameters:
 ; Typeless return, required <:flo> and optional <:int> parameters
 (lambda (:flo a (:int b 42))
   (+ a b))
-&#96;&#96;&#96;
 
-### &#96;define&#96;
+### `define`
 
-&#96;&#96;&#96;scheme
 ; Typed <:int> return and <:list>/<:char> parameters
 (define :int (function-name :list a :char b . rest-args)
   (length (cons b (cons a rest-args))))
@@ -10906,39 +10865,33 @@ Notes on optional and variadic parameters:
 ; Typeless return, required <:flo> and optional <:int> parameters
 (define (function-name :flo a (:int b 42))
   (+ a b))
-&#96;&#96;&#96;
 
-### &#96;define-generator&#96;
+### `define-generator`
 
 - Only supports typed parameters, not typed returns, to account for
-  &#96;*generator-complete*&#96; being returned from finite generators.
+  `*generator-complete*` being returned from finite generators.
 
-&#96;&#96;&#96;scheme
 ; Required <:flo> and optional <:int> parameters
 (define-generator (generator-factory-name :flo a (:int b 42))
   (let loop ((i b))
     (yield (+ i a))
     (loop (+ i 1))))
-&#96;&#96;&#96;
 
-### &#96;curry&#96;
+### `curry`
 
 - Only type-checks the return value once all parameters have been applied.
 
-&#96;&#96;&#96;scheme
 ; Typed <:int> return and <:list>/<:char> parameters
 (curry :int (:list a :char b)
   (length (cons b a)))
-&#96;&#96;&#96;
 
-### &#96;class&#96;/&#96;define-class&#96; and &#96;interface&#96;/&#96;define-interface&#96;
+### `class`/`define-class` and `interface`/`define-interface`
 
-- &#96;class&#96; supports types on instance and static methods
-- &#96;interface&#96; only supports types on static methods
-- &#96;define-class&#96; uses the same type syntax as &#96;class&#96;
-  - as &#96;define-interface&#96; does with &#96;interface&#96;
+- `class` supports types on instance and static methods
+- `interface` only supports types on static methods
+- `define-class` uses the same type syntax as `class`
+  - as `define-interface` does with `interface`
 
-&#96;&#96;&#96;scheme
 (define-class ClassName
   ; Instance: typed <:int> return and <:list>/<:char> parameters
   (:int (method-name-1 :list a :char b . rest-args)
@@ -10970,27 +10923,25 @@ Notes on optional and variadic parameters:
 ; Mandating that <function-name> returns either <ClassName> or <InterfaceName>
 (define :ClassName|InterfaceName (function-name)
   (ClassName))
-&#96;&#96;&#96;
 
 ---
 
 ## Type Aliases
 
 Type aliases reference a preexisting keyword type, typically to
-mask type complexity. For example, when implementing a &#96;UserProfile&#96;
-class, it might be nicer to define a &#96;:phone-number&#96; type instead of
-always using &#96;:str|list<int>&#96;.
+mask type complexity. For example, when implementing a `UserProfile`
+class, it might be nicer to define a `:phone-number` type instead of
+always using `:str|list<int>`.
 
-Type aliases can be created by using &#96;define-type&#96; (aliased by &#96;deftype&#96;).
+Type aliases can be created by using `define-type` (aliased by `deftype`).
 Type alias primitive helper functions include:
 
-- &#96;(type-alias? <obj>)&#96; returns whether &#96;<obj>&#96; is a type alias
-- &#96;(type-alias-source <type-alias>)&#96; returns the original keyword type
-  that &#96;<type-alias>&#96; references
+- `(type-alias? <obj>)` returns whether `<obj>` is a type alias
+- `(type-alias-source <type-alias>)` returns the original keyword type
+  that `<type-alias>` references
 
 ### Example
 
-&#96;&#96;&#96;scheme
 ; Create a type-alias and dispatch on it
 (define-type phone-number :str|list<int>)
 
@@ -11001,15 +10952,14 @@ Type alias primitive helper functions include:
 (function-name "555-555-5555") ; #t
 (function-name '(555 555 5555)) ; #t
 (function-name 5555555555) ; #f
-&#96;&#96;&#96;
 
 ---
 
 ## Type Primitive
 
-- &#96;(type? <type-keyword>)&#96; returns if &#96;<type-keyword>&#96; is a valid type
-- &#96;(type? <obj> <type-keyword>)&#96; returns if &#96;<obj>&#96; is a &#96;<type-keyword>&#96;
-- &#96;(type=? <type-keyword> ...)&#96; returns if &#96;<type-keyword>&#96;s are equivalent
+- `(type? <type-keyword>)` returns if `<type-keyword>` is a valid type
+- `(type? <obj> <type-keyword>)` returns if `<obj>` is a `<type-keyword>`
+- `(type=? <type-keyword> ...)` returns if `<type-keyword>`s are equivalent
 ```
 
 -------------------------------------------------------------------------------
