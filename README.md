@@ -1,6 +1,6 @@
 <!-- README.md -->
 
-# Eerina's Scheme
+# Eerina's Scheme 🦜
 
 ---
 
