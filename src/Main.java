@@ -37,26 +37,23 @@ import escm.primitive.FilePrimitives;
 public class Main {
   ////////////////////////////////////////////////////////////////////////////
   // Command-line flag options
-  public static final String COMMAND_LINE_FLAGS = 
-    "Command-line flags may be used to modify EScheme's behavior:\n"+
-    "  1. -v, --version                    | Print EScheme version information\n"+
-    "  2. -h, --help                       | Print this information\n"+
-    "  3. -q, --quiet                      | Launch the REPL without ASCII art\n"+
-    "  4. -e, --eval <escheme code>        | Evaluate <escheme code> in a temporary file\n"+
-    "  5. -l, --load <script> <arg1> ...   | Load <script> with <arg> ... as *argv* into the REPL\n"+
-    "  6. -i, --import <module> <arg1> ... | Import <module> with <arg> ... as *argv* into the REPL\n"+
-    "  7. <script> <arg1> ...              | Interpret <script> with <arg> ... as *argv*\n"+
-    "  8. [no arguments]                   | Launch the REPL\n";
-
+  public static final String COMMAND_LINE_FLAGS = "Command-line flags may be used to modify EScheme's behavior:\n" +
+      "  1. -v, --version                    | Print EScheme version information\n" +
+      "  2. -h, --help                       | Print this information\n" +
+      "  3. -q, --quiet                      | Launch the REPL without ASCII art\n" +
+      "  4. -e, --eval <escheme code>        | Evaluate <escheme code> in a temporary file\n" +
+      "  5. -l, --load <script> <arg1> ...   | Load <script> with <arg> ... as *argv* into the REPL\n" +
+      "  6. -i, --import <module> <arg1> ... | Import <module> with <arg> ... as *argv* into the REPL\n" +
+      "  7. <script> <arg1> ...              | Interpret <script> with <arg> ... as *argv*\n" +
+      "  8. [no arguments]                   | Launch the REPL\n";
 
   ////////////////////////////////////////////////////////////////////////////
   // Evaluate an escm expression in the given environment
   public static void eval(Environment env, Datum d, Trampoline.Continuation continuation) throws Exception {
-    Trampoline.resolve(Compiler.run(d,env,(compiled) -> () -> {
-      return Interpreter.run(new ExecutionState(env,Assembler.run(compiled)),continuation);
+    Trampoline.resolve(Compiler.run(d, env, (compiled) -> () -> {
+      return Interpreter.run(new ExecutionState(env, Assembler.run(compiled)), continuation);
     }));
   }
-
 
   ////////////////////////////////////////////////////////////////////////////
   // Implementing our REPL
@@ -76,64 +73,62 @@ public class Main {
     sb.append("                     __ / '. `````.'\\\n");
     sb.append("                    /,'`|   `````.-~\"~-.\n");
     sb.append("\n");
-    sb.append(              "      Copyright (c) Jordan Candide Randleman 2021-2024\n");
-    sb.append(String.format("             Eerina's Scheme (\u03bb): Version %s\n",SystemPrimitives.VERSION));
-    sb.append(              "            Type (help) for Help, (exit) to Exit\n");
+    sb.append("      Copyright (c) Jordan Candide Randleman 2021-2026\n");
+    sb.append(String.format("             Eerina's Scheme (\u03bb): Version %s\n", SystemPrimitives.VERSION));
+    sb.append("            Type (help) for Help, (exit) to Exit\n");
     sb.append("\n");
     sb.append("                        \u039b\u03c8\u0aea \u039b\u03b9\u03c5 \u03bc\u0391\u0aea\u03a9\n");
     sb.append("                         \u03b4\u0395\u03a4 \u03b4\u03c0\u03a4 \u03b2\u0392\n");
     System.out.print(sb.toString());
   }
 
-
   private static Datum readFullExpression() {
-    while(true) {
+    while (true) {
       try {
         Datum readDatum = InputPort.STDIN.readReplDatum();
         // Account for EOF => triggers REPL termination!
-        if(readDatum == null) {
-          if(GlobalState.getLastPrintedANewline() == false) {
+        if (readDatum == null) {
+          if (GlobalState.getLastPrintedANewline() == false) {
             System.out.print('\n');
           }
           System.out.println(SystemPrimitives.getExitMessage());
           System.exit(0);
         }
         return readDatum;
-      } catch(Exception e) {
-        System.err.printf("\n%s\n",e.getMessage());
+      } catch (Exception e) {
+        System.err.printf("\n%s\n", e.getMessage());
       }
     }
   }
 
-
   private static void launchRepl(boolean launchQuietly, Environment globalEnvironment) throws Exception {
     // Note that we DON'T set whether we're in the REPL here, as such risks
-    //   causing a read/write race condition should a script loaded by "-l" 
-    //   spawn a thread!
-    if(launchQuietly == false) {
+    // causing a read/write race condition should a script loaded by "-l"
+    // spawn a thread!
+    if (launchQuietly == false) {
       printReplIntro();
     } else {
       GlobalState.setLastPrintedANewline(true); // to print opening ">" on the 1st line
     }
     Trampoline.Continuation printContinuation = (value) -> () -> {
-      if(!(value instanceof escm.type.Void)) System.out.printf("%s\n", value.pprint());
+      if (!(value instanceof escm.type.Void))
+        System.out.printf("%s\n", value.pprint());
       return Trampoline.LAST_BOUNCE_SIGNAL;
     };
-    while(true) {
+    while (true) {
       try {
-        eval(globalEnvironment,readFullExpression(),printContinuation);
+        eval(globalEnvironment, readFullExpression(), printContinuation);
         EscmCallStack.clear(); // residue frames may reside after call/cc nonsense
-      } catch(Throwable t) {
+      } catch (Throwable t) {
         TopLevelError.report(t);
       }
     }
   }
 
-
   ////////////////////////////////////////////////////////////////////////////
   // Implementing our Code Evaluator
   private static String writeCodeToTemporaryFile(ParsedCommandLine parsedCmdLine) throws Exception {
-    File tempFile = File.createTempFile("escheme_eval",".scm");
+    File tempFile = File.createTempFile("escheme_eval", ".scm");
     tempFile.deleteOnExit();
     FileWriter writer = new FileWriter(tempFile);
     writer.append(parsedCmdLine.eschemeCode);
@@ -141,20 +136,22 @@ public class Main {
     return tempFile.getAbsolutePath();
   }
 
-
   ////////////////////////////////////////////////////////////////////////////
   // Implementing our File Interpreter
   private static void loadScript(ParsedCommandLine parsedCmdLine) throws Exception {
-    if(FilePrimitives.IsFileP.logic(Path.of(parsedCmdLine.scriptName)) == false)
-      throw new Exceptionf("\"--load\": \"%s\" isn't a file!\n  %s", parsedCmdLine.scriptName, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
-    if(parsedCmdLine.loadingIntoREPL) GlobalState.inREPL = true; // trigger exit message to be printed
+    if (FilePrimitives.IsFileP.logic(Path.of(parsedCmdLine.scriptName)) == false)
+      throw new Exceptionf("\"--load\": \"%s\" isn't a file!\n  %s", parsedCmdLine.scriptName,
+          COMMAND_LINE_FLAGS.replaceAll("\n", "\n  "));
+    if (parsedCmdLine.loadingIntoREPL)
+      GlobalState.inREPL = true; // trigger exit message to be printed
     Environment globalEnvironment = GlobalState.getDefaultEnvironment();
-    Trampoline.resolve(SystemPrimitives.Load.logic("load",parsedCmdLine.scriptName,globalEnvironment,(value) -> () -> {
-      if(parsedCmdLine.loadingIntoREPL) launchRepl(parsedCmdLine.launchingQuiet,globalEnvironment);
-      return Trampoline.LAST_BOUNCE_SIGNAL;
-    }));
+    Trampoline
+        .resolve(SystemPrimitives.Load.logic("load", parsedCmdLine.scriptName, globalEnvironment, (value) -> () -> {
+          if (parsedCmdLine.loadingIntoREPL)
+            launchRepl(parsedCmdLine.launchingQuiet, globalEnvironment);
+          return Trampoline.LAST_BOUNCE_SIGNAL;
+        }));
   }
-
 
   private static void importScript(ParsedCommandLine parsedCmdLine) throws Exception {
     GlobalState.inREPL = true; // trigger exit message to be printed
@@ -164,47 +161,45 @@ public class Main {
     args.add(modulePath);
     Environment globalEnvironment = GlobalState.getDefaultEnvironment();
     try {
-      Trampoline.resolve((new SystemPrimitives.EscmLoadModule()).callWith(args,(module) -> () -> {
-        globalEnvironment.define(moduleName,module);
-        launchRepl(parsedCmdLine.launchingQuiet,globalEnvironment);
+      Trampoline.resolve((new SystemPrimitives.EscmLoadModule()).callWith(args, (module) -> () -> {
+        globalEnvironment.define(moduleName, module);
+        launchRepl(parsedCmdLine.launchingQuiet, globalEnvironment);
         return Trampoline.LAST_BOUNCE_SIGNAL;
       }));
-    } catch(SystemPrimitives.EscmLoadModule.InvalidModuleException e) {
-      throw new Exceptionf("\"--import\": \"%s\" isn't a module!\n  %s", parsedCmdLine.scriptName, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
+    } catch (SystemPrimitives.EscmLoadModule.InvalidModuleException e) {
+      throw new Exceptionf("\"--import\": \"%s\" isn't a module!\n  %s", parsedCmdLine.scriptName,
+          COMMAND_LINE_FLAGS.replaceAll("\n", "\n  "));
     }
   }
 
-
   private static void evaluateCode(ParsedCommandLine parsedCmdLine) throws Exception {
     String fileName = writeCodeToTemporaryFile(parsedCmdLine);
-    if(FilePrimitives.IsFileP.logic(Path.of(fileName)) == false)
-      throw new Exceptionf("\"--eval\": \"%s\" couldn't be evaluated in temp file \"%s\"!\n  %s", parsedCmdLine.eschemeCode, fileName, COMMAND_LINE_FLAGS.replaceAll("\n","\n  "));
+    if (FilePrimitives.IsFileP.logic(Path.of(fileName)) == false)
+      throw new Exceptionf("\"--eval\": \"%s\" couldn't be evaluated in temp file \"%s\"!\n  %s",
+          parsedCmdLine.eschemeCode, fileName, COMMAND_LINE_FLAGS.replaceAll("\n", "\n  "));
     Environment globalEnvironment = GlobalState.getDefaultEnvironment();
-    Trampoline.resolve(SystemPrimitives.Load.logic("load",fileName,globalEnvironment,(value) -> () -> {
+    Trampoline.resolve(SystemPrimitives.Load.logic("load", fileName, globalEnvironment, (value) -> () -> {
       return Trampoline.LAST_BOUNCE_SIGNAL;
     }));
   }
 
-
   private static void launchScript(ParsedCommandLine parsedCmdLine) throws Exception {
-    if(parsedCmdLine.evaluatingCode) {
+    if (parsedCmdLine.evaluatingCode) {
       evaluateCode(parsedCmdLine);
-    } else if(parsedCmdLine.importingIntoREPL) {
+    } else if (parsedCmdLine.importingIntoREPL) {
       importScript(parsedCmdLine);
     } else {
       loadScript(parsedCmdLine);
     }
   }
 
-
   ////////////////////////////////////////////////////////////////////////////
   // Implementing the Unit Test Executor
   private static void executeUnitTests() throws Exception {
     ParsedCommandLine parsed = new ParsedCommandLine();
-    parsed.scriptName = EscmPath.VALUE+File.separator+"test"+File.separator+"main.scm";
+    parsed.scriptName = EscmPath.VALUE + File.separator + "test" + File.separator + "main.scm";
     loadScript(parsed);
   }
-
 
   ////////////////////////////////////////////////////////////////////////////
   // Implementing Java StdLib Loader Generation
@@ -212,30 +207,27 @@ public class Main {
     JavaStdLibLoaderGenerator.execute();
   }
 
-
   ////////////////////////////////////////////////////////////////////////////
   // Parse the command-line
   private static class ParsedCommandLine {
-    public boolean executeUnitTests          = false; // --unit-tests
-    public boolean generateJavaStdLibLoader  = false; // --generate-java-stdlib-loader
-    public boolean launchingQuiet            = false; // -q --quiet
-    public boolean evaluatingCode            = false; // -e --eval
-    public boolean loadingIntoREPL           = false; // -l --load
-    public boolean importingIntoREPL         = false; // -i --import
-    public String eschemeCode                = null;  // <null> denotes no code
-    public String scriptName                 = null;  // <null> denotes no script
+    public boolean executeUnitTests = false; // --unit-tests
+    public boolean generateJavaStdLibLoader = false; // --generate-java-stdlib-loader
+    public boolean launchingQuiet = false; // -q --quiet
+    public boolean evaluatingCode = false; // -e --eval
+    public boolean loadingIntoREPL = false; // -l --load
+    public boolean importingIntoREPL = false; // -i --import
+    public String eschemeCode = null; // <null> denotes no code
+    public String scriptName = null; // <null> denotes no script
   }
-
 
   private static String getJavaBinPath() {
-    return JvmPathPrefix.VALUE.substring(0,JvmPathPrefix.VALUE.length()-File.separator.length());
+    return JvmPathPrefix.VALUE.substring(0, JvmPathPrefix.VALUE.length() - File.separator.length());
   }
-
 
   private static ParsedCommandLine parseCommandLine(String[] args) {
     ParsedCommandLine parsed = new ParsedCommandLine();
-    for(int i = 0; i < args.length; ++i) {
-      switch(args[i]) {
+    for (int i = 0; i < args.length; ++i) {
+      switch (args[i]) {
         case "--unit-tests": {
           parsed.executeUnitTests = true;
           return parsed;
@@ -244,61 +236,68 @@ public class Main {
           parsed.generateJavaStdLibLoader = true;
           return parsed;
         }
-        case "-v": case "--version": {
+        case "-v":
+        case "--version": {
           System.out.printf("Eerina's Scheme Version %s\n", SystemPrimitives.VERSION);
-          System.out.printf("Target: %s %s\n", System.getProperty("os.name"),System.getProperty("os.version"));
+          System.out.printf("Target: %s %s\n", System.getProperty("os.name"), System.getProperty("os.version"));
           System.out.printf("InstalledDir: %s\n", EscmPath.VALUE);
           System.out.printf("JavaBin: %s\n", getJavaBinPath());
           System.exit(0);
         }
-        case "-h": case "--help": {
+        case "-h":
+        case "--help": {
           System.out.print(COMMAND_LINE_FLAGS);
           System.exit(0);
         }
-        case "-q": case "--quiet": {
+        case "-q":
+        case "--quiet": {
           parsed.launchingQuiet = true;
           break;
         }
-        case "-e": case "--eval": {
+        case "-e":
+        case "--eval": {
           parsed.evaluatingCode = true;
-          if(i+1 == args.length) {
+          if (i + 1 == args.length) {
             System.err.printf("ESCM ERROR: No EScheme code given to evaluate with \"%s\"!\n", args[i]);
             System.err.print(COMMAND_LINE_FLAGS);
             System.exit(1);
           }
           StringBuilder sb = new StringBuilder();
-          for(i = i+1; i < args.length;) {
+          for (i = i + 1; i < args.length;) {
             sb.append(args[i++]);
-            if(i < args.length) sb.append(' ');
+            if (i < args.length)
+              sb.append(' ');
           }
           parsed.eschemeCode = sb.toString();
           return parsed;
         }
-        case "-l": case "--load": {
+        case "-l":
+        case "--load": {
           parsed.loadingIntoREPL = true;
-          if(i+1 == args.length) {
+          if (i + 1 == args.length) {
             System.err.printf("ESCM ERROR: No filename given to load into the REPL with \"%s\"!\n", args[i]);
             System.err.print(COMMAND_LINE_FLAGS);
             System.exit(1);
           }
-          parsed.scriptName = args[i+1];
-          GlobalState.setArgv(i+1,args);
+          parsed.scriptName = args[i + 1];
+          GlobalState.setArgv(i + 1, args);
           return parsed;
         }
-        case "-i": case "--import": {
+        case "-i":
+        case "--import": {
           parsed.importingIntoREPL = true;
-          if(i+1 == args.length) {
+          if (i + 1 == args.length) {
             System.err.printf("ESCM ERROR: No filename given to import into the REPL with \"%s\"!\n", args[i]);
             System.err.print(COMMAND_LINE_FLAGS);
             System.exit(1);
           }
-          parsed.scriptName = args[i+1];
-          GlobalState.setArgv(i+1,args);
+          parsed.scriptName = args[i + 1];
+          GlobalState.setArgv(i + 1, args);
           return parsed;
         }
         default: {
           parsed.scriptName = args[i];
-          GlobalState.setArgv(i,args);
+          GlobalState.setArgv(i, args);
           return parsed;
         }
       }
@@ -306,40 +305,40 @@ public class Main {
     return parsed;
   }
 
-
   ////////////////////////////////////////////////////////////////////////////
   // Implementing our Interpreter
   public static void main(String[] args) {
     escm.type.concurrent.Thread mainThread = new escm.type.concurrent.Thread(
-      "escm-main",
-      new Callable() {
-        public String docstring() {
-          return "EScheme's main thread runnable. Starts the EScheme VM.";
-        }
-        public Datum signature() {
-          return Pair.List(new Symbol(escm.type.concurrent.Thread.DEFAULT_RUNNABLE_NAME));
-        }
-        public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
-          ParsedCommandLine parsedCmdLine = parseCommandLine(args);
-          try {
-            if(parsedCmdLine.generateJavaStdLibLoader == true) {
-              generateJavaStdLibLoader();
-            } else if(parsedCmdLine.executeUnitTests == true) {
-              executeUnitTests();
-            } else if(parsedCmdLine.scriptName == null && parsedCmdLine.eschemeCode == null) {
-              GlobalState.inREPL = true; // trigger exit message to be printed
-              launchRepl(parsedCmdLine.launchingQuiet,GlobalState.getDefaultEnvironment());
-            } else {
-              launchScript(parsedCmdLine);
-            }
-          } catch(Throwable t) {
-            TopLevelError.report(t);
-            System.exit(1);
+        "escm-main",
+        new Callable() {
+          public String docstring() {
+            return "EScheme's main thread runnable. Starts the EScheme VM.";
           }
-          return cont.run(escm.type.Void.VALUE);
-        }
-      }
-    );
+
+          public Datum signature() {
+            return Pair.List(new Symbol(escm.type.concurrent.Thread.DEFAULT_RUNNABLE_NAME));
+          }
+
+          public Trampoline.Bounce callWith(ArrayList<Datum> params, Trampoline.Continuation cont) throws Exception {
+            ParsedCommandLine parsedCmdLine = parseCommandLine(args);
+            try {
+              if (parsedCmdLine.generateJavaStdLibLoader == true) {
+                generateJavaStdLibLoader();
+              } else if (parsedCmdLine.executeUnitTests == true) {
+                executeUnitTests();
+              } else if (parsedCmdLine.scriptName == null && parsedCmdLine.eschemeCode == null) {
+                GlobalState.inREPL = true; // trigger exit message to be printed
+                launchRepl(parsedCmdLine.launchingQuiet, GlobalState.getDefaultEnvironment());
+              } else {
+                launchScript(parsedCmdLine);
+              }
+            } catch (Throwable t) {
+              TopLevelError.report(t);
+              System.exit(1);
+            }
+            return cont.run(escm.type.Void.VALUE);
+          }
+        });
     mainThread.start();
   }
 }
