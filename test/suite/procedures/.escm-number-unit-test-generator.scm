@@ -45,7 +45,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; FIRST HELPER (FOR ESCM'S MATH DIFFERENCES W/ CHEZ-SCHEME)
+;; FIRST HELPER (FOR ESCHEME'S MATH DIFFERENCES W/ CHEZ-SCHEME)
 ;; (first <expr> ...) ; returns the first non-#f <expr>, or #f if all #f.
 (define (id x) x)
 
@@ -68,7 +68,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM COMPLEX IDENTIFICATION
+;; ESCHEME COMPLEX IDENTIFICATION
 (define (number-has-nan? n)
   (if (real? n)
       (nan? n)
@@ -82,7 +82,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM COMPLEX SQRT NAN-SEMANITCS
+;; ESCHEME COMPLEX SQRT NAN-SEMANITCS
 ;; (sqrt [+-]inf[+-]infi) ; +nan.0
 (define chez-sqrt sqrt)
 
@@ -93,7 +93,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM ROUND SEMANITCS
+;; ESCHEME ROUND SEMANITCS
 ;; (round 1/2) ; 1
 (define chez-round round)
 
@@ -102,7 +102,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM ASINH SEMANTICS
+;; ESCHEME ASINH SEMANTICS
 ;; => Despite running afoul of both Chez-Scheme & Guile, we can confirm this 
 ;;    result by entering "asinh(0-2i)=" into Wolfram Alpha:
 ;;    * https://www.wolframalpha.com/input?i2d=true&i=asinh%5C%2840%290-2i%5C%2841%29%3D
@@ -114,7 +114,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM NPR EQUIVALENT
+;; ESCHEME NPR EQUIVALENT
 (define (npr-factorial n)
   (define (iter n p)
     (if (< n 2)
@@ -127,13 +127,13 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM NCR EQUIVALENT
+;; ESCHEME NCR EQUIVALENT
 (define (ncr n r)
   (/ (npr-factorial n) (* (npr-factorial r) (npr-factorial (- n r)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM DIVREM EQUIVALENT
+;; ESCHEME DIVREM EQUIVALENT
 (define (divrem a b) (cons (quotient a b) (remainder a b)))
 
 
@@ -166,7 +166,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM-STYLE INFINITY->STRING SYNTAX HELPERS
+;; ESCHEME-STYLE INFINITY->STRING SYNTAX HELPERS
 (define (create-escm-real n)
   (if (real? n)
       n
@@ -182,7 +182,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM-STYLE NUMBER->STRING SYNTAX HELPERS
+;; ESCHEME-STYLE NUMBER->STRING SYNTAX HELPERS
 ;; => Helps w/ NaN & Infinity conversions
 (define (escm-number->string n)
   (define i-string #f)
@@ -312,7 +312,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM/CHEZ DIFFERENCE: DIVIDE BY 0 HELPER
+;; ESCHEME/CHEZ DIFFERENCE: DIVIDE BY 0 HELPER
 ;; => div by 0 can yield an Infinity, not always NaN
 (define (get-/0-result-from-lhs n)
   (cond ((or (number-has-nan? n) (zero? n)) +nan.0)
@@ -338,7 +338,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM/CHEZ DIFFERENCE: (/ 0 <complex>)
+;; ESCHEME/CHEZ DIFFERENCE: (/ 0 <complex>)
 ;; => Chez-Scheme says +nan.0, EScheme says 0.0
 ;;    * Note we can manually verify 0.0 making sense via:
 ;;        (a+bi)/(c+di) = [(ac+bd)/(cc+dd)]+[(bc-ad)/(cc+dd)]i
@@ -357,7 +357,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ESCM/CHEZ DIFFERENCE: (<non-*-op> <number> NaN) = (<non-*-op> NaN <number>) = NaN
+;; ESCHEME/CHEZ DIFFERENCE: (<non-*-op> <number> NaN) = (<non-*-op> NaN <number>) = NaN
 (define (op-accepts-NaN? op)
   (case op ((* expt expt-mod) #t) (else #f)))
 

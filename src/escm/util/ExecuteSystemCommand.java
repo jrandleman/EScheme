@@ -5,6 +5,7 @@
 //    code from the execution.
 
 package escm.util;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -20,12 +21,10 @@ public class ExecuteSystemCommand {
     public int exit = 0;
   };
 
-
   ////////////////////////////////////////////////////////////////////////////
-  // Timeout buffer to account for ESCM actions done while process executes
+  // Timeout buffer to account for ESCHEME actions done while process executes
   // => e.g. stream reading & finished status setting
-  private static long TIMEOUT_MS_BUFFER = (long)100;
-
+  private static long TIMEOUT_MS_BUFFER = (long) 100;
 
   ////////////////////////////////////////////////////////////////////////////
   // Split a command string into an array of arguments
@@ -57,18 +56,17 @@ public class ExecuteSystemCommand {
       }
     }
     // After processing all characters, check for unclosed quotes or escaping
-    if(escaping) {
+    if (escaping) {
       throw new Exceptionf("Bad <system> command; Incomplete escape sequence: %s", command);
     }
-    if(inSingleQuotes || inDoubleQuotes) {
+    if (inSingleQuotes || inDoubleQuotes) {
       throw new Exceptionf("Bad <system> command; Mismatched quotes: %s", command);
     }
-    if(current.length() > 0) {
+    if (current.length() > 0) {
       tokens.add(current.toString());
     }
     return tokens.toArray(new String[0]);
   }
-  
 
   ////////////////////////////////////////////////////////////////////////////
   // Process main execution logic
@@ -81,9 +79,11 @@ public class ExecuteSystemCommand {
   }
 
   private static long preprocessMillisecondTimeout(long millisecondTimeout) {
-    if(millisecondTimeout < 0) millisecondTimeout = 0;
-    if(Long.MAX_VALUE - TIMEOUT_MS_BUFFER <= millisecondTimeout) return Long.MAX_VALUE;
-    return millisecondTimeout+TIMEOUT_MS_BUFFER;
+    if (millisecondTimeout < 0)
+      millisecondTimeout = 0;
+    if (Long.MAX_VALUE - TIMEOUT_MS_BUFFER <= millisecondTimeout)
+      return Long.MAX_VALUE;
+    return millisecondTimeout + TIMEOUT_MS_BUFFER;
   }
 
   private static void getInputStreamLines(Result res, Process pro) throws Exception {
@@ -94,20 +94,24 @@ public class ExecuteSystemCommand {
         BufferedReader reader = new BufferedReader(new InputStreamReader(pro.getInputStream()));
         StringBuilder buffer = new StringBuilder();
         String line = null;
-        while((line = reader.readLine()) != null) buffer.append('\n'+line);
+        while ((line = reader.readLine()) != null)
+          buffer.append('\n' + line);
         output.value = buffer.toString();
         pro.waitFor();
-      } catch(Throwable e) { /* do nothing */ }
+      } catch (Throwable e) {
+        /* do nothing */ }
     });
     Thread errorThread = new Thread(() -> {
       try {
         BufferedReader reader = new BufferedReader(new InputStreamReader(pro.getErrorStream()));
         StringBuilder buffer = new StringBuilder();
         String line = null;
-        while((line = reader.readLine()) != null) buffer.append('\n'+line);
+        while ((line = reader.readLine()) != null)
+          buffer.append('\n' + line);
         error.value = buffer.toString();
         pro.waitFor();
-      } catch(Throwable e) { /* do nothing */ }
+      } catch (Throwable e) {
+        /* do nothing */ }
     });
     outputThread.start();
     errorThread.start();
@@ -117,25 +121,29 @@ public class ExecuteSystemCommand {
     res.err = error.value.length() == 0 ? "" : error.value.substring(1);
   }
 
-  public static Result run(long millisecondTimeout, String command, String[] environmentVariableSettings, File workingDirectory) throws Exception {
+  public static Result run(long millisecondTimeout, String command, String[] environmentVariableSettings,
+      File workingDirectory) throws Exception {
     long timeout = preprocessMillisecondTimeout(millisecondTimeout);
-    Process pro = Runtime.getRuntime().exec(splitCommand(command),environmentVariableSettings,workingDirectory);
+    Process pro = Runtime.getRuntime().exec(splitCommand(command), environmentVariableSettings, workingDirectory);
     Result res = new Result();
     ClosureBoolean finished = new ClosureBoolean();
     Thread processThread = new Thread(() -> {
       try {
-        getInputStreamLines(res,pro);
+        getInputStreamLines(res, pro);
         finished.status = true;
-      } catch(Throwable e) {}
+      } catch (Throwable e) {
+      }
     });
     try {
       processThread.start();
       processThread.join(timeout);
-    } catch(Throwable t) {}
-    if(finished.status == false) {
+    } catch (Throwable t) {
+    }
+    if (finished.status == false) {
       pro.destroyForcibly();
-      if(res.err.length() != 0) res.err += '\n';
-      res.err += String.format("ESCM: Process killed after exceeding %dms time limit.", millisecondTimeout);
+      if (res.err.length() != 0)
+        res.err += '\n';
+      res.err += String.format("ESCHEME: Process killed after exceeding %dms time limit.", millisecondTimeout);
       res.exit = -1;
     } else {
       res.exit = pro.exitValue();
@@ -143,10 +151,11 @@ public class ExecuteSystemCommand {
     return res;
   }
 
-  public static Result run(String command, String[] environmentVariableSettings, File workingDirectory) throws Exception {
-    Process pro = Runtime.getRuntime().exec(splitCommand(command),environmentVariableSettings,workingDirectory);
+  public static Result run(String command, String[] environmentVariableSettings, File workingDirectory)
+      throws Exception {
+    Process pro = Runtime.getRuntime().exec(splitCommand(command), environmentVariableSettings, workingDirectory);
     Result res = new Result();
-    getInputStreamLines(res,pro);
+    getInputStreamLines(res, pro);
     res.exit = pro.exitValue();
     return res;
   }

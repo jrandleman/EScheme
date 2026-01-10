@@ -258,7 +258,7 @@ public class Main {
         case "--eval": {
           parsed.evaluatingCode = true;
           if (i + 1 == args.length) {
-            System.err.printf("ESCM ERROR: No EScheme code given to evaluate with \"%s\"!\n", args[i]);
+            System.err.printf("ESCHEME ERROR: No EScheme code given to evaluate with \"%s\"!\n", args[i]);
             System.err.print(COMMAND_LINE_FLAGS);
             System.exit(1);
           }
@@ -275,7 +275,7 @@ public class Main {
         case "--load": {
           parsed.loadingIntoREPL = true;
           if (i + 1 == args.length) {
-            System.err.printf("ESCM ERROR: No filename given to load into the REPL with \"%s\"!\n", args[i]);
+            System.err.printf("ESCHEME ERROR: No filename given to load into the REPL with \"%s\"!\n", args[i]);
             System.err.print(COMMAND_LINE_FLAGS);
             System.exit(1);
           }
@@ -287,7 +287,7 @@ public class Main {
         case "--import": {
           parsed.importingIntoREPL = true;
           if (i + 1 == args.length) {
-            System.err.printf("ESCM ERROR: No filename given to import into the REPL with \"%s\"!\n", args[i]);
+            System.err.printf("ESCHEME ERROR: No filename given to import into the REPL with \"%s\"!\n", args[i]);
             System.err.print(COMMAND_LINE_FLAGS);
             System.exit(1);
           }
