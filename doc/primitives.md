@@ -2694,6 +2694,7 @@ Returns whether succeeded.
 
 #### Signatures:
 ```scheme
+(path)
 (path <string> ...)
 ```
 
