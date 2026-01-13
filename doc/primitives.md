@@ -15,6 +15,7 @@
   * [Functional](#Functional)
   * [Hashmaps](#Hashmaps)
   * [IO](#IO)
+  * [JSON](#JSON)
   * [Keywords](#Keywords)
   * [Lists](#Lists)
   * [Meta](#Meta)
@@ -3367,6 +3368,67 @@ Note that this will infinitely loop for cyclical structures!
    ----------------------------------------------------------------------
    %%  = "%" (escapes a "%")
    ----------------------------------------------------------------------
+```
+
+-------------------------------------------------------------------------------
+## JSON
+
+
+-------------------------------------------------------------------------------
+### `data->json`
+
+#### Signatures:
+```scheme
+(data->json <json-compliant-datum>)
+(data->json <json-compliant-datum> <tab-width-integer>)
+```
+
+#### Description:
+```
+Convert a JSON-compliant EScheme datum to a JSON string. JSON-compliant data
+include booleans, nils, numbers, and strings, as well as vectors and hashmaps
+thereof (so long as the hashmap keys are all strings).
+```
+
+-------------------------------------------------------------------------------
+### `json->data`
+
+#### Signatures:
+```scheme
+(json->data <json-string>)
+```
+
+#### Description:
+```
+Convert a JSON string to an EScheme data structure.
+```
+
+-------------------------------------------------------------------------------
+### `json-datum?`
+
+#### Signatures:
+```scheme
+(json-datum? <obj>)
+```
+
+#### Description:
+```
+Determine whether <obj> is a JSON-compliant EScheme datum. JSON-compliant data
+include booleans, nils, numbers, and strings, as well as vectors and hashmaps
+thereof (so long as the hashmap keys are all strings).
+```
+
+-------------------------------------------------------------------------------
+### `json-string?`
+
+#### Signatures:
+```scheme
+(json-string? <string>)
+```
+
+#### Description:
+```
+Determine whether <string> is a valid JSON string.
 ```
 
 -------------------------------------------------------------------------------
