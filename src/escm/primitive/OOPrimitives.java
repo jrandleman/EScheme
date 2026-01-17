@@ -228,7 +228,8 @@ public class OOPrimitives {
         if (!typeSignatureFn.isTypeSignature())
           throw new Exceptionf("'interface method type-signature named %s isn't a valid type-signature: %s",
               name.profile(), Exceptionf.profileArgs(parameters));
-        namesAndValues.put(((Symbol) name).value(), typeSignatureFn);
+        String typeSignatureFnName = ((Symbol) name).value();
+        namesAndValues.put(typeSignatureFnName, typeSignatureFn.loadWithName(typeSignatureFnName));
         nameList = np.cdr();
         valueList = vp.cdr();
       }

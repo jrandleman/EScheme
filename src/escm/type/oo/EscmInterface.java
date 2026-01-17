@@ -13,6 +13,7 @@
 //    - void confirmSatisfiedBy(EscmClass class) // throws an error if the given class doesn't satisfy <this>
 
 package escm.type.oo;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -29,17 +30,17 @@ public class EscmInterface extends MetaObject {
   // Name
   public String name() {
     Datum val = props.get("name");
-    if(val == null || !(val instanceof Symbol)) return "";
-    return ((Symbol)val).value();
+    if (val == null || !(val instanceof Symbol))
+      return "";
+    return ((Symbol) val).value();
   }
-
 
   public String readableName() {
     String name = name();
-    if(name.length() == 0) return "#<anonymous>";
+    if (name.length() == 0)
+      return "#<anonymous>";
     return name;
   }
-
 
   ////////////////////////////////////////////////////////////////////////////
   // Interfaces Implemented
@@ -50,11 +51,11 @@ public class EscmInterface extends MetaObject {
   }
 
   public void forEachInterface(InterfaceIterationProcedure ip) {
-    for(EscmInterface iface : interfaces) {
-      if(!ip.exec(iface)) return;
+    for (EscmInterface iface : interfaces) {
+      if (!ip.exec(iface))
+        return;
     }
   }
-
 
   ////////////////////////////////////////////////////////////////////////////
   // Super Object Abstraction (<null> for interfaces)
@@ -62,12 +63,10 @@ public class EscmInterface extends MetaObject {
     return null;
   }
 
-
   ////////////////////////////////////////////////////////////////////////////
   // Object-Construction Template
   private ArrayList<String> requiredProps = null;
-  private ConcurrentHashMap<String,CompoundProcedure> methodsTypeSignatures = null;
-
+  private ConcurrentHashMap<String, CompoundProcedure> methodsTypeSignatures = null;
 
   ////////////////////////////////////////////////////////////////////////////
   // Documentation String
@@ -75,11 +74,11 @@ public class EscmInterface extends MetaObject {
 
   // Print class name + super + interfaces
   private void accumulateInterfaceSignature(StringBuilder sb) {
-    sb.append("Interface "+readableName());
-    if(interfaces.size() > 0) {
+    sb.append("Interface " + readableName());
+    if (interfaces.size() > 0) {
       sb.append(" (:extends");
-      for(EscmInterface iface : interfaces) {
-        sb.append(" "+iface.readableName());
+      for (EscmInterface iface : interfaces) {
+        sb.append(" " + iface.readableName());
       }
       sb.append(")");
     }
@@ -88,9 +87,9 @@ public class EscmInterface extends MetaObject {
 
   // Print user docstring
   private boolean accumulateUserDocstring(StringBuilder sb) {
-    if(docstring.length() > 0) {
+    if (docstring.length() > 0) {
       sb.append("  User Description:\n    ");
-      sb.append(docstring.replaceAll("\n","\n    "));
+      sb.append(docstring.replaceAll("\n", "\n    "));
       sb.append("\n\n");
       return true;
     }
@@ -99,11 +98,13 @@ public class EscmInterface extends MetaObject {
 
   // Print required props
   private boolean accumulateRequiredProperties(boolean printed, StringBuilder sb) {
-    if(requiredProps.size() == 0) return printed;
-    if(printed) sb.append("  ----------------------------------------------------------------------\n");
+    if (requiredProps.size() == 0)
+      return printed;
+    if (printed)
+      sb.append("  ----------------------------------------------------------------------\n");
     sb.append("  Required Instance Properties:");
-    for(String required : requiredProps) {
-      sb.append("\n    "+required);
+    for (String required : requiredProps) {
+      sb.append("\n    " + required);
     }
     sb.append("\n\n");
     printed = true;
@@ -112,20 +113,23 @@ public class EscmInterface extends MetaObject {
 
   // Print method signature + user docstring (if given)
   private void accumulateMethod(StringBuilder sb, String name, CompoundProcedure val) {
-    Datum signatures = EscmClass.tagMethodWithName(new Symbol(name),val.signature());
-    if(!(signatures instanceof Pair)) return;
-    EscmClass.accumulateMethodSignatureAndDocstring(sb,signatures,val.docstring());
+    Datum signatures = EscmClass.tagMethodWithName(new Symbol(name), val.signature());
+    if (!(signatures instanceof Pair))
+      return;
+    EscmClass.accumulateMethodSignatureAndDocstring(sb, signatures, val.docstring());
   }
 
   // Print required type signatures
   private boolean accumulateTypeSignatures(boolean printed, StringBuilder sb) {
-    if(props.size() == 0) return false;
-    if(methodsTypeSignatures.size() > 0) {
-      if(printed) sb.append("  ----------------------------------------------------------------------\n");
+    if (props.size() == 0)
+      return false;
+    if (methodsTypeSignatures.size() > 0) {
+      if (printed)
+        sb.append("  ----------------------------------------------------------------------\n");
       sb.append("  Required Instance Methods:");
-      TreeMap<String,CompoundProcedure> sortedSigs = new TreeMap<String,CompoundProcedure>(methodsTypeSignatures);
-      for(Map.Entry<String,CompoundProcedure> sig : sortedSigs.entrySet()) {
-        accumulateMethod(sb,sig.getKey(),sig.getValue());
+      TreeMap<String, CompoundProcedure> sortedSigs = new TreeMap<String, CompoundProcedure>(methodsTypeSignatures);
+      for (Map.Entry<String, CompoundProcedure> sig : sortedSigs.entrySet()) {
+        accumulateMethod(sb, sig.getKey(), sig.getValue());
       }
       sb.append("\n");
       printed = true;
@@ -135,33 +139,36 @@ public class EscmInterface extends MetaObject {
 
   // Print static fields & methods
   private boolean accumulateStaticProperties(boolean printed, StringBuilder sb) {
-    if(props.size() == 0) return false;
-    ConcurrentHashMap<String,Datum> fields = new ConcurrentHashMap<String,Datum>();
-    ConcurrentHashMap<String,CompoundProcedure> methods = new ConcurrentHashMap<String,CompoundProcedure>();
-    for(ConcurrentHashMap.Entry<String,Datum> prop : props.entrySet()) {
+    if (props.size() == 0)
+      return false;
+    ConcurrentHashMap<String, Datum> fields = new ConcurrentHashMap<String, Datum>();
+    ConcurrentHashMap<String, CompoundProcedure> methods = new ConcurrentHashMap<String, CompoundProcedure>();
+    for (ConcurrentHashMap.Entry<String, Datum> prop : props.entrySet()) {
       Datum val = prop.getValue();
-      if(val instanceof CompoundProcedure) {
-        methods.put(prop.getKey(),(CompoundProcedure)val);
+      if (val instanceof CompoundProcedure) {
+        methods.put(prop.getKey(), (CompoundProcedure) val);
       } else {
-        fields.put(prop.getKey(),val);
+        fields.put(prop.getKey(), val);
       }
     }
-    if(fields.size() > 0) {
-      if(printed) sb.append("  ----------------------------------------------------------------------\n");
+    if (fields.size() > 0) {
+      if (printed)
+        sb.append("  ----------------------------------------------------------------------\n");
       sb.append("  Static Fields:");
-      for(ConcurrentHashMap.Entry<String,Datum> field : fields.entrySet()) {
+      for (ConcurrentHashMap.Entry<String, Datum> field : fields.entrySet()) {
         Datum val = field.getValue();
-        sb.append("\n    "+field.getKey()+" [type: <"+val.type()+">, hashcode: "+val.hashCode()+"]\n");
+        sb.append("\n    " + field.getKey() + " [type: <" + val.type() + ">, hashcode: " + val.hashCode() + "]\n");
       }
       sb.append("\n");
       printed = true;
     }
-    if(methods.size() > 0) {
-      if(printed) sb.append("  ----------------------------------------------------------------------\n");
+    if (methods.size() > 0) {
+      if (printed)
+        sb.append("  ----------------------------------------------------------------------\n");
       sb.append("  Static Methods:");
-      TreeMap<String,CompoundProcedure> sortedMethods = new TreeMap<String,CompoundProcedure>(methods);
-      for(Map.Entry<String,CompoundProcedure> method : sortedMethods.entrySet()) {
-        accumulateMethod(sb,method.getKey(),method.getValue());
+      TreeMap<String, CompoundProcedure> sortedMethods = new TreeMap<String, CompoundProcedure>(methods);
+      for (Map.Entry<String, CompoundProcedure> method : sortedMethods.entrySet()) {
+        accumulateMethod(sb, method.getKey(), method.getValue());
       }
       sb.append("\n");
       printed = true;
@@ -176,31 +183,31 @@ public class EscmInterface extends MetaObject {
     // Print user docstring
     boolean printed = accumulateUserDocstring(sb);
     // Print instance properties
-    printed = accumulateRequiredProperties(printed,sb);
+    printed = accumulateRequiredProperties(printed, sb);
     // Print type signatures
-    printed = accumulateTypeSignatures(printed,sb);
+    printed = accumulateTypeSignatures(printed, sb);
     // Print static properties
-    printed = accumulateStaticProperties(printed,sb);
+    printed = accumulateStaticProperties(printed, sb);
     return sb.toString();
   }
 
-
   ////////////////////////////////////////////////////////////////////////////
   // Constructor
-  public EscmInterface(String name, String docstring, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps, ConcurrentHashMap<String,CompoundProcedure> methodsTypeSignatures) throws Exception {
+  public EscmInterface(String name, String docstring, ArrayList<EscmInterface> interfaces,
+      ConcurrentHashMap<String, Datum> props, ArrayList<String> requiredProps,
+      ConcurrentHashMap<String, CompoundProcedure> methodsTypeSignatures) throws Exception {
     this.docstring = DocString.format(docstring);
     this.interfaces = interfaces;
     this.props = props;
     this.requiredProps = requiredProps;
     this.methodsTypeSignatures = methodsTypeSignatures;
-    if(name == null) {
+    if (name == null) {
       this.convertProceduresToMethods();
     } else {
-      this.props.put("name",new Symbol(name));
+      this.props.put("name", new Symbol(name));
       this.convertProceduresToNamedMethods();
     }
   }
-
 
   ////////////////////////////////////////////////////////////////////////////
   // Immediate Method Name Generation
@@ -213,7 +220,6 @@ public class EscmInterface extends MetaObject {
     return sb.toString();
   }
 
-
   ////////////////////////////////////////////////////////////////////////////
   // Instance Property Serialization Operations
   public static interface InstancePropertyIterationProcedure {
@@ -225,69 +231,64 @@ public class EscmInterface extends MetaObject {
   }
 
   public void forEachInstanceProperty(InstancePropertyIterationProcedure ipp) {
-    for(String prop : requiredProps) {
-      if(!ipp.exec(prop)) return;
+    for (String prop : requiredProps) {
+      if (!ipp.exec(prop))
+        return;
     }
   }
-
 
   ////////////////////////////////////////////////////////////////////////////
   // Class Satisfaction Verification
   private void confirmHasProp(EscmClass cls, EscmClass topmostClass, String targetProp) throws Exception {
-    if(cls == null) {
+    if (cls == null) {
       throw new Exceptionf(
-        "Class %s missing required property \"%s\" for interface \"%s\"",
-        topmostClass.readableName(),
-        targetProp,
-        readableName()
-      );
+          "Class %s missing required property \"%s\" for interface \"%s\"",
+          topmostClass.readableName(),
+          targetProp,
+          readableName());
     }
-    if(!cls.hasInstanceProp(targetProp)) {
-      confirmHasProp(cls.getSuper(),topmostClass,targetProp);
+    if (!cls.hasInstanceProp(targetProp)) {
+      confirmHasProp(cls.getSuper(), topmostClass, targetProp);
     }
   }
 
-
-  private void confirmHasMethod(EscmClass cls, EscmClass topmostClass, String methodName, CompoundProcedure method) throws Exception {
-    if(cls == null) {
+  private void confirmHasMethod(EscmClass cls, EscmClass topmostClass, String methodName, CompoundProcedure method)
+      throws Exception {
+    if (cls == null) {
       throw new Exceptionf(
-        "Class %s missing required method \"%s\" %s for interface %s", 
-        topmostClass.readableName(),
-        methodName, 
-        method.signature(),
-        readableName()
-      );
+          "Class %s missing required method \"%s\" %s for interface %s",
+          topmostClass.readableName(),
+          methodName,
+          method.signature(),
+          readableName());
     }
-    if(!cls.hasInstanceMethod(methodName,method)) {
-      confirmHasMethod(cls.getSuper(),topmostClass,methodName,method);
+    if (!cls.hasInstanceMethod(methodName, method)) {
+      confirmHasMethod(cls.getSuper(), topmostClass, methodName, method);
     }
   }
-
 
   private void confirmSatisfiedBy(EscmClass cls, EscmClass topmostClass) throws Exception {
     EscmClass superClass = cls.getSuper();
-    for(String prop : requiredProps) {
-      if(!cls.hasInstanceProp(prop)) {
-        confirmHasProp(superClass,topmostClass,prop);
+    for (String prop : requiredProps) {
+      if (!cls.hasInstanceProp(prop)) {
+        confirmHasProp(superClass, topmostClass, prop);
       }
     }
-    for(ConcurrentHashMap.Entry<String,CompoundProcedure> typeSig : methodsTypeSignatures.entrySet()) {
+    for (ConcurrentHashMap.Entry<String, CompoundProcedure> typeSig : methodsTypeSignatures.entrySet()) {
       String name = typeSig.getKey();
       CompoundProcedure method = typeSig.getValue();
-      if(!cls.hasInstanceMethod(name,method)) {
-        confirmHasMethod(superClass,topmostClass,name,method);
+      if (!cls.hasInstanceMethod(name, method)) {
+        confirmHasMethod(superClass, topmostClass, name, method);
       }
     }
   }
 
-
   public void confirmSatisfiedBy(EscmClass cls) throws Exception {
-    confirmSatisfiedBy(cls,cls);
-    for(EscmInterface superIface : interfaces) {
+    confirmSatisfiedBy(cls, cls);
+    for (EscmInterface superIface : interfaces) {
       superIface.confirmSatisfiedBy(cls);
     }
   }
-
 
   ////////////////////////////////////////////////////////////////////////////
   // Type
@@ -295,24 +296,23 @@ public class EscmInterface extends MetaObject {
     return "interface";
   }
 
-
   ////////////////////////////////////////////////////////////////////////////
   // Equality
   public boolean eq(Object o) {
-    return o instanceof EscmInterface && ((EscmInterface)o).props == this.props;
+    return o instanceof EscmInterface && ((EscmInterface) o).props == this.props;
   }
 
   public boolean equal(Object o) {
     return eq(o);
   }
 
-
   ////////////////////////////////////////////////////////////////////////////
   // Serialization
   public String display() {
     String name = name();
-    if(name.length() == 0) return "#<interface>";
-    return "#<interface " + name  + '>';
+    if (name.length() == 0)
+      return "#<interface>";
+    return "#<interface " + name + '>';
   }
 
   public String write() {
@@ -323,25 +323,24 @@ public class EscmInterface extends MetaObject {
     return write();
   }
 
-
   ////////////////////////////////////////////////////////////////////////////
   // Loading-into-environment semantics for the VM's interpreter
   // We use <ignore> here to distinguish from the <public> ctor
-  private EscmInterface(int ignore, String name, String docstring, ArrayList<EscmInterface> interfaces, ConcurrentHashMap<String,Datum> props, ArrayList<String> requiredProps) {
+  private EscmInterface(int ignore, String name, String docstring, ArrayList<EscmInterface> interfaces,
+      ConcurrentHashMap<String, Datum> props, ArrayList<String> requiredProps) {
     this.docstring = docstring;
     this.interfaces = interfaces;
     this.props = props;
-    this.props.put("name",new Symbol(name));
+    this.props.put("name", new Symbol(name));
     this.requiredProps = requiredProps;
     this.bindMethodsWithName();
   }
 
-
   public EscmInterface loadWithName(String name) {
-    if(name.equals("self") || name.equals("super") || name().length() > 0) return this;
-    return new EscmInterface(0,name,docstring,this.interfaces,this.props,this.requiredProps);
+    if (name.equals("self") || name.equals("super") || name().length() > 0)
+      return this;
+    return new EscmInterface(0, name, docstring, this.interfaces, this.props, this.requiredProps);
   }
-
 
   ////////////////////////////////////////////////////////////////////////////
   // Copying
