@@ -53,7 +53,7 @@ public class SystemPrimitives {
     } else if (timeOfDay >= 16 && timeOfDay < 21) {
       return "\uD83C\uDF03 Have a nice evening!";
     } else {
-      return "\uD83D\uDE34 Good night! Sleep well :)";
+      return "Good night! Sleep well :) \uD83D\uDE34";
     }
   }
 
