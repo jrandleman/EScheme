@@ -8212,7 +8212,7 @@ a list, and that the <curry> returns an integer.
 #### Signatures:
 ```scheme
 (define <symbol> <obj>)
-(define <symbol1> <symbol2> ... <symbolN> <N-length-list-expression>)
+(define <symbol1> <symbol2> ... <symbolN> <N-length-list-or-vector>)
 (define (<function-name> <parameter> ...) <optional-docstring> <body> ...)
 ```
 
@@ -8222,7 +8222,7 @@ Binds <symbol> to <obj> in the current environment. Note that <symbol>
 may be an object property chain too, hence (define obj.prop 42) is valid 
 syntax!
 
-May bind several variables to values in a list. For example:
+May bind several variables to values in a list or vector. For example:
 (define a b (list 1 2)) binds variables <a> to 1 and <b> to 2.
   * Alias <list> with <ls> to quickly create multiple values!
 
@@ -8829,7 +8829,7 @@ For example:
 #### Signatures:
 ```scheme
 (set! <symbol> <obj>)
-(set! <symbol1> <symbol2> ... <symbolN> <N-length-list-expression>)
+(set! <symbol1> <symbol2> ... <symbolN> <N-length-list-or-vector>)
 ```
 
 #### Description:
@@ -8838,7 +8838,7 @@ Assigns <symbol> to <obj>. <symbol> must have been previously
 defined. Note that <symbol> may be an object property chain too,
 hence (set! obj.prop 42) is valid syntax!
 
-May assign several variables to values in a list. For example:
+May assign several variables to values in a list or vector. For example:
 (set! a b (list 1 2)) sets variables <a> to 1 and <b> to 2.
   * Alias <list> with <ls> to quickly create multiple values!
 ```
