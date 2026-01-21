@@ -10817,6 +10817,7 @@ EScheme's primitive types include:
 :real
 :exact
 :inexact
+:bigint
 
 :str
 :char

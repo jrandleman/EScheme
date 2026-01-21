@@ -39,6 +39,11 @@
 (ut ((fn ((:inexact x) #t) ((:any x) #f)) 3/7+5/6i) #f)
 (ut ((fn ((:inexact x) #t) ((:any x) #f)) 3.7+5.6i) #t)
 (ut ((fn ((:inexact x) #t) ((:any x) #f)) "42") #f)
+(ut ((fn ((:bigint x) #t) ((:any x) #f)) 42) #t)
+(ut ((fn ((:bigint x) #t) ((:any x) #f)) 42.0) #f)
+(ut ((fn ((:bigint x) #t) ((:any x) #f)) 3/7+5/6i) #f)
+(ut ((fn ((:bigint x) #t) ((:any x) #f)) 3.7+5.6i) #f)
+(ut ((fn ((:bigint x) #t) ((:any x) #f)) "42") #f)
 
 ; Common Atomics
 (ut ((fn ((:str x) #t) ((:any x) #f)) "42") #t)
