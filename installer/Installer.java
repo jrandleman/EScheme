@@ -201,7 +201,7 @@ public class Installer {
 
   private static ExecuteCommandResult executeCommand(String command, boolean reportLive) throws Exception {
     if (VERBOSE_MODE) {
-      System.out.println("> Executing Command:");
+      System.out.println("> \uD83E\uDD16 Executing Command:");
       System.out.println("  \"" + command + "\"");
     }
     Process pro = Runtime.getRuntime().exec(splitCommand(command));
