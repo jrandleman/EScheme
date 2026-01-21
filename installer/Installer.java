@@ -73,7 +73,8 @@ public class Installer {
           System.exit(0);
         }
         default: {
-          System.err.printf("> [ FATAL ] ESCHEME INSTALLER ERROR: Invalid command-line argument \"%s\"! Use:\n",
+          System.err.printf(
+              "> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Invalid command-line argument \"%s\"! Use:\n",
               args[i]);
           System.err.print(COMMAND_LINE_FLAGS);
           System.exit(1);
@@ -233,14 +234,16 @@ public class Installer {
       }
     } catch (Exception e) {
       System.err.println(
-          "> [ FATAL ] ESCHEME INSTALLER ERROR: Can't clear directory to store generated files: " + generatedFilesDir);
+          "> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Can't clear directory to store generated files: "
+              + generatedFilesDir);
       System.err.println("  error: " + e);
       System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
     if ((new File(generatedFilesDir)).mkdirs() == false) {
       System.err.println(
-          "> [ FATAL ] ESCHEME INSTALLER ERROR: Can't create directory for generated file: " + generatedFilesDir);
+          "> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Can't create directory for generated file: "
+              + generatedFilesDir);
       System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
@@ -266,12 +269,13 @@ public class Installer {
       Files.deleteIfExists(escmPathPath);
       Files.writeString(escmPathPath, escmPath.toString());
     } catch (Exception e) {
-      System.err.println("> [ FATAL ] ESCHEME INSTALLER ERROR: Can't create escm path file: " + e);
+      System.err
+          .println("> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Can't create escm path file: " + e);
       System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
     if (VERBOSE_MODE) {
-      System.out.println("> Successfully generated the path file to our EScheme implementation!");
+      System.out.println("> \u2705 Successfully generated the path file to our EScheme implementation!");
     }
   }
 
@@ -294,12 +298,13 @@ public class Installer {
       Files.deleteIfExists(jvmPathPrefixPath);
       Files.writeString(jvmPathPrefixPath, escmPath.toString());
     } catch (Exception e) {
-      System.err.println("> [ FATAL ] ESCHEME INSTALLER ERROR: Can't create jvm/jre path prefix file: " + e);
+      System.err.println(
+          "> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Can't create jvm/jre path prefix file: " + e);
       System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
     if (VERBOSE_MODE) {
-      System.out.println("> Successfully generated the path prefix file to our JVM/JRE!");
+      System.out.println("> \u2705 Successfully generated the path prefix file to our JVM/JRE!");
     }
   }
 
@@ -321,7 +326,7 @@ public class Installer {
     javaStdLibLoaderCode.append("public class JavaStdLibLoader {\n");
     javaStdLibLoaderCode.append("  public static void load(Environment definitionEnvironment) {\n");
     javaStdLibLoaderCode.append(
-        "    System.err.println(\"ESCHEME JAVA-STDLIB-LOADER ERROR: THE JAVA STDLIB LOADER GENERATOR WAS NEVER EXECUTED (RE-RUN INSTALLER)!\");\n");
+        "    System.err.println(\"\\ud83d\\udea8 ESCHEME JAVA-STDLIB-LOADER ERROR \\ud83d\\udea8: THE JAVA STDLIB LOADER GENERATOR WAS NEVER EXECUTED (RE-RUN INSTALLER)!\");\n");
     javaStdLibLoaderCode.append("    System.exit(1);\n");
     javaStdLibLoaderCode.append("  }\n");
     javaStdLibLoaderCode.append("}\n");
@@ -330,12 +335,14 @@ public class Installer {
       Files.writeString(javaStdLibLoaderPath, javaStdLibLoaderCode.toString());
     } catch (Exception e) {
       System.err
-          .println("> [ FATAL ] ESCHEME INSTALLER ERROR: Can't create the sentinel Java-stdlib-loader file: " + e);
+          .println(
+              "> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Can't create the sentinel Java-stdlib-loader file: "
+                  + e);
       System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
     if (VERBOSE_MODE) {
-      System.out.println("> Successfully generated the sentinel Java-stdlib-loader file!");
+      System.out.println("> \u2705 Successfully generated the sentinel Java-stdlib-loader file!");
     }
   }
 
@@ -402,7 +409,7 @@ public class Installer {
     javaStdlibLoader.append("      outerClass = Class.forName(className);\n");
     javaStdlibLoader.append("    } catch(ClassNotFoundException e) {\n");
     javaStdlibLoader.append(
-        "      System.err.printf(\"ESCHEME JAVA-STDLIB-LOADER-GENERATOR ERROR: Couldn't find class \\\"%s\\\": %s\\n\", className, e);\n");
+        "      System.err.printf(\"\\ud83d\\udea8 ESCHEME JAVA-STDLIB-LOADER-GENERATOR ERROR \\ud83d\\udea8: Couldn't find class \\\"%s\\\": %s\\n\", className, e);\n");
     javaStdlibLoader.append("      return new StringBuilder();\n");
     javaStdlibLoader.append("    }\n");
     javaStdlibLoader.append("    // Get the inner Classes of the outer Class\n");
@@ -411,7 +418,7 @@ public class Installer {
     javaStdlibLoader.append("      innerClasses = outerClass.getDeclaredClasses();\n");
     javaStdlibLoader.append("    } catch(SecurityException e) {\n");
     javaStdlibLoader.append(
-        "      System.err.printf(\"ESCHEME JAVA-STDLIB-LOADER-GENERATOR ERROR: Security exception finding inner classes for class \\\"%s\\\": %s\\n\", className, e);\n");
+        "      System.err.printf(\"\\ud83d\\udea8 ESCHEME JAVA-STDLIB-LOADER-GENERATOR ERROR \\ud83d\\udea8: Security exception finding inner classes for class \\\"%s\\\": %s\\n\", className, e);\n");
     javaStdlibLoader.append("      return new StringBuilder();\n");
     javaStdlibLoader.append("    }\n");
     javaStdlibLoader
@@ -487,10 +494,10 @@ public class Installer {
     javaStdlibLoader.append("    try {\n");
     javaStdlibLoader.append("      if(Files.deleteIfExists(javaStdLibLoaderPath) == false)\n");
     javaStdlibLoader.append(
-        "        throw new Exceptionf(\"ESCHEME JAVA-STDLIB-LOADER-GENERATOR ERROR: Couldn't delete existing sentinel loader file: \\\"%s\\\"\", javaStdLibLoaderPath);\n");
+        "        throw new Exceptionf(\"\\ud83d\\udea8 ESCHEME JAVA-STDLIB-LOADER-GENERATOR ERROR \\ud83d\\udea8: Couldn't delete existing sentinel loader file: \\\"%s\\\"\", javaStdLibLoaderPath);\n");
     javaStdlibLoader.append("    } catch (Exception e) {\n");
     javaStdlibLoader.append(
-        "      throw new Exceptionf(\"ESCHEME JAVA-STDLIB-LOADER-GENERATOR ERROR: Couldn't delete existing sentinel loader file: \\\"%s\\\"\", javaStdLibLoaderPath);\n");
+        "      throw new Exceptionf(\"\\ud83d\\udea8 ESCHEME JAVA-STDLIB-LOADER-GENERATOR ERROR \\ud83d\\udea8: Couldn't delete existing sentinel loader file: \\\"%s\\\"\", javaStdLibLoaderPath);\n");
     javaStdlibLoader.append("    }\n");
     javaStdlibLoader.append("  }\n");
     javaStdlibLoader.append("\n");
@@ -501,7 +508,7 @@ public class Installer {
     javaStdlibLoader.append("      Files.writeString(javaStdLibLoaderPath,contents);\n");
     javaStdlibLoader.append("    } catch (Exception e) {\n");
     javaStdlibLoader.append(
-        "      throw new Exceptionf(\"ESCHEME JAVA-STDLIB-LOADER-GENERATOR ERROR: Couldn't write new contents to loader file: \\\"%s\\\"\", javaStdLibLoaderPath);\n");
+        "      throw new Exceptionf(\"\\ud83d\\udea8 ESCHEME JAVA-STDLIB-LOADER-GENERATOR ERROR \\ud83d\\udea8: Couldn't write new contents to loader file: \\\"%s\\\"\", javaStdLibLoaderPath);\n");
     javaStdlibLoader.append("    }\n");
     javaStdlibLoader.append("  }\n");
     javaStdlibLoader.append("\n");
@@ -523,12 +530,14 @@ public class Installer {
       Files.deleteIfExists(stdlibLoaderPath);
       Files.writeString(stdlibLoaderPath, contents);
     } catch (Exception e) {
-      System.err.println("> [ FATAL ] ESCHEME INSTALLER ERROR: Can't create Java-stdlib-loader-generator file: " + e);
+      System.err.println(
+          "> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Can't create Java-stdlib-loader-generator file: "
+              + e);
       System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
     }
     if (VERBOSE_MODE) {
-      System.out.println("> Successfully generated the Java-stdlib-loader-generator file!");
+      System.out.println("> \u2705 Successfully generated the Java-stdlib-loader-generator file!");
     }
   }
 
@@ -552,7 +561,9 @@ public class Installer {
     try {
       recursivelyDeleteDirectory(Path.of(binPath));
     } catch (Exception e) {
-      System.err.println("> [ FATAL ] ESCHEME INSTALLER ERROR: Can't clear directory to store bin files: " + binPath);
+      System.err.println(
+          "> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Can't clear directory to store bin files: "
+              + binPath);
       System.err.println("  error: " + e);
       System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
@@ -567,7 +578,8 @@ public class Installer {
     try {
       ExecuteCommandResult res = executeCommand(compileCmd, false);
       if (res.exit != 0) {
-        System.err.println("> [ FATAL ] ESCHEME INSTALLER ERROR: Can't compile: " + escmDir + File.separator + "src"
+        System.err.println("> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Can't compile: " + escmDir
+            + File.separator + "src"
             + File.separator + "Main.java");
         System.err.println("  exit: " + String.valueOf(res.exit));
         System.err.println("  error: " + res.err);
@@ -578,7 +590,8 @@ public class Installer {
             res.err.replaceAll("\n", "\n  "));
       }
     } catch (Exception e) {
-      System.err.println("> [ FATAL ] ESCHEME INSTALLER ERROR: Can't compile: " + escmDir + File.separator + "src"
+      System.err.println("> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Can't compile: " + escmDir
+          + File.separator + "src"
           + File.separator + "Main.java");
       System.err.println("  error: " + e);
       System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
@@ -595,7 +608,8 @@ public class Installer {
       ExecuteCommandResult res = executeCommand(unitTestCmd, true);
       if (res.exit != 0) {
         System.err
-            .println("> [ FATAL ] ESCHEME INSTALLER ERROR: Error Executing EScheme's Java-stdlib-loader-generator!");
+            .println(
+                "> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Error Executing EScheme's Java-stdlib-loader-generator!");
         System.err.println("  exit: " + String.valueOf(res.exit));
         System.err.println("  error: " + res.err);
         System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
@@ -606,7 +620,8 @@ public class Installer {
       }
     } catch (Exception e) {
       System.err
-          .println("> [ FATAL ] ESCHEME INSTALLER ERROR: Error Executing EScheme's Java-stdlib-loader-generator!");
+          .println(
+              "> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Error Executing EScheme's Java-stdlib-loader-generator!");
       System.err.println("  error: " + e);
       System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
@@ -621,7 +636,8 @@ public class Installer {
     try {
       ExecuteCommandResult res = executeCommand(unitTestCmd, true);
       if (res.exit != 0) {
-        System.err.println("> [ FATAL ] ESCHEME INSTALLER ERROR: Error Executing EScheme Unit Tests!");
+        System.err.println(
+            "> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Error Executing EScheme Unit Tests!");
         System.err.println("  exit: " + String.valueOf(res.exit));
         System.err.println("  error: " + res.err);
         System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
@@ -631,7 +647,8 @@ public class Installer {
             res.err.replaceAll("\n", "\n  "));
       }
     } catch (Exception e) {
-      System.err.println("> [ FATAL ] ESCHEME INSTALLER ERROR: Error Executing EScheme Unit Tests!");
+      System.err.println(
+          "> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Error Executing EScheme Unit Tests!");
       System.err.println("  error: " + e);
       System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
@@ -667,7 +684,8 @@ public class Installer {
         return homePath + "bin" + File.separator;
       }
     } catch (Exception e) {
-      System.err.println("> [ FATAL ] ESCHEME INSTALLER ERROR: Error Getting \"java.home\" System Property!");
+      System.err.println(
+          "> [ FATAL ] \ud83d\udea8 ESCHEME INSTALLER ERROR \ud83d\udea8: Error Getting \"java.home\" System Property!");
       System.err.println("  error: " + e);
       System.err.println("> TERMINATING THE ESCHEME INSTALLER. RESOLVE AND RETRY.");
       System.exit(1);
@@ -688,6 +706,6 @@ public class Installer {
     if (EXECUTE_UNIT_TESTS == true)
       executeUnitTests(escmDir);
     printEscmShellAliasString(escmDir);
-    System.out.println("> Successfully installed EScheme! Happy Hacking :)");
+    System.out.println("> \u2705 Successfully installed EScheme! Happy Hacking :)");
   }
 }

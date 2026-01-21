@@ -40,11 +40,12 @@ public class TopLevelError {
   public static void report(Throwable t) {
     resetCurrentPorts();
     if (t instanceof Exception) {
-      System.err.printf("\nESCHEME ERROR: %s\n", t.getMessage());
+      System.err.printf("\n\ud83d\udea8 ESCHEME ERROR \ud83d\udea8: %s\n", t.getMessage());
     } else if (t instanceof StackOverflowError) {
-      System.err.println("\nESCHEME: JAVA STACK-OVERFLOW ERROR: Did you try printing/equating cyclical data?");
+      System.err.println(
+          "\n\ud83d\udea8 ESCHEME: JAVA STACK-OVERFLOW ERROR \ud83d\udea8: Did you try printing/equating cyclical data?");
     } else {
-      System.err.printf("\nESCHEME: JAVA ERROR: %s\n", t.getMessage());
+      System.err.printf("\n\ud83d\udea8 ESCHEME: JAVA ERROR \ud83d\udea8: %s\n", t.getMessage());
     }
     EscmCallStack.print();
     System.err.printf(">> Java Throwable: %s\n", t.getClass().getName());
