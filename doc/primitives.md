@@ -10424,8 +10424,8 @@ lists via the object system!). Note that vectors and hashmaps are mutable
 too.
 
 In addition to Java threads, EScheme also supports JavaScript's `Promise`
-concurrency paradigm. For synchronization, EScheme exposes Java reentrant
-locks via `mutex`, and supports Clojure's `dosync` macro!
+and `Timeout` concurrency paradigms. For synchronization, EScheme exposes
+Java reentrant locks via `mutex`, and supports Clojure's `dosync` macro!
 
 ---
 
@@ -10433,6 +10433,7 @@ locks via `mutex`, and supports Clojure's `dosync` macro!
 
 - Spawn threads via the `thread` procedure.
 - Create promises via the `promise` procedure.
+- Create timeouts via the `timeout` procedure.
 - Get a reentrant lock via the `mutex` procedure.
 - Check out the `help` function's `Procedures > Concurrency` section for more!
 
