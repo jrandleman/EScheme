@@ -9,6 +9,7 @@
     * [Mutexes](#Mutexes)
     * [Promises](#Promises)
     * [Threads](#Threads)
+    * [Timeouts](#Timeouts)
   * [Date-Time](#Date-Time)
   * [Equality](#Equality)
   * [Files](#Files)
@@ -2175,6 +2176,118 @@ Hints that the runtime may temporarily pause this thread if needed.
 ##### Description:
 ```
 Returns whether <obj> is a thread.
+```
+
+-------------------------------------------------------------------------------
+### Timeouts
+
+
+-------------------------------------------------------------------------------
+#### `clear-timeout!`
+
+##### Signatures:
+```scheme
+(clear-timeout! <timeout-thread>)
+```
+
+##### Description:
+```
+Cancels <timeout-thread> from the <timeout> function. <timeout-thread>
+will no longer execute <code> after <delay-ms>. Ruturns whether succeeded.
+
+Note that this will not cancel <timeout-thread> if it's in the middle of 
+executing <code>, only if it's still waiting for <delay-ms> to elapse.
+
+For more <timeout> support, see:
+  * <timeout> to create a timed asynchronous function call
+  * <timeout?> to determine if a thread came from <timeout>
+  * <timeout-done?> to determine if <timeout-thread> terminated
+  * <timeout-waiting?> to determine if <timeout-thread> is still waiting
+```
+
+-------------------------------------------------------------------------------
+#### `timeout`
+
+##### Signatures:
+```scheme
+(timeout <int-delay-ms> <code-callable>)
+(timeout <int-delay-ms> <code-callable> <code-params> ...)
+```
+
+##### Description:
+```
+Calls the <code> function after <delay-ms>. Applies any other arguments
+given to <code> after <delay-ms> expires.
+
+Returns the <timeout-thread>, which may be passed to <clear-timeout!>
+to stop the timeout from executing <code>. Note that, as a daemon, the 
+<timeout-thread> will automatically exit once the main thread terminates.
+
+For more <timeout> support, see:
+  * <timeout?> to determine if a thread came from <timeout>
+  * <timeout-done?> to determine if <timeout-thread> terminated
+  * <timeout-waiting?> to determine if <timeout-thread> is still waiting
+  * <clear-timeout!> to cancel <timeout-thread> mid-delay
+```
+
+-------------------------------------------------------------------------------
+#### `timeout-done?`
+
+##### Signatures:
+```scheme
+(timeout-done? <timeout-thread>)
+```
+
+##### Description:
+```
+Returns whether <timeout-thread> has completed, either by being canceled,
+or by <delay-ms> elapsing and <code> having been executed.
+
+For more <timeout> support, see:
+  * <timeout> to create a timed asynchronous function call
+  * <timeout?> to determine if a thread came from <timeout>
+  * <timeout-waiting?> to determine if <timeout-thread> is still waiting
+  * <clear-timeout!> to cancel <timeout-thread> mid-delay
+```
+
+-------------------------------------------------------------------------------
+#### `timeout-waiting?`
+
+##### Signatures:
+```scheme
+(timeout-waiting? <timeout-thread>)
+```
+
+##### Description:
+```
+Returns whether <timeout-thread> is still waiting during <delay-ms>. 
+Indicates that <code> has not been executed yet and that the timeout can
+still be cancelled.
+
+For more <timeout> support, see:
+  * <timeout> to create a timed asynchronous function call
+  * <timeout?> to determine if a thread came from <timeout>
+  * <timeout-done?> to determine if <timeout-thread> terminated
+  * <clear-timeout!> to cancel <timeout-thread> mid-delay
+```
+
+-------------------------------------------------------------------------------
+#### `timeout?`
+
+##### Signatures:
+```scheme
+(timeout? <timeout-thread>)
+```
+
+##### Description:
+```
+Returns whether <timeout-thread> came from <timeout>.
+
+For more <timeout> support, see:
+  * <timeout> to create a timed asynchronous function call
+  * <timeout-done?> to determine if <timeout-thread> terminated
+  * <timeout-waiting?> to determine if <timeout-thread> is still waiting
+  * <clear-timeout!> to cancel <timeout-thread> mid-delay
 ```
 
 -------------------------------------------------------------------------------

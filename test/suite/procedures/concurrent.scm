@@ -284,3 +284,25 @@
 
 (ut (promise? (promise-1)) #t)
 (ut (promise? #t) #f)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TIMEOUTS
+(ut (timeout? (timeout 500 (lambda () #void))) #t)
+(ut (timeout? (thread (lambda () #void))) #f)
+(ut (timeout? 42) #f)
+
+(def timeout-obj (timeout 5000 (lambda () #void)))
+(ut (timeout-done? timeout-obj) #f)
+(ut (timeout-waiting? timeout-obj) #t)
+(sleep 7000)
+(ut (timeout-done? timeout-obj) #t)
+(ut (timeout-waiting? timeout-obj) #f)
+
+(def timeout-obj (timeout 5000 (lambda () #void)))
+(ut (timeout-done? timeout-obj) #f)
+(ut (timeout-waiting? timeout-obj) #t)
+(ut (clear-timeout! timeout-obj) #t)
+(sleep 2000) ; give time for the cleared timeout's thread to exit 
+(ut (timeout-done? timeout-obj) #t)
+(ut (timeout-waiting? timeout-obj) #f)

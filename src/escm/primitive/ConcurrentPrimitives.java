@@ -5,6 +5,8 @@
 package escm.primitive;
 
 import java.util.ArrayList;
+
+import escm.primitive.FunctionalPrimitives.IsCallable;
 import escm.type.Datum;
 import escm.type.Symbol;
 import escm.type.bool.Boolean;
@@ -1411,6 +1413,217 @@ public class ConcurrentPrimitives {
           return resolve.callWith(winArgs, ignored);
         }
       });
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // timeout
+  //
+  // (define :thread (timeout :int delay-ms :fn code . code-params)
+  // (define timeout-thread
+  // (thread
+  // "timeout-thread"
+  // #(unless (sleep delay-ms) (apply code code-params))))
+  // (thread-set-daemon! timeout-thread #t)
+  // (thread-start! timeout-thread)
+  // timeout-thread)
+  public static class Timeout extends Primitive {
+    public java.lang.String escmName() {
+      return "timeout";
+    }
+
+    public Datum signature() {
+      return Pair.List(
+          Pair.List(new Symbol("timeout"), new Symbol("<int-delay-ms>"), new Symbol("<code-callable>")),
+          Pair.List(new Symbol("timeout"), new Symbol("<int-delay-ms>"), new Symbol("<code-callable>"),
+              new Symbol("<code-params>"), Signature.VARIADIC));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Concurrency:Timeouts\nCalls the <code> function after <delay-ms>. Applies any other arguments\ngiven to <code> after <delay-ms> expires.\n\nReturns the <timeout-thread>, which may be passed to <clear-timeout!>\nto stop the timeout from executing <code>. Note that, as a daemon, the \n<timeout-thread> will automatically exit once the main thread terminates.\n\nFor more <timeout> support, see:\n  * <timeout?> to determine if a thread came from <timeout>\n  * <timeout-done?> to determine if <timeout-thread> terminated\n  * <timeout-waiting?> to determine if <timeout-thread> is still waiting\n  * <clear-timeout!> to cancel <timeout-thread> mid-delay";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      int n = parameters.size();
+      if (n < 2) {
+        throw new Exceptionf(
+            "'(timeout <int-delay-ms> <code-callable> . <code-params>) invalid args: %s",
+            Exceptionf.profileArgs(parameters));
+      }
+      Datum delayDatum = parameters.get(0);
+      if (!(delayDatum instanceof Real) || !((Real) delayDatum).isInteger()) {
+        throw new Exceptionf(
+            "'(timeout <int-delay-ms> <code-callable> . <code-params>) 1st arg %s isn't an integer: %s",
+            delayDatum.profile(), Exceptionf.profileArgs(parameters));
+      }
+      Datum codeDatum = parameters.get(1);
+      if (!IsCallable.logic(codeDatum)) {
+        throw new Exceptionf(
+            "'(timeout <int-delay-ms> <code-callable> . <code-params>) 2nd arg %s isn't a callable: %s",
+            codeDatum.profile(), Exceptionf.profileArgs(parameters));
+      }
+      int timeoutDelay = ((Real) delayDatum).intValue();
+      Callable callable = (Callable) codeDatum;
+      escm.type.concurrent.Thread timeoutThread = new escm.type.concurrent.Thread(
+          "timeout-thread",
+          new Callable() {
+            public String docstring() {
+              return "Internal timeout thread.";
+            }
+
+            public Datum signature() {
+              return Pair.List(new Symbol("timeout-thread-thunk"));
+            }
+
+            public Trampoline.Bounce callWith(ArrayList<Datum> ignoredParameters,
+                Trampoline.Continuation continuation) throws Exception {
+              if (escm.type.concurrent.Thread.sleep(timeoutDelay) == false) {
+                return callable.callWith(new ArrayList<Datum>(parameters.subList(2, n)), continuation);
+              } else {
+                return continuation.run(Void.VALUE);
+              }
+            }
+          });
+      timeoutThread.setDaemon(true);
+      timeoutThread.start();
+      return timeoutThread;
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // timeout?
+  //
+  // (define :bool (timeout? :thread timeout-thread)
+  // (eq? (thread-name timeout-thread) "timeout-thread"))
+  public static class IsTimeoutP extends Primitive {
+    public java.lang.String escmName() {
+      return "timeout?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("timeout?"), new Symbol("<timeout-thread>"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Concurrency:Timeouts\nReturns whether <timeout-thread> came from <timeout>.\n\nFor more <timeout> support, see:\n  * <timeout> to create a timed asynchronous function call\n  * <timeout-done?> to determine if <timeout-thread> terminated\n  * <timeout-waiting?> to determine if <timeout-thread> is still waiting\n  * <clear-timeout!> to cancel <timeout-thread> mid-delay";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if (parameters.size() != 1) {
+        throw new Exceptionf(
+            "'(timeout? <timeout-thread>) invalid args: %s",
+            Exceptionf.profileArgs(parameters));
+      }
+      Datum timeoutThread = parameters.get(0);
+      if (!(timeoutThread instanceof escm.type.concurrent.Thread)) {
+        return Boolean.FALSE;
+      }
+      return Boolean.valueOf(((escm.type.concurrent.Thread) timeoutThread).getName().equals("timeout-thread"));
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // timeout-done?
+  //
+  // (define :bool (timeout-done? :thread timeout-thread)
+  // (eq? (thread-status timeout-thread) 'finished))
+  public static class IsTimeoutDoneP extends Primitive {
+    public java.lang.String escmName() {
+      return "timeout-done?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("timeout-done?"), new Symbol("<timeout-thread>"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Concurrency:Timeouts\nReturns whether <timeout-thread> has completed, either by being canceled,\nor by <delay-ms> elapsing and <code> having been executed.\n\nFor more <timeout> support, see:\n  * <timeout> to create a timed asynchronous function call\n  * <timeout?> to determine if a thread came from <timeout>\n  * <timeout-waiting?> to determine if <timeout-thread> is still waiting\n  * <clear-timeout!> to cancel <timeout-thread> mid-delay";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if (parameters.size() != 1) {
+        throw new Exceptionf(
+            "'(timeout-done? <timeout-thread>) invalid args: %s",
+            Exceptionf.profileArgs(parameters));
+      }
+      Datum timeoutThread = parameters.get(0);
+      if (!(timeoutThread instanceof escm.type.concurrent.Thread)) {
+        throw new Exceptionf(
+            "'(timeout-done? <timeout-thread>) %s isn't a thread: %s",
+            timeoutThread.profile(),
+            Exceptionf.profileArgs(parameters));
+      }
+      return Boolean.valueOf(((escm.type.concurrent.Thread) timeoutThread).getStatus().equals("finished"));
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // timeout-waiting?
+  //
+  // (define :bool (timeout-waiting? :thread timeout-thread)
+  // (eq? (thread-status timeout-thread) 'timed-waiting))
+  public static class IsTimeoutWaitingP extends Primitive {
+    public java.lang.String escmName() {
+      return "timeout-waiting?";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("timeout-waiting?"), new Symbol("<timeout-thread>"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Concurrency:Timeouts\nReturns whether <timeout-thread> is still waiting during <delay-ms>. \nIndicates that <code> has not been executed yet and that the timeout can\nstill be cancelled.\n\nFor more <timeout> support, see:\n  * <timeout> to create a timed asynchronous function call\n  * <timeout?> to determine if a thread came from <timeout>\n  * <timeout-done?> to determine if <timeout-thread> terminated\n  * <clear-timeout!> to cancel <timeout-thread> mid-delay";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if (parameters.size() != 1) {
+        throw new Exceptionf(
+            "'(timeout-waiting? <timeout-thread>) invalid args: %s",
+            Exceptionf.profileArgs(parameters));
+      }
+      Datum timeoutThread = parameters.get(0);
+      if (!(timeoutThread instanceof escm.type.concurrent.Thread)) {
+        throw new Exceptionf(
+            "'(timeout-waiting? <timeout-thread>) %s isn't a thread: %s",
+            timeoutThread.profile(),
+            Exceptionf.profileArgs(parameters));
+      }
+      return Boolean.valueOf(((escm.type.concurrent.Thread) timeoutThread).getStatus().equals("timed-waiting"));
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // clear-timeout!
+  //
+  // (define :bool (clear-timeout! :thread timeout-thread)
+  // (thread-interrupt! timeout-thread))
+  public static class ClearTimeoutBang extends Primitive {
+    public java.lang.String escmName() {
+      return "clear-timeout!";
+    }
+
+    public Datum signature() {
+      return Pair.List(new Symbol("clear-timeout!"), new Symbol("<timeout-thread>"));
+    }
+
+    public String docstring() {
+      return "@help:Procedures:Concurrency:Timeouts\nCancels <timeout-thread> from the <timeout> function. <timeout-thread>\nwill no longer execute <code> after <delay-ms>. Ruturns whether succeeded.\n\nNote that this will not cancel <timeout-thread> if it's in the middle of \nexecuting <code>, only if it's still waiting for <delay-ms> to elapse.\n\nFor more <timeout> support, see:\n  * <timeout> to create a timed asynchronous function call\n  * <timeout?> to determine if a thread came from <timeout>\n  * <timeout-done?> to determine if <timeout-thread> terminated\n  * <timeout-waiting?> to determine if <timeout-thread> is still waiting";
+    }
+
+    public Datum callWith(ArrayList<Datum> parameters) throws Exception {
+      if (parameters.size() != 1) {
+        throw new Exceptionf(
+            "'(timeout-waiting? <timeout-thread>) invalid args: %s",
+            Exceptionf.profileArgs(parameters));
+      }
+      Datum timeoutThread = parameters.get(0);
+      if (!(timeoutThread instanceof escm.type.concurrent.Thread)) {
+        throw new Exceptionf(
+            "'(timeout-waiting? <timeout-thread>) %s isn't a thread: %s",
+            timeoutThread.profile(),
+            Exceptionf.profileArgs(parameters));
+      }
+      return Boolean.valueOf(((escm.type.concurrent.Thread) timeoutThread).interrupt());
     }
   }
 }
