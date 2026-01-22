@@ -34,6 +34,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TESTS
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; THREADS
 (define t1 (thread (lambda () (hashmap-set! hm (gensym) 42))))
 (define t2 (thread "t2" (lambda () (hashmap-set! hm (gensym) 314))))
@@ -110,6 +111,7 @@
 (ut (list? (thread-dynamic-environment (current-thread))) #t)
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MUTEXES
 (ut (define m1 (mutex)) #void)
 (ut (define m2 (mutex "m2")) #void)
@@ -140,7 +142,7 @@
 ;   is non-deterministic. Hence we design an algorithm that has a very low 
 ;   chance for #f positives, and no chance for #f negatives. Then, we use
 ;   "amplification" (a quick thank you to my graduate algorithms course!)
-;   in order to even further reduce the liklihood of error.
+;   in order to even further reduce the likelihood of error.
 (define *amplification-count* 10)
 
 (define *buffer* "")
@@ -265,6 +267,9 @@
 (ut (mutex-hold-count m1) 0)
 (ut (mutex-held? m1) #f)
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; PROMISES
 (def add1 #(+ 1 %1))
 (def add2 #(+ 2 %1))
 (ut (await (promise (lambda (resolve reject) 1)) add1 add2) 2)
