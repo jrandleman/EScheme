@@ -41,7 +41,7 @@
   (define start (epoch-time))
   (test-all-files (path #path "suite"))
   (define end (epoch-time))
-  (define result-emoji (if (zero? total-errors) "\u2705" "\ud83d\udea8"))
+  (define result-emoji (if (zero? total-errors) "\ud83d\udc4d" "\ud83d\udc4e"))
   (verbose-displayf ">>> Total Files: %n; Total Errors: %n; Success Rate: %.2n%%; Total Time: %.2ns %s\n" 
     total-files 
     total-errors 

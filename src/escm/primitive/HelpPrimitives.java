@@ -204,7 +204,7 @@ public class HelpPrimitives {
     private static synchronized void launchInteractiveMenu(Environment env) throws Exception {
       FolderNode home = HelpNode.createHomeDirectory(env);
       System.out.println("\n===============================================================================");
-      System.out.println("Welcome to EScheme's help menu! \ud83d\udcda");
+      System.out.println("Welcome to EScheme's help menu! \ud83d\udcda \ud83e\udd9c");
       System.out.println("");
       System.out.println("Type :quit to quit, :help for a list of commands, .. to go to the parent");
       System.out.println("directory, . for the current directory, or any of the options below for");
