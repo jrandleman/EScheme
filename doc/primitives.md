@@ -466,7 +466,7 @@ Java 16bit unicode literals may be used by prefixing up to 4 hex digits with "\u
 
 EScheme also extends Java unicode literals with syntax for 32bit unicode values.
 Prefixing up to 8 hex digits with "\U" compiles to 2 seperate "\u" instances.
-  => For example, both "\U1f608" and "\ud83d\ude08" create the same string, but the
+  => For example, both "\U1f99c" and "\ud83e\udd9c" create the same string, but the
      former is easier to write out after referencing the "U+" code from the internet.
 
 Strings are also applicable to an index to get a character: (<string> <index>)
@@ -6370,7 +6370,7 @@ Java 16bit unicode literals may be used by prefixing up to 4 hex digits with "\u
 
 EScheme also extends Java unicode literals with syntax for 32bit unicode values.
 Prefixing up to 8 hex digits with "\U" compiles to 2 seperate "\u" instances.
-  => For example, both "\U1f608" and "\ud83d\ude08" create the same string, but the
+  => For example, both "\U1f99c" and "\ud83e\udd9c" create the same string, but the
      former is easier to write out after referencing the "U+" code from the internet.
 ```
 
