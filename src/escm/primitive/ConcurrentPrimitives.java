@@ -1440,7 +1440,7 @@ public class ConcurrentPrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Concurrency:Timeouts\nCalls the <code> function after <delay-ms>. Applies any other arguments\ngiven to <code> after <delay-ms> expires.\n\nReturns the <timeout-thread>, which may be passed to <clear-timeout!>\nto stop the timeout from executing <code>. Note that, as a daemon, the \n<timeout-thread> will automatically exit once the main thread terminates.\n\nFor more <timeout> support, see:\n  * <timeout?> to determine if a thread came from <timeout>\n  * <timeout-done?> to determine if <timeout-thread> terminated\n  * <timeout-waiting?> to determine if <timeout-thread> is still waiting\n  * <clear-timeout!> to cancel <timeout-thread> mid-delay";
+      return "@help:Procedures:Concurrency:Timeouts\nCalls the <code> callable after <delay-ms>. Applies any other arguments\ngiven to <code> after <delay-ms> expires.\n\nReturns the <timeout-thread>, which may be passed to <clear-timeout!>\nto stop the timeout from executing <code>. Note that, as a daemon, the \n<timeout-thread> will automatically exit once the main thread terminates.\n\nFor more <timeout> support, see:\n  * <timeout?> to determine if a thread came from <timeout>\n  * <timeout-done?> to determine if <timeout-thread> terminated\n  * <timeout-waiting?> to determine if <timeout-thread> is still waiting\n  * <clear-timeout!> to cancel <timeout-thread> mid-delay";
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {

@@ -663,7 +663,7 @@ public class FilePrimitives {
     }
 
     public String docstring() {
-      return "@help:Procedures:Files\nCreate a path by combining \"<string> ...\" with <*file-separator*> between each\ncomponent. Yields an absolute path. Passing no arguments is equivalent to\n(current-directory).";
+      return "@help:Procedures:Files\nCreate a path by combining \"<string> ...\" with <*file-separator*> between each\ncomponent. Yields an absolute path. Passing no arguments is equivalent to\n(current-directory). Aliased by </>.";
     }
 
     private static boolean hasTerminalSeparator(String s) {
@@ -682,9 +682,18 @@ public class FilePrimitives {
       return s;
     }
 
-    public static String logic(String[] pathStrings) throws Exception {
-      if (pathStrings.length == 0)
+    public static String logic(ArrayList<Datum> parameters) throws Exception {
+      int totalArgs = parameters.size();
+      if (totalArgs == 0)
         return CurrentDirectory.logic();
+      String[] pathStrings = new String[totalArgs];
+      for (int i = 0; i < totalArgs; ++i) {
+        Datum arg = parameters.get(i);
+        if (!(arg instanceof escm.type.String))
+          throw new Exceptionf("'(path <string> ...) arg %s isn't a string: %s", arg.profile(),
+              Exceptionf.profileArgs(parameters));
+        pathStrings[i] = ((escm.type.String) arg).value();
+      }
       String path = pathStrings[0];
       if (!hasTerminalSeparator(path))
         path += File.separator;
@@ -700,16 +709,7 @@ public class FilePrimitives {
     }
 
     public Datum callWith(ArrayList<Datum> parameters) throws Exception {
-      int totalArgs = parameters.size();
-      String[] args = new String[totalArgs];
-      for (int i = 0; i < totalArgs; ++i) {
-        Datum arg = parameters.get(i);
-        if (!(arg instanceof escm.type.String))
-          throw new Exceptionf("'(path <string> ...) arg %s isn't a string: %s", arg.profile(),
-              Exceptionf.profileArgs(parameters));
-        args[i] = ((escm.type.String) arg).value();
-      }
-      return new escm.type.String(logic(args));
+      return new escm.type.String(logic(parameters));
     }
   }
 

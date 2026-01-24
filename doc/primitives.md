@@ -2216,7 +2216,7 @@ For more <timeout> support, see:
 
 ##### Description:
 ```
-Calls the <code> function after <delay-ms>. Applies any other arguments
+Calls the <code> callable after <delay-ms>. Applies any other arguments
 given to <code> after <delay-ms> expires.
 
 Returns the <timeout-thread>, which may be passed to <clear-timeout!>
@@ -2816,7 +2816,7 @@ Returns whether succeeded.
 ```
 Create a path by combining "<string> ..." with <*file-separator*> between each
 component. Yields an absolute path. Passing no arguments is equivalent to
-(current-directory).
+(current-directory). Aliased by </>.
 ```
 
 -------------------------------------------------------------------------------
@@ -4193,12 +4193,15 @@ If given one <number>, returns its negative value.
 ```scheme
 (/ <number>)
 (/ <number> <number> ...)
+(/)
+(/ <string> <string> ...)
 ```
 
 #### Description:
 ```
 Returns the division of "<number> <number> ...".
 If given one <number>, returns its inverse value.
+If given no arguments or only strings, aliases <path>.
 ```
 
 -------------------------------------------------------------------------------

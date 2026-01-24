@@ -292,17 +292,19 @@
 (ut (timeout? (thread (lambda () #void))) #f)
 (ut (timeout? 42) #f)
 
-(def timeout-obj (timeout 5000 (lambda () #void)))
+(def timeout-obj (timeout 10000 (lambda () #void)))
+(sleep 1000) ; give the timeout thread time to start
 (ut (timeout-done? timeout-obj) #f)
 (ut (timeout-waiting? timeout-obj) #t)
-(sleep 7000)
+(sleep 15000)
 (ut (timeout-done? timeout-obj) #t)
 (ut (timeout-waiting? timeout-obj) #f)
 
-(def timeout-obj (timeout 5000 (lambda () #void)))
+(def timeout-obj (timeout 10000 (lambda () #void)))
+(sleep 1000) ; give the timeout thread time to start
 (ut (timeout-done? timeout-obj) #f)
 (ut (timeout-waiting? timeout-obj) #t)
 (ut (clear-timeout! timeout-obj) #t)
-(sleep 2000) ; give time for the cleared timeout's thread to exit 
+(sleep 3000) ; give time for the `clear-timeout!`'s thread to exit 
 (ut (timeout-done? timeout-obj) #t)
 (ut (timeout-waiting? timeout-obj) #f)
