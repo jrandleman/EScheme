@@ -47,11 +47,11 @@ public class SystemPrimitives {
   public static String getExitMessage() {
     int timeOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
     if (timeOfDay >= 4 && timeOfDay < 12) {
-      return "\uD83C\uDF05 Have a great day!";
+      return "\u2600\ufe0f  Have a great day!";
     } else if (timeOfDay >= 12 && timeOfDay < 16) {
       return "\uD83C\uDF40 Enjoy your afternoon!";
     } else if (timeOfDay >= 16 && timeOfDay < 21) {
-      return "\uD83C\uDF03 Have a nice evening!";
+      return "\uD83C\uDF19 Have a nice evening!";
     } else {
       return "Good night! Sleep well :) \uD83D\uDE34";
     }
