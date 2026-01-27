@@ -148,7 +148,9 @@ Ends file/REPL evaluation early if read in as a single expression.
 Also see the <hashmap> procedure.
 A hashmap containing key-value associations of "<key> <value> ...".
 Create hashmap literals via the {<key> <value> ...} syntax.
+
 Hashmaps are applicable to a key to get their entry: (<hashmap> <key>)
+  * Set values by adding a 3rd argument: (<hashmap> <key> <value>)
 ```
 
 -------------------------------------------------------------------------------
@@ -524,7 +526,9 @@ for more details on how to create and use type aliases.
 Also see the <vector> procedure.
 A vector containing "<obj> ...".
 Create vector literals via the [<item> ...] syntax.
+
 Vectors are applicable to an index to get an entry: (<vector> <index>)
+  * Set values by adding a 3rd argument: (<vector> <index> <value>)
 ```
 
 -------------------------------------------------------------------------------
@@ -3026,7 +3030,9 @@ could be useful to expose to users.
 ```
 Construct a hashmap containing key-value associations of "<key> <value> ...".
 Create hashmap literals via the {<key> <value> ...} syntax.
+
 Hashmaps are applicable to a key to get their entry: (<hashmap> <key>)
+  * Set values by adding a 3rd argument: (<hashmap> <key> <value>)
 ```
 
 -------------------------------------------------------------------------------
@@ -7671,7 +7677,9 @@ Construct a vector of <length> instances of <fill-value>.
 ```
 Construct a vector containing "<obj> ...".
 Create vector literals via the [<item> ...] syntax.
+
 Vectors are applicable to an index to get an entry: (<vector> <index>)
+  * Set values by adding a 3rd argument: (<vector> <index> <value>)
 ```
 
 -------------------------------------------------------------------------------

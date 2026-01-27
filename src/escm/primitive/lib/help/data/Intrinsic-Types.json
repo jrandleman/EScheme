@@ -61,11 +61,11 @@
   },
   {
     "name": "vector",
-    "description": "Also see the <vector> procedure.\nA vector containing \"<obj> ...\".\nCreate vector literals via the [<item> ...] syntax.\nVectors are applicable to an index to get an entry: (<vector> <index>)"
+    "description": "Also see the <vector> procedure.\nA vector containing \"<obj> ...\".\nCreate vector literals via the [<item> ...] syntax.\n\nVectors are applicable to an index to get an entry: (<vector> <index>)\n  * Set values by adding a 3rd argument: (<vector> <index> <value>)"
   },
   {
     "name": "hashmap",
-    "description": "Also see the <hashmap> procedure.\nA hashmap containing key-value associations of \"<key> <value> ...\".\nCreate hashmap literals via the {<key> <value> ...} syntax.\nHashmaps are applicable to a key to get their entry: (<hashmap> <key>)"
+    "description": "Also see the <hashmap> procedure.\nA hashmap containing key-value associations of \"<key> <value> ...\".\nCreate hashmap literals via the {<key> <value> ...} syntax.\n\nHashmaps are applicable to a key to get their entry: (<hashmap> <key>)\n  * Set values by adding a 3rd argument: (<hashmap> <key> <value>)"
   },
   {
     "name": "stream",
