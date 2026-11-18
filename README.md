@@ -2,8 +2,6 @@
 
 # Eerina's Scheme 🦜
 
----
-
 ## Installing and Running EScheme:
 
 ### Dependencies:
@@ -179,3 +177,9 @@ Note that [primitives.md](https://github.com/jrandleman/EScheme/blob/main/doc/pr
 is already rife with many wonderful alternatives. Hence, its documentation is only
 intended to be searched by those who already know what they are looking for, with
 EScheme's most unique features being referenced from traditional Scheme entries.
+
+---
+
+## Disclaimer:
+
+This is a personal project. The views, code, and opinions expressed here are my own and do not represent those of my current or past employers.
